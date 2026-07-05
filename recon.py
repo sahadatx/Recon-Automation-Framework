@@ -1,10 +1,10 @@
 from core.banner import show_banner
-from core.logger import (
-    info,
-    success,
-    warning,
-    error,
-    debug,
+from core.logger import info
+from core.utils import (
+    create_directory,
+    read_file,
+    write_file,
+    validate_domain,
 )
 
 
@@ -12,15 +12,28 @@ def main():
 
     show_banner()
 
-    info("Initializing framework...")
+    create_directory("output")
 
-    success("Logger loaded successfully.")
+    domains = [
+        "example.com",
+        "google.com",
+    ]
 
-    warning("This is a sample warning.")
+    write_file(
+        "output/domains.txt",
+        domains
+    )
 
-    error("This is a sample error.")
+    data = read_file(
+        "output/domains.txt"
+    )
 
-    debug("Debug mode enabled.")
+    info(f"Domains: {data}")
+
+    info(
+        f"example.com valid: "
+        f"{validate_domain('example.com')}"
+    )
 
 
 if __name__ == "__main__":
