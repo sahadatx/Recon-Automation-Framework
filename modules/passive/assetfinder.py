@@ -1,15 +1,15 @@
 """
-Subfinder Module
+Assetfinder Module
 
-Passive subdomain enumeration using ProjectDiscovery Subfinder.
+Passive subdomain enumeration using Assetfinder.
 """
 
 from modules.passive.helpers import execute_source
 
 
-def run_subfinder(domain: str) -> list[str]:
+def run_assetfinder(domain: str) -> list[str]:
     """
-    Run Subfinder.
+    Run Assetfinder.
 
     Args:
         domain: Target domain.
@@ -19,13 +19,12 @@ def run_subfinder(domain: str) -> list[str]:
     """
 
     command = [
-        "subfinder",
-        "-silent",
-        "-d",
+        "assetfinder",
+        "--subs-only",
         domain,
     ]
 
     return execute_source(
-        name="Subfinder",
+        name="Assetfinder",
         command=command,
     )

@@ -1,7 +1,22 @@
+"""
+Subfinder Module
+
+Passive subdomain enumeration using ProjectDiscovery Subfinder.
+"""
+
 from modules.passive.helpers import execute_source
 
 
-def run_subfinder(domain):
+def run_subfinder(domain: str) -> list[str]:
+    """
+    Run Subfinder.
+
+    Args:
+        domain: Target domain.
+
+    Returns:
+        List of discovered subdomains.
+    """
 
     command = [
         "subfinder",
@@ -11,6 +26,6 @@ def run_subfinder(domain):
     ]
 
     return execute_source(
-        "Subfinder",
-        command
+        name="Subfinder",
+        command=command,
     )
