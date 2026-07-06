@@ -22,3 +22,9 @@ USER_AGENT = "ReconAutomationFramework/2.0"
 
 PDCP_API_KEY = os.getenv("PDCP_API_KEY", "")
 SECURITYTRAILS_API_KEY = os.getenv("SECURITYTRAILS_API_KEY", "")
+
+# ==========================================================
+# DNS Configuration
+# ==========================================================
+
+DNS_TIMEOUT = 5
