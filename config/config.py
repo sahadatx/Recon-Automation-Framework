@@ -28,3 +28,10 @@ SECURITYTRAILS_API_KEY = os.getenv("SECURITYTRAILS_API_KEY", "")
 # ==========================================================
 
 DNS_TIMEOUT = 5
+DNS_LIFETIME = 8
+DNS_RETRY = 1
+
+DNS_SERVERS = [
+    "1.1.1.1",
+    "1.0.0.1",
+]

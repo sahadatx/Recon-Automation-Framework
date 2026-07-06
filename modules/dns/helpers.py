@@ -8,7 +8,10 @@ Resolution module.
 import dns.exception
 import dns.resolver
 
-from config.config import DNS_TIMEOUT
+from config.config import (
+    DNS_TIMEOUT,
+    DNS_SERVERS,
+)
 
 from core.logger import (
     info,
@@ -27,6 +30,9 @@ def create_resolver():
 
     resolver = dns.resolver.Resolver()
 
+    # Use configured public DNS servers
+    resolver.nameservers = DNS_SERVERS
+
     resolver.timeout = DNS_TIMEOUT
     resolver.lifetime = DNS_TIMEOUT
 
@@ -40,12 +46,16 @@ def create_resolver():
 def resolve_record(
     domain: str,
     record_type: str,
-):
+) -> list[str]:
     """
     Resolve a DNS record.
 
+    Args:
+        domain: Target domain or subdomain.
+        record_type: DNS record type.
+
     Returns:
-        list[str]
+        List of resolved records.
     """
 
     resolver = create_resolver()
@@ -55,7 +65,11 @@ def resolve_record(
         answers = resolver.resolve(
             domain,
             record_type,
+            raise_on_no_answer=False,
         )
+
+        if answers.rrset is None:
+            return []
 
         return sorted(
             {
@@ -64,34 +78,28 @@ def resolve_record(
             }
         )
 
-    except dns.resolver.NoAnswer:
-
-        warning(
-            f"No {record_type} record found for {domain}"
-        )
-
     except dns.resolver.NXDOMAIN:
 
         warning(
-            f"{domain} does not exist"
+            f"{domain} does not exist."
         )
 
     except dns.resolver.NoNameservers:
 
         warning(
-            f"No nameservers available for {domain}"
+            f"No nameservers available for {domain}."
         )
 
     except dns.exception.Timeout:
 
         warning(
-            f"{record_type} lookup timed out for {domain}"
+            f"{record_type} lookup timed out for {domain}."
         )
 
     except Exception as error:
 
         warning(
-            f"{record_type} lookup failed: {error}"
+            f"{record_type} lookup failed for {domain}: {error}"
         )
 
     return []
