@@ -59,6 +59,7 @@ def section(title: str) -> None:
     """
 
     console.print()
+
     console.print(
         Rule(
             title,
@@ -73,6 +74,7 @@ def subsection(title: str) -> None:
     """
 
     console.print()
+
     console.print(
         Rule(
             title,
@@ -86,7 +88,9 @@ def divider() -> None:
     Display a separator line.
     """
 
-    console.rule(style="grey50")
+    console.rule(
+        style="grey50"
+    )
 
 
 # ==========================================================
@@ -106,5 +110,78 @@ def progress(
         f"[bold cyan]"
         f"[{current}/{total}]"
         f"[/bold cyan] "
+        f"{message}"
+    )
+
+
+# ==========================================================
+# Progress Bar
+# ==========================================================
+
+def progress_bar(
+    current: int,
+    total: int,
+    width: int = 30,
+) -> str:
+    """
+    Return a textual progress bar.
+
+    Example:
+    ████████████░░░░░░░░░░ 45%
+    """
+
+    if total <= 0:
+
+        return ""
+
+    ratio = current / total
+
+    filled = int(
+        width * ratio
+    )
+
+    empty = width - filled
+
+    bar = (
+        "█" * filled
+        + "░" * empty
+    )
+
+    percent = ratio * 100
+
+    return (
+        f"{bar} "
+        f"{percent:.0f}%"
+    )
+
+
+# ==========================================================
+# Progress Line
+# ==========================================================
+
+def progress_status(
+    current: int,
+    total: int,
+    message: str,
+) -> None:
+    """
+    Display progress with a progress bar.
+
+    Example:
+
+    [123/207] ███████████░░░░░░░ 59%
+    ✓ api.example.com (200 HTTPS)
+    """
+
+    bar = progress_bar(
+        current,
+        total,
+    )
+
+    console.print(
+        f"[bold cyan]"
+        f"[{current}/{total}]"
+        f"[/bold cyan] "
+        f"{bar} "
         f"{message}"
     )

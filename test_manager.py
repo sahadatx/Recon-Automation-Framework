@@ -1,26 +1,32 @@
-from modules.dns.manager import (
-    resolve_subdomains,
-    save_dns_results,
-    export_dns_json,
-    show_summary,
+from pprint import pprint
+
+from modules.http.manager import (
+    probe_hosts,
 )
 
-targets = [
+hosts = [
     "google.com",
     "github.com",
     "openai.com",
+    "example.invalid",
 ]
 
-results, failed, elapsed = resolve_subdomains(
-    targets
+results, failed, elapsed = probe_hosts(
+    hosts
 )
 
-save_dns_results(results)
+print()
 
-export_dns_json(results)
+print("Alive")
 
-show_summary(
-    results,
-    failed,
-    elapsed,
-)
+pprint(results)
+
+print()
+
+print("Failed")
+
+pprint(failed)
+
+print()
+
+print(elapsed)

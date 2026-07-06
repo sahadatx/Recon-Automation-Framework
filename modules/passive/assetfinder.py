@@ -27,4 +27,5 @@ def run_assetfinder(domain: str) -> list[str]:
     return execute_source(
         name="Assetfinder",
         command=command,
+        domain=domain,
     )

@@ -28,4 +28,5 @@ def run_findomain(domain: str) -> list[str]:
     return execute_source(
         name="Findomain",
         command=command,
+        domain=domain,
     )

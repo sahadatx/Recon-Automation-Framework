@@ -10,6 +10,8 @@ import dns.resolver
 
 from config.config import (
     DNS_TIMEOUT,
+    DNS_LIFETIME,
+    DNS_RETRY,
     DNS_SERVERS,
 )
 
@@ -25,16 +27,33 @@ from core.logger import (
 
 def create_resolver():
     """
-    Create a configured DNS resolver.
+    Create and configure a DNS resolver.
+
+    Returns:
+        dns.resolver.Resolver
     """
 
     resolver = dns.resolver.Resolver()
 
-    # Use configured public DNS servers
+    # ------------------------------------------
+    # Enable DNS Cache
+    # ------------------------------------------
+
+    resolver.cache = dns.resolver.Cache()
+
+    # ------------------------------------------
+    # Public DNS Servers
+    # ------------------------------------------
+
     resolver.nameservers = DNS_SERVERS
 
+    # ------------------------------------------
+    # Timeout Configuration
+    # ------------------------------------------
+
     resolver.timeout = DNS_TIMEOUT
-    resolver.lifetime = DNS_TIMEOUT
+
+    resolver.lifetime = DNS_LIFETIME
 
     return resolver
 
@@ -46,61 +65,87 @@ def create_resolver():
 def resolve_record(
     domain: str,
     record_type: str,
-) -> list[str]:
+):
     """
     Resolve a DNS record.
 
     Args:
-        domain: Target domain or subdomain.
+        domain: Target domain/subdomain.
         record_type: DNS record type.
 
     Returns:
-        List of resolved records.
+        list[str]
     """
 
     resolver = create_resolver()
 
-    try:
+    # ------------------------------------------
+    # Retry Loop
+    # ------------------------------------------
 
-        answers = resolver.resolve(
-            domain,
-            record_type,
-            raise_on_no_answer=False,
-        )
+    for attempt in range(DNS_RETRY + 1):
 
-        if answers.rrset is None:
+        try:
+
+            answers = resolver.resolve(
+                domain,
+                record_type,
+                raise_on_no_answer=False,
+            )
+
+            if answers.rrset is None:
+
+                return []
+
+            return sorted(
+                {
+                    answer.to_text().strip()
+                    for answer in answers
+                }
+            )
+
+        except dns.exception.Timeout:
+
+            if attempt < DNS_RETRY:
+
+                warning(
+                    f"{record_type} lookup timeout "
+                    f"({attempt + 1}/{DNS_RETRY + 1}) "
+                    f"for {domain}. Retrying..."
+                )
+
+                continue
+
+            warning(
+                f"{record_type} lookup timed out for {domain}"
+            )
+
             return []
 
-        return sorted(
-            {
-                answer.to_text().strip()
-                for answer in answers
-            }
-        )
+        except dns.resolver.NXDOMAIN:
 
-    except dns.resolver.NXDOMAIN:
+            warning(
+                f"{domain} does not exist."
+            )
 
-        warning(
-            f"{domain} does not exist."
-        )
+            return []
 
-    except dns.resolver.NoNameservers:
+        except dns.resolver.NoNameservers:
 
-        warning(
-            f"No nameservers available for {domain}."
-        )
+            warning(
+                f"No nameservers available for {domain}."
+            )
 
-    except dns.exception.Timeout:
+            return []
 
-        warning(
-            f"{record_type} lookup timed out for {domain}."
-        )
+        except Exception as error:
 
-    except Exception as error:
+            warning(
+                f"{record_type} lookup failed for "
+                f"{domain}: {error}"
+            )
 
-        warning(
-            f"{record_type} lookup failed for {domain}: {error}"
-        )
+            return []
 
     return []
 

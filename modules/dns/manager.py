@@ -19,8 +19,8 @@ from core.logger import (
     info,
     warning,
     success,
-    progress,
     section,
+    progress_status,
 )
 
 from modules.dns.records import (
@@ -131,7 +131,7 @@ def resolve_subdomains(
                     subdomain
                 )
 
-            progress(
+            progress_status(
                 completed,
                 total,
                 f"✓ {subdomain} resolved"

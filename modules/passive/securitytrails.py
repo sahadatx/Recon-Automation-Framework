@@ -86,7 +86,8 @@ def run_securitytrails(
         )
 
     subdomains = normalize_subdomains(
-        subdomains
+        subdomains,
+        domain,
     )
 
     if subdomains:

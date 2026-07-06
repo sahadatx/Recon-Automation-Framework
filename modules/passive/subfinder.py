@@ -28,4 +28,5 @@ def run_subfinder(domain: str) -> list[str]:
     return execute_source(
         name="Subfinder",
         command=command,
+        domain=domain,
     )

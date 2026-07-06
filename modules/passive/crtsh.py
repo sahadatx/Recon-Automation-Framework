@@ -86,7 +86,8 @@ def run_crtsh(domain: str) -> list[str]:
         )
 
     subdomains = normalize_subdomains(
-        subdomains
+        subdomains,
+        domain,
     )
 
     if subdomains:

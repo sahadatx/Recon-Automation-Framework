@@ -27,4 +27,5 @@ def run_subranger(domain: str) -> list[str]:
     return execute_source(
         name="Subranger",
         command=command,
+        domain=domain,
     )

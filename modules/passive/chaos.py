@@ -24,5 +24,6 @@ def run_chaos(domain: str) -> list[str]:
     return execute_source(
         name="Chaos",
         command=command,
+        domain=domain,
         env=env,
     )
