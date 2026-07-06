@@ -55,3 +55,29 @@ USER_AGENT = (
 # ==========================================================
 
 VERBOSE = False
+
+# ==========================================================
+# Port Scanner
+# ==========================================================
+
+PORT_SCAN_TIMEOUT = 1
+
+PORT_SCAN_RETRY = 1
+
+# Parallel Hosts
+PORT_HOST_WORKERS = 30
+
+# Parallel Ports
+PORT_SCAN_WORKERS = 100
+
+# Banner Grabbing
+ENABLE_BANNER_GRAB = False
+
+# Default TCP ports to scan
+DEFAULT_PORTS = "common"
+
+# ==========================================================
+# Debug
+# ==========================================================
+
+DEBUG = False

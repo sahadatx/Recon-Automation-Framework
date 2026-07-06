@@ -53,6 +53,23 @@ from modules.http.exporter import (
 
 
 # ==========================================================
+# Port Scanner
+# ==========================================================
+
+from modules.ports.manager import (
+    scan_hosts,
+)
+
+from modules.ports.exporter import (
+    save_open_ports,
+    save_port_results,
+    export_port_json,
+    export_open_ports_csv,
+    show_summary as show_port_summary,
+)
+
+
+# ==========================================================
 # Main
 # ==========================================================
 
@@ -142,13 +159,13 @@ def main() -> None:
 
     # Probe only DNS-resolved hosts
 
-    hosts = list(
+    http_hosts = list(
         dns_results.keys()
     )
 
     http_results, http_failed, http_time = (
         probe_hosts(
-            hosts
+            http_hosts
         )
     )
 
@@ -168,6 +185,44 @@ def main() -> None:
         http_results,
         http_failed,
         http_time,
+    )
+
+    # ------------------------------------------------------
+    # Port Scanner
+    # ------------------------------------------------------
+
+    # Scan only alive HTTP hosts
+
+    port_hosts = list(
+        http_results.keys()
+    )
+
+    port_results, port_failed, port_time = (
+        scan_hosts(
+            port_hosts
+        )
+    )
+
+    save_open_ports(
+        port_results
+    )
+
+    save_port_results(
+        port_results
+    )
+
+    export_port_json(
+        port_results
+    )
+
+    export_open_ports_csv(
+        port_results
+    )
+
+    show_port_summary(
+        port_results,
+        port_failed,
+        port_time,
     )
 
 
