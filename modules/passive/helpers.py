@@ -8,21 +8,32 @@ import subprocess
 import time
 from functools import wraps
 
+from core.logger import (
+    info,
+    success,
+    warning,
+    error,
+)
 
 # ==========================================================
 # Run External Command
 # ==========================================================
 
-def run_command(command, timeout=60):
+def run_command(
+    command: list[str],
+    timeout: int = 60,
+    env: dict | None = None,
+) -> list[str]:
     """
-    Execute a shell command and return its output.
+    Execute an external command.
 
     Args:
-        command (list): Command to execute.
-        timeout (int): Timeout in seconds.
+        command: Command to execute.
+        timeout: Timeout in seconds.
+        env: Optional environment variables.
 
     Returns:
-        list[str]
+        List of command output lines.
     """
 
     try:
@@ -32,7 +43,8 @@ def run_command(command, timeout=60):
             capture_output=True,
             text=True,
             timeout=timeout,
-            check=True
+            check=True,
+            env=env,
         )
 
         return [
@@ -43,30 +55,37 @@ def run_command(command, timeout=60):
 
     except FileNotFoundError:
 
-        return []
+        error(f"{command[0]} is not installed.")
 
     except subprocess.TimeoutExpired:
 
-        return []
+        error(f"{command[0]} timed out.")
 
-    except subprocess.CalledProcessError:
+    except subprocess.CalledProcessError as e:
 
-        return []
+        error(f"{command[0]} failed.")
+
+        if e.stderr:
+            error(e.stderr.strip())
+
+    return []
 
 
 # ==========================================================
 # Normalize Subdomains
 # ==========================================================
 
-def normalize_subdomains(subdomains):
+def normalize_subdomains(
+    subdomains: list[str],
+) -> list[str]:
     """
     Normalize discovered subdomains.
 
-    - lowercase
-    - remove whitespace
-    - remove wildcard
-    - remove duplicates
-    - sort alphabetically
+    - Strip whitespace
+    - Convert to lowercase
+    - Remove wildcard (*.)
+    - Remove duplicates
+    - Sort alphabetically
     """
 
     cleaned = set()
@@ -90,30 +109,32 @@ def normalize_subdomains(subdomains):
 # Execute Enumeration Source
 # ==========================================================
 
-def execute_source(name, command, timeout=60):
+def execute_source(
+    name: str,
+    command: list[str],
+    timeout: int = 60,
+    env: dict | None = None,
+) -> list[str]:
     """
-    Execute a passive enumeration tool.
+    Execute a passive enumeration source.
 
     Args:
-        name (str): Tool name.
-        command (list): Command.
+        name: Tool name.
+        command: Command to execute.
+        timeout: Command timeout.
+        env: Optional environment variables.
 
     Returns:
-        list[str]
+        Normalized subdomain list.
     """
-
-    from core.logger import (
-        info,
-        success,
-        warning,
-    )
 
     info(f"Running {name}...")
 
     results = normalize_subdomains(
         run_command(
-            command,
-            timeout=timeout
+            command=command,
+            timeout=timeout,
+            env=env,
         )
     )
 
@@ -136,19 +157,17 @@ def execute_source(name, command, timeout=60):
 # Retry Decorator
 # ==========================================================
 
-def retry_request(max_attempts=3, delay=2):
+def retry_request(
+    max_attempts: int = 3,
+    delay: int = 2,
+):
     """
-    Retry decorator.
-
-    Args:
-        max_attempts (int)
-        delay (int)
+    Retry decorator for network requests.
     """
 
     def decorator(function):
 
         @wraps(function)
-
         def wrapper(*args, **kwargs):
 
             for attempt in range(max_attempts):
@@ -164,6 +183,10 @@ def retry_request(max_attempts=3, delay=2):
 
                     if attempt == max_attempts - 1:
                         raise
+
+                    warning(
+                        f"Retry {attempt + 1}/{max_attempts}"
+                    )
 
                     time.sleep(delay)
 

@@ -1,22 +1,63 @@
+#!/usr/bin/env python3
+
+"""
+Recon Automation Framework
+
+Main Entry Point
+"""
+
+import argparse
+
 from core.banner import show_banner
-from modules.passive.crtsh import run_crtsh
+
+from modules.passive.manager import (
+    collect_subdomains,
+    merge_results,
+    save_results,
+    export_results,
+    show_summary,
+)
 
 
-def main():
+def main() -> None:
+    """
+    Main function.
+    """
+
+    parser = argparse.ArgumentParser(
+        prog="recon",
+        description="Recon Automation Framework",
+    )
+
+    parser.add_argument(
+        "-d",
+        "--domain",
+        required=True,
+        metavar="DOMAIN",
+        help="Target domain (e.g. example.com)",
+    )
+
+    args = parser.parse_args()
 
     show_banner()
 
-    results = run_crtsh("example.com")
+    results, timings, failed, total_time = collect_subdomains(
+        args.domain
+    )
 
-    print()
+    unique = merge_results(results)
 
-    for subdomain in results:
+    save_results(unique)
 
-        print(subdomain)
+    export_results(results)
 
-    print()
-
-    print(f"Total: {len(results)}")
+    show_summary(
+        results,
+        timings,
+        failed,
+        unique,
+        total_time,
+    )
 
 
 if __name__ == "__main__":
