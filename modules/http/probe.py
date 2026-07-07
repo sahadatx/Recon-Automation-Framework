@@ -30,9 +30,9 @@ def probe_http(
     Probe HTTP (port 80).
     """
 
-    url = f"http://{host}"
-
-    return probe_url(url)
+    return probe_url(
+        f"http://{host}"
+    )
 
 
 # ==========================================================
@@ -46,9 +46,9 @@ def probe_https(
     Probe HTTPS (port 443).
     """
 
-    url = f"https://{host}"
-
-    return probe_url(url)
+    return probe_url(
+        f"https://{host}"
+    )
 
 
 # ==========================================================
@@ -60,11 +60,16 @@ def probe_url(
 ):
     """
     Probe a single URL.
+
+    Returns:
+        dict | None
     """
 
     session = create_session()
 
-    show_probe(url)
+    show_probe(
+        url
+    )
 
     start = time.perf_counter()
 
@@ -83,6 +88,10 @@ def probe_url(
 
         return {
 
+            # --------------------------------------------------
+            # General
+            # --------------------------------------------------
+
             "alive": True,
 
             "url": response.url,
@@ -92,6 +101,16 @@ def probe_url(
             )[0],
 
             "status": response.status_code,
+
+            "response_time": elapsed,
+
+            "redirect": bool(
+                response.history
+            ),
+
+            # --------------------------------------------------
+            # Common Headers
+            # --------------------------------------------------
 
             "server": response.headers.get(
                 "Server",
@@ -108,11 +127,15 @@ def probe_url(
                 "0",
             ),
 
-            "response_time": elapsed,
+            # --------------------------------------------------
+            # Technology Detection
+            # --------------------------------------------------
 
-            "redirect": (
-                response.history != []
+            "headers": dict(
+                response.headers
             ),
+
+            "html": response.text,
 
         }
 
@@ -135,13 +158,17 @@ def probe_host(
     try HTTP.
     """
 
-    result = probe_https(host)
+    result = probe_https(
+        host
+    )
 
     if result:
 
         return result
 
-    result = probe_http(host)
+    result = probe_http(
+        host
+    )
 
     if result:
 

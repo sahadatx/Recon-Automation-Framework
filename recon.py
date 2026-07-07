@@ -70,6 +70,23 @@ from modules.ports.exporter import (
 
 
 # ==========================================================
+# Technology Detection
+# ==========================================================
+
+from modules.tech.manager import (
+    detect_hosts,
+)
+
+from modules.tech.exporter import (
+    save_technologies,
+    save_technology_results,
+    export_technology_json,
+    export_technology_csv,
+    show_summary as show_technology_summary,
+)
+
+
+# ==========================================================
 # Main
 # ==========================================================
 
@@ -157,8 +174,6 @@ def main() -> None:
     # HTTP Probe
     # ------------------------------------------------------
 
-    # Probe only DNS-resolved hosts
-
     http_hosts = list(
         dns_results.keys()
     )
@@ -191,8 +206,6 @@ def main() -> None:
     # Port Scanner
     # ------------------------------------------------------
 
-    # Scan only alive HTTP hosts
-
     port_hosts = list(
         http_results.keys()
     )
@@ -223,6 +236,38 @@ def main() -> None:
         port_results,
         port_failed,
         port_time,
+    )
+
+    # ------------------------------------------------------
+    # Technology Detection
+    # ------------------------------------------------------
+
+    technology_results, technology_failed, technology_time = (
+        detect_hosts(
+            http_results
+        )
+    )
+
+    save_technologies(
+        technology_results
+    )
+
+    save_technology_results(
+        technology_results
+    )
+
+    export_technology_json(
+        technology_results
+    )
+
+    export_technology_csv(
+        technology_results
+    )
+
+    show_technology_summary(
+        technology_results,
+        technology_failed,
+        technology_time,
     )
 
 
