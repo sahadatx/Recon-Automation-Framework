@@ -81,3 +81,22 @@ DEFAULT_PORTS = "common"
 # ==========================================================
 
 DEBUG = False
+
+# ==========================================================
+# Screenshot
+# ==========================================================
+
+SCREENSHOT_TIMEOUT = 60000
+
+SCREENSHOT_WIDTH = 1440
+
+SCREENSHOT_HEIGHT = 900
+
+SCREENSHOT_FULL_PAGE = True
+
+SCREENSHOT_WORKERS = 5
+
+SCREENSHOT_OUTPUT = "output/screenshots"
+
+HEADLESS_BROWSER = True
+

@@ -87,6 +87,21 @@ from modules.tech.exporter import (
 
 
 # ==========================================================
+# Screenshot Capture
+# ==========================================================
+
+from modules.screenshot.manager import (
+    capture_hosts,
+)
+
+from modules.screenshot.exporter import (
+    save_screenshot_results,
+    export_screenshot_json,
+    show_summary as show_screenshot_summary,
+)
+
+
+# ==========================================================
 # Main
 # ==========================================================
 
@@ -268,6 +283,30 @@ def main() -> None:
         technology_results,
         technology_failed,
         technology_time,
+    )
+
+    # ------------------------------------------------------
+    # Screenshot Capture
+    # ------------------------------------------------------
+
+    screenshot_results, screenshot_failed, screenshot_time = (
+        capture_hosts(
+            http_results
+        )
+    )
+
+    save_screenshot_results(
+        screenshot_results
+    )
+
+    export_screenshot_json(
+        screenshot_results
+    )
+
+    show_screenshot_summary(
+        screenshot_results,
+        screenshot_failed,
+        screenshot_time,
     )
 
 
