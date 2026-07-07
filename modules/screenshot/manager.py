@@ -1,14 +1,11 @@
 """
 Screenshot Manager
 
-Coordinates parallel screenshot capture.
+Production Async Screenshot Manager.
 """
 
+import asyncio
 import time
-from concurrent.futures import (
-    ThreadPoolExecutor,
-    as_completed,
-)
 
 from config.config import (
     SCREENSHOT_WORKERS,
@@ -22,8 +19,11 @@ from core.logger import (
 )
 
 from modules.screenshot.helpers import (
-    create_browser,
+    start_playwright,
+    launch_browser,
     create_context,
+    close_context,
+    cleanup,
 )
 
 from modules.screenshot.capture import (
@@ -35,44 +35,62 @@ from modules.screenshot.capture import (
 # Capture One Host
 # ==========================================================
 
-def capture_one(
-    context,
+async def capture_one(
+    semaphore,
+    browser,
     host: str,
     response: dict,
 ):
     """
-    Capture screenshot for one host.
+    Capture one host.
 
-    Returns:
-        tuple[str, dict]
+    Each task gets its own
+    BrowserContext.
     """
 
-    metadata = capture_host(
-        context,
-        response,
-    )
+    async with semaphore:
 
-    return (
-        host,
-        metadata,
-    )
+        context = await create_context(
+            browser
+        )
+
+        try:
+
+            metadata = await capture_host(
+                context,
+                response,
+            )
+
+            return (
+
+                host,
+
+                metadata,
+
+            )
+
+        finally:
+
+            await close_context(
+                context
+            )
 
 
 # ==========================================================
-# Capture All Hosts
+# Capture Hosts
 # ==========================================================
 
-def capture_hosts(
+async def capture_hosts(
     http_results: dict,
 ):
     """
-    Capture screenshots for all alive hosts.
+    Capture screenshots.
 
     Returns:
         (
             results,
             failed,
-            elapsed
+            elapsed,
         )
     """
 
@@ -80,11 +98,15 @@ def capture_hosts(
         "Starting Screenshot Capture..."
     )
 
+    start_time = time.perf_counter()
+
+    semaphore = asyncio.Semaphore(
+        SCREENSHOT_WORKERS
+    )
+
     results = {}
 
     failed = []
-
-    retry_queue = []
 
     completed = 0
 
@@ -92,167 +114,123 @@ def capture_hosts(
         http_results
     )
 
-    start_time = time.perf_counter()
+    playwright = await start_playwright()
 
-    # ------------------------------------------------------
-    # Launch Browser Once
-    # ------------------------------------------------------
-
-    playwright, browser = (
-        create_browser()
-    )
-
-    context = create_context(
-        browser
+    browser = await launch_browser(
+        playwright
     )
 
     try:
 
-        with ThreadPoolExecutor(
-            max_workers=SCREENSHOT_WORKERS,
-        ) as executor:
+        tasks = [
 
-            futures = {
+            capture_one(
 
-                executor.submit(
-                    capture_one,
-                    context,
-                    host,
-                    response,
-                ): host
+                semaphore,
 
-                for host, response
-                in http_results.items()
+                browser,
 
-            }
+                host,
 
-            for future in as_completed(
-                futures
-            ):
+                response,
 
-                host = futures[
-                    future
-                ]
+            )
 
-                completed += 1
+            for host, response
 
-                try:
+            in http_results.items()
 
-                    hostname, metadata = (
-                        future.result()
+        ]
+
+        for task in asyncio.as_completed(
+            tasks
+        ):
+
+            completed += 1
+
+            try:
+
+                host, metadata = await task
+
+                if metadata.get(
+                    "captured",
+                    False,
+                ):
+
+                    results[
+                        host
+                    ] = metadata
+
+                    progress_status(
+
+                        completed,
+
+                        total,
+
+                        f"✓ {host}",
+
                     )
 
-                    if metadata.get(
-                        "captured",
-                        False,
-                    ):
-
-                        results[
-                            hostname
-                        ] = metadata
-
-                        progress_status(
-                            completed,
-                            total,
-                            f"✓ {hostname}",
-                        )
-
-                    else:
-
-                        failed.append(
-                            hostname
-                        )
-
-                        retry_queue.append(
-                            hostname
-                        )
-
-                        progress_status(
-                            completed,
-                            total,
-                            f"✗ {hostname}",
-                        )
-
-                except Exception as error:
-
-                    warning(
-                        f"{host}: {error}"
-                    )
+                else:
 
                     failed.append(
                         host
                     )
 
-                    retry_queue.append(
-                        host
+                    progress_status(
+
+                        completed,
+
+                        total,
+
+                        f"✗ {host}",
+
                     )
 
-                    progress_status(
-                        completed,
-                        total,
-                        f"✗ {host}",
-                    )
+            except Exception as error:
+
+                warning(
+                    str(error)
+                )
 
     finally:
 
-        # --------------------------------------------------
-        # Cleanup
-        # --------------------------------------------------
+        await cleanup(
 
-        try:
+            playwright,
 
-            context.close()
+            browser,
 
-        except Exception:
-
-            pass
-
-        try:
-
-            browser.close()
-
-        except Exception:
-
-            pass
-
-        try:
-
-            playwright.stop()
-
-        except Exception:
-
-            pass
-
-    # ------------------------------------------------------
-    # Retry Queue (Future)
-    # ------------------------------------------------------
-
-    if retry_queue:
-
-        info(
-            f"Retry Queue: "
-            f"{len(retry_queue)} host(s)"
         )
 
-        # Future:
-        # Retry failed screenshots.
-
     elapsed = round(
+
         time.perf_counter()
+
         - start_time,
+
         2,
+
     )
 
     success(
-        f"Screenshots Captured : {len(results)}"
+        f"Screenshots : {len(results)}"
     )
 
     success(
-        f"Failed Captures : {len(failed)}"
+        f"Failed : {len(failed)}"
+    )
+
+    success(
+        f"Elapsed : {elapsed:.2f} sec"
     )
 
     return (
+
         results,
+
         failed,
+
         elapsed,
+
     )

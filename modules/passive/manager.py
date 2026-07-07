@@ -4,6 +4,7 @@ Passive Enumeration Manager
 Coordinates all passive enumeration sources.
 """
 
+import re
 import time
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -21,7 +22,6 @@ from modules.passive.assetfinder import run_assetfinder
 from modules.passive.crtsh import run_crtsh
 from modules.passive.chaos import run_chaos
 from modules.passive.findomain import run_findomain
-from modules.passive.subranger import run_subranger
 from modules.passive.securitytrails import run_securitytrails
 
 
@@ -35,7 +35,6 @@ PASSIVE_SOURCES = [
     ("crt.sh", run_crtsh),
     ("Chaos", run_chaos),
     ("Findomain", run_findomain),
-    ("Subranger", run_subranger),
     ("SecurityTrails", run_securitytrails),
 ]
 
@@ -198,17 +197,55 @@ def collect_subdomains(domain: str):
 # Merge Results
 # ==========================================================
 
-def merge_results(results: dict) -> list[str]:
+DOMAIN_RE = re.compile(
+    r"^(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$"
+)
+
+
+def merge_results(
+    results: dict,
+    domain: str,
+) -> list[str]:
     """
-    Merge all discovered subdomains and remove duplicates.
+    Merge, validate and normalize subdomains.
     """
 
     unique = set()
 
-    for subdomains in results.values():
-        unique.update(subdomains)
+    suffix = "." + domain.lower()
 
-    return sorted(unique, key=str.lower)
+    for subdomains in results.values():
+
+        for subdomain in subdomains:
+
+            if not subdomain:
+                continue
+
+            subdomain = subdomain.strip().lower()
+
+            # Remove trailing dot
+            subdomain = subdomain.rstrip(".")
+
+            # Keep only target domain
+            if (
+                subdomain != domain.lower()
+                and not subdomain.endswith(suffix)
+            ):
+                continue
+
+            # Validate hostname
+            if not DOMAIN_RE.fullmatch(
+                subdomain
+            ):
+                continue
+
+            unique.add(
+                subdomain
+            )
+
+    return sorted(
+        unique
+    )
 
 
 # ==========================================================

@@ -8,6 +8,8 @@ Main Entry Point
 
 import argparse
 
+import asyncio
+
 from core.banner import show_banner
 
 
@@ -87,6 +89,19 @@ from modules.tech.exporter import (
 
 
 # ==========================================================
+# URL Discovery
+# ==========================================================
+
+from modules.crawler.manager import (
+    crawl_hosts,
+)
+
+from modules.crawler.exporter import (
+    export_all,
+)
+
+
+# ==========================================================
 # Screenshot Capture
 # ==========================================================
 
@@ -99,6 +114,7 @@ from modules.screenshot.exporter import (
     export_screenshot_json,
     show_summary as show_screenshot_summary,
 )
+
 
 
 # ==========================================================
@@ -142,7 +158,8 @@ def main() -> None:
     )
 
     unique_subdomains = merge_results(
-        passive_results
+        passive_results,
+        args.domain,
     )
 
     save_results(
@@ -285,13 +302,48 @@ def main() -> None:
         technology_time,
     )
 
+
+    # ------------------------------------------------------
+    # URL Discovery
+    # ------------------------------------------------------
+
+    crawl_targets = sorted({
+
+        result["url"]
+
+        for result in http_results.values()
+
+        if result.get("url")
+
+    })
+
+    print("\n========== Crawl Targets ==========")
+
+    for url in crawl_targets:
+
+        print(url)
+
+    print("===================================\n")
+
+    crawl_results = crawl_hosts(
+        crawl_targets
+    )
+
+    export_all(
+        crawl_results
+    )
+
     # ------------------------------------------------------
     # Screenshot Capture
     # ------------------------------------------------------
 
     screenshot_results, screenshot_failed, screenshot_time = (
-        capture_hosts(
-            http_results
+        asyncio.run(
+
+            capture_hosts(
+                http_results
+            )
+
         )
     )
 

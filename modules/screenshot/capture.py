@@ -1,12 +1,13 @@
 """
-Screenshot Capture Engine
+Screenshot Capture
 
-Captures screenshots of alive web applications.
+Production Async Screenshot Engine.
 """
 
-from datetime import datetime
+from pathlib import Path
+from time import perf_counter
 
-from playwright.sync_api import (
+from playwright.async_api import (
     BrowserContext,
     TimeoutError as PlaywrightTimeoutError,
 )
@@ -14,180 +15,108 @@ from playwright.sync_api import (
 from config.config import (
     SCREENSHOT_TIMEOUT,
     SCREENSHOT_FULL_PAGE,
-    SCREENSHOT_WIDTH,
-    SCREENSHOT_HEIGHT,
+    SCREENSHOT_OUTPUT,
 )
 
 from core.logger import (
+    debug,
     warning,
 )
 
-from modules.screenshot.helpers import (
-    ensure_directory,
-    normalize_filename,
-    show_capture,
-)
-
 
 # ==========================================================
-# Capture URL
+# Ensure Output Directory
 # ==========================================================
 
-def capture_url(
-    context: BrowserContext,
-    url: str,
-):
+def ensure_output_directory() -> Path:
     """
-    Capture screenshot using a shared browser context.
-
-    Args:
-        context:
-            Shared Playwright BrowserContext.
-
-        url:
-            Target URL.
+    Create screenshot output directory.
 
     Returns:
-        dict
+        Path
     """
 
-    output_dir = ensure_directory()
-
-    filename = normalize_filename(
-        url
+    output = Path(
+        SCREENSHOT_OUTPUT
     )
 
-    output_file = (
-        output_dir / filename
+    output.mkdir(
+
+        parents=True,
+
+        exist_ok=True,
+
     )
 
-    show_capture(
-        url
+    return output
+
+
+# ==========================================================
+# Safe Filename
+# ==========================================================
+
+def safe_filename(
+    url: str,
+) -> str:
+    """
+    Convert URL into
+    filesystem-safe filename.
+    """
+
+    invalid = (
+        "https://",
+        "http://",
+        "/",
+        ":",
+        "?",
+        "&",
+        "=",
+        "%",
+        "#",
     )
 
-    page = None
+    filename = url
 
-    try:
+    for item in invalid:
 
-        page = context.new_page()
+        filename = filename.replace(
 
-        page.set_default_navigation_timeout(
-            SCREENSHOT_TIMEOUT
+            item,
+
+            "_",
+
         )
 
-        page.goto(
-            url,
-            wait_until="domcontentloaded",
-            timeout=SCREENSHOT_TIMEOUT,
+    while "__" in filename:
+
+        filename = filename.replace(
+
+            "__",
+
+            "_",
+
         )
 
-        # Allow JavaScript to finish rendering
-        page.wait_for_timeout(
-            2000
-        )
-
-        page.screenshot(
-            path=str(output_file),
-            full_page=SCREENSHOT_FULL_PAGE,
-        )
-
-        try:
-
-            title = page.title()
-
-        except Exception:
-
-            title = ""
-
-        return {
-
-            "url": url,
-
-            "final_url": page.url,
-
-            "title": title,
-
-            "status": None,
-
-            "screenshot": str(
-                output_file
-            ),
-
-            "captured": True,
-
-            "timestamp": (
-                datetime.utcnow().isoformat()
-                + "Z"
-            ),
-
-            "width": SCREENSHOT_WIDTH,
-
-            "height": SCREENSHOT_HEIGHT,
-
-        }
-
-    except PlaywrightTimeoutError:
-
-        warning(
-            f"Timeout: {url}"
-        )
-
-        return {
-
-            "url": url,
-
-            "captured": False,
-
-            "error": "Timeout",
-
-        }
-
-    except Exception as error:
-
-        warning(
-            f"{url}: {error}"
-        )
-
-        return {
-
-            "url": url,
-
-            "captured": False,
-
-            "error": str(error),
-
-        }
-
-    finally:
-
-        if page:
-
-            try:
-
-                page.close()
-
-            except Exception:
-
-                pass
+    return filename.strip("_")
 
 
 # ==========================================================
 # Capture Host
 # ==========================================================
 
-def capture_host(
+async def capture_host(
     context: BrowserContext,
     response: dict,
-):
+) -> dict:
     """
-    Capture screenshot using HTTP probe results.
+    Capture screenshot.
 
     Args:
         context:
-            Shared BrowserContext.
+            BrowserContext
 
         response:
-            HTTP probe result.
+            HTTP probe result
 
     Returns:
         dict
@@ -203,34 +132,167 @@ def capture_host(
 
             "captured": False,
 
-            "error": "Missing URL",
+            "reason": "Missing URL",
 
         }
 
-    metadata = capture_url(
-        context,
-        url,
+    debug(
+        f"Capturing {url}"
     )
 
-    # Merge HTTP probe metadata for future reports
-    if metadata.get(
-        "captured"
-    ):
+    output_dir = ensure_output_directory()
 
-        metadata["status"] = response.get(
-            "status"
+    screenshot_path = (
+
+        output_dir
+
+        /
+
+        (
+
+            safe_filename(url)
+
+            + ".png"
+
         )
 
-        metadata["response_time"] = response.get(
-            "response_time"
+    )
+
+    page = await context.new_page()
+
+    start = perf_counter()
+
+    try:
+
+        # --------------------------------------------------
+        # Visit Target
+        # --------------------------------------------------
+
+        await page.goto(
+
+            url,
+
+            wait_until="load",
+
+            timeout=SCREENSHOT_TIMEOUT,
+
         )
 
-        metadata["server"] = response.get(
-            "server"
+        # Give the page a moment to finish rendering
+        await page.wait_for_timeout(
+            2000
         )
 
-        metadata["content_type"] = response.get(
-            "content_type"
+        # --------------------------------------------------
+        # Capture Screenshot
+        # --------------------------------------------------
+
+        await page.screenshot(
+
+            path=str(
+                screenshot_path
+            ),
+
+            full_page=SCREENSHOT_FULL_PAGE,
+
         )
 
-    return metadata
+        elapsed = round(
+
+            perf_counter()
+
+            - start,
+
+            2,
+
+        )
+
+        title = await page.title()
+
+        viewport = page.viewport_size
+
+        filesize = 0
+
+        if screenshot_path.exists():
+
+            filesize = (
+
+                screenshot_path.stat()
+
+                .st_size
+
+            )
+
+        return {
+
+            "captured": True,
+
+            "url": url,
+
+            "title": title,
+
+            "path": str(
+                screenshot_path
+            ),
+
+            "status": response.get(
+                "status"
+            ),
+
+            "elapsed": elapsed,
+
+            "width": viewport.get(
+                "width"
+            ) if viewport else None,
+
+            "height": viewport.get(
+                "height"
+            ) if viewport else None,
+
+            "filesize": filesize,
+
+        }
+
+    except PlaywrightTimeoutError:
+
+        warning(
+            f"{url}: Timeout"
+        )
+
+        return {
+
+            "captured": False,
+
+            "url": url,
+
+            "reason": "Timeout",
+
+        }
+
+    except Exception as error:
+
+        warning(
+            f"{url}: {error}"
+        )
+
+        return {
+
+            "captured": False,
+
+            "url": url,
+
+            "reason": str(
+                error
+            ),
+
+        }
+
+    finally:
+
+        try:
+
+            await page.close()
+
+        except Exception:
+
+            pass

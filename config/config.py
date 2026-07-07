@@ -86,7 +86,7 @@ DEBUG = False
 # Screenshot
 # ==========================================================
 
-SCREENSHOT_TIMEOUT = 60000
+SCREENSHOT_TIMEOUT = 15000
 
 SCREENSHOT_WIDTH = 1440
 
@@ -99,4 +99,49 @@ SCREENSHOT_WORKERS = 5
 SCREENSHOT_OUTPUT = "output/screenshots"
 
 HEADLESS_BROWSER = True
+
+
+
+# ==========================================================
+# URL Discovery
+# ==========================================================
+
+CRAWLER_DEPTH = 2
+
+CRAWLER_TIMEOUT = 10
+
+CRAWLER_MAX_URLS = 500
+
+CRAWLER_DELAY = 0
+
+CRAWLER_VERIFY_SSL = False
+
+# ==========================================================
+# URL Discovery
+# ==========================================================
+
+CRAWLER_DEPTH = 2
+
+CRAWLER_MAX_URLS = 500
+
+# ==========================================================
+# URL Discovery
+# ==========================================================
+
+# Maximum crawl depth
+CRAWLER_DEPTH = 2
+
+# Maximum URLs to crawl per host
+CRAWLER_MAX_URLS = 500
+
+# HTTP timeout (seconds)
+CRAWLER_TIMEOUT = 10
+
+# Delay between requests (seconds)
+CRAWLER_DELAY = 0
+
+# Verify SSL certificates
+CRAWLER_VERIFY_SSL = False
+
+CRAWLER_WORKERS = 10
 

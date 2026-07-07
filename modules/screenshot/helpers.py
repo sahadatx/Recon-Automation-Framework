@@ -1,23 +1,21 @@
 """
 Screenshot Helper Functions
 
-Shared helper functions used by the
-Screenshot Capture module.
+Production Async Playwright Browser Engine.
 """
 
-import hashlib
-from pathlib import Path
-from urllib.parse import urlparse
-
-from playwright.sync_api import (
-    sync_playwright,
+from playwright.async_api import (
+    async_playwright,
+    Playwright,
+    Browser,
+    BrowserContext,
+    Page,
 )
 
 from config.config import (
-    SCREENSHOT_OUTPUT,
+    HEADLESS_BROWSER,
     SCREENSHOT_WIDTH,
     SCREENSHOT_HEIGHT,
-    HEADLESS_BROWSER,
 )
 
 from core.logger import (
@@ -26,164 +24,220 @@ from core.logger import (
 
 
 # ==========================================================
-# Ensure Output Directory
+# Start Playwright
 # ==========================================================
 
-def ensure_directory() -> Path:
+async def start_playwright() -> Playwright:
     """
-    Create screenshot output directory.
+    Start Playwright engine.
 
     Returns:
-        Path
+        Playwright
     """
 
-    output_dir = Path(
-        SCREENSHOT_OUTPUT
+    debug(
+        "Starting Playwright..."
     )
 
-    output_dir.mkdir(
-        parents=True,
-        exist_ok=True,
-    )
-
-    return output_dir
+    return await async_playwright().start()
 
 
 # ==========================================================
-# Normalize Filename
+# Launch Browser
 # ==========================================================
 
-def normalize_filename(
-    url: str,
-) -> str:
-    """
-    Generate a safe screenshot filename.
-
-    Examples
-    --------
-    https://app.syfe.com/login?id=123
-
-        ↓
-
-    app.syfe.com_a1b2c3d4.png
-    """
-
-    parsed = urlparse(
-        url
-    )
-
-    host = parsed.netloc
-
-    host = host.replace(
-        ":",
-        "_",
-    )
-
-    digest = hashlib.sha1(
-        url.encode(
-            "utf-8"
-        )
-    ).hexdigest()[:8]
-
-    return (
-        f"{host}_{digest}.png"
-    )
-
-
-# ==========================================================
-# Create Browser
-# ==========================================================
-
-def create_browser():
+async def launch_browser(
+    playwright: Playwright,
+) -> Browser:
     """
     Launch Chromium browser.
 
+    Args:
+        playwright:
+            Playwright instance.
+
     Returns:
-        tuple(playwright, browser)
+        Browser
     """
 
-    playwright = sync_playwright().start()
+    debug(
+        "Launching Chromium..."
+    )
 
-    browser = playwright.chromium.launch(
+    browser = await playwright.chromium.launch(
 
         headless=HEADLESS_BROWSER,
 
+        args=[
+
+            "--disable-dev-shm-usage",
+
+            "--disable-gpu",
+
+            "--disable-setuid-sandbox",
+
+            "--no-sandbox",
+
+        ],
+
     )
 
-    return (
-
-        playwright,
-
-        browser,
-
-    )
+    return browser
 
 
 # ==========================================================
 # Create Browser Context
 # ==========================================================
 
-def create_context(
-    browser,
-):
+async def create_context(
+    browser: Browser,
+) -> BrowserContext:
     """
-    Create browser context.
+    Create isolated browser context.
+
+    Args:
+        browser:
+            Browser instance.
 
     Returns:
         BrowserContext
     """
 
-    return browser.new_context(
+    context = await browser.new_context(
 
         viewport={
 
-            "width":
-                SCREENSHOT_WIDTH,
+            "width": SCREENSHOT_WIDTH,
 
-            "height":
-                SCREENSHOT_HEIGHT,
+            "height": SCREENSHOT_HEIGHT,
 
         },
 
         ignore_https_errors=True,
 
+        java_script_enabled=True,
+
     )
+
+    return context
 
 
 # ==========================================================
 # Create Page
 # ==========================================================
 
-def create_page(
-    context,
-):
+async def create_page(
+    context: BrowserContext,
+) -> Page:
     """
-    Create a new page.
+    Create browser page.
 
     Returns:
         Page
     """
 
-    page = context.new_page()
-
-    page.set_default_navigation_timeout(
-        30000
-    )
-
-    return page
+    return await context.new_page()
 
 
 # ==========================================================
-# Show Capture
+# Close Page
 # ==========================================================
 
-def show_capture(
-    url: str,
+async def close_page(
+    page: Page,
 ):
     """
-    Display capture information.
+    Close page.
     """
 
-    debug(
-        f"Capturing {url}"
+    try:
+
+        await page.close()
+
+    except Exception:
+
+        pass
+
+
+# ==========================================================
+# Close Context
+# ==========================================================
+
+async def close_context(
+    context: BrowserContext,
+):
+    """
+    Close browser context.
+    """
+
+    try:
+
+        await context.close()
+
+    except Exception:
+
+        pass
+
+
+# ==========================================================
+# Close Browser
+# ==========================================================
+
+async def close_browser(
+    browser: Browser,
+):
+    """
+    Close browser.
+    """
+
+    try:
+
+        await browser.close()
+
+    except Exception:
+
+        pass
+
+
+# ==========================================================
+# Stop Playwright
+# ==========================================================
+
+async def stop_playwright(
+    playwright: Playwright,
+):
+    """
+    Stop Playwright.
+    """
+
+    try:
+
+        await playwright.stop()
+
+    except Exception:
+
+        pass
+
+
+# ==========================================================
+# Cleanup
+# ==========================================================
+
+async def cleanup(
+    playwright: Playwright,
+    browser: Browser,
+):
+    """
+    Cleanup Playwright resources.
+
+    BrowserContext cleanup is handled
+    by each capture task individually.
+    """
+
+    await close_browser(
+        browser
+    )
+
+    await stop_playwright(
+        playwright
     )
