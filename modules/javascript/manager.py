@@ -1,7 +1,8 @@
 """
 JavaScript Manager
 
-Coordinates parallel JavaScript downloads.
+Coordinates JavaScript download,
+parsing and security analysis.
 """
 
 import time
@@ -26,55 +27,306 @@ from modules.javascript.downloader import (
     download_one,
 )
 
+from modules.javascript.parser import (
+    parse_file,
+)
+
+from modules.javascript.detectors import (
+    scan_content,
+)
+
+from modules.javascript.interesting import (
+    detect_interesting,
+)
+
 
 # ==========================================================
-# Download One
+# Process One JavaScript
 # ==========================================================
 
-def download_single(
+def process_javascript(
     url: str,
 ):
     """
-    Download a single JavaScript file.
+    Download and analyze one JavaScript file.
 
     Args:
         url:
             JavaScript URL.
 
     Returns:
-        tuple[str, dict | None]
+        tuple(
+            url,
+            metadata | None,
+        )
     """
 
-    result = download_one(
+    metadata = download_one(
         url
+    )
+
+    if metadata is None:
+
+        return (
+
+            url,
+
+            None,
+
+        )
+
+    filepath = metadata.get(
+        "path"
+    )
+
+    if not filepath:
+
+        metadata.update({
+
+            "analysis": None,
+
+            "interesting": None,
+
+            "secrets": None,
+
+        })
+
+        return (
+
+            url,
+
+            metadata,
+
+        )
+
+    # ------------------------------------------------------
+    # Parse JavaScript
+    # ------------------------------------------------------
+
+    analysis = parse_file(
+        filepath
+    )
+
+    if analysis is None:
+
+        metadata.update({
+
+            "analysis": None,
+
+            "interesting": None,
+
+            "secrets": None,
+
+        })
+
+        return (
+
+            url,
+
+            metadata,
+
+        )
+
+    metadata[
+        "analysis"
+    ] = analysis
+
+    # ------------------------------------------------------
+    # Interesting Files
+    # ------------------------------------------------------
+
+    metadata[
+        "interesting"
+    ] = detect_interesting(
+
+        analysis.get(
+            "urls",
+            [],
+        )
+
+    )
+
+    # ------------------------------------------------------
+    # Secret Detection
+    # ------------------------------------------------------
+
+    try:
+
+        with open(
+
+            filepath,
+
+            "r",
+
+            encoding="utf-8",
+
+            errors="ignore",
+
+        ) as file:
+
+            content = file.read()
+
+    except Exception as error:
+
+        warning(
+            f"{filepath}: {error}"
+        )
+
+        content = ""
+
+    metadata[
+        "secrets"
+    ] = (
+
+        scan_content(
+            content
+        )
+
+        if content
+
+        else None
+
     )
 
     return (
 
         url,
 
-        result,
+        metadata,
 
     )
 
 
 # ==========================================================
-# Download All
+# Generate Statistics
+# ==========================================================
+
+def generate_statistics(
+    results: dict,
+):
+    """
+    Generate overall statistics.
+
+    Args:
+        results:
+            JavaScript analysis results.
+
+    Returns:
+        dict
+    """
+
+    stats = {
+
+        "javascript": len(
+            results
+        ),
+
+        "urls": 0,
+
+        "comments": 0,
+
+        "strings": 0,
+
+        "source_maps": 0,
+
+        "endpoints": 0,
+
+        "interesting_files": 0,
+
+        "interesting_directories": 0,
+
+        "secret_types": 0,
+
+        "total_secrets": 0,
+
+    }
+
+    for metadata in results.values():
+
+        analysis = metadata.get(
+            "analysis"
+        ) or {}
+
+        parser_stats = analysis.get(
+            "statistics",
+            {},
+        )
+
+        for key in (
+
+            "urls",
+
+            "comments",
+
+            "strings",
+
+            "source_maps",
+
+            "endpoints",
+
+        ):
+
+            stats[key] += parser_stats.get(
+                key,
+                0,
+            )
+
+        interesting = metadata.get(
+            "interesting"
+        ) or {}
+
+        interesting_stats = interesting.get(
+            "statistics",
+            {},
+        )
+
+        stats["interesting_files"] += interesting_stats.get(
+            "interesting_files",
+            0,
+        )
+
+        stats["interesting_directories"] += interesting_stats.get(
+            "interesting_directories",
+            0,
+        )
+
+        secrets = metadata.get(
+            "secrets"
+        ) or {}
+
+        secret_stats = secrets.get(
+            "statistics",
+            {},
+        )
+
+        stats["secret_types"] += secret_stats.get(
+            "secret_types",
+            0,
+        )
+
+        stats["total_secrets"] += secret_stats.get(
+            "total_secrets",
+            0,
+        )
+
+    return stats
+
+# ==========================================================
+# Download & Analyze
 # ==========================================================
 
 def download_javascript(
     javascript_urls: list[str],
 ):
     """
-    Download all JavaScript files
-    in parallel.
+    Download and analyze JavaScript files.
 
     Args:
         javascript_urls:
             List of JavaScript URLs.
 
     Returns:
-        (
+        tuple(
             results,
             failed,
             elapsed,
@@ -82,22 +334,34 @@ def download_javascript(
     """
 
     info(
-        "Starting JavaScript Download..."
+        "Starting JavaScript Analysis..."
     )
-
-    # ------------------------------------------------------
-    # Remove Duplicates
-    # ------------------------------------------------------
 
     javascript_urls = sorted(
-        set(javascript_urls)
+        set(
+            javascript_urls
+        )
     )
+
+    if not javascript_urls:
+
+        warning(
+            "No JavaScript files found."
+        )
+
+        return (
+
+            {},
+
+            [],
+
+            0.0,
+
+        )
 
     results = {}
 
     failed = []
-
-    retry_queue = []
 
     completed = 0
 
@@ -108,14 +372,19 @@ def download_javascript(
     start_time = time.perf_counter()
 
     with ThreadPoolExecutor(
+
         max_workers=MAX_WORKERS,
+
     ) as executor:
 
         futures = {
 
             executor.submit(
-                download_single,
+
+                process_javascript,
+
                 url,
+
             ): url
 
             for url in javascript_urls
@@ -162,10 +431,6 @@ def download_javascript(
                         js_url
                     )
 
-                    retry_queue.append(
-                        js_url
-                    )
-
                     progress_status(
 
                         completed,
@@ -179,10 +444,6 @@ def download_javascript(
             except Exception as error:
 
                 failed.append(
-                    url
-                )
-
-                retry_queue.append(
                     url
                 )
 
@@ -200,23 +461,6 @@ def download_javascript(
 
                 )
 
-    # ------------------------------------------------------
-    # Retry Queue (Future)
-    # ------------------------------------------------------
-
-    if retry_queue:
-
-        info(
-
-            f"Retry Queue: "
-
-            f"{len(retry_queue)} file(s)"
-
-        )
-
-        # Future:
-        # Retry failed JavaScript downloads.
-
     elapsed = round(
 
         time.perf_counter()
@@ -227,28 +471,64 @@ def download_javascript(
 
     )
 
+    # ------------------------------------------------------
+    # Statistics
+    # ------------------------------------------------------
+
+    statistics = generate_statistics(
+        results
+    )
+
+    # ------------------------------------------------------
+    # Summary
+    # ------------------------------------------------------
+
     success(
-
-        f"Downloaded : "
-
-        f"{len(results)}"
-
+        f"JavaScript Files        : {statistics['javascript']}"
     )
 
     success(
-
-        f"Failed      : "
-
-        f"{len(failed)}"
-
+        f"Failed Downloads        : {len(failed)}"
     )
 
     success(
+        f"URLs Found              : {statistics['urls']}"
+    )
 
-        f"Elapsed     : "
+    success(
+        f"Endpoints               : {statistics['endpoints']}"
+    )
 
-        f"{elapsed:.2f} sec"
+    success(
+        f"Comments                : {statistics['comments']}"
+    )
 
+    success(
+        f"Strings                 : {statistics['strings']}"
+    )
+
+    success(
+        f"Source Maps             : {statistics['source_maps']}"
+    )
+
+    success(
+        f"Interesting Files       : {statistics['interesting_files']}"
+    )
+
+    success(
+        f"Interesting Directories : {statistics['interesting_directories']}"
+    )
+
+    success(
+        f"Secret Types            : {statistics['secret_types']}"
+    )
+
+    success(
+        f"Secrets Found           : {statistics['total_secrets']}"
+    )
+
+    success(
+        f"Elapsed                 : {elapsed:.2f} sec"
     )
 
     return (

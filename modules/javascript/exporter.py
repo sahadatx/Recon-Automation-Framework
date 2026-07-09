@@ -1,187 +1,736 @@
 """
-JavaScript Extractors
+JavaScript Exporter
 
-Generic extraction functions for
-JavaScript analysis.
+Exports JavaScript analysis results.
 """
 
-import re
+import json
 
+from pathlib import Path
 
-# ==========================================================
-# URL Pattern
-# ==========================================================
-
-URL_PATTERN = re.compile(
-
-    r"""(?:
-        https?://[^\s"'<>]+
-        |
-        /[A-Za-z0-9_\-./?=&%]+
-    )""",
-
-    re.VERBOSE,
-
+from core.logger import (
+    success,
 )
 
 
 # ==========================================================
-# Source Map Pattern
+# Output Directory
 # ==========================================================
 
-SOURCEMAP_PATTERN = re.compile(
-
-    r"""[A-Za-z0-9_\-./]+\.map""",
-
-    re.IGNORECASE,
-
+OUTPUT_DIR = Path(
+    "output/javascript"
 )
 
 
 # ==========================================================
-# String Pattern
+# Ensure Output Directory
 # ==========================================================
 
-STRING_PATTERN = re.compile(
-
-    r"""["']([^"'\\]{4,})["']"""
-
-)
-
-
-# ==========================================================
-# Comment Pattern
-# ==========================================================
-
-COMMENT_PATTERN = re.compile(
-
-    r"""//.*?$|/\*.*?\*/""",
-
-    re.MULTILINE | re.DOTALL,
-
-)
-
-
-# ==========================================================
-# Normalize
-# ==========================================================
-
-def normalize(
-    items,
-):
+def ensure_output_directory() -> Path:
     """
-    Normalize extracted values.
+    Create output directory.
+
+    Returns:
+        Path
+    """
+
+    OUTPUT_DIR.mkdir(
+
+        parents=True,
+
+        exist_ok=True,
+
+    )
+
+    return OUTPUT_DIR
+
+
+# ==========================================================
+# Write List
+# ==========================================================
+
+def write_list(
+    filename: str,
+    values,
+) -> Path:
+    """
+    Write iterable values into a file.
+
+    Args:
+        filename:
+            Output filename.
+
+        values:
+            Iterable values.
+
+    Returns:
+        Path
+    """
+
+    output_file = (
+
+        ensure_output_directory()
+
+        / filename
+
+    )
+
+    with output_file.open(
+
+        "w",
+
+        encoding="utf-8",
+
+    ) as file:
+
+        for value in sorted(
+
+            set(values)
+
+        ):
+
+            file.write(
+
+                f"{value}\n"
+
+            )
+
+    success(
+
+        f"Saved {output_file}"
+
+    )
+
+    return output_file
+
+
+# ==========================================================
+# Collect Analysis Items
+# ==========================================================
+
+def collect_analysis_items(
+    results: dict,
+    key: str,
+) -> list:
+    """
+    Collect one analysis field
+    from every JavaScript file.
+
+    Args:
+        results:
+            JavaScript results.
+
+        key:
+            Analysis field.
 
     Returns:
         list
     """
 
-    cleaned = set()
+    collected = set()
 
-    for item in items:
+    for metadata in results.values():
 
-        item = item.strip()
+        analysis = metadata.get(
 
-        if not item:
+            "analysis",
 
-            continue
+            {},
 
-        cleaned.add(
-            item
+        )
+
+        collected.update(
+
+            analysis.get(
+
+                key,
+
+                [],
+
+            )
+
         )
 
     return sorted(
-        cleaned
+
+        collected
+
     )
 
 
 # ==========================================================
-# Extract URLs
+# Collect Secrets
 # ==========================================================
 
-def extract_urls(
-    content: str,
-):
+def collect_secret_items(
+    results: dict,
+) -> dict:
     """
-    Extract URLs from JavaScript.
+    Collect detected secrets.
 
     Returns:
-        list
+        dict
     """
 
-    urls = URL_PATTERN.findall(
-        content
-    )
+    secrets = {}
 
-    return normalize(
-        urls
-    )
+    for metadata in results.values():
+
+        secret_data = metadata.get(
+
+            "secrets",
+
+            {},
+
+        )
+
+        findings = secret_data.get(
+
+            "findings",
+
+            {},
+
+        )
+
+        for secret_type, values in findings.items():
+
+            secrets.setdefault(
+
+                secret_type,
+
+                set(),
+
+            ).update(
+
+                values
+
+            )
+
+    return {
+
+        key: sorted(value)
+
+        for key, value
+
+        in secrets.items()
+
+    }
 
 
 # ==========================================================
-# Extract Comments
+# Generic Analysis Export
 # ==========================================================
 
-def extract_comments(
-    content: str,
-):
+def export_analysis(
+    results: dict,
+    key: str,
+    filename: str,
+) -> Path:
     """
-    Extract JavaScript comments.
+    Generic exporter for
+    analysis fields.
+
+    Args:
+        results:
+            JavaScript results.
+
+        key:
+            Analysis key.
+
+        filename:
+            Output filename.
 
     Returns:
-        list
+        Path
     """
 
-    comments = COMMENT_PATTERN.findall(
-        content
+    values = collect_analysis_items(
+
+        results,
+
+        key,
+
     )
 
-    return normalize(
-        comments
+    return write_list(
+
+        filename,
+
+        values,
+
     )
 
 
 # ==========================================================
-# Extract Strings
+# Export JSON
 # ==========================================================
 
-def extract_strings(
-    content: str,
-):
+def export_json(
+    results: dict,
+    filename: str = "javascript.json",
+) -> Path:
     """
-    Extract quoted strings.
+    Export JSON report.
 
     Returns:
-        list
+        Path
     """
 
-    strings = STRING_PATTERN.findall(
-        content
+    output_file = (
+
+        ensure_output_directory()
+
+        / filename
+
     )
 
-    return normalize(
-        strings
+    with output_file.open(
+
+        "w",
+
+        encoding="utf-8",
+
+    ) as file:
+
+        json.dump(
+
+            results,
+
+            file,
+
+            indent=4,
+
+            sort_keys=True,
+
+        )
+
+    success(
+
+        f"JSON exported to {output_file}"
+
     )
+
+    return output_file
 
 
 # ==========================================================
-# Extract Source Maps
+# Save Human Readable Report
 # ==========================================================
 
-def extract_source_maps(
-    content: str,
-):
+def save_results(
+    results: dict,
+    filename: str = "javascript.txt",
+) -> Path:
     """
-    Extract source map references.
+    Save JavaScript analysis report.
 
     Returns:
-        list
+        Path
     """
 
-    maps = SOURCEMAP_PATTERN.findall(
-        content
+    output_file = (
+
+        ensure_output_directory()
+
+        / filename
+
     )
 
-    return normalize(
-        maps
+    with output_file.open(
+
+        "w",
+
+        encoding="utf-8",
+
+    ) as file:
+
+        for url, metadata in sorted(
+
+            results.items()
+
+        ):
+
+            analysis = metadata.get(
+
+                "analysis",
+
+                {},
+
+            )
+
+            statistics = analysis.get(
+
+                "statistics",
+
+                {},
+
+            )
+
+            secrets = metadata.get(
+
+                "secrets",
+
+                {},
+
+            )
+
+            findings = secrets.get(
+
+                "findings",
+
+                {},
+
+            )
+
+            file.write(
+
+                "=" * 80 + "\n"
+
+            )
+
+            file.write(
+
+                f"JavaScript : {url}\n"
+
+            )
+
+            file.write(
+
+                f"Saved File : "
+
+                f"{metadata.get('path','-')}\n"
+
+            )
+
+            file.write(
+
+                f"Status     : "
+
+                f"{metadata.get('status','-')}\n\n"
+
+            )
+
+            file.write(
+
+                "Statistics\n"
+
+            )
+
+            file.write(
+
+                "-" * 80 + "\n"
+
+            )
+
+            for key, value in statistics.items():
+
+                file.write(
+
+                    f"{key:<20}: {value}\n"
+
+                )
+
+            if findings:
+
+                file.write(
+
+                    "\nSecrets\n"
+
+                )
+
+                file.write(
+
+                    "-" * 80 + "\n"
+
+                )
+
+                for secret_type, values in findings.items():
+
+                    file.write(
+
+                        f"[{secret_type}]\n"
+
+                    )
+
+                    for value in values:
+
+                        file.write(
+
+                            f"  - {value}\n"
+
+                        )
+
+                    file.write("\n")
+
+            file.write("\n")
+
+    success(
+
+        f"Results saved to {output_file}"
+
     )
+
+    return output_file
+
+
+# ==========================================================
+# Export Analysis Files
+# ==========================================================
+
+def export_urls(
+    results: dict,
+) -> Path:
+
+    return export_analysis(
+
+        results,
+
+        "urls",
+
+        "urls.txt",
+
+    )
+
+
+def export_comments(
+    results: dict,
+) -> Path:
+
+    return export_analysis(
+
+        results,
+
+        "comments",
+
+        "comments.txt",
+
+    )
+
+
+def export_strings(
+    results: dict,
+) -> Path:
+
+    return export_analysis(
+
+        results,
+
+        "strings",
+
+        "strings.txt",
+
+    )
+
+
+def export_source_maps(
+    results: dict,
+) -> Path:
+
+    return export_analysis(
+
+        results,
+
+        "source_maps",
+
+        "source_maps.txt",
+
+    )
+
+
+def export_endpoints(
+    results: dict,
+) -> Path:
+
+    return export_analysis(
+
+        results,
+
+        "endpoints",
+
+        "endpoints.txt",
+
+    )
+
+
+# ==========================================================
+# Export Secrets
+# ==========================================================
+
+def export_secrets(
+    results: dict,
+    filename: str = "secrets.txt",
+) -> Path:
+    """
+    Export detected secrets.
+
+    Returns:
+        Path
+    """
+
+    output_file = (
+
+        ensure_output_directory()
+
+        / filename
+
+    )
+
+    secrets = collect_secret_items(
+        results
+    )
+
+    with output_file.open(
+
+        "w",
+
+        encoding="utf-8",
+
+    ) as file:
+
+        if not secrets:
+
+            file.write(
+
+                "No secrets detected.\n"
+
+            )
+
+        else:
+
+            for secret_type, values in sorted(
+
+                secrets.items()
+
+            ):
+
+                file.write(
+
+                    "=" * 80 + "\n"
+
+                )
+
+                file.write(
+
+                    f"{secret_type}\n"
+
+                )
+
+                file.write(
+
+                    "-" * 80 + "\n"
+
+                )
+
+                for value in values:
+
+                    file.write(
+
+                        value + "\n"
+
+                    )
+
+                file.write("\n")
+
+    success(
+
+        f"Secrets exported to {output_file}"
+
+    )
+
+    return output_file
+
+
+# ==========================================================
+# Export All
+# ==========================================================
+
+def export_all(
+    results: dict,
+):
+    """
+    Export all JavaScript reports.
+    """
+
+    save_results(
+        results
+    )
+
+    export_json(
+        results
+    )
+
+    export_urls(
+        results
+    )
+
+    export_comments(
+        results
+    )
+
+    export_strings(
+        results
+    )
+
+    export_source_maps(
+        results
+    )
+
+    export_endpoints(
+        results
+    )
+
+    export_secrets(
+        results
+    )
+
+
+# ==========================================================
+# Summary
+# ==========================================================
+
+def show_summary(
+    results: dict,
+    failed: list,
+    elapsed: float,
+):
+    """
+    Display summary.
+    """
+
+    total = len(results) + len(failed)
+
+    success_rate = (
+
+        (len(results) / total) * 100
+
+        if total
+
+        else 0
+
+    )
+
+    print("\n" + "=" * 80)
+    print("JavaScript Analysis Summary")
+    print("=" * 80)
+
+    print(f"{'Processed':<20}{total}")
+    print(f"{'Downloaded':<20}{len(results)}")
+    print(f"{'Failed':<20}{len(failed)}")
+
+    print("-" * 80)
+
+    print(f"{'Success Rate':<20}{success_rate:.1f}%")
+    print(f"{'Elapsed':<20}{elapsed:.2f} sec")
+
+    print("=" * 80)
+
+    if failed:
+
+        print("\nFailed Downloads")
+        print("-" * 80)
+
+        for item in failed:
+
+            print(f" • {item}")
+
+        print("-" * 80)

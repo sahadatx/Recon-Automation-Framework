@@ -17,6 +17,7 @@ from modules.javascript.extractors import (
     extract_comments,
     extract_strings,
     extract_source_maps,
+    generate_statistics,
 )
 
 from modules.javascript.endpoints import (
@@ -32,19 +33,17 @@ def read_javascript(
     filepath: str | Path,
 ) -> str | None:
     """
-    Read JavaScript file.
+    Read a JavaScript file.
 
     Args:
         filepath:
-            JavaScript file path.
+            Path to JavaScript file.
 
     Returns:
         File content or None.
     """
 
-    path = Path(
-        filepath
-    )
+    path = Path(filepath)
 
     if not path.exists():
 
@@ -56,15 +55,13 @@ def read_javascript(
 
     try:
 
-        content = path.read_text(
+        return path.read_text(
 
             encoding="utf-8",
 
             errors="ignore",
 
         )
-
-        return content
 
     except Exception as error:
 
@@ -87,7 +84,7 @@ def parse_file(
 
     Args:
         filepath:
-            JavaScript file.
+            JavaScript file path.
 
     Returns:
         dict | None
@@ -137,29 +134,25 @@ def parse_file(
     # Statistics
     # ------------------------------------------------------
 
-    statistics = {
+    statistics = generate_statistics(
 
-        "urls": len(
-            urls
-        ),
+        urls,
 
-        "comments": len(
-            comments
-        ),
+        comments,
 
-        "strings": len(
-            strings
-        ),
+        strings,
 
-        "source_maps": len(
-            source_maps
-        ),
+        source_maps,
 
-        "endpoints": len(
-            endpoints
-        ),
+    )
 
-    }
+    statistics["endpoints"] = len(
+        endpoints
+    )
+
+    # ------------------------------------------------------
+    # Result
+    # ------------------------------------------------------
 
     return {
 
@@ -213,7 +206,7 @@ def parse_multiple(
             filepath
         )
 
-        if parsed:
+        if parsed is not None:
 
             results[
                 filepath

@@ -12,6 +12,10 @@ import asyncio
 
 from core.banner import show_banner
 
+from core.logger import (
+    info,
+)
+
 
 # ==========================================================
 # Passive Enumeration
@@ -97,7 +101,21 @@ from modules.crawler.manager import (
 )
 
 from modules.crawler.exporter import (
-    export_all,
+    export_all as export_crawler_results,
+)
+
+
+# ==========================================================
+# JavaScript Analysis
+# ==========================================================
+
+from modules.javascript.manager import (
+    download_javascript,
+)
+
+from modules.javascript.exporter import (
+    export_all as export_javascript_results,
+    show_summary as show_javascript_summary,
 )
 
 
@@ -317,49 +335,125 @@ def main() -> None:
 
     })
 
-    print("\n========== Crawl Targets ==========")
 
-    for url in crawl_targets:
-
-        print(url)
-
-    print("===================================\n")
-
-    crawl_results = crawl_hosts(
-        crawl_targets
+    info(
+        f"Crawl Targets: {len(crawl_targets)}"
     )
 
-    export_all(
+
+    if crawl_targets:
+
+        crawl_results = crawl_hosts(
+            crawl_targets
+        )
+
+    else:
+
+        info(
+            "No crawl targets discovered."
+        )
+
+        crawl_results = {
+            "results": {}
+        }
+
+    export_crawler_results(
         crawl_results
     )
+
+    # ------------------------------------------------------
+    # JavaScript Analysis
+    # ------------------------------------------------------
+
+    javascript_urls = sorted({
+
+        script
+
+        for host in crawl_results["results"].values()
+
+        for page in host.get(
+            "pages",
+            {},
+        ).values()
+
+        for script in page.get(
+            "parsed",
+            {},
+        ).get(
+            "javascript",
+            [],
+        )
+
+    })
+
+    if javascript_urls:
+
+        javascript_results, javascript_failed, javascript_time = (
+
+            download_javascript(
+                javascript_urls
+            )
+
+        )
+
+        export_javascript_results(
+            javascript_results
+        )
+
+        show_javascript_summary(
+
+            javascript_results,
+
+            javascript_failed,
+
+            javascript_time,
+
+        )
+
+    else:
+
+        info(
+            "No JavaScript files discovered."
+        )
+
 
     # ------------------------------------------------------
     # Screenshot Capture
     # ------------------------------------------------------
 
-    screenshot_results, screenshot_failed, screenshot_time = (
-        asyncio.run(
+    if http_results:
 
-            capture_hosts(
-                http_results
+        screenshot_results, screenshot_failed, screenshot_time = (
+
+            asyncio.run(
+
+                capture_hosts(
+                    http_results
+                )
+
             )
 
         )
-    )
 
-    save_screenshot_results(
-        screenshot_results
-    )
+        save_screenshot_results(
+            screenshot_results
+        )
 
-    export_screenshot_json(
-        screenshot_results
-    )
+        export_screenshot_json(
+            screenshot_results
+        )
 
-    show_screenshot_summary(
-        screenshot_results,
-        screenshot_failed,
-        screenshot_time,
-    )
+        show_screenshot_summary(
+            screenshot_results,
+            screenshot_failed,
+            screenshot_time,
+        )
+
+    else:
+
+        info(
+            "No alive hosts for screenshots."
+        )
 
 
 # ==========================================================
