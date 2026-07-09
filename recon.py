@@ -147,6 +147,18 @@ from modules.screenshot.exporter import (
     show_summary as show_screenshot_summary,
 )
 
+# ==========================================================
+# Nuclei Scanner
+# ==========================================================
+
+from modules.nuclei.manager import (
+
+    run_and_export,
+
+    print_summary,
+
+)
+
 
 
 # ==========================================================
@@ -530,6 +542,77 @@ def main() -> None:
         info(
             "No alive hosts for screenshots."
         )
+    
+
+    # ------------------------------------------------------
+    # Nuclei Scan
+    # ------------------------------------------------------
+
+    nuclei_targets = sorted({
+
+        result["url"]
+
+        for result in http_results.values()
+
+        if result.get(
+            "url"
+        )
+
+    })
+
+    info(
+
+        f"Nuclei Targets: {len(nuclei_targets)}"
+
+    )
+
+
+    if nuclei_targets:
+
+        try:
+
+            (
+
+                nuclei_results,
+
+                nuclei_overall,
+
+                nuclei_failed,
+
+                nuclei_time,
+
+                nuclei_files,
+
+            ) = run_and_export(
+
+                nuclei_targets
+
+            )
+
+            print_summary(
+
+                nuclei_overall
+
+            )
+
+        except Exception as error:
+
+            from core.logger import warning
+
+            warning(
+
+                f"Nuclei scan failed: {error}"
+
+            )
+
+    else:
+
+        info(
+
+            "No targets for Nuclei scan."
+
+        )
+
 
 
 # ==========================================================
@@ -538,3 +621,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+

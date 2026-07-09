@@ -1,8 +1,21 @@
-from modules.fuzzing.manager import run_fuzzing
+from pprint import pprint
 
-results, overall, failed, elapsed = run_fuzzing([
-    "https://httpbin.org"
-])
+from modules.nuclei.scanner import scan_target
+from modules.nuclei.parser import parse_nuclei
 
-print(results)
-print(overall)
+result = scan_target(
+    "https://demo.testfire.net",
+    profile="fast",
+)
+
+pprint(result)
+
+if result["success"]:
+
+    print("\nOutput File:")
+    print(result["output"])
+
+    print("\nParsed:")
+    pprint(
+        parse_nuclei(result["output"])
+    )

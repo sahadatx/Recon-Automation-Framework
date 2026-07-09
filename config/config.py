@@ -164,3 +164,14 @@ FUZZ_RECURSION = False
 FUZZ_FOLLOW_REDIRECT = False
 
 FUZZ_RATE = 0
+
+
+# ==========================================================
+# Nuclei
+# ==========================================================
+
+NUCLEI_THREADS = 25
+
+NUCLEI_TIMEOUT = 600
+
+NUCLEI_RATE_LIMIT = 150
