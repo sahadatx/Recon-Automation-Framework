@@ -145,3 +145,22 @@ CRAWLER_VERIFY_SSL = False
 
 CRAWLER_WORKERS = 10
 
+# ==========================================================
+# Directory Fuzzing
+# ==========================================================
+
+FUZZ_THREADS = 40
+
+FUZZ_TIMEOUT = 300
+
+FUZZ_MATCH_CODES = (
+
+    "200,204,301,302,307,401,403,405"
+
+)
+
+FUZZ_RECURSION = False
+
+FUZZ_FOLLOW_REDIRECT = False
+
+FUZZ_RATE = 0

@@ -120,6 +120,20 @@ from modules.javascript.exporter import (
 
 
 # ==========================================================
+# Directory Fuzzing
+# ==========================================================
+
+from modules.fuzzing.manager import (
+    run_fuzzing,
+)
+
+from modules.fuzzing.exporter import (
+    export_all as export_fuzzing_results,
+    show_summary as show_fuzzing_summary,
+)
+
+
+# ==========================================================
 # Screenshot Capture
 # ==========================================================
 
@@ -416,6 +430,68 @@ def main() -> None:
             "No JavaScript files discovered."
         )
 
+
+
+    # ------------------------------------------------------
+    # Directory Fuzzing
+    # ------------------------------------------------------
+
+    fuzz_targets = sorted({
+
+        result["url"]
+
+        for result in http_results.values()
+
+        if result.get("url")
+
+    })
+
+    info(
+        f"Fuzz Targets: {len(fuzz_targets)}"
+    )
+
+    if fuzz_targets:
+
+        try:
+
+            (
+
+                fuzz_results,
+
+                fuzz_statistics,
+
+                fuzz_failed,
+
+                fuzz_time,
+
+            ) = run_fuzzing(
+                fuzz_targets
+            )
+
+            export_fuzzing_results(
+                fuzz_results
+            )
+
+            show_fuzzing_summary(
+                fuzz_results,
+                fuzz_statistics,
+                fuzz_failed,
+                fuzz_time,
+            )
+
+        except Exception as error:
+
+            from core.logger import warning
+
+            warning(
+                f"Directory Fuzzing failed: {error}"
+            )
+
+    else:
+
+        info(
+            "No fuzzing targets discovered."
+        )
 
     # ------------------------------------------------------
     # Screenshot Capture
