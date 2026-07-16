@@ -11,7 +11,7 @@ import dns.resolver
 from config.config import (
     DNS_TIMEOUT,
     DNS_LIFETIME,
-    DNS_RETRY,
+    DNS_RETRIES,
     DNS_SERVERS,
 )
 
@@ -83,7 +83,7 @@ def resolve_record(
     # Retry Loop
     # ------------------------------------------
 
-    for attempt in range(DNS_RETRY + 1):
+    for attempt in range(DNS_RETRIES + 1):
 
         try:
 
@@ -106,11 +106,11 @@ def resolve_record(
 
         except dns.exception.Timeout:
 
-            if attempt < DNS_RETRY:
+            if attempt < DNS_RETRIES:
 
                 warning(
                     f"{record_type} lookup timeout "
-                    f"({attempt + 1}/{DNS_RETRY + 1}) "
+                    f"({attempt + 1}/{DNS_RETRIES + 1}) "
                     f"for {domain}. Retrying..."
                 )
 

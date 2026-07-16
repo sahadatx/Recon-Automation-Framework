@@ -14,6 +14,10 @@ DEFAULT_STATUS_CODES = {
 
     200,
 
+    201,
+
+    202,
+
     204,
 
     301,
@@ -22,11 +26,15 @@ DEFAULT_STATUS_CODES = {
 
     307,
 
+    308,
+
     401,
 
     403,
 
     405,
+
+    500,
 
 }
 
@@ -74,7 +82,8 @@ def filter_status_codes(
     allowed=None,
 ):
     """
-    Keep allowed HTTP status codes.
+    Keep allowed HTTP
+    status codes.
 
     Returns:
         list
@@ -82,7 +91,9 @@ def filter_status_codes(
 
     if allowed is None:
 
-        allowed = DEFAULT_STATUS_CODES
+        allowed = (
+            DEFAULT_STATUS_CODES
+        )
 
     return [
 
@@ -99,31 +110,41 @@ def filter_status_codes(
 
 
 # ==========================================================
-# Remove Empty Responses
+# Remove Invalid Responses
 # ==========================================================
 
-def remove_empty(
+def remove_invalid(
     results: list,
 ):
     """
-    Remove empty responses.
+    Remove invalid
+    ffuf responses.
+
+    Responses with a valid
+    HTTP status are kept,
+    even if response size
+    is zero.
 
     Returns:
         list
     """
 
-    return [
+    filtered = []
 
-        result
-
-        for result in results
+    for result in results:
 
         if result.get(
-            "length",
+            "status",
             0,
-        ) > 0
+        ) == 0:
 
-    ]
+            continue
+
+        filtered.append(
+            result
+        )
+
+    return filtered
 
 
 # ==========================================================
@@ -135,7 +156,8 @@ def filter_extensions(
     blocked=None,
 ):
     """
-    Remove unwanted file extensions.
+    Remove unwanted
+    file extensions.
 
     Returns:
         list
@@ -155,13 +177,17 @@ def filter_extensions(
 
             ".svg",
 
+            ".ico",
+
             ".woff",
 
             ".woff2",
 
             ".ttf",
 
-            ".ico",
+            ".eot",
+
+            ".otf",
 
         }
 
@@ -175,10 +201,13 @@ def filter_extensions(
         ).lower()
 
         if any(
+
             url.endswith(
                 extension
             )
+
             for extension in blocked
+
         ):
 
             continue
@@ -212,7 +241,7 @@ def apply_filters(
         results
     )
 
-    results = remove_empty(
+    results = remove_invalid(
         results
     )
 

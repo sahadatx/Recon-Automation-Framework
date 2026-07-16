@@ -14,11 +14,21 @@ from urllib.parse import (
 import requests
 
 from config.config import (
+
     HTTP_TIMEOUT,
+
+    HTTP_USER_AGENT,
+
+    HTTP_VERIFY_SSL,
+
+    CRAWLER_RETRIES,
+
 )
 
 from core.logger import (
+
     debug,
+
 )
 
 
@@ -40,18 +50,22 @@ def create_session():
 
         {
 
-            "User-Agent": (
-                "ReconAutomationFramework/2.0"
-            ),
+            "User-Agent": HTTP_USER_AGENT,
 
             "Accept": (
+
                 "text/html,"
+
                 "application/xhtml+xml,"
+
                 "application/xml;q=0.9,*/*;q=0.8"
+
             ),
 
             "Accept-Encoding": (
+
                 "gzip, deflate, br"
+
             ),
 
             "Connection": "keep-alive",
@@ -87,8 +101,11 @@ def normalize_url(
     """
 
     url = urljoin(
+
         base_url,
+
         link,
+
     )
 
     parsed = urlparse(
@@ -127,7 +144,11 @@ def same_domain(
     url: str,
 ):
     """
-    Check same hostname.
+    Check whether two URLs
+    belong to the same host.
+
+    Returns:
+        bool
     """
 
     return (
@@ -146,7 +167,7 @@ def same_domain(
 
 
 # ==========================================================
-# Is HTML
+# HTML Detection
 # ==========================================================
 
 def is_html(
@@ -154,7 +175,10 @@ def is_html(
 ):
     """
     Check whether response
-    is HTML.
+    contains HTML.
+
+    Returns:
+        bool
     """
 
     if response is None:
@@ -198,11 +222,19 @@ def download_page(
     """
     Download HTML page.
 
+    Args:
+        url:
+            Target URL.
+
     Returns:
         requests.Response | None
     """
 
-    for attempt in range(3):
+    for attempt in range(
+
+        CRAWLER_RETRIES
+
+    ):
 
         try:
 
@@ -214,6 +246,8 @@ def download_page(
 
                 allow_redirects=True,
 
+                verify=HTTP_VERIFY_SSL,
+
             )
 
             response.raise_for_status()
@@ -223,21 +257,47 @@ def download_page(
             ):
 
                 debug(
+
                     f"Skipped non-HTML: {url}"
+
                 )
 
                 return None
 
             return response
 
+        except requests.exceptions.SSLError as error:
+
+            debug(
+
+                f"SSL Error "
+
+                f"({attempt + 1}/{CRAWLER_RETRIES}): "
+
+                f"{url} ({error})"
+
+            )
+
         except requests.RequestException as error:
 
             debug(
-                f"Retry {attempt + 1}: {url} ({error})"
+
+                f"Retry "
+
+                f"({attempt + 1}/{CRAWLER_RETRIES}): "
+
+                f"{url} ({error})"
+
             )
 
     debug(
-        f"Failed: {url}"
+
+        f"Failed after "
+
+        f"{CRAWLER_RETRIES} attempts: "
+
+        f"{url}"
+
     )
 
     return None
@@ -252,6 +312,13 @@ def get_domain(
 ):
     """
     Return hostname.
+
+    Args:
+        url:
+            Target URL.
+
+    Returns:
+        str
     """
 
     return urlparse(

@@ -10,11 +10,23 @@ from pathlib import Path
 import requests
 
 from config.config import (
+
     HTTP_TIMEOUT,
+
+    HTTP_RETRIES,
+
+    HTTP_USER_AGENT,
+
+    HTTP_VERIFY_SSL,
+
+    JAVASCRIPT_OUTPUT_DIR,
+
 )
 
 from core.logger import (
+
     debug,
+
 )
 
 
@@ -36,13 +48,13 @@ def create_session():
 
         {
 
-            "User-Agent": (
-                "ReconAutomationFramework/2.0"
-            ),
+            "User-Agent": HTTP_USER_AGENT,
 
         }
 
     )
+
+    session.verify = HTTP_VERIFY_SSL
 
     return session
 
@@ -58,7 +70,7 @@ SESSION = create_session()
 # Create Output Directory
 # ==========================================================
 
-def create_output_directory():
+def create_output_directory() -> Path:
     """
     Create JavaScript output directory.
 
@@ -66,11 +78,7 @@ def create_output_directory():
         Path
     """
 
-    output = Path(
-        "output/javascript/raw"
-    )
-
-    output.mkdir(
+    JAVASCRIPT_OUTPUT_DIR.mkdir(
 
         parents=True,
 
@@ -78,7 +86,7 @@ def create_output_directory():
 
     )
 
-    return output
+    return JAVASCRIPT_OUTPUT_DIR
 
 
 # ==========================================================
@@ -87,10 +95,14 @@ def create_output_directory():
 
 def safe_filename(
     url: str,
-):
+) -> str:
     """
     Convert JavaScript URL into
     filesystem-safe filename.
+
+    Args:
+        url:
+            JavaScript URL.
 
     Returns:
         str
@@ -101,48 +113,76 @@ def safe_filename(
         url
 
         .replace(
+
             "https://",
+
             "",
+
         )
 
         .replace(
+
             "http://",
+
             "",
+
         )
 
         .replace(
+
             "/",
+
             "_",
+
         )
 
         .replace(
+
             "\\",
+
             "_",
+
         )
 
         .replace(
+
             "?",
+
             "_",
+
         )
 
         .replace(
+
             "&",
+
             "_",
+
         )
 
         .replace(
+
             "=",
+
             "_",
+
         )
 
         .replace(
+
             ":",
+
             "_",
+
         )
 
     )
 
-    if not filename.endswith(".js"):
+    if not filename.endswith(
+
+        ".js"
+
+    ):
 
         filename += ".js"
 
@@ -156,9 +196,16 @@ def safe_filename(
 def save_javascript(
     filename: str,
     content: str,
-):
+) -> Path:
     """
     Save JavaScript file.
+
+    Args:
+        filename:
+            Output filename.
+
+        content:
+            JavaScript content.
 
     Returns:
         Path
@@ -166,7 +213,13 @@ def save_javascript(
 
     output = create_output_directory()
 
-    filepath = output / filename
+    filepath = (
+
+        output
+
+        / filename
+
+    )
 
     filepath.write_text(
 
@@ -191,11 +244,19 @@ def download_file(
     """
     Download JavaScript file.
 
+    Args:
+        url:
+            JavaScript URL.
+
     Returns:
         requests.Response | None
     """
 
-    for attempt in range(3):
+    for attempt in range(
+
+        HTTP_RETRIES + 1
+
+    ):
 
         try:
 
@@ -213,18 +274,38 @@ def download_file(
 
             return response
 
+        except requests.exceptions.SSLError as error:
+
+            debug(
+
+                f"SSL Error "
+
+                f"({attempt + 1}/{HTTP_RETRIES + 1}): "
+
+                f"{url} ({error})"
+
+            )
+
         except requests.RequestException as error:
 
             debug(
 
-                f"Retry {attempt + 1}: "
+                f"Retry "
+
+                f"({attempt + 1}/{HTTP_RETRIES + 1}): "
 
                 f"{url} ({error})"
 
             )
 
     debug(
-        f"Failed: {url}"
+
+        f"Failed after "
+
+        f"{HTTP_RETRIES + 1} attempts: "
+
+        f"{url}"
+
     )
 
     return None

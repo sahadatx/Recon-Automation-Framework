@@ -82,10 +82,22 @@ def process_target(
 
         if parsed is None:
 
+            print("[DEBUG] Parser returned None")
+
             return (
                 target,
                 None,
             )
+
+        print(
+            "[DEBUG] Raw Results:",
+            len(
+                parsed.get(
+                    "results",
+                    [],
+                )
+            )
+        )
 
         results = apply_filters(
 
@@ -93,6 +105,14 @@ def process_target(
                 "results",
                 [],
             )
+
+        )
+
+        print(
+
+            "[DEBUG] Filtered Results:",
+
+            len(results)
 
         )
 
@@ -126,9 +146,7 @@ def process_target(
 
     finally:
 
-        cleanup(
-            output
-        )
+        pass
 
 
 # ==========================================================

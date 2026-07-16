@@ -12,7 +12,7 @@ from concurrent.futures import (
 )
 
 from config.config import (
-    CRAWLER_WORKERS,
+    CRAWLER_THREADS,
 )
 
 from core.logger import (
@@ -146,7 +146,7 @@ def crawl_hosts(
 
     with ThreadPoolExecutor(
 
-        max_workers=CRAWLER_WORKERS,
+        max_workers=CRAWLER_THREADS,
 
     ) as executor:
 

@@ -15,7 +15,7 @@ from playwright.async_api import (
 from config.config import (
     SCREENSHOT_TIMEOUT,
     SCREENSHOT_FULL_PAGE,
-    SCREENSHOT_OUTPUT,
+    SCREENSHOT_OUTPUT_DIR,
 )
 
 from core.logger import (
@@ -37,7 +37,7 @@ def ensure_output_directory() -> Path:
     """
 
     output = Path(
-        SCREENSHOT_OUTPUT
+        SCREENSHOT_OUTPUT_DIR
     )
 
     output.mkdir(

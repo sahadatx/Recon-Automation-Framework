@@ -9,8 +9,8 @@ import requests
 
 from config.config import (
     HTTP_TIMEOUT,
-    VERIFY_SSL,
-    USER_AGENT,
+    HTTP_VERIFY_SSL,
+    HTTP_USER_AGENT,
     VERBOSE,
 )
 
@@ -36,11 +36,11 @@ def create_session():
 
     session = requests.Session()
 
-    session.verify = VERIFY_SSL
+    session.verify = HTTP_VERIFY_SSL
 
     session.headers.update(
         {
-            "User-Agent": USER_AGENT,
+            "User-Agent": HTTP_USER_AGENT,
         }
     )
 

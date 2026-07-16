@@ -13,7 +13,7 @@ from playwright.async_api import (
 )
 
 from config.config import (
-    HEADLESS_BROWSER,
+    SCREENSHOT_HEADLESS,
     SCREENSHOT_WIDTH,
     SCREENSHOT_HEIGHT,
 )
@@ -66,7 +66,7 @@ async def launch_browser(
 
     browser = await playwright.chromium.launch(
 
-        headless=HEADLESS_BROWSER,
+        headless=SCREENSHOT_HEADLESS,
 
         args=[
 

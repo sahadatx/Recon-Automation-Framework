@@ -8,33 +8,21 @@ import json
 
 from pathlib import Path
 
+from config.config import (
+
+    JAVASCRIPT_OUTPUT_DIR,
+
+)
+
 from core.logger import (
+
     success,
+
 )
-
-
-# ==========================================================
-# Output Directory
-# ==========================================================
-
-OUTPUT_DIR = Path(
-    "output/javascript"
-)
-
-
-# ==========================================================
-# Ensure Output Directory
-# ==========================================================
 
 def ensure_output_directory() -> Path:
-    """
-    Create output directory.
 
-    Returns:
-        Path
-    """
-
-    OUTPUT_DIR.mkdir(
+    JAVASCRIPT_OUTPUT_DIR.mkdir(
 
         parents=True,
 
@@ -42,7 +30,7 @@ def ensure_output_directory() -> Path:
 
     )
 
-    return OUTPUT_DIR
+    return JAVASCRIPT_OUTPUT_DIR
 
 
 # ==========================================================
