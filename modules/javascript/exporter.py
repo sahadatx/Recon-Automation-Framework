@@ -18,9 +18,22 @@ from core.logger import (
 
     success,
 
+    warning,
+
 )
 
+
+# ==========================================================
+# Ensure Output Directory
+# ==========================================================
+
 def ensure_output_directory() -> Path:
+    """
+    Create output directory.
+
+    Returns:
+        Path
+    """
 
     JAVASCRIPT_OUTPUT_DIR.mkdir(
 
@@ -42,14 +55,8 @@ def write_list(
     values,
 ) -> Path:
     """
-    Write iterable values into a file.
-
-    Args:
-        filename:
-            Output filename.
-
-        values:
-            Iterable values.
+    Write iterable values
+    into a text file.
 
     Returns:
         Path
@@ -63,25 +70,39 @@ def write_list(
 
     )
 
-    with output_file.open(
+    values = sorted(
 
-        "w",
+        set(values)
 
-        encoding="utf-8",
+    )
 
-    ) as file:
+    try:
 
-        for value in sorted(
+        with output_file.open(
 
-            set(values)
+            "w",
 
-        ):
+            encoding="utf-8",
 
-            file.write(
+        ) as file:
 
-                f"{value}\n"
+            for value in values:
 
-            )
+                file.write(
+
+                    f"{value}\n"
+
+                )
+
+    except Exception as error:
+
+        warning(
+
+            f"{output_file}: {error}"
+
+        )
+
+        return output_file
 
     success(
 
@@ -99,17 +120,10 @@ def write_list(
 def collect_analysis_items(
     results: dict,
     key: str,
-) -> list:
+):
     """
     Collect one analysis field
-    from every JavaScript file.
-
-    Args:
-        results:
-            JavaScript results.
-
-        key:
-            Analysis field.
+    from all JavaScript files.
 
     Returns:
         list
@@ -119,25 +133,31 @@ def collect_analysis_items(
 
     for metadata in results.values():
 
+        if not metadata:
+
+            continue
+
         analysis = metadata.get(
 
-            "analysis",
+            "analysis"
 
-            {},
+        ) or {}
+
+        values = analysis.get(
+
+            key,
+
+            [],
 
         )
 
-        collected.update(
+        if values:
 
-            analysis.get(
+            collected.update(
 
-                key,
-
-                [],
+                values
 
             )
-
-        )
 
     return sorted(
 
@@ -147,12 +167,12 @@ def collect_analysis_items(
 
 
 # ==========================================================
-# Collect Secrets
+# Collect Secret Items
 # ==========================================================
 
 def collect_secret_items(
     results: dict,
-) -> dict:
+):
     """
     Collect detected secrets.
 
@@ -164,21 +184,21 @@ def collect_secret_items(
 
     for metadata in results.values():
 
+        if not metadata:
+
+            continue
+
         secret_data = metadata.get(
 
-            "secrets",
+            "secrets"
 
-            {},
-
-        )
+        ) or {}
 
         findings = secret_data.get(
 
-            "findings",
+            "findings"
 
-            {},
-
-        )
+        ) or {}
 
         for secret_type, values in findings.items():
 
@@ -196,9 +216,9 @@ def collect_secret_items(
 
     return {
 
-        key: sorted(value)
+        key: sorted(values)
 
-        for key, value
+        for key, values
 
         in secrets.items()
 
@@ -213,20 +233,9 @@ def export_analysis(
     results: dict,
     key: str,
     filename: str,
-) -> Path:
+):
     """
-    Generic exporter for
-    analysis fields.
-
-    Args:
-        results:
-            JavaScript results.
-
-        key:
-            Analysis key.
-
-        filename:
-            Output filename.
+    Export one analysis field.
 
     Returns:
         Path
@@ -256,7 +265,7 @@ def export_analysis(
 def export_json(
     results: dict,
     filename: str = "javascript.json",
-) -> Path:
+):
     """
     Export JSON report.
 
@@ -272,25 +281,39 @@ def export_json(
 
     )
 
-    with output_file.open(
+    try:
 
-        "w",
+        with output_file.open(
 
-        encoding="utf-8",
+            "w",
 
-    ) as file:
+            encoding="utf-8",
 
-        json.dump(
+        ) as file:
 
-            results,
+            json.dump(
 
-            file,
+                results,
 
-            indent=4,
+                file,
 
-            sort_keys=True,
+                indent=4,
+
+                sort_keys=True,
+
+                default=str,
+
+            )
+
+    except Exception as error:
+
+        warning(
+
+            f"{output_file}: {error}"
 
         )
+
+        return output_file
 
     success(
 
@@ -308,9 +331,9 @@ def export_json(
 def save_results(
     results: dict,
     filename: str = "javascript.txt",
-) -> Path:
+):
     """
-    Save JavaScript analysis report.
+    Save JavaScript report.
 
     Returns:
         Path
@@ -324,105 +347,81 @@ def save_results(
 
     )
 
-    with output_file.open(
+    try:
 
-        "w",
+        with output_file.open(
 
-        encoding="utf-8",
+            "w",
 
-    ) as file:
+            encoding="utf-8",
 
-        for url, metadata in sorted(
+        ) as file:
 
-            results.items()
+            for url, metadata in sorted(
 
-        ):
+                results.items()
 
-            analysis = metadata.get(
+            ):
 
-                "analysis",
+                if not metadata:
 
-                {},
+                    continue
 
-            )
+                analysis = metadata.get(
 
-            statistics = analysis.get(
+                    "analysis"
 
-                "statistics",
+                ) or {}
 
-                {},
+                statistics = analysis.get(
 
-            )
+                    "statistics"
 
-            secrets = metadata.get(
+                ) or {}
 
-                "secrets",
+                secrets = metadata.get(
 
-                {},
+                    "secrets"
 
-            )
+                ) or {}
 
-            findings = secrets.get(
+                findings = secrets.get(
 
-                "findings",
+                    "findings"
 
-                {},
-
-            )
-
-            file.write(
-
-                "=" * 80 + "\n"
-
-            )
-
-            file.write(
-
-                f"JavaScript : {url}\n"
-
-            )
-
-            file.write(
-
-                f"Saved File : "
-
-                f"{metadata.get('path','-')}\n"
-
-            )
-
-            file.write(
-
-                f"Status     : "
-
-                f"{metadata.get('status','-')}\n\n"
-
-            )
-
-            file.write(
-
-                "Statistics\n"
-
-            )
-
-            file.write(
-
-                "-" * 80 + "\n"
-
-            )
-
-            for key, value in statistics.items():
+                ) or {}
 
                 file.write(
 
-                    f"{key:<20}: {value}\n"
+                    "=" * 80 + "\n"
 
                 )
 
-            if findings:
+                file.write(
+
+                    f"JavaScript : {url}\n"
+
+                )
 
                 file.write(
 
-                    "\nSecrets\n"
+                    f"Saved File : "
+
+                    f"{metadata.get('path','-')}\n"
+
+                )
+
+                file.write(
+
+                    f"Status     : "
+
+                    f"{metadata.get('status','-')}\n\n"
+
+                )
+
+                file.write(
+
+                    "Statistics\n"
 
                 )
 
@@ -432,25 +431,61 @@ def save_results(
 
                 )
 
-                for secret_type, values in findings.items():
+                for key, value in statistics.items():
 
                     file.write(
 
-                        f"[{secret_type}]\n"
+                        f"{key:<24}: {value}\n"
 
                     )
 
-                    for value in values:
+                if findings:
+
+                    file.write(
+
+                        "\nSecrets\n"
+
+                    )
+
+                    file.write(
+
+                        "-" * 80 + "\n"
+
+                    )
+
+                    for secret_type, values in sorted(
+
+                        findings.items()
+
+                    ):
 
                         file.write(
 
-                            f"  - {value}\n"
+                            f"[{secret_type}]\n"
 
                         )
 
-                    file.write("\n")
+                        for value in values:
 
-            file.write("\n")
+                            file.write(
+
+                                f"  - {value}\n"
+
+                            )
+
+                        file.write("\n")
+
+                file.write("\n")
+
+    except Exception as error:
+
+        warning(
+
+            f"{output_file}: {error}"
+
+        )
+
+        return output_file
 
     success(
 
@@ -467,7 +502,7 @@ def save_results(
 
 def export_urls(
     results: dict,
-) -> Path:
+):
 
     return export_analysis(
 
@@ -482,7 +517,7 @@ def export_urls(
 
 def export_comments(
     results: dict,
-) -> Path:
+):
 
     return export_analysis(
 
@@ -497,7 +532,7 @@ def export_comments(
 
 def export_strings(
     results: dict,
-) -> Path:
+):
 
     return export_analysis(
 
@@ -512,7 +547,7 @@ def export_strings(
 
 def export_source_maps(
     results: dict,
-) -> Path:
+):
 
     return export_analysis(
 
@@ -527,7 +562,7 @@ def export_source_maps(
 
 def export_endpoints(
     results: dict,
-) -> Path:
+):
 
     return export_analysis(
 
@@ -547,7 +582,7 @@ def export_endpoints(
 def export_secrets(
     results: dict,
     filename: str = "secrets.txt",
-) -> Path:
+):
     """
     Export detected secrets.
 
@@ -564,60 +599,74 @@ def export_secrets(
     )
 
     secrets = collect_secret_items(
+
         results
+
     )
 
-    with output_file.open(
+    try:
 
-        "w",
+        with output_file.open(
 
-        encoding="utf-8",
+            "w",
 
-    ) as file:
+            encoding="utf-8",
 
-        if not secrets:
+        ) as file:
 
-            file.write(
-
-                "No secrets detected.\n"
-
-            )
-
-        else:
-
-            for secret_type, values in sorted(
-
-                secrets.items()
-
-            ):
+            if not secrets:
 
                 file.write(
 
-                    "=" * 80 + "\n"
+                    "No secrets detected.\n"
 
                 )
 
-                file.write(
+            else:
 
-                    f"{secret_type}\n"
+                for secret_type, values in sorted(
 
-                )
+                    secrets.items()
 
-                file.write(
-
-                    "-" * 80 + "\n"
-
-                )
-
-                for value in values:
+                ):
 
                     file.write(
 
-                        value + "\n"
+                        "=" * 80 + "\n"
 
                     )
 
-                file.write("\n")
+                    file.write(
+
+                        f"{secret_type}\n"
+
+                    )
+
+                    file.write(
+
+                        "-" * 80 + "\n"
+
+                    )
+
+                    for value in values:
+
+                        file.write(
+
+                            value + "\n"
+
+                        )
+
+                    file.write("\n")
+
+    except Exception as error:
+
+        warning(
+
+            f"{output_file}: {error}"
+
+        )
+
+        return output_file
 
     success(
 
@@ -637,38 +686,53 @@ def export_all(
 ):
     """
     Export all JavaScript reports.
+
+    Returns:
+        None
     """
 
-    save_results(
-        results
+    exporters = (
+
+        save_results,
+
+        export_json,
+
+        export_urls,
+
+        export_comments,
+
+        export_strings,
+
+        export_source_maps,
+
+        export_endpoints,
+
+        export_secrets,
+
     )
 
-    export_json(
-        results
-    )
+    for exporter in exporters:
 
-    export_urls(
-        results
-    )
+        try:
 
-    export_comments(
-        results
-    )
+            exporter(
 
-    export_strings(
-        results
-    )
+                results
 
-    export_source_maps(
-        results
-    )
+            )
 
-    export_endpoints(
-        results
-    )
+        except Exception as error:
 
-    export_secrets(
-        results
+            warning(
+
+                f"{exporter.__name__}: {error}"
+
+            )
+
+    success(
+
+        "JavaScript analysis export completed."
+
     )
 
 
@@ -682,43 +746,161 @@ def show_summary(
     elapsed: float,
 ):
     """
-    Display summary.
+    Display JavaScript analysis summary.
+
+    Returns:
+        None
     """
 
-    total = len(results) + len(failed)
+    total = len(
 
-    success_rate = (
+        results
 
-        (len(results) / total) * 100
+    ) + len(
 
-        if total
-
-        else 0
+        failed
 
     )
 
-    print("\n" + "=" * 80)
-    print("JavaScript Analysis Summary")
-    print("=" * 80)
+    downloaded = len(
 
-    print(f"{'Processed':<20}{total}")
-    print(f"{'Downloaded':<20}{len(results)}")
-    print(f"{'Failed':<20}{len(failed)}")
+        results
 
-    print("-" * 80)
+    )
 
-    print(f"{'Success Rate':<20}{success_rate:.1f}%")
-    print(f"{'Elapsed':<20}{elapsed:.2f} sec")
+    success_rate = (
 
-    print("=" * 80)
+        (downloaded / total) * 100
+
+        if total
+
+        else 0.0
+
+    )
+
+    statistics = {
+
+        "processed": total,
+
+        "downloaded": downloaded,
+
+        "failed": len(
+
+            failed
+
+        ),
+
+        "success_rate": success_rate,
+
+        "elapsed": elapsed,
+
+    }
+
+    print()
+
+    print(
+
+        "=" * 80
+
+    )
+
+    print(
+
+        "JavaScript Analysis Summary"
+
+    )
+
+    print(
+
+        "=" * 80
+
+    )
+
+    print(
+
+        f"{'Processed Files':<24}"
+
+        f"{statistics['processed']}"
+
+    )
+
+    print(
+
+        f"{'Downloaded Files':<24}"
+
+        f"{statistics['downloaded']}"
+
+    )
+
+    print(
+
+        f"{'Failed Files':<24}"
+
+        f"{statistics['failed']}"
+
+    )
+
+    print(
+
+        "-" * 80
+
+    )
+
+    print(
+
+        f"{'Success Rate':<24}"
+
+        f"{statistics['success_rate']:.1f}%"
+
+    )
+
+    print(
+
+        f"{'Elapsed':<24}"
+
+        f"{statistics['elapsed']:.2f} sec"
+
+    )
+
+    print(
+
+        "=" * 80
+
+    )
 
     if failed:
 
-        print("\nFailed Downloads")
-        print("-" * 80)
+        print()
 
-        for item in failed:
+        print(
 
-            print(f" • {item}")
+            "Failed Downloads"
 
-        print("-" * 80)
+        )
+
+        print(
+
+            "-" * 80
+
+        )
+
+        for item in sorted(
+
+            failed
+
+        ):
+
+            print(
+
+                f" • {item}"
+
+            )
+
+        print(
+
+            "-" * 80
+
+        )
+
+
+

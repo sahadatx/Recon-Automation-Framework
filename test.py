@@ -1,11 +1,5 @@
-from pprint import pprint
+python - <<'PY'
+from modules.crawler.helpers import download_page
 
-from modules.fuzzing.manager import run_fuzzing
-
-pprint(
-    run_fuzzing(
-        [
-            "https://testphp.vulnweb.com",
-        ]
-    )
-)
+download_page("https://httpbin.org/status/404")
+PY

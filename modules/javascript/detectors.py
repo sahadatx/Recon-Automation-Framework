@@ -5,13 +5,36 @@ Detects secrets from JavaScript source code
 using the configured regex database.
 """
 
+from core.logger import (
+    warning,
+)
+
 from modules.javascript.secrets import (
     SECRET_PATTERNS,
 )
 
-# from modules.javascript.filters import (
-#     filter_findings,
-# )
+from modules.javascript.filters import (
+    filter_findings,
+)
+
+
+# ==========================================================
+# Empty Result
+# ==========================================================
+
+EMPTY_RESULT = {
+
+    "findings": {},
+
+    "statistics": {
+
+        "secret_types": 0,
+
+        "total_secrets": 0,
+
+    },
+
+}
 
 
 # ==========================================================
@@ -19,87 +42,104 @@ from modules.javascript.secrets import (
 # ==========================================================
 
 def normalize_matches(
-    matches: list,
-) -> list[str]:
+    matches,
+):
     """
     Normalize regex matches.
 
-    Args:
-        matches:
-            Raw regex matches.
-
     Returns:
-        Sorted unique matches.
+        list
     """
 
-    cleaned = set()
+    normalized = set()
 
     for match in matches:
 
-        # Regex with capture groups
         if isinstance(
+
             match,
+
             tuple,
+
         ):
 
-            value = ""
+            value = next(
 
-            for item in match:
+                (
 
-                if item:
+                    item.strip()
 
-                    value = item.strip()
+                    for item
 
-                    break
+                    in match
+
+                    if item
+
+                ),
+
+                "",
+
+            )
 
         else:
 
             value = str(
+
                 match
+
             ).strip()
 
-        if not value:
+        if value:
 
-            continue
+            normalized.add(
 
-        cleaned.add(
-            value
-        )
+                value
+
+            )
 
     return sorted(
-        cleaned
+
+        normalized
+
     )
 
 
 # ==========================================================
-# Detect One Pattern
+# Detect Pattern
 # ==========================================================
 
 def detect_pattern(
     content: str,
     pattern,
-) -> list[str]:
+):
     """
-    Detect one secret type.
-
-    Args:
-        content:
-            JavaScript content.
-
-        pattern:
-            Compiled regex.
+    Detect one regex pattern.
 
     Returns:
-        Secret matches.
+        list
     """
 
-    matches = pattern.findall(
-        content
-    )
+    try:
 
-    return normalize_matches(
-        matches
-    )
+        return normalize_matches(
+
+            pattern.findall(
+
+                content
+
+            )
+
+        )
+
+    except Exception as error:
+
+        warning(
+
+            f"Regex failed: {error}"
+
+        )
+
+        return []
 
 
 # ==========================================================
@@ -108,21 +148,18 @@ def detect_pattern(
 
 def detect_secrets(
     content: str,
-) -> dict:
+):
     """
-    Detect every supported secret.
-
-    Args:
-        content:
-            JavaScript source.
+    Detect every supported
+    secret type.
 
     Returns:
-        Dictionary of findings.
+        dict
     """
 
     findings = {}
 
-    for secret_name, pattern in SECRET_PATTERNS.items():
+    for secret_type, pattern in SECRET_PATTERNS.items():
 
         matches = detect_pattern(
 
@@ -135,7 +172,7 @@ def detect_secrets(
         if matches:
 
             findings[
-                secret_name
+                secret_type
             ] = matches
 
     return findings
@@ -146,36 +183,69 @@ def detect_secrets(
 # ==========================================================
 
 def generate_statistics(
-    findings: dict,
-) -> dict:
+    findings,
+):
     """
-    Generate summary statistics.
-
-    Args:
-        findings:
-            Filtered findings.
+    Generate statistics.
 
     Returns:
-        Statistics dictionary.
+        dict
     """
-
-    total = 0
-
-    for values in findings.values():
-
-        total += len(
-            values
-        )
 
     return {
 
         "secret_types": len(
+
             findings
+
         ),
 
-        "total_secrets": total,
+        "total_secrets": sum(
+
+            len(values)
+
+            for values
+
+            in findings.values()
+
+        ),
 
     }
+
+
+# ==========================================================
+# Secret Pipeline
+# ==========================================================
+
+def process_findings(
+    content: str,
+):
+    """
+    Secret detection pipeline.
+
+        Regex
+           ↓
+        Normalize
+           ↓
+        False Positive Filter
+
+    Returns:
+        dict
+    """
+
+    findings = detect_secrets(
+
+        content
+
+    )
+
+    findings = filter_findings(
+
+        findings
+
+    )
+
+    return findings
 
 
 # ==========================================================
@@ -184,58 +254,54 @@ def generate_statistics(
 
 def scan_content(
     content: str,
-) -> dict:
+):
     """
     Scan JavaScript content.
 
     Workflow
 
         Detect Secrets
-            ↓
-        Remove False Positives
-            ↓
-        Generate Statistics
-
-    Args:
-        content:
-            JavaScript source.
+              ↓
+        Normalize
+              ↓
+        False Positive Filter
+              ↓
+        Statistics
 
     Returns:
-        Scan result.
+        dict
     """
 
     if not content:
 
-        return {
+        return EMPTY_RESULT.copy()
 
-            "findings": {},
+    try:
 
-            "statistics": {
+        findings = process_findings(
 
-                "secret_types": 0,
+            content
 
-                "total_secrets": 0,
+        )
 
-            },
+    except Exception as error:
 
-        }
+        warning(
 
-    findings = detect_secrets(
-        content
-    )
+            f"Secret detection failed: {error}"
 
-    # findings = filter_findings(
-    #     findings
-    # )
+        )
 
-    statistics = generate_statistics(
-        findings
-    )
+        return EMPTY_RESULT.copy()
 
     return {
 
         "findings": findings,
 
-        "statistics": statistics,
+        "statistics": generate_statistics(
+
+            findings
+
+        ),
 
     }

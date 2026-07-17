@@ -6,8 +6,23 @@ JavaScript Analysis module.
 """
 
 from pathlib import Path
+from urllib.parse import urlparse
 
 import requests
+
+from requests.exceptions import (
+
+    ConnectionError,
+
+    ConnectTimeout,
+
+    HTTPError,
+
+    ReadTimeout,
+
+    Timeout,
+
+)
 
 from config.config import (
 
@@ -28,6 +43,23 @@ from core.logger import (
     debug,
 
 )
+
+
+# ==========================================================
+# Retryable HTTP Status Codes
+# ==========================================================
+
+RETRY_STATUS_CODES = {
+
+    500,
+
+    502,
+
+    503,
+
+    504,
+
+}
 
 
 # ==========================================================
@@ -90,6 +122,53 @@ def create_output_directory() -> Path:
 
 
 # ==========================================================
+# URL Validation
+# ==========================================================
+
+def is_valid_url(
+    url: str,
+) -> bool:
+    """
+    Validate JavaScript URL.
+
+    Returns:
+        bool
+    """
+
+    if not url:
+
+        return False
+
+    try:
+
+        parsed = urlparse(
+
+            url
+
+        )
+
+    except ValueError:
+
+        return False
+
+    if parsed.scheme not in (
+
+        "http",
+
+        "https",
+
+    ):
+
+        return False
+
+    if not parsed.netloc:
+
+        return False
+
+    return True
+
+
+# ==========================================================
 # Safe Filename
 # ==========================================================
 
@@ -99,10 +178,6 @@ def safe_filename(
     """
     Convert JavaScript URL into
     filesystem-safe filename.
-
-    Args:
-        url:
-            JavaScript URL.
 
     Returns:
         str
@@ -200,26 +275,13 @@ def save_javascript(
     """
     Save JavaScript file.
 
-    Args:
-        filename:
-            Output filename.
-
-        content:
-            JavaScript content.
-
     Returns:
         Path
     """
 
     output = create_output_directory()
 
-    filepath = (
-
-        output
-
-        / filename
-
-    )
+    filepath = output / filename
 
     filepath.write_text(
 
@@ -235,6 +297,76 @@ def save_javascript(
 
 
 # ==========================================================
+# Retry Policy
+# ==========================================================
+
+def should_retry(
+    error: Exception,
+) -> bool:
+    """
+    Decide whether request
+    should be retried.
+
+    Returns:
+        bool
+    """
+
+    if isinstance(
+
+        error,
+
+        (
+
+            Timeout,
+
+            ConnectTimeout,
+
+            ReadTimeout,
+
+            ConnectionError,
+
+        ),
+
+    ):
+
+        return True
+
+    if isinstance(
+
+        error,
+
+        HTTPError,
+
+    ):
+
+        response = getattr(
+
+            error,
+
+            "response",
+
+            None,
+
+        )
+
+        if response is None:
+
+            return False
+
+        return (
+
+            response.status_code
+
+            in
+
+            RETRY_STATUS_CODES
+
+        )
+
+    return False
+
+
+# ==========================================================
 # Download File
 # ==========================================================
 
@@ -244,13 +376,23 @@ def download_file(
     """
     Download JavaScript file.
 
-    Args:
-        url:
-            JavaScript URL.
-
     Returns:
         requests.Response | None
     """
+
+    if not is_valid_url(
+
+        url
+
+    ):
+
+        debug(
+
+            f"Invalid URL skipped: {url}"
+
+        )
+
+        return None
 
     for attempt in range(
 
@@ -278,25 +420,85 @@ def download_file(
 
             debug(
 
-                f"SSL Error "
-
-                f"({attempt + 1}/{HTTP_RETRIES + 1}): "
-
-                f"{url} ({error})"
+                f"SSL Error: {url} ({error})"
 
             )
 
-        except requests.RequestException as error:
+            return None
+
+        except ValueError as error:
 
             debug(
 
-                f"Retry "
-
-                f"({attempt + 1}/{HTTP_RETRIES + 1}): "
-
-                f"{url} ({error})"
+                f"Invalid URL: {url} ({error})"
 
             )
+
+            return None
+
+        except requests.RequestException as error:
+
+            if not should_retry(
+
+                error
+
+            ):
+
+                if isinstance(
+
+                    error,
+
+                    HTTPError,
+
+                ) and error.response is not None:
+
+                    debug(
+
+                        f"HTTP {error.response.status_code}: {url}"
+
+                    )
+
+                else:
+
+                    debug(
+
+                        f"Not retrying: {url} ({error})"
+
+                    )
+
+                return None
+
+            if isinstance(
+
+                error,
+
+                HTTPError,
+
+            ) and error.response is not None:
+
+                debug(
+
+                    f"Retry "
+
+                    f"({attempt + 1}/{HTTP_RETRIES + 1}) "
+
+                    f"HTTP {error.response.status_code}: "
+
+                    f"{url}"
+
+                )
+
+            else:
+
+                debug(
+
+                    f"Retry "
+
+                    f"({attempt + 1}/{HTTP_RETRIES + 1}): "
+
+                    f"{url} ({error})"
+
+                )
 
     debug(
 

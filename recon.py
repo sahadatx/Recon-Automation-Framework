@@ -14,6 +14,7 @@ from core.banner import show_banner
 
 from core.logger import (
     info,
+    warning,
 )
 
 
@@ -147,6 +148,17 @@ from modules.screenshot.exporter import (
     show_summary as show_screenshot_summary,
 )
 
+
+# ==========================================================
+# Virtual Host Discovery
+# ==========================================================
+
+from modules.vhost.manager import (
+
+    run_vhosts,
+
+)
+
 # ==========================================================
 # Nuclei Scanner
 # ==========================================================
@@ -278,6 +290,29 @@ def main() -> None:
         http_time,
     )
 
+
+    # ------------------------------------------------------
+    # Live HTTP URLs
+    # ------------------------------------------------------
+
+    live_urls = sorted({
+
+        result["url"]
+
+        for result in http_results.values()
+
+        if result.get(
+            "url"
+        )
+
+    })
+
+    info(
+
+        f"Live HTTP Targets: {len(live_urls)}"
+
+    )
+
     # ------------------------------------------------------
     # Port Scanner
     # ------------------------------------------------------
@@ -351,41 +386,41 @@ def main() -> None:
     # URL Discovery
     # ------------------------------------------------------
 
-    crawl_targets = sorted({
-
-        result["url"]
-
-        for result in http_results.values()
-
-        if result.get("url")
-
-    })
-
-
     info(
-        f"Crawl Targets: {len(crawl_targets)}"
+
+        f"Crawl Targets: {len(live_urls)}"
+
     )
 
-
-    if crawl_targets:
+    if live_urls:
 
         crawl_results = crawl_hosts(
-            crawl_targets
+
+            live_urls
+
         )
 
     else:
 
         info(
+
             "No crawl targets discovered."
+
         )
 
         crawl_results = {
+
             "results": {}
+
         }
 
     export_crawler_results(
+
         crawl_results
+
     )
+
+
 
     # ------------------------------------------------------
     # JavaScript Analysis
@@ -395,19 +430,34 @@ def main() -> None:
 
         script
 
-        for host in crawl_results["results"].values()
+        for host in crawl_results.get(
+
+            "results",
+
+            {},
+
+        ).values()
 
         for page in host.get(
+
             "pages",
+
             {},
+
         ).values()
 
         for script in page.get(
+
             "parsed",
+
             {},
+
         ).get(
+
             "javascript",
+
             [],
+
         )
 
     })
@@ -417,13 +467,17 @@ def main() -> None:
         javascript_results, javascript_failed, javascript_time = (
 
             download_javascript(
+
                 javascript_urls
+
             )
 
         )
 
         export_javascript_results(
+
             javascript_results
+
         )
 
         show_javascript_summary(
@@ -439,30 +493,17 @@ def main() -> None:
     else:
 
         info(
-            "No JavaScript files discovered."
-        )
 
+            "No JavaScript files discovered."
+
+        )
 
 
     # ------------------------------------------------------
     # Directory Fuzzing
     # ------------------------------------------------------
 
-    fuzz_targets = sorted({
-
-        result["url"]
-
-        for result in http_results.values()
-
-        if result.get("url")
-
-    })
-
-    info(
-        f"Fuzz Targets: {len(fuzz_targets)}"
-    )
-
-    if fuzz_targets:
+    if live_urls:
 
         try:
 
@@ -477,46 +518,59 @@ def main() -> None:
                 fuzz_time,
 
             ) = run_fuzzing(
-                fuzz_targets
+
+                live_urls
+
             )
 
             export_fuzzing_results(
+
                 fuzz_results
+
             )
 
             show_fuzzing_summary(
+
                 fuzz_results,
+
                 fuzz_statistics,
+
                 fuzz_failed,
+
                 fuzz_time,
+
             )
 
         except Exception as error:
 
-            from core.logger import warning
-
             warning(
+
                 f"Directory Fuzzing failed: {error}"
+
             )
 
     else:
 
         info(
+
             "No fuzzing targets discovered."
+
         )
 
     # ------------------------------------------------------
     # Screenshot Capture
     # ------------------------------------------------------
 
-    if http_results:
+    if live_urls:
 
         screenshot_results, screenshot_failed, screenshot_time = (
 
             asyncio.run(
 
                 capture_hosts(
+
                     http_results
+
                 )
 
             )
@@ -524,68 +578,104 @@ def main() -> None:
         )
 
         save_screenshot_results(
+
             screenshot_results
+
         )
 
         export_screenshot_json(
+
             screenshot_results
+
         )
 
         show_screenshot_summary(
+
             screenshot_results,
+
             screenshot_failed,
+
             screenshot_time,
+
         )
 
     else:
 
         info(
+
             "No alive hosts for screenshots."
+
         )
     
+
+
+    # ------------------------------------------------------
+    # Virtual Host Discovery
+    # ------------------------------------------------------
+
+    info(
+
+        f"Virtual Host Targets: {len(live_urls)}"
+
+    )
+
+    if live_urls:
+
+        try:
+
+            run_vhosts(
+
+                live_urls
+
+            )
+
+        except Exception as error:
+
+            warning(
+
+                f"Virtual Host Discovery failed: {error}"
+
+            )
+
+    else:
+
+        info(
+
+            "No targets for Virtual Host Discovery."
+
+        )
+
+
 
     # ------------------------------------------------------
     # Nuclei Scan
     # ------------------------------------------------------
 
-    nuclei_targets = sorted({
-
-        result["url"]
-
-        for result in http_results.values()
-
-        if result.get(
-            "url"
-        )
-
-    })
-
     info(
 
-        f"Nuclei Targets: {len(nuclei_targets)}"
+        f"Nuclei Targets: {len(live_urls)}"
 
     )
 
-
-    if nuclei_targets:
+    if live_urls:
 
         try:
 
             (
 
-                nuclei_results,
+                _,
 
                 nuclei_overall,
 
-                nuclei_failed,
+                _,
 
-                nuclei_time,
+                _,
 
-                nuclei_files,
+                _,
 
             ) = run_and_export(
 
-                nuclei_targets
+                live_urls
 
             )
 
@@ -596,8 +686,6 @@ def main() -> None:
             )
 
         except Exception as error:
-
-            from core.logger import warning
 
             warning(
 

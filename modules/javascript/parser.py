@@ -8,20 +8,31 @@ coordinates the extraction pipeline.
 from pathlib import Path
 
 from core.logger import (
+
     debug,
+
     warning,
+
 )
 
 from modules.javascript.extractors import (
+
     extract_urls,
+
     extract_comments,
+
     extract_strings,
+
     extract_source_maps,
+
     generate_statistics,
+
 )
 
 from modules.javascript.endpoints import (
+
     extract_endpoints,
+
 )
 
 
@@ -35,12 +46,8 @@ def read_javascript(
     """
     Read a JavaScript file.
 
-    Args:
-        filepath:
-            Path to JavaScript file.
-
     Returns:
-        File content or None.
+        str | None
     """
 
     path = Path(filepath)
@@ -48,7 +55,9 @@ def read_javascript(
     if not path.exists():
 
         warning(
+
             f"File not found: {path}"
+
         )
 
         return None
@@ -66,7 +75,9 @@ def read_javascript(
     except Exception as error:
 
         warning(
+
             f"{path}: {error}"
+
         )
 
         return None
@@ -82,57 +93,115 @@ def parse_file(
     """
     Parse one JavaScript file.
 
-    Args:
-        filepath:
-            JavaScript file path.
-
     Returns:
         dict | None
     """
 
     debug(
+
         f"Parsing {filepath}"
+
     )
 
     content = read_javascript(
+
         filepath
+
     )
 
     if content is None:
 
         return None
 
-    # ------------------------------------------------------
-    # Generic Extraction
-    # ------------------------------------------------------
+    try:
 
-    urls = extract_urls(
-        content
-    )
+        urls = extract_urls(
 
-    comments = extract_comments(
-        content
-    )
+            content
 
-    strings = extract_strings(
-        content
-    )
+        )
 
-    source_maps = extract_source_maps(
-        content
-    )
+    except Exception as error:
 
-    # ------------------------------------------------------
-    # Endpoint Discovery
-    # ------------------------------------------------------
+        warning(
 
-    endpoints = extract_endpoints(
-        urls
-    )
+            f"{filepath}: URL extraction failed ({error})"
 
-    # ------------------------------------------------------
-    # Statistics
-    # ------------------------------------------------------
+        )
+
+        urls = []
+
+    try:
+
+        comments = extract_comments(
+
+            content
+
+        )
+
+    except Exception as error:
+
+        warning(
+
+            f"{filepath}: Comment extraction failed ({error})"
+
+        )
+
+        comments = []
+
+    try:
+
+        strings = extract_strings(
+
+            content
+
+        )
+
+    except Exception as error:
+
+        warning(
+
+            f"{filepath}: String extraction failed ({error})"
+
+        )
+
+        strings = []
+
+    try:
+
+        source_maps = extract_source_maps(
+
+            content
+
+        )
+
+    except Exception as error:
+
+        warning(
+
+            f"{filepath}: Source map extraction failed ({error})"
+
+        )
+
+        source_maps = []
+
+    try:
+
+        endpoints = extract_endpoints(
+
+            urls
+
+        )
+
+    except Exception as error:
+
+        warning(
+
+            f"{filepath}: Endpoint extraction failed ({error})"
+
+        )
+
+        endpoints = []
 
     statistics = generate_statistics(
 
@@ -147,17 +216,17 @@ def parse_file(
     )
 
     statistics["endpoints"] = len(
-        endpoints
-    )
 
-    # ------------------------------------------------------
-    # Result
-    # ------------------------------------------------------
+        endpoints
+
+    )
 
     return {
 
         "file": str(
+
             filepath
+
         ),
 
         "urls": urls,
@@ -185,15 +254,8 @@ def parse_multiple(
     """
     Parse multiple JavaScript files.
 
-    Args:
-        files:
-            List of JavaScript files.
-
     Returns:
-        tuple(
-            results,
-            failed,
-        )
+        tuple
     """
 
     results = {}
@@ -203,20 +265,26 @@ def parse_multiple(
     for filepath in files:
 
         parsed = parse_file(
+
             filepath
+
         )
 
-        if parsed is not None:
-
-            results[
-                filepath
-            ] = parsed
-
-        else:
+        if parsed is None:
 
             failed.append(
+
                 filepath
+
             )
+
+            continue
+
+        results[
+
+            filepath
+
+        ] = parsed
 
     return (
 
@@ -236,18 +304,10 @@ def parse_javascript(
 ):
     """
     JavaScript parser entry point.
-
-    Args:
-        files:
-            JavaScript file paths.
-
-    Returns:
-        tuple(
-            results,
-            failed,
-        )
     """
 
     return parse_multiple(
+
         files
+
     )

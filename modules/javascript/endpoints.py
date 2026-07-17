@@ -68,6 +68,10 @@ def normalize_endpoint(
         str
     """
 
+    if not endpoint:
+
+        return ""
+
     endpoint = endpoint.strip()
 
     if not endpoint:
@@ -103,9 +107,7 @@ def is_interesting(
 
         keyword in endpoint
 
-        for keyword
-
-        in INTERESTING_KEYWORDS
+        for keyword in INTERESTING_KEYWORDS
 
     )
 
@@ -129,7 +131,9 @@ def filter_endpoints(
     for url in urls:
 
         endpoint = normalize_endpoint(
+
             url
+
         )
 
         if not endpoint:
@@ -137,15 +141,21 @@ def filter_endpoints(
             continue
 
         if is_interesting(
+
             endpoint
+
         ):
 
             endpoints.add(
+
                 endpoint
+
             )
 
     return sorted(
+
         endpoints
+
     )
 
 
@@ -171,22 +181,28 @@ def detect_api_versions(
 
     )
 
-    apis = set()
+    apis = {
 
-    for url in urls:
+        normalize_endpoint(
+
+            url
+
+        )
+
+        for url in urls
 
         if pattern.search(
-            url
-        ):
 
-            apis.add(
-                normalize_endpoint(
-                    url
-                )
-            )
+            url
+
+        )
+
+    }
 
     return sorted(
+
         apis
+
     )
 
 
@@ -206,7 +222,11 @@ def detect_graphql(
 
     graphql = {
 
-        normalize_endpoint(url)
+        normalize_endpoint(
+
+            url
+
+        )
 
         for url in urls
 
@@ -217,7 +237,9 @@ def detect_graphql(
     }
 
     return sorted(
+
         graphql
+
     )
 
 
@@ -240,7 +262,9 @@ def extract_endpoints(
     endpoints.update(
 
         filter_endpoints(
+
             urls
+
         )
 
     )
@@ -248,7 +272,9 @@ def extract_endpoints(
     endpoints.update(
 
         detect_api_versions(
+
             urls
+
         )
 
     )
@@ -256,11 +282,15 @@ def extract_endpoints(
     endpoints.update(
 
         detect_graphql(
+
             urls
+
         )
 
     )
 
     return sorted(
+
         endpoints
+
     )

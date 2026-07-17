@@ -11,7 +11,29 @@ from urllib.parse import (
     urlunparse,
 )
 
+import urllib3
+
+urllib3.disable_warnings(
+
+    urllib3.exceptions.InsecureRequestWarning
+
+)
+
 import requests
+
+from requests.exceptions import (
+
+    ConnectionError,
+
+    ConnectTimeout,
+
+    HTTPError,
+
+    ReadTimeout,
+
+    Timeout,
+
+)
 
 from config.config import (
 
@@ -30,6 +52,23 @@ from core.logger import (
     debug,
 
 )
+
+
+# ==========================================================
+# Retryable HTTP Status Codes
+# ==========================================================
+
+RETRY_STATUS_CODES = {
+
+    500,
+
+    502,
+
+    503,
+
+    504,
+
+}
 
 
 # ==========================================================
@@ -109,7 +148,9 @@ def normalize_url(
     )
 
     parsed = urlparse(
+
         url
+
     )
 
     path = parsed.path
@@ -131,7 +172,9 @@ def normalize_url(
     )
 
     return urlunparse(
+
         parsed
+
     )
 
 
@@ -146,9 +189,6 @@ def same_domain(
     """
     Check whether two URLs
     belong to the same host.
-
-    Returns:
-        bool
     """
 
     return (
@@ -176,9 +216,6 @@ def is_html(
     """
     Check whether response
     contains HTML.
-
-    Returns:
-        bool
     """
 
     if response is None:
@@ -213,6 +250,73 @@ def is_html(
 
 
 # ==========================================================
+# Retry Policy
+# ==========================================================
+
+def should_retry(
+    error: Exception,
+):
+    """
+    Decide whether a request
+    should be retried.
+    """
+
+    if isinstance(
+
+        error,
+
+        (
+
+            Timeout,
+
+            ConnectTimeout,
+
+            ReadTimeout,
+
+            ConnectionError,
+
+        ),
+
+    ):
+
+        return True
+
+    if isinstance(
+
+        error,
+
+        HTTPError,
+
+    ):
+
+        response = getattr(
+
+            error,
+
+            "response",
+
+            None,
+
+        )
+
+        if response is None:
+
+            return False
+
+        return (
+
+            response.status_code
+
+            in
+
+            RETRY_STATUS_CODES
+
+        )
+
+    return False
+
+
+# ==========================================================
 # Download Page
 # ==========================================================
 
@@ -221,10 +325,6 @@ def download_page(
 ):
     """
     Download HTML page.
-
-    Args:
-        url:
-            Target URL.
 
     Returns:
         requests.Response | None
@@ -253,7 +353,9 @@ def download_page(
             response.raise_for_status()
 
             if not is_html(
+
                 response
+
             ):
 
                 debug(
@@ -270,25 +372,75 @@ def download_page(
 
             debug(
 
-                f"SSL Error "
-
-                f"({attempt + 1}/{CRAWLER_RETRIES}): "
-
-                f"{url} ({error})"
+                f"SSL Error: {url} ({error})"
 
             )
+
+            return None
 
         except requests.RequestException as error:
 
-            debug(
+            if not should_retry(
 
-                f"Retry "
+                error
 
-                f"({attempt + 1}/{CRAWLER_RETRIES}): "
+            ):
 
-                f"{url} ({error})"
+                if isinstance(
 
-            )
+                    error,
+
+                    HTTPError,
+
+                ) and error.response is not None:
+
+                    debug(
+
+                        f"HTTP {error.response.status_code}: {url}"
+
+                    )
+
+                else:
+
+                    debug(
+
+                        f"Not retrying: {url} ({error})"
+
+                    )
+
+                return None
+
+            if isinstance(
+
+                error,
+
+                HTTPError,
+
+            ) and error.response is not None:
+
+                debug(
+
+                    f"Retry "
+
+                    f"({attempt + 1}/{CRAWLER_RETRIES}) "
+
+                    f"HTTP {error.response.status_code}: "
+
+                    f"{url}"
+
+                )
+
+            else:
+
+                debug(
+
+                    f"Retry "
+
+                    f"({attempt + 1}/{CRAWLER_RETRIES}): "
+
+                    f"{url} ({error})"
+
+                )
 
     debug(
 
@@ -313,14 +465,12 @@ def get_domain(
     """
     Return hostname.
 
-    Args:
-        url:
-            Target URL.
-
     Returns:
         str
     """
 
     return urlparse(
+
         url
+
     ).netloc

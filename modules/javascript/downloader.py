@@ -5,16 +5,26 @@ Downloads JavaScript files discovered
 by the URL Discovery module.
 """
 
-from core.logger import (
-    debug,
-    info,
-    warning,
+from modules.javascript.helpers import (
+
+    download_file,
+
+    safe_filename,
+
+    save_javascript,
+
+    is_valid_url,
+
 )
 
-from modules.javascript.helpers import (
-    download_file,
-    safe_filename,
-    save_javascript,
+from core.logger import (
+
+    debug,
+
+    info,
+
+    warning,
+
 )
 
 
@@ -26,43 +36,85 @@ def download_one(
     url: str,
 ):
     """
-    Download a single JavaScript file.
-
-    Args:
-        url:
-            JavaScript URL.
+    Download one JavaScript file.
 
     Returns:
         dict | None
     """
 
-    debug(
-        f"Downloading {url}"
-    )
+    if not is_valid_url(
 
-    response = download_file(
         url
-    )
 
-    if response is None:
+    ):
 
         warning(
-            f"Failed: {url}"
+
+            f"Invalid JavaScript URL: {url}"
+
         )
 
         return None
 
-    filename = safe_filename(
-        url
-    )
+    debug(
 
-    filepath = save_javascript(
-
-        filename,
-
-        response.text,
+        f"Downloading {url}"
 
     )
+
+    try:
+
+        response = download_file(
+
+            url
+
+        )
+
+    except Exception as error:
+
+        warning(
+
+            f"{url}: {error}"
+
+        )
+
+        return None
+
+    if response is None:
+
+        warning(
+
+            f"Failed: {url}"
+
+        )
+
+        return None
+
+    try:
+
+        filename = safe_filename(
+
+            url
+
+        )
+
+        filepath = save_javascript(
+
+            filename,
+
+            response.text,
+
+        )
+
+    except Exception as error:
+
+        warning(
+
+            f"{url}: {error}"
+
+        )
+
+        return None
 
     return {
 
@@ -71,18 +123,25 @@ def download_one(
         "filename": filename,
 
         "path": str(
+
             filepath
+
         ),
 
         "status": response.status_code,
 
         "size": len(
+
             response.text
+
         ),
 
         "content_type": response.headers.get(
+
             "Content-Type",
+
             "",
+
         ),
 
     }
@@ -96,11 +155,8 @@ def download_multiple(
     urls: list[str],
 ):
     """
-    Download multiple JavaScript files.
-
-    Args:
-        urls:
-            List of JavaScript URLs.
+    Download multiple
+    JavaScript files.
 
     Returns:
         tuple(
@@ -110,38 +166,52 @@ def download_multiple(
     """
 
     info(
+
         "Downloading JavaScript files..."
+
     )
+
+    urls = sorted({
+
+        url
+
+        for url in urls
+
+        if is_valid_url(
+
+            url
+
+        )
+
+    })
 
     results = []
 
     failed = []
 
-    # ------------------------------------------
-    # Remove Duplicates
-    # ------------------------------------------
-
-    urls = sorted(
-        set(urls)
-    )
-
     for url in urls:
 
         metadata = download_one(
+
             url
+
         )
 
-        if metadata:
-
-            results.append(
-                metadata
-            )
-
-        else:
+        if metadata is None:
 
             failed.append(
+
                 url
+
             )
+
+            continue
+
+        results.append(
+
+            metadata
+
+        )
 
     info(
 
@@ -175,27 +245,19 @@ def download_multiple(
 
 
 # ==========================================================
-# Download JavaScript
+# Entry Point
 # ==========================================================
 
 def download_javascript(
     javascript_urls: list[str],
 ):
     """
-    Entry point for downloading
-    JavaScript files.
-
-    Args:
-        javascript_urls:
-            List of discovered JS URLs.
-
-    Returns:
-        tuple(
-            results,
-            failed,
-        )
+    JavaScript downloader
+    entry point.
     """
 
     return download_multiple(
+
         javascript_urls
+
     )

@@ -7,6 +7,14 @@ JavaScript Analysis module.
 
 import re
 
+from urllib.parse import (
+    urlparse,
+)
+
+from modules.javascript.string_filters import (
+    filter_strings,
+)
+
 
 # ==========================================================
 # Regex Patterns
@@ -27,16 +35,35 @@ URL_PATTERN = re.compile(
 
 COMMENT_PATTERN = re.compile(
     r"""
-    //.*?$|
-    /\*.*?\*/
+    (?:
+        (?<!:)
+
+        //[^\r\n]*
+
+        |
+
+        /\*
+
+        [\s\S]*?
+
+        \*/
+    )
     """,
-    re.MULTILINE | re.DOTALL,
+    re.VERBOSE,
 )
 
 STRING_PATTERN = re.compile(
-    r"""
-    ["']([^"'\\]{4,})["']
-    """,
+    r'''
+    (?P<quote>["'])
+    (
+        (?:
+            \\\\.|
+            (?! (?P=quote) ).
+        )*
+    )
+    (?P=quote)
+    ''',
+    re.VERBOSE | re.DOTALL,
 )
 
 SOURCEMAP_PATTERN = re.compile(
@@ -48,34 +75,101 @@ SOURCEMAP_PATTERN = re.compile(
 
 
 # ==========================================================
+# URL Validation
+# ==========================================================
+
+def is_valid_url(
+    url: str,
+):
+    """
+    Validate extracted URL.
+
+    Returns:
+        bool
+    """
+
+    if not url:
+
+        return False
+
+    url = url.strip()
+
+    if url.startswith("/"):
+
+        return True
+
+    if url.startswith("//"):
+
+        return False
+
+    try:
+
+        parsed = urlparse(
+
+            url
+
+        )
+
+    except ValueError:
+
+        return False
+
+    return (
+
+        parsed.scheme
+
+        in
+
+        {
+
+            "http",
+
+            "https",
+
+        }
+
+        and
+
+        bool(
+
+            parsed.netloc
+
+        )
+
+    )
+
+
+# ==========================================================
 # Normalize
 # ==========================================================
 
-def normalize(items):
+def normalize(
+    items,
+):
     """
     Normalize extracted values.
-
-    Args:
-        items:
-            Iterable of extracted values.
 
     Returns:
         list
     """
 
-    cleaned = set()
+    return sorted(
 
-    for item in items:
+        {
 
-        item = item.strip()
+            str(item).strip()
 
-        if not item:
+            for item
 
-            continue
+            in items
 
-        cleaned.add(item)
+            if item
 
-    return sorted(cleaned)
+            and str(item).strip()
+
+        }
+
+    )
 
 
 # ==========================================================
@@ -86,18 +180,34 @@ def extract_urls(
     content: str,
 ):
     """
-    Extract URLs from JavaScript.
+    Extract valid URLs.
 
     Returns:
         list
     """
 
-    urls = URL_PATTERN.findall(
-        content
-    )
-
     return normalize(
-        urls
+
+        [
+
+            url
+
+            for url
+
+            in URL_PATTERN.findall(
+
+                content
+
+            )
+
+            if is_valid_url(
+
+                url
+
+            )
+
+        ]
+
     )
 
 
@@ -115,12 +225,32 @@ def extract_comments(
         list
     """
 
-    comments = COMMENT_PATTERN.findall(
+    comments = []
+
+    for match in COMMENT_PATTERN.finditer(
+
         content
-    )
+
+    ):
+
+        value = match.group(
+
+            0
+
+        ).strip()
+
+        if value:
+
+            comments.append(
+
+                value
+
+            )
 
     return normalize(
+
         comments
+
     )
 
 
@@ -138,12 +268,38 @@ def extract_strings(
         list
     """
 
-    strings = STRING_PATTERN.findall(
+    strings = []
+
+    for match in STRING_PATTERN.finditer(
+
         content
+
+    ):
+
+        value = match.group(
+
+            2
+
+        ).strip()
+
+        if value:
+
+            strings.append(
+
+                value
+
+            )
+
+    strings = normalize(
+
+        strings
+
     )
 
-    return normalize(
+    return filter_strings(
+
         strings
+
     )
 
 
@@ -155,18 +311,22 @@ def extract_source_maps(
     content: str,
 ):
     """
-    Extract source map references.
+    Extract source maps.
 
     Returns:
         list
     """
 
     maps = SOURCEMAP_PATTERN.findall(
+
         content
+
     )
 
     return normalize(
+
         maps
+
     )
 
 
@@ -181,7 +341,7 @@ def generate_statistics(
     source_maps: list,
 ):
     """
-    Generate extraction statistics.
+    Generate statistics.
 
     Returns:
         dict
@@ -190,19 +350,27 @@ def generate_statistics(
     return {
 
         "urls": len(
+
             urls
+
         ),
 
         "comments": len(
+
             comments
+
         ),
 
         "strings": len(
+
             strings
+
         ),
 
         "source_maps": len(
+
             source_maps
+
         ),
 
     }
@@ -223,19 +391,27 @@ def parse_content(
     """
 
     urls = extract_urls(
+
         content
+
     )
 
     comments = extract_comments(
+
         content
+
     )
 
     strings = extract_strings(
+
         content
+
     )
 
     source_maps = extract_source_maps(
+
         content
+
     )
 
     statistics = generate_statistics(
