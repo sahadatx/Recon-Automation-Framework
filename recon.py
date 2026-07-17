@@ -171,6 +171,16 @@ from modules.nuclei.manager import (
 
 )
 
+# ==========================================================
+# WAF Detection
+# ==========================================================
+
+from modules.waf.manager import (
+
+    run_waf_detection,
+
+)
+
 
 
 # ==========================================================
@@ -701,6 +711,43 @@ def main() -> None:
 
         )
 
+
+
+    # ------------------------------------------------------
+    # WAF Detection
+    # ------------------------------------------------------
+
+    info(
+
+        f"WAF Targets: {len(live_urls)}"
+
+    )
+
+    if live_urls:
+
+        try:
+
+            run_waf_detection(
+
+                live_urls
+
+            )
+
+        except Exception as error:
+
+            warning(
+
+                f"WAF Detection failed: {error}"
+
+            )
+
+    else:
+
+        info(
+
+            "No targets for WAF Detection."
+
+        )
 
 
 # ==========================================================

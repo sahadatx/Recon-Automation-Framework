@@ -255,6 +255,13 @@ CUSTOM_WORDLIST_DIR = (
 
 )
 
+WAF_OUTPUT_DIR = (
+
+    OUTPUT_DIR
+
+    / "waf"
+
+)
 
 # ==========================================================
 # Default Wordlists
@@ -354,7 +361,7 @@ DNS_TIMEOUT = 5
 
 DNS_LIFETIME = 8
 
-DNS_RETRIES = 1
+DNS_RETRIES = 2
 
 DNS_SERVERS = [
 
@@ -375,11 +382,13 @@ DNS_SERVERS = [
 
 HTTP_TIMEOUT = 8
 
-HTTP_RETRIES = 1
+HTTP_RETRIES = 2
 
-HTTP_THREADS = 50
+CPU_COUNT = os.cpu_count() or 4
 
-HTTP_VERIFY_SSL = False
+HTTP_THREADS = min(100, CPU_COUNT * 8)
+
+HTTP_VERIFY_SSL = True
 
 HTTP_FOLLOW_REDIRECTS = True
 
@@ -396,7 +405,7 @@ HTTP_USER_AGENT = (
 
 PORT_SCAN_TIMEOUT = 1
 
-PORT_SCAN_RETRIES = 1
+PORT_SCAN_RETRIES = 2
 
 PORT_HOST_WORKERS = 30
 
@@ -598,6 +607,28 @@ LOG_FILE = (
 )
 
 
+NETWORK_TIMEOUT = 10
+
+HTTP_TIMEOUT = NETWORK_TIMEOUT
+
+DNS_TIMEOUT = 5
+
+PORT_SCAN_TIMEOUT = 1
+
+
+# ==========================================================
+# WAF Detection
+# ==========================================================
+
+WAF_TIMEOUT = HTTP_TIMEOUT
+
+WAF_THREADS = HTTP_THREADS
+
+WAF_VERIFY_SSL = HTTP_VERIFY_SSL
+
+WAF_MAX_BODY_SIZE = 8192
+
+
 # ==========================================================
 # Debug Configuration
 # ==========================================================
@@ -615,7 +646,7 @@ SHOW_TOOL_COMMANDS = False
 # Export Configuration
 # ==========================================================
 
-DEFAULT_OUTPUT_FORMATS = [
+DEFAULT_OUTPUT_FORMATS = (
 
     "txt",
 
@@ -625,4 +656,4 @@ DEFAULT_OUTPUT_FORMATS = [
 
     "markdown",
 
-]
+)
