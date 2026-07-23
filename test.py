@@ -1,75 +1,90 @@
 """
-Unit tests for takeover.manager
+Unit tests for
+email.manager
 """
 
 from __future__ import annotations
 
 import unittest
-
 from unittest.mock import patch
 
-from modules.takeover.manager import (
-    run_takeover_detection,
+from modules.email.manager import (
+    run_email_security,
 )
 
 
-class TestTakeoverManager(
+class TestEmailManager(
     unittest.TestCase,
 ):
 
     @patch(
-        "modules.takeover.manager.export_results",
+        "modules.email.manager.export_results",
     )
     @patch(
-        "modules.takeover.manager.print_summary",
+        "modules.email.manager.print_summary",
     )
     @patch(
-        "modules.takeover.manager.generate_statistics",
+        "modules.email.manager.generate_statistics",
     )
     @patch(
-        "modules.takeover.manager.filter_results",
+        "modules.email.manager.filter_results",
     )
     @patch(
-        "modules.takeover.manager.analyze",
+        "modules.email.manager.analyze",
     )
     @patch(
-        "modules.takeover.manager.resolve_ipv4",
+        "modules.email.manager.create_result",
     )
     @patch(
-        "modules.takeover.manager.resolve_cname",
+        "modules.email.manager.resolve_dnskey",
     )
     @patch(
-        "modules.takeover.manager.extract_title",
+        "modules.email.manager.resolve_bimi",
     )
     @patch(
-        "modules.takeover.manager.extract_body",
+        "modules.email.manager.resolve_tls_rpt",
     )
     @patch(
-        "modules.takeover.manager.extract_status_code",
+        "modules.email.manager.resolve_mta_sts",
     )
     @patch(
-        "modules.takeover.manager.request_page",
+        "modules.email.manager.resolve_dmarc",
     )
     @patch(
-        "modules.takeover.manager.normalize_target",
+        "modules.email.manager.resolve_dkim",
     )
-    def test_run_takeover_detection(
+    @patch(
+        "modules.email.manager.resolve_spf",
+    )
+    @patch(
+        "modules.email.manager.resolve_mx",
+    )
+    @patch(
+        "modules.email.manager.normalize_target",
+    )
+    def test_run_email_security(
 
         self,
 
         mock_normalize,
 
-        mock_request,
+        mock_mx,
 
-        mock_status,
+        mock_spf,
 
-        mock_body,
+        mock_dkim,
 
-        mock_title,
+        mock_dmarc,
 
-        mock_cname,
+        mock_mta_sts,
 
-        mock_ip,
+        mock_tls_rpt,
+
+        mock_bimi,
+
+        mock_dnssec,
+
+        mock_create,
 
         mock_analyze,
 
@@ -85,83 +100,73 @@ class TestTakeoverManager(
 
         mock_normalize.return_value = (
 
-            "demo.example.com"
+            "example.com"
 
         )
 
-        mock_request.return_value = object()
+        mock_mx.return_value = [
 
-        mock_status.return_value = 404
+            "mx.example.com",
 
-        mock_body.return_value = (
+        ]
 
-            "There isn't a "
+        mock_spf.return_value = (
 
-            "GitHub Pages site here."
+            True,
 
-        )
-
-        mock_title.return_value = ""
-
-        mock_cname.return_value = (
-
-            "demo.github.io"
+            "v=spf1",
 
         )
 
-        mock_ip.return_value = (
+        mock_dkim.return_value = (
 
-            "185.199.108.153"
+            True,
+
+            "default",
 
         )
 
-        analysis = {
+        mock_dmarc.return_value = (
 
-            "target": "demo.example.com",
+            True,
 
-            "vulnerable": True,
+            "v=DMARC1",
 
-            "provider": "GitHub Pages",
+        )
 
-            "confidence": 95,
+        mock_mta_sts.return_value = True
 
-            "methods": [
+        mock_tls_rpt.return_value = True
 
-                "http",
+        mock_bimi.return_value = False
 
-                "status",
+        mock_dnssec.return_value = False
 
-                "cname",
+        result = {
 
-            ],
+            "target": "example.com",
 
-            "status_code": 404,
+            "provider": "Google Workspace",
 
-            "fingerprint": (
+            "score": 20,
 
-                "GitHub Pages"
+            "risk": "Low",
 
-            ),
+            "spf": True,
 
-            "cname": "demo.github.io",
+            "dkim": True,
 
-            "ip": "185.199.108.153",
-
-            "http_title": "",
-
-            "recommendations": [],
+            "dmarc": True,
 
         }
 
-        mock_analyze.return_value = (
+        mock_create.return_value = result
 
-            analysis
-
-        )
+        mock_analyze.return_value = result
 
         mock_filter.return_value = [
 
-            analysis,
+            result,
 
         ]
 
@@ -169,33 +174,19 @@ class TestTakeoverManager(
 
             "targets": 1,
 
-            "vulnerable": 1,
+            "low": 1,
 
-            "safe": 0,
+            "medium": 0,
 
-            "provider_statistics": {
+            "high": 0,
 
-                "GitHub Pages": 1,
+            "critical": 0,
 
-            },
+            "average_score": 20,
 
-            "confidence_statistics": {
+            "highest_score": 20,
 
-                "high": 1,
-
-                "medium": 0,
-
-                "low": 0,
-
-                "unknown": 0,
-
-            },
-
-            "average_confidence": 95,
-
-            "highest_confidence": 95,
-
-            "elapsed": 0.10,
+            "elapsed": 0.01,
 
         }
 
@@ -205,43 +196,37 @@ class TestTakeoverManager(
 
         )
 
-        results, stats = (
+        results, stats = run_email_security(
 
-            run_takeover_detection(
+            [
 
-                [
+                "example.com",
 
-                    "demo.example.com",
-
-                ]
-
-            )
+            ],
 
         )
 
         self.assertEqual(
 
-            len(results),
+            len(
+
+                results,
+
+            ),
 
             1,
 
         )
 
-        self.assertTrue(
-
-            results[0][
-
-                "vulnerable"
-
-            ]
-
-        )
-
         self.assertEqual(
 
-            stats,
+            stats[
 
-            statistics,
+                "targets"
+
+            ],
+
+            1,
 
         )
 

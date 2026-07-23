@@ -211,6 +211,15 @@ from modules.takeover.manager import (
 
 )
 
+# ==========================================================
+# Email Security
+# ==========================================================
+
+from modules.email.manager import (
+
+    run_email_security,
+
+)
 
 
 # ==========================================================
@@ -892,6 +901,42 @@ def main() -> None:
 
         )
 
+
+    # ==========================================================
+    # Email Security
+    # ==========================================================
+
+    info(
+
+        f"Email Targets: {len(live_urls)}"
+
+    )
+
+    if live_urls:
+
+        try:
+
+            run_email_security(
+
+                live_urls,
+
+            )
+
+        except Exception as error:
+
+            warning(
+
+                f"Email Security failed: {error}"
+
+            )
+
+    else:
+
+        info(
+
+            "No targets for Email Security."
+
+        )
 
 # ==========================================================
 # Entry Point
