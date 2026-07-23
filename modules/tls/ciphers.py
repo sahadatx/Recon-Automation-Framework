@@ -445,10 +445,21 @@ def hash_algorithm(
 
 def forward_secrecy(
     cipher_name: str,
+    protocol: str,
 ):
     """
     Detect Forward Secrecy.
     """
+
+    if protocol in (
+
+        "TLS 1.3",
+
+        "TLSv1.3",
+
+    ):
+
+        return True
 
     return contains_keyword(
 
@@ -457,6 +468,7 @@ def forward_secrecy(
         FORWARD_SECRECY_KEYWORDS,
 
     )
+
 
 
 # ==========================================================
@@ -656,6 +668,8 @@ def collect_cipher(
             forward_secrecy(
 
                 name,
+
+                result["protocol"],
 
             )
 

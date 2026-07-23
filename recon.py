@@ -181,6 +181,16 @@ from modules.waf.manager import (
 
 )
 
+# ==========================================================
+# TLS Analysis
+# ==========================================================
+
+from modules.tls.manager import (
+
+    run_tls_analysis,
+
+)
+
 
 
 # ==========================================================
@@ -746,6 +756,43 @@ def main() -> None:
         info(
 
             "No targets for WAF Detection."
+
+        )
+
+
+    # ==========================================================
+    # TLS Analysis
+    # ==========================================================
+
+    info(
+
+        f"TLS Targets: {len(live_urls)}"
+
+    )
+
+    if live_urls:
+
+        try:
+
+            run_tls_analysis(
+
+                live_urls
+
+            )
+
+        except Exception as error:
+
+            warning(
+
+                f"TLS Analysis failed: {error}"
+
+            )
+
+    else:
+
+        info(
+
+            "No targets for TLS Analysis."
 
         )
 

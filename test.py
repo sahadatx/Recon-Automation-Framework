@@ -1,67 +1,59 @@
-"""
-Test TLS Cipher Module
-"""
-
 from pprint import pprint
 
-from modules.tls.ciphers import (
-    collect_cipher,
-    cipher_summary,
+from modules.tls.manager import run_tls_analysis
+
+
+HOSTS = [
+
+    "google.com",
+
+    "github.com",
+
+    "cloudflare.com",
+
+]
+
+
+# ==========================================================
+# Run TLS Analysis
+# ==========================================================
+
+results, statistics = run_tls_analysis(
+
+    HOSTS
+
 )
 
 
-def main():
+# ==========================================================
+# Results
+# ==========================================================
 
-    host = "google.com"
+print()
 
-    result = collect_cipher(
+print("=" * 80)
 
-        host,
+print("Results Dictionary")
 
-    )
+print("=" * 80)
 
-    print("=" * 70)
-    print("TLS Cipher Analysis")
-    print("=" * 70)
+pprint(
 
-    if result["error"]:
+    results
 
-        print("Error:", result["error"])
-        return
-
-    pprint(result)
-
-    print()
-
-    summary = cipher_summary(
-
-        result,
-
-    )
-
-    print("=" * 70)
-    print("Cipher Summary")
-    print("=" * 70)
-
-    pprint(summary)
-
-    print()
-
-    print(f"Cipher            : {summary['cipher']}")
-    print(f"Protocol          : {summary['protocol']}")
-    print(f"Bits              : {summary['bits']}")
-    print(f"Strength          : {summary['strength']}")
-    print(f"Forward Secrecy   : {summary['forward_secrecy']}")
-    print(f"AEAD              : {summary['aead']}")
-    print(f"Weak Cipher       : {summary['weak']}")
-
-    print()
-
-    print("=" * 70)
-    print("PASS")
-    print("=" * 70)
+)
 
 
-if __name__ == "__main__":
+print()
 
-    main()
+print("=" * 80)
+
+print("Statistics Dictionary")
+
+print("=" * 80)
+
+pprint(
+
+    statistics
+
+)

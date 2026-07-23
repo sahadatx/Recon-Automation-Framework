@@ -7,8 +7,9 @@ analysis functions.
 
 from __future__ import annotations
 
-
 from copy import deepcopy
+from datetime import datetime, timezone
+import ssl
 
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes
@@ -29,7 +30,6 @@ from modules.tls.helpers import (
     get_not_before,
     get_not_after,
 )
-
 
 # ==========================================================
 # Default Result
@@ -73,6 +73,16 @@ EMPTY_CERTIFICATE = {
 
     "x509": None,
 
+    "expired": False,
+
+    "self_signed": False,
+
+    "hostname_match": False,
+
+    "wildcard": False,
+
+    "days_remaining": 0,
+
     "error": None,
 
 }
@@ -89,45 +99,29 @@ def load_x509_certificate(
     """
     Download and load
     X509 certificate.
-
-    Returns:
-        tuple
     """
 
     tls = get_certificate(
-
         host,
-
         port,
-
     )
 
     if tls["error"]:
 
         return (
-
             tls,
-
             None,
-
         )
 
     try:
 
-        der = tls["certificate_der"]
-
-        pem = x509.load_der_x509_certificate(
-
-            der,
-
+        certificate = x509.load_der_x509_certificate(
+            tls["certificate_der"],
         )
 
         return (
-
             tls,
-
-            pem,
-
+            certificate,
         )
 
     except Exception as exc:
@@ -135,78 +129,54 @@ def load_x509_certificate(
         tls["error"] = str(exc)
 
         return (
-
             tls,
-
             None,
-
         )
 
 
 # ==========================================================
-# SHA1 Fingerprint
+# SHA1
 # ==========================================================
 
 def get_sha1(
     certificate: x509.Certificate,
 ):
-    """
-    SHA1 fingerprint.
-
-    Returns:
-        str
-    """
 
     if certificate is None:
 
         return ""
 
     return (
-
-        certificate.fingerprint(
-
+        certificate
+        .fingerprint(
             hashes.SHA1(),
-
         )
-
         .hex()
-
         .upper()
-
     )
 
 
 # ==========================================================
-# SHA256 Fingerprint
+# SHA256
 # ==========================================================
 
 def get_sha256(
     certificate: x509.Certificate,
 ):
-    """
-    SHA256 fingerprint.
-
-    Returns:
-        str
-    """
 
     if certificate is None:
 
         return ""
 
     return (
-
-        certificate.fingerprint(
-
+        certificate
+        .fingerprint(
             hashes.SHA256(),
-
         )
-
         .hex()
-
         .upper()
-
     )
+
 
 # ==========================================================
 # Certificate Version
@@ -215,28 +185,22 @@ def get_sha256(
 def get_certificate_version(
     certificate: x509.Certificate,
 ):
-    """
-    Get certificate version.
-
-    Returns:
-        str
-    """
 
     if certificate is None:
 
         return ""
 
-    version = certificate.version
-
-    if version == x509.Version.v1:
+    if certificate.version == x509.Version.v1:
 
         return "v1"
 
-    if version == x509.Version.v3:
+    if certificate.version == x509.Version.v3:
 
         return "v3"
 
-    return str(version)
+    return str(
+        certificate.version,
+    )
 
 
 # ==========================================================
@@ -246,12 +210,6 @@ def get_certificate_version(
 def get_signature_algorithm(
     certificate: x509.Certificate,
 ):
-    """
-    Get signature algorithm.
-
-    Returns:
-        str
-    """
 
     if certificate is None:
 
@@ -260,9 +218,9 @@ def get_signature_algorithm(
     try:
 
         return (
-
-            certificate.signature_hash_algorithm.name
-
+            certificate
+            .signature_hash_algorithm
+            .name
         )
 
     except Exception:
@@ -277,12 +235,6 @@ def get_signature_algorithm(
 def get_public_key(
     certificate: x509.Certificate,
 ):
-    """
-    Return public key object.
-
-    Returns:
-        object | None
-    """
 
     if certificate is None:
 
@@ -304,78 +256,36 @@ def get_public_key(
 def get_public_key_type(
     certificate: x509.Certificate,
 ):
-    """
-    Detect public key type.
-
-    Returns:
-        str
-    """
 
     key = get_public_key(
-
         certificate,
-
     )
 
     if key is None:
 
         return ""
 
-    if isinstance(
-
-        key,
-
-        rsa.RSAPublicKey,
-
-    ):
+    if isinstance(key, rsa.RSAPublicKey):
 
         return "RSA"
 
-    if isinstance(
-
-        key,
-
-        ec.EllipticCurvePublicKey,
-
-    ):
+    if isinstance(key, ec.EllipticCurvePublicKey):
 
         return "EC"
 
-    if isinstance(
-
-        key,
-
-        dsa.DSAPublicKey,
-
-    ):
+    if isinstance(key, dsa.DSAPublicKey):
 
         return "DSA"
 
-    if isinstance(
-
-        key,
-
-        ed25519.Ed25519PublicKey,
-
-    ):
+    if isinstance(key, ed25519.Ed25519PublicKey):
 
         return "Ed25519"
 
-    if isinstance(
-
-        key,
-
-        ed448.Ed448PublicKey,
-
-    ):
+    if isinstance(key, ed448.Ed448PublicKey):
 
         return "Ed448"
 
-    return type(
-
-        key,
-
-    ).__name__
+    return type(key).__name__
 
 
 # ==========================================================
@@ -385,17 +295,9 @@ def get_public_key_type(
 def get_public_key_size(
     certificate: x509.Certificate,
 ):
-    """
-    Get public key size.
-
-    Returns:
-        int
-    """
 
     key = get_public_key(
-
         certificate,
-
     )
 
     if key is None:
@@ -403,16 +305,160 @@ def get_public_key_size(
         return 0
 
     return getattr(
-
         key,
-
         "key_size",
-
         0,
-
     )
 
 
+# ==========================================================
+# Certificate Expired
+# ==========================================================
+
+def is_expired(
+    certificate: x509.Certificate,
+):
+
+    if certificate is None:
+
+        return False
+
+    try:
+
+        return (
+            certificate.not_valid_after_utc
+            < datetime.now(timezone.utc)
+        )
+
+    except Exception:
+
+        return False
+
+
+# ==========================================================
+# Days Remaining
+# ==========================================================
+
+def get_days_remaining(
+    certificate: x509.Certificate,
+):
+
+    if certificate is None:
+
+        return 0
+
+    try:
+
+        delta = (
+            certificate.not_valid_after_utc
+            - datetime.now(timezone.utc)
+        )
+
+        return max(
+            delta.days,
+            0,
+        )
+
+    except Exception:
+
+        return 0
+
+
+# ==========================================================
+# Self Signed
+# ==========================================================
+
+def is_self_signed(
+    certificate: x509.Certificate,
+):
+
+    if certificate is None:
+
+        return False
+
+    try:
+
+        return (
+            certificate.subject
+            == certificate.issuer
+        )
+
+    except Exception:
+
+        return False
+
+
+# ==========================================================
+# Wildcard
+# ==========================================================
+
+def is_wildcard(
+    cert: dict,
+):
+
+    if not cert:
+
+        return False
+
+    subject = get_subject(
+        cert,
+    )
+
+    return subject.get(
+        "commonName",
+        "",
+    ).startswith("*.")
+
+
+# ==========================================================
+# Hostname Match
+# ==========================================================
+
+def hostname_matches(
+    cert: dict,
+    host: str,
+):
+    """
+    Verify hostname
+    against SAN/CN.
+    """
+
+    if not cert:
+
+        return False
+
+    names = set()
+
+    subject = get_subject(cert)
+
+    cn = subject.get("commonName", "")
+
+    if cn:
+
+        names.add(cn.lower())
+
+    for name in get_san(cert):
+
+        names.add(name.lower())
+
+    host = host.lower()
+
+    for name in names:
+
+        if name == host:
+
+            return True
+
+        if name.startswith("*."):
+
+            suffix = name[1:]      # ".google.com"
+
+            if host.endswith(suffix):
+
+                return True
+
+    return False
+    
 # ==========================================================
 # Certificate Summary
 # ==========================================================
@@ -421,7 +467,8 @@ def certificate_summary(
     certificate: x509.Certificate,
 ):
     """
-    Generate certificate summary.
+    Generate certificate
+    summary.
 
     Returns:
         dict
@@ -481,6 +528,30 @@ def certificate_summary(
 
             ),
 
+        "expired":
+
+            is_expired(
+
+                certificate,
+
+            ),
+
+        "self_signed":
+
+            is_self_signed(
+
+                certificate,
+
+            ),
+
+        "days_remaining":
+
+            get_days_remaining(
+
+                certificate,
+
+            ),
+
     }
 
 
@@ -493,7 +564,8 @@ def collect_certificate(
     port: int = 443,
 ):
     """
-    Collect TLS certificate
+    Collect TLS
+    certificate
     information.
 
     Returns:
@@ -586,15 +658,27 @@ def collect_certificate(
 
     )
 
-    summary = certificate_summary(
+    result.update(
 
-        certificate,
+        certificate_summary(
+
+            certificate,
+
+        )
 
     )
 
-    result.update(
+    result["hostname_match"] = hostname_matches(
 
-        summary,
+        cert,
+
+        host,
+
+    )
+
+    result["wildcard"] = is_wildcard(
+
+        cert,
 
     )
 
@@ -629,9 +713,18 @@ __all__ = [
 
     "get_public_key_size",
 
+    "is_expired",
+
+    "get_days_remaining",
+
+    "is_self_signed",
+
+    "is_wildcard",
+
+    "hostname_matches",
+
     "certificate_summary",
 
     "collect_certificate",
 
 ]
-
