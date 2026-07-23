@@ -191,6 +191,16 @@ from modules.tls.manager import (
 
 )
 
+# ==========================================================
+# CDN Detection
+# ==========================================================
+
+from modules.cdn.manager import (
+
+    run_cdn_detection,
+
+)
+
 
 
 # ==========================================================
@@ -793,6 +803,44 @@ def main() -> None:
         info(
 
             "No targets for TLS Analysis."
+
+        )
+
+
+
+    # ==========================================================
+    # CDN Detection
+    # ==========================================================
+
+    info(
+
+        f"CDN Targets: {len(live_urls)}"
+
+    )
+
+    if live_urls:
+
+        try:
+
+            run_cdn_detection(
+
+                live_urls,
+
+            )
+
+        except Exception as error:
+
+            warning(
+
+                f"CDN Detection failed: {error}"
+
+            )
+
+    else:
+
+        info(
+
+            "No targets for CDN Detection."
 
         )
 
