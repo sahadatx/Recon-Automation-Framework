@@ -201,6 +201,16 @@ from modules.cdn.manager import (
 
 )
 
+# ==========================================================
+# Subdomain Takeover Detection
+# ==========================================================
+
+from modules.takeover.manager import (
+
+    run_takeover_detection,
+
+)
+
 
 
 # ==========================================================
@@ -841,6 +851,44 @@ def main() -> None:
         info(
 
             "No targets for CDN Detection."
+
+        )
+
+
+
+    # ==========================================================
+    # Subdomain Takeover Detection
+    # ==========================================================
+
+    info(
+
+        f"Takeover Targets: {len(live_urls)}"
+
+    )
+
+    if live_urls:
+
+        try:
+
+            run_takeover_detection(
+
+                live_urls,
+
+            )
+
+        except Exception as error:
+
+            warning(
+
+                f"Takeover Detection failed: {error}"
+
+            )
+
+    else:
+
+        info(
+
+            "No targets for Takeover Detection."
 
         )
 
