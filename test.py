@@ -1,12 +1,12 @@
 """
-Test TLS Protocol Module
+Test TLS Cipher Module
 """
 
 from pprint import pprint
 
-from modules.tls.protocols import (
-    collect_protocols,
-    protocol_summary,
+from modules.tls.ciphers import (
+    collect_cipher,
+    cipher_summary,
 )
 
 
@@ -14,14 +14,14 @@ def main():
 
     host = "google.com"
 
-    result = collect_protocols(
+    result = collect_cipher(
 
         host,
 
     )
 
     print("=" * 70)
-    print("TLS Protocol Analysis")
+    print("TLS Cipher Analysis")
     print("=" * 70)
 
     if result["error"]:
@@ -33,30 +33,27 @@ def main():
 
     print()
 
-    summary = protocol_summary(
+    summary = cipher_summary(
 
         result,
 
     )
 
     print("=" * 70)
-    print("Protocol Summary")
+    print("Cipher Summary")
     print("=" * 70)
 
     pprint(summary)
 
     print()
 
-    print(f"Highest Protocol : {summary['highest_protocol']}")
-    print(f"Security         : {summary['security']}")
-
-    print()
-
-    print("Supported Protocols")
-
-    for protocol in summary["supported_protocols"]:
-
-        print(f"  ✔ {protocol}")
+    print(f"Cipher            : {summary['cipher']}")
+    print(f"Protocol          : {summary['protocol']}")
+    print(f"Bits              : {summary['bits']}")
+    print(f"Strength          : {summary['strength']}")
+    print(f"Forward Secrecy   : {summary['forward_secrecy']}")
+    print(f"AEAD              : {summary['aead']}")
+    print(f"Weak Cipher       : {summary['weak']}")
 
     print()
 
