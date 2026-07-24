@@ -1,10 +1,8 @@
 """
 Nuclei Manager
-
-Coordinates Nuclei scanning,
-parsing, filtering,
-statistics and exporting.
 """
+
+from __future__ import annotations
 
 import time
 
@@ -13,113 +11,59 @@ from concurrent.futures import (
     as_completed,
 )
 
-from config.config import (
-    MAX_WORKERS,
-)
+from typing import Any
+
+from config.config import MAX_WORKERS
 
 from core.logger import (
     info,
+    progress_status,
     success,
     warning,
-    progress_status,
 )
 
-from modules.nuclei.scanner import (
-    scan_target,
+from .analyzer import analyze
+from .filters import apply_filters
+from .parser import parse_nuclei
+from .scanner import (
     cleanup,
-)
-
-from modules.nuclei.parser import (
-    parse_nuclei,
-)
-
-from modules.nuclei.filters import (
-    apply_filters,
-)
-
-from modules.nuclei.statistics import (
-    generate,
-)
-
-from modules.nuclei.exporter import (
-    export_all,
+    scan_target,
 )
 
 
 # ==========================================================
-# Process One Target
+# Process Target
 # ==========================================================
 
 def process_target(
     target: str,
-):
+) -> tuple[str, list[dict[str, Any]] | None]:
     """
-    Scan one target.
-
-    Returns:
-        tuple(
-            target,
-            result | None,
-        )
+    Scan and process one target.
     """
 
-    scan = scan_target(
-        target
-    )
+    scan = scan_target(target)
 
     if not scan["success"]:
-
-        return (
-            target,
-            None,
-        )
+        return target, None
 
     output = scan["output"]
 
-    parsed = parse_nuclei(
-        output
-    )
+    parsed = parse_nuclei(output)
 
-    cleanup(
-        output
-    )
+    cleanup(output)
 
     if parsed is None:
-
-        return (
-            target,
-            None,
-        )
+        return target, None
 
     findings = apply_filters(
-
         parsed.get(
-
             "findings",
-
             [],
-
         )
-
     )
 
-    statistics = generate(
-        findings
-    )
-
-    return (
-
-        target,
-
-        {
-
-            "findings": findings,
-
-            "statistics": statistics,
-
-        },
-
-    )
+    return target, findings
 
 
 # ==========================================================
@@ -127,81 +71,18 @@ def process_target(
 # ==========================================================
 
 def collect_findings(
-    results: dict,
-):
+    results: dict[str, list[dict[str, Any]]],
+) -> list[dict[str, Any]]:
     """
-    Collect findings from all
-    successful targets.
-
-    Returns:
-        list
+    Merge findings from all targets.
     """
 
-    findings = []
+    findings: list[dict[str, Any]] = []
 
-    for data in results.values():
-
-        if not data:
-
-            continue
-
-        findings.extend(
-
-            data.get(
-
-                "findings",
-
-                [],
-
-            )
-
-        )
+    for target_findings in results.values():
+        findings.extend(target_findings)
 
     return findings
-
-
-# ==========================================================
-# Build Overall Statistics
-# ==========================================================
-
-def build_overall_statistics(
-    results: dict,
-    failed: list,
-    elapsed: float,
-):
-    """
-    Build overall scan
-    statistics.
-
-    Returns:
-        dict
-    """
-
-    findings = collect_findings(
-        results
-    )
-
-    statistics = generate(
-        findings
-    )
-
-    statistics.update({
-
-        "targets": len(results) + len(failed),
-
-        "successful": len(
-            results
-        ),
-
-        "failed": len(
-            failed
-        ),
-
-        "elapsed": elapsed,
-
-    })
-
-    return statistics
 
 
 # ==========================================================
@@ -210,36 +91,19 @@ def build_overall_statistics(
 
 def run_nuclei(
     targets: list[str],
-):
+) -> dict[str, Any]:
     """
-    Run Nuclei against
-    multiple targets.
-
-    Returns:
-        (
-            results,
-            overall,
-            failed,
-            elapsed,
-        )
+    Run Nuclei against targets.
     """
 
     if not targets:
 
-        warning(
-            "No targets supplied."
-        )
+        warning("No targets supplied.")
 
-        return (
-
-            {},
-
-            {},
-
-            [],
-
-            0,
-
+        return analyze(
+            results=[],
+            failed=[],
+            elapsed=0,
         )
 
     info(
@@ -250,70 +114,55 @@ def run_nuclei(
         set(targets)
     )
 
-    results: dict[str, dict] = {}
+    results: dict[
+        str,
+        list[dict[str, Any]],
+    ] = {}
 
     failed: list[str] = []
 
     completed = 0
 
-    total = len(
-        targets
-    )
+    total = len(targets)
 
     start_time = time.perf_counter()
 
     with ThreadPoolExecutor(
-
         max_workers=MAX_WORKERS,
-
     ) as executor:
 
         futures = {
-
             executor.submit(
-
                 process_target,
-
                 target,
-
             ): target
-
             for target in targets
-
         }
 
         for future in as_completed(
             futures
         ):
 
-            target = futures[
-                future
-            ]
+            target = futures[future]
 
             completed += 1
 
             try:
 
-                hostname, data = (
-
+                hostname, findings = (
                     future.result()
-
                 )
 
-                if data:
+                if findings is not None:
 
                     results[
                         hostname
-                    ] = data
+                    ] = findings
 
                     progress_status(
-
                         completed,
-
                         total,
-
                         f"✓ {hostname}",
-
                     )
 
                 else:
@@ -323,14 +172,12 @@ def run_nuclei(
                     )
 
                     progress_status(
-
                         completed,
-
                         total,
-
                         f"✗ {hostname}",
-
                     )
+
+
 
             except KeyboardInterrupt:
 
@@ -343,9 +190,7 @@ def run_nuclei(
             except Exception as error:
 
                 warning(
-
                     f"{target}: {error}"
-
                 )
 
                 failed.append(
@@ -353,161 +198,59 @@ def run_nuclei(
                 )
 
                 progress_status(
-
                     completed,
-
                     total,
-
                     f"✗ {target}",
-
                 )
 
-    elapsed = round(
-
+    elapsed = (
         time.perf_counter()
-
-        - start_time,
-
-        2,
-
+        - start_time
     )
-
-    overall = build_overall_statistics(
-
-        results,
-
-        failed,
-
-        elapsed,
-
-    )
-
-    success(
-
-        f"Targets          : {overall['targets']}"
-
-    )
-
-    success(
-
-        f"Successful       : {overall['successful']}"
-
-    )
-
-    success(
-
-        f"Failed           : {overall['failed']}"
-
-    )
-
-    success(
-
-        f"Findings         : {overall['total_findings']}"
-
-    )
-
-    success(
-
-        f"Elapsed          : {overall['elapsed']:.2f} sec"
-
-    )
-
-    return (
-
-        results,
-
-        overall,
-
-        failed,
-
-        elapsed,
-
-    )
-
-
-# ==========================================================
-# Export Results
-# ==========================================================
-
-def export_results(
-    results: dict,
-    overall: dict,
-):
-    """
-    Export all findings.
-
-    Args:
-        results:
-            Scan results.
-
-        overall:
-            Overall statistics.
-
-    Returns:
-        dict
-    """
 
     findings = collect_findings(
         results
     )
 
-    return export_all(
-
-        findings,
-
-        overall,
-
+    analysis = analyze(
+        results=findings,
+        failed=failed,
+        elapsed=elapsed,
     )
 
+    statistics = analysis[
+        "statistics"
+    ]
 
-# ==========================================================
-# Run And Export
-# ==========================================================
-
-def run_and_export(
-    targets: list[str],
-):
-    """
-    Run Nuclei scan and
-    export all reports.
-
-    Args:
-        targets:
-            Target list.
-
-    Returns:
-        tuple
-    """
-
-    results, overall, failed, elapsed = (
-
-        run_nuclei(
-            targets
-        )
-
+    statistics.update(
+        {
+            "total_targets": total,
+            "successful": len(results),
+            "failed": len(failed),
+        }
     )
 
-    files = export_results(
-
-        results,
-
-        overall,
-
+    success(
+        f"Targets      : {statistics['total_targets']}"
     )
 
-    return (
-
-        results,
-
-        overall,
-
-        failed,
-
-        elapsed,
-
-        files,
-
+    success(
+        f"Successful   : {statistics['successful']}"
     )
+
+    success(
+        f"Failed       : {statistics['failed']}"
+    )
+
+    success(
+        f"Findings     : {statistics['total_findings']}"
+    )
+
+    success(
+        f"Elapsed      : {statistics['elapsed']:.2f} sec"
+    )
+
+    return analysis
 
 
 # ==========================================================
@@ -515,20 +258,21 @@ def run_and_export(
 # ==========================================================
 
 def successful_targets(
-    results: dict,
-):
+    analysis: dict[str, Any],
+) -> list[str]:
     """
-    Return successful
-    targets.
+    Return successful targets.
+    """
 
-    Returns:
-        list
-    """
+    target_statistics = analysis[
+        "statistics"
+    ].get(
+        "target_statistics",
+        {},
+    )
 
     return sorted(
-
-        results.keys()
-
+        target_statistics.keys()
     )
 
 
@@ -537,115 +281,26 @@ def successful_targets(
 # ==========================================================
 
 def failed_targets(
-    failed: list,
-):
+    analysis: dict[str, Any],
+) -> list[str]:
     """
-    Return failed
-    targets.
-
-    Returns:
-        list
+    Return failed targets.
     """
 
     return sorted(
-
-        failed
-
-    )
-
-
-# ==========================================================
-# Print Summary
-# ==========================================================
-
-def print_summary(
-    overall: dict,
-):
-    """
-    Display final summary.
-
-    Args:
-        overall:
-            Overall statistics.
-    """
-
-    success(
-        "=" * 60
-    )
-
-    success(
-        "Nuclei Scan Completed"
-    )
-
-    success(
-        "=" * 60
-    )
-
-    success(
-        f"Targets            : {overall.get('targets', 0)}"
-    )
-
-    success(
-        f"Successful         : {overall.get('successful', 0)}"
-    )
-
-    success(
-        f"Failed             : {overall.get('failed', 0)}"
-    )
-
-    success(
-        f"Total Findings     : {overall.get('total_findings', 0)}"
-    )
-
-    success(
-        f"Critical           : {overall.get('critical', 0)}"
-    )
-
-    success(
-        f"High               : {overall.get('high', 0)}"
-    )
-
-    success(
-        f"Medium             : {overall.get('medium', 0)}"
-    )
-
-    success(
-        f"Low                : {overall.get('low', 0)}"
-    )
-
-    success(
-        f"Info               : {overall.get('info', 0)}"
-    )
-
-    success(
-        f"Elapsed            : {overall.get('elapsed', 0):.2f} sec"
-    )
-
-    success(
-        "=" * 60
-    )
-
-
-# ==========================================================
-# Self Test
-# ==========================================================
-
-if __name__ == "__main__":
-
-    targets = [
-
-        "https://scanme.sh",
-
-    ]
-
-    results, overall, failed, elapsed, files = (
-
-        run_and_export(
-            targets
+        analysis.get(
+            "failed",
+            [],
         )
-
     )
 
-    print_summary(
-        overall
-    )
+
+# ==========================================================
+# Exports
+# ==========================================================
+
+__all__ = [
+    "run_nuclei",
+    "successful_targets",
+    "failed_targets",
+]

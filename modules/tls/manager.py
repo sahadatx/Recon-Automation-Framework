@@ -1,8 +1,8 @@
 """
 TLS Manager
 
-Main entry point for
-TLS Analysis.
+Coordinates the complete
+TLS Analysis pipeline.
 """
 
 from __future__ import annotations
@@ -10,20 +10,17 @@ from __future__ import annotations
 from time import perf_counter
 from typing import Any
 
-from core.logger import info
+from core.logger import (
+    info,
+    success,
+)
 
-from modules.tls.certificate import collect_certificate
-from modules.tls.protocols import collect_protocols
-from modules.tls.ciphers import collect_cipher
-from modules.tls.analyzer import analyze
-from modules.tls.filters import filter_results
-from modules.tls.statistics import (
-    generate_statistics,
-    print_summary,
-)
-from modules.tls.exporter import (
-    export_results,
-)
+from .certificate import collect_certificate
+from .protocols import collect_protocols
+from .ciphers import collect_cipher
+
+from .analyzer import analyze
+from .filters import filter_results
 
 
 # ==========================================================
@@ -32,297 +29,125 @@ from modules.tls.exporter import (
 
 def run_tls_analysis(
     targets: list[str],
-) -> tuple[
-    list[dict[str, Any]],
-    dict[str, Any],
-]:
+) -> dict[str, Any]:
     """
-    Run complete TLS Analysis pipeline.
-
-    Pipeline:
-        Certificate
-        -> Protocols
-        -> Cipher
-        -> Analyzer
-        -> Filter
-        -> Statistics
-        -> Export
-
-    Returns:
-        tuple(results, statistics)
+    Run complete TLS Analysis.
     """
 
-    print()
+    if not targets:
 
-    print("=" * 80)
-
-    print(
-
-        "TLS Analysis".center(
-
-            80
-
+        return analyze(
+            results=[],
+            elapsed=0,
         )
 
+    info(
+        "Starting TLS Analysis..."
     )
-
-    print("=" * 80)
 
     start = perf_counter()
 
-    results = []
+    results: list[dict[str, Any]] = []
 
-
-    try:
-
-        # --------------------------------------------------
-        # Analyze Targets
-        # --------------------------------------------------
-
-        for target in targets:
-
-            info(
-
-                f"Analyzing {target}..."
-
-            )
-
-            # ----------------------------------------------
-            # Certificate
-            # ----------------------------------------------
-
-            certificate = collect_certificate(
-
-                target
-
-            )
-
-            # ----------------------------------------------
-            # Protocols
-            # ----------------------------------------------
-
-            protocols = collect_protocols(
-
-                target
-
-            )
-
-            # ----------------------------------------------
-            # Cipher
-            # ----------------------------------------------
-
-            cipher = collect_cipher(
-
-                target
-
-            )
-
-            # ----------------------------------------------
-            # Analysis
-            # ----------------------------------------------
-
-            result = analyze(
-
-                certificate,
-
-                protocols,
-
-                cipher,
-
-            )
-
-            result["host"] = target
-
-            results.append(
-
-                result
-
-            )
-
-        # --------------------------------------------------
-        # Filter Results
-        # --------------------------------------------------
+    for target in targets:
 
         info(
-
-            "Filtering results..."
-
+            f"Analyzing {target}..."
         )
 
-        results = filter_results(
-
-            results
-
+        certificate = collect_certificate(
+            target
         )
 
-        # --------------------------------------------------
-        # Statistics
-        # --------------------------------------------------
-
-        elapsed = perf_counter() - start
-
-        statistics = generate_statistics(
-
-            results,
-
-            elapsed,
-
-        )
-    
-
-        # --------------------------------------------------
-        # Export Results
-        # --------------------------------------------------
-
-        info(
-
-            "Exporting results..."
-
+        protocols = collect_protocols(
+            target
         )
 
-        export_results(
-
-            results,
-
-            statistics,
-
+        cipher = collect_cipher(
+            target
         )
 
-        # --------------------------------------------------
-        # Print Summary
-        # --------------------------------------------------
-
-        print_summary(
-
-            statistics
-
+        result = analyze(
+            certificate,
+            protocols,
+            cipher,
         )
 
-        print()
+        result["host"] = target
 
-        print("=" * 80)
-
-        print(
-
-            "[SUCCESS] TLS Analysis Completed"
-
+        results.append(
+            result
         )
 
-        print("=" * 80)
+    results = filter_results(
+        results
+    )
 
-        print(
+    elapsed = (
+        perf_counter()
+        - start
+    )
 
-            f"Targets             : {statistics['targets']}"
+    analysis = analyze(
+        results=results,
+        elapsed=elapsed,
+    )
 
-        )
+    statistics = analysis[
+        "statistics"
+    ]
 
-        print(
+    success(
+        f"Targets             : {statistics['targets']}"
+    )
 
-            f"Average Risk        : {statistics['average_risk']}"
+    success(
+        f"Average Risk        : {statistics['average_risk']}"
+    )
 
-        )
+    success(
+        f"Highest Risk        : {statistics['highest_risk']}"
+    )
 
-        print(
+    success(
+        f"Expired             : {statistics['expired']}"
+    )
 
-            f"Highest Risk        : {statistics['highest_risk']}"
+    success(
+        f"Self Signed         : {statistics['self_signed']}"
+    )
 
-        )
+    success(
+        f"Hostname Mismatch   : {statistics['hostname_mismatch']}"
+    )
 
-        print(
+    success(
+        f"Weak Protocol       : {statistics['weak_protocol']}"
+    )
 
-            f"Expired             : {statistics['expired']}"
+    success(
+        f"Weak Cipher         : {statistics['weak_cipher']}"
+    )
 
-        )
+    success(
+        f"Wildcard            : {statistics['wildcard']}"
+    )
 
-        print(
+    success(
+        f"Forward Secrecy     : {statistics['forward_secrecy']}"
+    )
 
-            f"Self Signed         : {statistics['self_signed']}"
+    success(
+        f"Elapsed             : {statistics['elapsed']:.2f} sec"
+    )
 
-        )
-
-        print(
-
-            f"Hostname Mismatch   : {statistics['hostname_mismatch']}"
-
-        )
-
-        print(
-
-            f"Weak Protocol       : {statistics['weak_protocol']}"
-
-        )
-
-        print(
-
-            f"Weak Cipher         : {statistics['weak_cipher']}"
-
-        )
-
-        print(
-
-            f"Wildcard            : {statistics['wildcard']}"
-
-        )
-
-        print(
-
-            f"Forward Secrecy     : {statistics['forward_secrecy']}"
-
-        )
-
-        print(
-
-            f"Elapsed Time        : {statistics['elapsed']} sec"
-
-        )
-
-        print("=" * 80)
-
-        return (
-
-            results,
-
-            statistics,
-
-        )
-
-    except KeyboardInterrupt:
-
-        print()
-
-        print(
-
-            "[ERROR] TLS Analysis cancelled by user."
-
-        )
-
-        raise
-
-    except Exception as error:
-
-        print()
-
-        print(
-
-            "[ERROR] TLS Analysis failed."
-
-        )
-
-        print(
-
-            f"[ERROR] {error}"
-
-        )
-
-        raise
+    return analysis
 
 
 # ==========================================================
-# Export
+# Public Exports
 # ==========================================================
 
 __all__ = [
-
     "run_tls_analysis",
-
 ]

@@ -10,8 +10,16 @@ from __future__ import annotations
 
 import csv
 import json
+from pathlib import Path
+from typing import Any
+
+from core.logger import (
+    success,
+    warning,
+)
 
 from .constants import (
+    OUTPUT_DIR,
     TXT_FILE,
     JSON_FILE,
     CSV_FILE,
@@ -19,286 +27,368 @@ from .constants import (
     VULNERABLE_FILE,
 )
 
+# ==========================================================
+# Output Directory
+# ==========================================================
+
+def create_output_directory() -> None:
+    """
+    Create output directory.
+    """
+
+    OUTPUT_DIR.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
 
 # ==========================================================
 # Write Text
 # ==========================================================
 
 def write_text(
-    path,
-    content: str,
-) -> None:
+    output_file: Path,
+    lines: list[str],
+) -> Path:
     """
     Write text file.
+
+    Args:
+        output_file:
+            Destination file.
+
+        lines:
+            File content.
+
+    Returns:
+        Output file path.
     """
 
-    path.write_text(
+    try:
 
-        content,
+        output_file.write_text(
+            "\n".join(lines),
+            encoding="utf-8",
+        )
 
-        encoding="utf-8",
+        success(
+            f"Saved {output_file}"
+        )
 
+    except OSError as error:
+
+        warning(
+            f"{output_file}: {error}"
+        )
+
+    return output_file
+
+
+# ==========================================================
+# Write JSON
+# ==========================================================
+
+def write_json(
+    output_file: Path,
+    data: Any,
+) -> Path:
+    """
+    Write JSON file.
+
+    Args:
+        output_file:
+            Destination file.
+
+        data:
+            JSON data.
+
+    Returns:
+        Output file path.
+    """
+
+    try:
+
+        with output_file.open(
+            "w",
+            encoding="utf-8",
+        ) as file:
+
+            json.dump(
+                data,
+                file,
+                indent=4,
+                ensure_ascii=False,
+                sort_keys=True,
+                default=str,
+            )
+
+        success(
+            f"Saved {output_file}"
+        )
+
+    except OSError as error:
+
+        warning(
+            f"{output_file}: {error}"
+        )
+
+    return output_file
+
+
+# ==========================================================
+# Write CSV
+# ==========================================================
+
+def write_csv(
+    output_file: Path,
+    results: list[dict[str, Any]],
+) -> Path:
+    """
+    Write CSV report.
+
+    Args:
+        output_file:
+            Destination file.
+
+        results:
+            Takeover results.
+
+    Returns:
+        Output file path.
+    """
+
+    try:
+
+        with output_file.open(
+            "w",
+            newline="",
+            encoding="utf-8",
+        ) as file:
+
+            writer = csv.writer(file)
+
+            writer.writerow(
+                [
+                    "Target",
+                    "Vulnerable",
+                    "Provider",
+                    "Confidence",
+                    "Methods",
+                    "Status Code",
+                    "Fingerprint",
+                    "CNAME",
+                    "IP",
+                    "HTTP Title",
+                ]
+            )
+
+            for result in results:
+
+                writer.writerow(
+                    [
+                        result.get("target", ""),
+                        result.get("vulnerable", False),
+                        result.get("provider", ""),
+                        result.get("confidence", ""),
+                        ", ".join(
+                            result.get(
+                                "methods",
+                                [],
+                            )
+                        ),
+                        result.get("status_code", ""),
+                        result.get("fingerprint", ""),
+                        result.get("cname", ""),
+                        result.get("ip", ""),
+                        result.get("http_title", ""),
+                    ]
+                )
+
+        success(
+            f"Saved {output_file}"
+        )
+
+    except OSError as error:
+
+        warning(
+            f"{output_file}: {error}"
+        )
+
+    return output_file
+
+# ==========================================================
+# Export JSON
+# ==========================================================
+
+def export_json(
+    analysis: dict[str, Any],
+) -> Path:
+    """
+    Export JSON report.
+    """
+
+    return write_json(
+        JSON_FILE,
+        analysis,
     )
 
 
 # ==========================================================
-# TXT Export
+# Export TXT
 # ==========================================================
 
 def export_txt(
-    results,
-) -> None:
+    analysis: dict[str, Any],
+) -> Path:
     """
     Export TXT report.
     """
 
-    lines = []
+    results = analysis["results"]
+
+    lines: list[str] = []
 
     for result in results:
 
         lines.append("=" * 80)
 
         lines.append(
-
-            f"Target              : {result['target']}"
-
+            f"Target              : {result.get('target', '-')}"
         )
 
         lines.append(
-
-            f"Vulnerable          : {result['vulnerable']}"
-
+            f"Vulnerable          : {result.get('vulnerable', False)}"
         )
 
         lines.append(
-
-            f"Provider            : {result['provider']}"
-
+            f"Provider            : {result.get('provider', '-')}"
         )
 
         lines.append(
-
-            f"Confidence          : {result['confidence']}"
-
+            f"Confidence          : {result.get('confidence', '-')}"
         )
 
         lines.append(
-
-            f"Methods             : "
-
-            f"{', '.join(result['methods'])}"
-
+            "Methods             : "
+            + ", ".join(result.get("methods", []))
         )
 
         lines.append(
-
-            f"Status Code         : {result['status_code']}"
-
+            f"Status Code         : {result.get('status_code', '-')}"
         )
 
         lines.append(
-
-            f"Fingerprint         : {result['fingerprint']}"
-
+            f"Fingerprint         : {result.get('fingerprint', '-')}"
         )
 
         lines.append(
-
-            f"CNAME               : {result['cname']}"
-
+            f"CNAME               : {result.get('cname', '-')}"
         )
 
         lines.append(
-
-            f"IP Address          : {result['ip']}"
-
+            f"IP Address          : {result.get('ip', '-')}"
         )
 
         lines.append(
-
-            f"HTTP Title          : {result['http_title']}"
-
+            f"HTTP Title          : {result.get('http_title', '-')}"
         )
 
-        lines.append(
-
-            "Recommendations"
-
-        )
+        lines.append("Recommendations")
 
         recommendations = result.get(
-
             "recommendations",
-
             [],
-
         )
 
         if recommendations:
 
-            for item in recommendations:
+            for recommendation in recommendations:
 
                 lines.append(
-
-                    f"  - {item}"
-
+                    f"  - {recommendation}"
                 )
 
         else:
 
             lines.append(
-
                 "  None"
-
             )
 
         lines.append("")
 
-    write_text(
-
+    return write_text(
         TXT_FILE,
-
-        "\n".join(
-
-            lines,
-
-        ),
-
+        lines,
     )
 
 
 # ==========================================================
-# JSON Export
-# ==========================================================
-
-def export_json(
-    results,
-) -> None:
-    """
-    Export JSON report.
-    """
-
-    with JSON_FILE.open(
-
-        "w",
-
-        encoding="utf-8",
-
-    ) as fp:
-
-        json.dump(
-
-            results,
-
-            fp,
-
-            indent=4,
-
-            ensure_ascii=False,
-
-        )
-
-
-# ==========================================================
-# CSV Export
+# Export CSV
 # ==========================================================
 
 def export_csv(
-    results,
-) -> None:
+    analysis: dict[str, Any],
+) -> Path:
     """
     Export CSV report.
     """
 
-    with CSV_FILE.open(
-
-        "w",
-
-        newline="",
-
-        encoding="utf-8",
-
-    ) as fp:
-
-        writer = csv.writer(
-
-            fp,
-
-        )
-
-        writer.writerow(
-
-            [
-
-                "Target",
-
-                "Vulnerable",
-
-                "Provider",
-
-                "Confidence",
-
-                "Methods",
-
-                "Status Code",
-
-                "Fingerprint",
-
-                "CNAME",
-
-                "IP",
-
-                "HTTP Title",
-
-            ]
-
-        )
-
-        for result in results:
-
-            writer.writerow(
-
-                [
-
-                    result["target"],
-
-                    result["vulnerable"],
-
-                    result["provider"],
-
-                    result["confidence"],
-
-                    ", ".join(
-
-                        result["methods"],
-
-                    ),
-
-                    result["status_code"],
-
-                    result["fingerprint"],
-
-                    result["cname"],
-
-                    result["ip"],
-
-                    result["http_title"],
-
-                ]
-
-            )
+    return write_csv(
+        CSV_FILE,
+        analysis["results"],
+    )
 
 
 # ==========================================================
-# Summary Export
+# Export Vulnerable
+# ==========================================================
+
+def export_vulnerable(
+    analysis: dict[str, Any],
+) -> Path:
+    """
+    Export vulnerable targets.
+    """
+
+    results = analysis["results"]
+
+    lines: list[str] = []
+
+    for result in results:
+
+        if not result.get(
+            "vulnerable",
+            False,
+        ):
+            continue
+
+        lines.append(
+
+            f"{result.get('target', '-')}"
+            f" -> "
+            f"{result.get('provider', '-')}"
+            f" (Confidence: {result.get('confidence', '-')})"
+
+        )
+
+    return write_text(
+        VULNERABLE_FILE,
+        lines,
+    )
+
+
+# ==========================================================
+# Export Summary
 # ==========================================================
 
 def export_summary(
-    statistics,
-) -> None:
+    analysis: dict[str, Any],
+) -> Path:
     """
     Export summary report.
     """
+
+    statistics = analysis["statistics"]
 
     lines = [
 
@@ -326,16 +416,10 @@ def export_summary(
 
     ]
 
-    for level, count in statistics[
-
-        "confidence_statistics"
-
-    ].items():
+    for level, count in statistics["confidence_statistics"].items():
 
         lines.append(
-
             f"{level:<20}{count}"
-
         )
 
     lines.extend(
@@ -352,181 +436,105 @@ def export_summary(
 
     )
 
-    for provider, count in statistics[
-
-        "provider_statistics"
-
-    ].items():
+    for provider, count in statistics["provider_statistics"].items():
 
         lines.append(
-
             f"{provider:<20}{count}"
-
         )
 
-    write_text(
-
+    return write_text(
         SUMMARY_FILE,
-
-        "\n".join(
-
-            lines,
-
-        ),
-
+        lines,
     )
 
 
 # ==========================================================
-# Vulnerable Export
+# Show Summary
 # ==========================================================
 
-def export_vulnerable(
-    results,
+def show_summary(
+    analysis: dict[str, Any],
 ) -> None:
     """
-    Export vulnerable
-    targets.
+    Display summary.
     """
 
-    targets = [
+    statistics = analysis["statistics"]
 
-        result
+    print()
 
-        for result
+    print("=" * 80)
 
-        in results
-
-        if result.get(
-
-            "vulnerable",
-
-            False,
-
-        )
-
-    ]
-
-    lines = []
-
-    for result in targets:
-
-        lines.append(
-
-            f"{result['target']} -> "
-
-            f"{result['provider']} "
-
-            f"(Confidence: "
-
-            f"{result['confidence']})"
-
-        )
-
-    write_text(
-
-        VULNERABLE_FILE,
-
-        "\n".join(
-
-            lines,
-
-        ),
-
+    print(
+        "Subdomain Takeover Summary".center(80)
     )
+
+    print("=" * 80)
+
+    print(f"Targets             : {statistics['targets']}")
+    print(f"Vulnerable          : {statistics['vulnerable']}")
+    print(f"Safe                : {statistics['safe']}")
+    print(f"Average Confidence  : {statistics['average_confidence']}")
+    print(f"Highest Confidence  : {statistics['highest_confidence']}")
+    print(f"Elapsed Time        : {statistics['elapsed']} sec")
+
+    print("-" * 80)
+
+    print("Confidence Levels")
+
+    print("-" * 80)
+
+    for level, count in statistics["confidence_statistics"].items():
+
+        print(
+            f"{level:<30}{count}"
+        )
+
+    print("-" * 80)
+
+    print("Providers")
+
+    print("-" * 80)
+
+    for provider, count in statistics["provider_statistics"].items():
+
+        print(
+            f"{provider:<30}{count}"
+        )
+
+    print("=" * 80)
 
 
 # ==========================================================
 # Export All
 # ==========================================================
 
-def export_results(
-    results,
-    statistics,
+def export_all(
+    analysis: dict[str, Any],
 ) -> None:
     """
     Export all reports.
     """
 
-    export_txt(
+    create_output_directory()
 
-        results,
+    export_json(analysis)
 
-    )
+    export_txt(analysis)
 
-    export_json(
+    export_csv(analysis)
 
-        results,
+    export_vulnerable(analysis)
 
-    )
+    export_summary(analysis)
 
-    export_csv(
-
-        results,
-
-    )
-
-    export_summary(
-
-        statistics,
-
-    )
-
-    export_vulnerable(
-
-        results,
-
-    )
-
-    print(
-
-        f"[SUCCESS] Saved {TXT_FILE}"
-
-    )
-
-    print(
-
-        f"[SUCCESS] Saved {JSON_FILE}"
-
-    )
-
-    print(
-
-        f"[SUCCESS] Saved {CSV_FILE}"
-
-    )
-
-    print(
-
-        f"[SUCCESS] Saved {SUMMARY_FILE}"
-
-    )
-
-    print(
-
-        f"[SUCCESS] Saved {VULNERABLE_FILE}"
-
-    )
+    show_summary(analysis)
 
 
 # ==========================================================
-# Export
+# Public Exports
 # ==========================================================
 
 __all__ = [
-
-    "export_txt",
-
-    "export_json",
-
-    "export_csv",
-
-    "export_summary",
-
-    "export_vulnerable",
-
-    "export_results",
-
+    "export_all",
 ]
-
-

@@ -1,9 +1,9 @@
 """
 Takeover Manager
 
-Main entry point for
+Coordinates the complete
 Subdomain Takeover
-Detection.
+Detection pipeline.
 """
 
 from __future__ import annotations
@@ -11,9 +11,12 @@ from __future__ import annotations
 from time import perf_counter
 from typing import Any
 
-from core.logger import info
+from core.logger import (
+    info,
+    success,
+)
 
-from modules.takeover.helpers import (
+from .helpers import (
     normalize_target,
     request_page,
     extract_status_code,
@@ -23,21 +26,16 @@ from modules.takeover.helpers import (
     resolve_ipv4,
 )
 
-from modules.takeover.analyzer import (
+from .target_analyzer import (
+    analyze_target,
+)
+
+from .analyzer import (
     analyze,
 )
 
-from modules.takeover.filters import (
+from .filters import (
     filter_results,
-)
-
-from modules.takeover.statistics import (
-    generate_statistics,
-    print_summary,
-)
-
-from modules.takeover.exporter import (
-    export_results,
 )
 
 
@@ -47,323 +45,143 @@ from modules.takeover.exporter import (
 
 def run_takeover_detection(
     targets: list[str],
-) -> tuple[
-    list[dict[str, Any]],
-    dict[str, Any],
-]:
+) -> dict[str, Any]:
     """
     Run complete
-    Takeover Detection
-    pipeline.
-
-    Pipeline:
-        HTTP
-        -> DNS
-        -> Analysis
-        -> Filter
-        -> Statistics
-        -> Export
-
-    Returns:
-        tuple(
-            results,
-            statistics,
-        )
+    Subdomain Takeover
+    Detection pipeline.
     """
 
-    print()
+    if not targets:
 
-    print("=" * 80)
-
-    print(
-
-        "Subdomain Takeover Detection".center(
-
-            80,
-
+        return analyze(
+            results=[],
+            elapsed=0,
         )
 
+    info(
+        "Starting Subdomain Takeover Detection..."
     )
-
-    print("=" * 80)
 
     start = perf_counter()
 
-    results = []
+    results: list[dict[str, Any]] = []
 
-    try:
-
-        # --------------------------------------------------
-        # Analyze Targets
-        # --------------------------------------------------
-
-        for target in targets:
-
-            info(
-
-                f"Analyzing {target}..."
-
-            )
-
-            host = normalize_target(
-
-                target,
-
-            )
-
-            if not host:
-
-                info(
-
-                    f"Skipping invalid target: "
-
-                    f"{target}"
-
-                )
-
-                continue
-
-            # ----------------------------------------------
-            # HTTP
-            # ----------------------------------------------
-
-            response = request_page(
-
-                target,
-
-            )
-
-            status_code = extract_status_code(
-
-                response,
-
-            )
-
-            body = extract_body(
-
-                response,
-
-            )
-
-            http_title = extract_title(
-
-                response,
-
-            )
-
-            # ----------------------------------------------
-            # DNS
-            # ----------------------------------------------
-
-            cname = resolve_cname(
-
-                host,
-
-            )
-
-            ip = resolve_ipv4(
-
-                host,
-
-            )
-
-            # ----------------------------------------------
-            # Analysis
-            # ----------------------------------------------
-
-            result = analyze(
-
-                host,
-
-                body,
-
-                status_code,
-
-                cname,
-
-                ip,
-
-                http_title,
-
-            )
-
-            results.append(
-
-                result,
-
-            )
-
-
-        # --------------------------------------------------
-        # Filter Results
-        # --------------------------------------------------
+    for target in targets:
 
         info(
-
-            "Filtering results..."
-
+            f"Analyzing {target}..."
         )
 
-        results = filter_results(
+        host = normalize_target(
+            target,
+        )
 
-            results,
+        if not host:
+            continue
 
+        # --------------------------------------------------
+        # HTTP
+        # --------------------------------------------------
+
+        response = request_page(
+            target,
+        )
+
+        status_code = extract_status_code(
+            response,
+        )
+
+        body = extract_body(
+            response,
+        )
+
+        http_title = extract_title(
+            response,
         )
 
         # --------------------------------------------------
-        # Statistics
+        # DNS
         # --------------------------------------------------
 
-        elapsed = perf_counter() - start
+        cname = resolve_cname(
+            host,
+        )
 
-        statistics = generate_statistics(
-
-            results,
-
-            elapsed,
-
+        ip = resolve_ipv4(
+            host,
         )
 
         # --------------------------------------------------
-        # Export Results
+        # Analyze Target
         # --------------------------------------------------
 
-        info(
-
-            "Exporting results..."
-
+        result = analyze_target(
+            target=host,
+            body=body,
+            status_code=status_code,
+            cname=cname,
+            ip=ip,
+            http_title=http_title,
         )
 
-        export_results(
-
-            results,
-
-            statistics,
-
+        results.append(
+            result,
         )
 
-        # --------------------------------------------------
-        # Print Summary
-        # --------------------------------------------------
+    # ------------------------------------------------------
+    # Filter Results
+    # ------------------------------------------------------
 
-        print_summary(
+    results = filter_results(
+        results,
+    )
 
-            statistics,
+    elapsed = (
+        perf_counter()
+        - start
+    )
 
-        )
+    analysis = analyze(
+        results=results,
+        elapsed=elapsed,
+    )
 
-        print()
+    statistics = analysis[
+        "statistics"
+    ]
 
-        print("=" * 80)
+    success(
+        f"Targets             : {statistics['targets']}"
+    )
 
-        print(
+    success(
+        f"Vulnerable          : {statistics['vulnerable']}"
+    )
 
-            "[SUCCESS] Subdomain Takeover Detection Completed"
+    success(
+        f"Safe                : {statistics['safe']}"
+    )
 
-        )
+    success(
+        f"Average Confidence  : {statistics['average_confidence']}"
+    )
 
-        print("=" * 80)
+    success(
+        f"Highest Confidence  : {statistics['highest_confidence']}"
+    )
 
-        print(
+    success(
+        f"Elapsed             : {statistics['elapsed']:.2f} sec"
+    )
 
-            f"Targets             : "
-
-            f"{statistics['targets']}"
-
-        )
-
-        print(
-
-            f"Vulnerable          : "
-
-            f"{statistics['vulnerable']}"
-
-        )
-
-        print(
-
-            f"Safe                : "
-
-            f"{statistics['safe']}"
-
-        )
-
-        print(
-
-            f"Average Confidence  : "
-
-            f"{statistics['average_confidence']}"
-
-        )
-
-        print(
-
-            f"Highest Confidence  : "
-
-            f"{statistics['highest_confidence']}"
-
-        )
-
-        print(
-
-            f"Elapsed Time        : "
-
-            f"{statistics['elapsed']} sec"
-
-        )
-
-        print("=" * 80)
-
-        return (
-
-            results,
-
-            statistics,
-
-        )
-
-    except KeyboardInterrupt:
-
-        print()
-
-        print(
-
-            "[ERROR] Subdomain Takeover Detection "
-
-            "cancelled by user."
-
-        )
-
-        raise
-
-    except Exception as error:
-
-        print()
-
-        print(
-
-            "[ERROR] Subdomain Takeover Detection "
-
-            "failed."
-
-        )
-
-        print(
-
-            f"[ERROR] {error}"
-
-        )
-
-        raise
+    return analysis
 
 
 # ==========================================================
-# Export
+# Public Exports
 # ==========================================================
 
 __all__ = [
-
     "run_takeover_detection",
-
 ]
-

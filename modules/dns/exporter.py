@@ -1,12 +1,13 @@
 """
 DNS Resolution Exporter
 
-Export DNS resolution results to output files.
+Export DNS resolution results.
 """
 
 from __future__ import annotations
 
 import json
+from typing import Any
 
 from modules.dns.constants import (
     DNS_OUTPUT_DIR,
@@ -16,14 +17,13 @@ from modules.dns.constants import (
     UNRESOLVED_TXT,
 )
 
-
 # ==========================================================
-# Create Output Directory
+# Helpers
 # ==========================================================
 
 def create_output_directory() -> None:
     """
-    Create the DNS output directory.
+    Create DNS output directory.
     """
 
     DNS_OUTPUT_DIR.mkdir(
@@ -33,45 +33,38 @@ def create_output_directory() -> None:
 
 
 # ==========================================================
-# Export Results (TXT)
+# Results (TXT)
 # ==========================================================
 
 def export_results_txt(
-    analysis: dict,
+    analysis: dict[str, Any],
 ) -> None:
     """
-    Export DNS results as text.
+    Export DNS results as human-readable text.
     """
+
+    create_output_directory()
+
+    results = analysis["results"]
 
     with RESULTS_TXT.open(
         "w",
         encoding="utf-8",
     ) as file:
 
-        for host in sorted(
-            analysis["results"]
-        ):
+        for host in sorted(results):
 
-            file.write(
-                f"{host}\n"
-            )
+            file.write(f"{host}\n")
+            file.write("=" * 70 + "\n")
 
-            file.write(
-                "=" * 70 + "\n"
-            )
-
-            records = analysis[
-                "results"
-            ][host]
+            records = results[host]
 
             for (
                 record_type,
                 values,
             ) in records.items():
 
-                file.write(
-                    f"\n{record_type}\n"
-                )
+                file.write(f"\n{record_type}\n")
 
                 if values:
 
@@ -91,15 +84,17 @@ def export_results_txt(
 
 
 # ==========================================================
-# Export Results (JSON)
+# Results (JSON)
 # ==========================================================
 
 def export_results_json(
-    analysis: dict,
+    analysis: dict[str, Any],
 ) -> None:
     """
-    Export DNS results as JSON.
+    Export DNS analysis as JSON.
     """
+
+    create_output_directory()
 
     with RESULTS_JSON.open(
         "w",
@@ -115,19 +110,19 @@ def export_results_json(
 
 
 # ==========================================================
-# Export Summary
+# Summary
 # ==========================================================
 
 def export_summary(
-    analysis: dict,
+    analysis: dict[str, Any],
 ) -> None:
     """
     Export DNS summary.
     """
 
-    statistics = analysis[
-        "statistics"
-    ]
+    create_output_directory()
+
+    statistics = analysis["statistics"]
 
     with SUMMARY_TXT.open(
         "w",
@@ -135,21 +130,21 @@ def export_summary(
     ) as file:
 
         file.write(
-            "DNS Resolution Summary\n"
+            "DNS RESOLUTION SUMMARY\n"
         )
 
         file.write(
-            "=" * 60 + "\n\n"
+            "=" * 70 + "\n\n"
         )
 
         file.write(
             f"Resolved Hosts : "
-            f"{analysis['resolved_hosts']}\n"
+            f"{statistics['resolved_hosts']}\n"
         )
 
         file.write(
             f"Failed Hosts   : "
-            f"{analysis['failed_hosts']}\n"
+            f"{statistics['failed_hosts']}\n"
         )
 
         file.write(
@@ -159,7 +154,7 @@ def export_summary(
 
         file.write(
             f"Scan Time      : "
-            f"{analysis['scan_time']} sec\n\n"
+            f"{statistics['elapsed']} sec\n\n"
         )
 
         file.write(
@@ -167,7 +162,7 @@ def export_summary(
         )
 
         file.write(
-            "-" * 60 + "\n"
+            "-" * 70 + "\n"
         )
 
         for (
@@ -178,8 +173,7 @@ def export_summary(
         ].items():
 
             file.write(
-                f"{record_type:<10}"
-                f"{count}\n"
+                f"{record_type:<10}{count}\n"
             )
 
         file.write("\n")
@@ -189,7 +183,7 @@ def export_summary(
         )
 
         file.write(
-            "-" * 60 + "\n"
+            "-" * 70 + "\n"
         )
 
         for (
@@ -200,30 +194,31 @@ def export_summary(
         ].items():
 
             file.write(
-                f"{record_type:<10}"
-                f"{count}\n"
+                f"{record_type:<10}{count}\n"
             )
 
 
 # ==========================================================
-# Export Unresolved Hosts
+# Unresolved Hosts
 # ==========================================================
 
 def export_unresolved(
-    analysis: dict,
+    analysis: dict[str, Any],
 ) -> None:
     """
     Export unresolved hosts.
     """
+
+    create_output_directory()
+
+    statistics = analysis["statistics"]
 
     with UNRESOLVED_TXT.open(
         "w",
         encoding="utf-8",
     ) as file:
 
-        for host in analysis[
-            "unresolved"
-        ]:
+        for host in statistics["unresolved"]:
 
             file.write(
                 f"{host}\n"
@@ -231,17 +226,15 @@ def export_unresolved(
 
 
 # ==========================================================
-# Export All
+# Export Everything
 # ==========================================================
 
 def export_all(
-    analysis: dict,
+    analysis: dict[str, Any],
 ) -> None:
     """
     Export all DNS output files.
     """
-
-    create_output_directory()
 
     export_results_txt(
         analysis,
@@ -265,10 +258,5 @@ def export_all(
 # ==========================================================
 
 __all__ = [
-    "create_output_directory",
-    "export_results_txt",
-    "export_results_json",
-    "export_summary",
-    "export_unresolved",
     "export_all",
 ]

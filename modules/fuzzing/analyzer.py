@@ -1,9 +1,8 @@
 """
-Email Security Analyzer
+Directory Fuzzing Analyzer
 
-Analyzes email security
-results and generates the
-final analysis.
+Analyze Directory
+Fuzzing results.
 """
 
 from __future__ import annotations
@@ -21,23 +20,40 @@ from .statistics import (
 
 def analyze(
     results: list[dict[str, Any]],
+    interesting: dict[str, Any],
     elapsed: float,
 ) -> dict[str, Any]:
     """
-    Analyze email security
-    results.
+    Analyze Directory Fuzzing results.
+
+    Args:
+        results:
+            Parsed fuzzing results.
+
+        interesting:
+            Interesting findings.
+
+        elapsed:
+            Execution time.
 
     Returns:
-        dict[str, Any]
+        Analysis results.
     """
 
     statistics = {
-        **generate_statistics(results),
-        "elapsed": round(elapsed, 2),
+        **generate_statistics(
+            results,
+            interesting,
+        ),
+        "elapsed": round(
+            elapsed,
+            2,
+        ),
     }
 
     return {
         "results": results,
+        "interesting": interesting,
         "statistics": statistics,
     }
 

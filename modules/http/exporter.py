@@ -7,6 +7,7 @@ Export HTTP probe results.
 from __future__ import annotations
 
 import json
+from typing import Any
 
 from modules.http.constants import (
     ALIVE_TXT,
@@ -19,7 +20,7 @@ from modules.http.constants import (
 
 
 # ==========================================================
-# Create Output Directory
+# Helpers
 # ==========================================================
 
 def create_output_directory() -> None:
@@ -34,45 +35,32 @@ def create_output_directory() -> None:
 
 
 # ==========================================================
-# Export Results (TXT)
+# Results (TXT)
 # ==========================================================
 
 def export_results_txt(
-    analysis: dict,
+    analysis: dict[str, Any],
 ) -> None:
     """
-    Export HTTP results as text.
+    Export HTTP results as human-readable text.
     """
+
+    create_output_directory()
+
+    results = analysis["results"]
 
     with RESULTS_TXT.open(
         "w",
         encoding="utf-8",
     ) as file:
 
-        for host in sorted(
-            analysis["results"]
-        ):
+        for host in sorted(results):
 
-            data = analysis["results"][
-                host
-            ]
+            file.write("=" * 70 + "\n")
+            file.write(f"{host}\n")
+            file.write("=" * 70 + "\n")
 
-            file.write(
-                "=" * 70 + "\n"
-            )
-
-            file.write(
-                f"{host}\n"
-            )
-
-            file.write(
-                "=" * 70 + "\n"
-            )
-
-            for (
-                key,
-                value,
-            ) in data.items():
+            for key, value in results[host].items():
 
                 file.write(
                     f"{key:<18}: {value}\n"
@@ -82,15 +70,17 @@ def export_results_txt(
 
 
 # ==========================================================
-# Export Results (JSON)
+# Results (JSON)
 # ==========================================================
 
 def export_results_json(
-    analysis: dict,
+    analysis: dict[str, Any],
 ) -> None:
     """
-    Export HTTP results as JSON.
+    Export HTTP analysis as JSON.
     """
+
+    create_output_directory()
 
     with RESULTS_JSON.open(
         "w",
@@ -106,19 +96,19 @@ def export_results_json(
 
 
 # ==========================================================
-# Export Summary
+# Summary
 # ==========================================================
 
 def export_summary(
-    analysis: dict,
+    analysis: dict[str, Any],
 ) -> None:
     """
     Export HTTP summary.
     """
 
-    statistics = analysis[
-        "statistics"
-    ]
+    create_output_directory()
+
+    statistics = analysis["statistics"]
 
     with SUMMARY_TXT.open(
         "w",
@@ -126,21 +116,21 @@ def export_summary(
     ) as file:
 
         file.write(
-            "HTTP Probe Summary\n"
+            "HTTP PROBE SUMMARY\n"
         )
 
         file.write(
-            "=" * 60 + "\n\n"
+            "=" * 70 + "\n\n"
         )
 
         file.write(
             f"Alive Hosts     : "
-            f"{analysis['alive_hosts']}\n"
+            f"{statistics['alive_hosts']}\n"
         )
 
         file.write(
             f"Dead Hosts      : "
-            f"{analysis['dead_hosts']}\n"
+            f"{statistics['dead_hosts']}\n"
         )
 
         file.write(
@@ -160,7 +150,7 @@ def export_summary(
 
         file.write(
             f"Scan Time       : "
-            f"{analysis['scan_time']} sec\n\n"
+            f"{statistics['elapsed']} sec\n\n"
         )
 
         file.write(
@@ -168,7 +158,7 @@ def export_summary(
         )
 
         file.write(
-            "-" * 60 + "\n"
+            "-" * 70 + "\n"
         )
 
         for (
@@ -179,30 +169,31 @@ def export_summary(
         ].items():
 
             file.write(
-                f"{status:<10}"
-                f"{count}\n"
+                f"{status:<10}{count}\n"
             )
 
 
 # ==========================================================
-# Export Alive Hosts
+# Alive Hosts
 # ==========================================================
 
 def export_alive(
-    analysis: dict,
+    analysis: dict[str, Any],
 ) -> None:
     """
     Export alive hosts.
     """
+
+    create_output_directory()
+
+    statistics = analysis["statistics"]
 
     with ALIVE_TXT.open(
         "w",
         encoding="utf-8",
     ) as file:
 
-        for host in analysis[
-            "alive"
-        ]:
+        for host in statistics["alive"]:
 
             file.write(
                 f"{host}\n"
@@ -210,24 +201,26 @@ def export_alive(
 
 
 # ==========================================================
-# Export Dead Hosts
+# Dead Hosts
 # ==========================================================
 
 def export_dead(
-    analysis: dict,
+    analysis: dict[str, Any],
 ) -> None:
     """
     Export dead hosts.
     """
+
+    create_output_directory()
+
+    statistics = analysis["statistics"]
 
     with DEAD_TXT.open(
         "w",
         encoding="utf-8",
     ) as file:
 
-        for host in analysis[
-            "dead"
-        ]:
+        for host in statistics["dead"]:
 
             file.write(
                 f"{host}\n"
@@ -235,17 +228,15 @@ def export_dead(
 
 
 # ==========================================================
-# Export All
+# Export Everything
 # ==========================================================
 
 def export_all(
-    analysis: dict,
+    analysis: dict[str, Any],
 ) -> None:
     """
     Export all HTTP output files.
     """
-
-    create_output_directory()
 
     export_results_txt(
         analysis,
@@ -273,11 +264,5 @@ def export_all(
 # ==========================================================
 
 __all__ = [
-    "create_output_directory",
-    "export_results_txt",
-    "export_results_json",
-    "export_summary",
-    "export_alive",
-    "export_dead",
     "export_all",
 ]

@@ -9,35 +9,30 @@ from __future__ import annotations
 import csv
 import json
 from pathlib import Path
+from typing import Any
+
+from core.logger import (
+    success,
+    warning,
+)
 
 
 # ==========================================================
 # Output Directory
 # ==========================================================
 
-OUTPUT_DIR = Path(
+OUTPUT_DIR = Path("output/tls")
 
-    "output/tls"
 
-)
+def create_output_directory() -> None:
+    """
+    Create output directory.
+    """
 
-OUTPUT_DIR.mkdir(
-
-    parents=True,
-
-    exist_ok=True,
-
-)
-
-TXT_FILE = OUTPUT_DIR / "results.txt"
-
-JSON_FILE = OUTPUT_DIR / "results.json"
-
-CSV_FILE = OUTPUT_DIR / "results.csv"
-
-SUMMARY_FILE = OUTPUT_DIR / "summary.txt"
-
-HIGH_RISK_FILE = OUTPUT_DIR / "high_risk.txt"
+    OUTPUT_DIR.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
 
 
 # ==========================================================
@@ -45,279 +40,353 @@ HIGH_RISK_FILE = OUTPUT_DIR / "high_risk.txt"
 # ==========================================================
 
 def write_text(
-    path: Path,
-    content: str,
-):
+    output_file: Path,
+    lines: list[str],
+) -> Path:
     """
     Write text file.
+
+    Args:
+        output_file:
+            Destination file.
+
+        lines:
+            File content.
+
+    Returns:
+        Output file path.
     """
 
-    path.write_text(
+    try:
 
-        content,
+        output_file.write_text(
+            "\n".join(lines),
+            encoding="utf-8",
+        )
 
-        encoding="utf-8",
+        success(
+            f"Saved {output_file}"
+        )
 
+    except OSError as error:
+
+        warning(
+            f"{output_file}: {error}"
+        )
+
+    return output_file
+
+
+# ==========================================================
+# Write JSON
+# ==========================================================
+
+def write_json(
+    output_file: Path,
+    data: Any,
+) -> Path:
+    """
+    Write JSON file.
+
+    Args:
+        output_file:
+            Destination file.
+
+        data:
+            JSON data.
+
+    Returns:
+        Output file path.
+    """
+
+    try:
+
+        with output_file.open(
+            "w",
+            encoding="utf-8",
+        ) as file:
+
+            json.dump(
+                data,
+                file,
+                indent=4,
+                ensure_ascii=False,
+                sort_keys=True,
+                default=str,
+            )
+
+        success(
+            f"Saved {output_file}"
+        )
+
+    except OSError as error:
+
+        warning(
+            f"{output_file}: {error}"
+        )
+
+    return output_file
+
+
+# ==========================================================
+# Write CSV
+# ==========================================================
+
+def write_csv(
+    output_file: Path,
+    results: list[dict[str, Any]],
+) -> Path:
+    """
+    Write CSV file.
+
+    Args:
+        output_file:
+            Destination file.
+
+        results:
+            TLS results.
+
+    Returns:
+        Output file path.
+    """
+
+    try:
+
+        with output_file.open(
+            "w",
+            newline="",
+            encoding="utf-8",
+        ) as file:
+
+            writer = csv.writer(file)
+
+            writer.writerow(
+                [
+                    "Target",
+                    "Risk Level",
+                    "Risk Score",
+                    "Days Remaining",
+                    "Expired",
+                    "Self Signed",
+                    "Hostname Match",
+                    "Weak Protocol",
+                    "Weak Cipher",
+                    "Forward Secrecy",
+                    "Wildcard",
+                ]
+            )
+
+            for result in results:
+
+                writer.writerow(
+                    [
+                        result.get("host", ""),
+                        result.get("risk_level", ""),
+                        result.get("risk_score", 0),
+                        result.get("days_remaining", 0),
+                        result.get("expired", False),
+                        result.get("self_signed", False),
+                        result.get("hostname_match", False),
+                        result.get("weak_protocol", False),
+                        result.get("weak_cipher", False),
+                        result.get("forward_secrecy", False),
+                        result.get("wildcard", False),
+                    ]
+                )
+
+        success(
+            f"Saved {output_file}"
+        )
+
+    except OSError as error:
+
+        warning(
+            f"{output_file}: {error}"
+        )
+
+    return output_file
+
+
+# ==========================================================
+# Export JSON
+# ==========================================================
+
+def export_json(
+    analysis: dict[str, Any],
+) -> Path:
+    """
+    Export JSON report.
+    """
+
+    return write_json(
+        OUTPUT_DIR / "results.json",
+        analysis,
     )
 
 
 # ==========================================================
-# TXT Export
+# Export TXT
 # ==========================================================
 
 def export_txt(
-    results,
-):
+    analysis: dict[str, Any],
+) -> Path:
     """
     Export TXT report.
     """
 
-    lines = []
+    results = analysis["results"]
+
+    lines: list[str] = []
 
     for result in results:
 
         lines.append("=" * 80)
 
         lines.append(
-
-            f"Target              : {result['host']}"
-
+            f"Target              : {result.get('host', '-')}"
         )
 
         lines.append(
-
-            f"Risk Level          : {result['risk_level']}"
-
+            f"Risk Level          : {result.get('risk_level', '-')}"
         )
 
         lines.append(
-
-            f"Risk Score          : {result['risk_score']}"
-
+            f"Risk Score          : {result.get('risk_score', 0)}"
         )
 
         lines.append(
-
-            f"Days Remaining      : {result['days_remaining']}"
-
+            f"Days Remaining      : {result.get('days_remaining', 0)}"
         )
 
         lines.append(
-
-            f"Expired             : {result['expired']}"
-
+            f"Expired             : {result.get('expired', False)}"
         )
 
         lines.append(
-
-            f"Self Signed         : {result['self_signed']}"
-
+            f"Self Signed         : {result.get('self_signed', False)}"
         )
 
         lines.append(
-
-            f"Hostname Match      : {result['hostname_match']}"
-
+            f"Hostname Match      : {result.get('hostname_match', False)}"
         )
 
         lines.append(
-
-            f"Weak Protocol       : {result['weak_protocol']}"
-
+            f"Weak Protocol       : {result.get('weak_protocol', False)}"
         )
 
         lines.append(
-
-            f"Weak Cipher         : {result['weak_cipher']}"
-
+            f"Weak Cipher         : {result.get('weak_cipher', False)}"
         )
 
         lines.append(
-
-            f"Forward Secrecy     : {result['forward_secrecy']}"
-
+            f"Forward Secrecy     : {result.get('forward_secrecy', False)}"
         )
 
         lines.append(
-
-            f"Wildcard            : {result['wildcard']}"
-
+            f"Wildcard            : {result.get('wildcard', False)}"
         )
 
-        lines.append(
-
-            "Recommendations"
-
-        )
+        lines.append("Recommendations")
 
         recommendations = result.get(
-
             "recommendations",
-
             [],
-
         )
 
         if recommendations:
 
-            for item in recommendations:
+            for recommendation in recommendations:
 
                 lines.append(
-
-                    f"  - {item}"
-
+                    f"  - {recommendation}"
                 )
 
         else:
 
             lines.append(
-
                 "  None"
-
             )
 
         lines.append("")
 
-    write_text(
-
-        TXT_FILE,
-
-        "\n".join(lines),
-
+    return write_text(
+        OUTPUT_DIR / "results.txt",
+        lines,
     )
 
-# ==========================================================
-# JSON Export
-# ==========================================================
-
-def export_json(
-    results,
-):
-    """
-    Export JSON report.
-    """
-
-    with JSON_FILE.open(
-
-        "w",
-
-        encoding="utf-8",
-
-    ) as fp:
-
-        json.dump(
-
-            results,
-
-            fp,
-
-            indent=4,
-
-            ensure_ascii=False,
-
-        )
-
 
 # ==========================================================
-# CSV Export
+# Export CSV
 # ==========================================================
 
 def export_csv(
-    results,
-):
+    analysis: dict[str, Any],
+) -> Path:
     """
     Export CSV report.
     """
 
-    with CSV_FILE.open(
-
-        "w",
-
-        newline="",
-
-        encoding="utf-8",
-
-    ) as fp:
-
-        writer = csv.writer(
-
-            fp
-
-        )
-
-        writer.writerow(
-
-            [
-
-                "Target",
-
-                "Risk Level",
-
-                "Risk Score",
-
-                "Days Remaining",
-
-                "Expired",
-
-                "Self Signed",
-
-                "Hostname Match",
-
-                "Weak Protocol",
-
-                "Weak Cipher",
-
-                "Forward Secrecy",
-
-                "Wildcard",
-
-            ]
-
-        )
-
-        for result in results:
-
-            writer.writerow(
-
-                [
-
-                    result["host"],
-
-                    result["risk_level"],
-
-                    result["risk_score"],
-
-                    result["days_remaining"],
-
-                    result["expired"],
-
-                    result["self_signed"],
-
-                    result["hostname_match"],
-
-                    result["weak_protocol"],
-
-                    result["weak_cipher"],
-
-                    result["forward_secrecy"],
-
-                    result["wildcard"],
-
-                ]
-
-            )
+    return write_csv(
+        OUTPUT_DIR / "results.csv",
+        analysis["results"],
+    )
 
 
 # ==========================================================
-# Summary Export
+# Export High Risk
+# ==========================================================
+
+def export_high_risk(
+    analysis: dict[str, Any],
+) -> Path:
+    """
+    Export High/Critical targets.
+    """
+
+    results = analysis["results"]
+
+    lines: list[str] = []
+
+    for result in results:
+
+        if result.get(
+            "risk_level",
+            "",
+        ) not in (
+            "High",
+            "Critical",
+        ):
+            continue
+
+        lines.append(
+
+            f"{result.get('host', '-')}"
+            f" -> "
+            f"{result.get('risk_level', '-')}"
+            f" "
+            f"(Score: {result.get('risk_score', 0)})"
+
+        )
+
+    return write_text(
+        OUTPUT_DIR / "high_risk.txt",
+        lines,
+    )
+
+
+# ==========================================================
+# Export Summary
 # ==========================================================
 
 def export_summary(
-    statistics,
-):
+    analysis: dict[str, Any],
+) -> Path:
     """
     Export summary report.
     """
+
+    statistics = analysis["statistics"]
 
     lines = [
 
@@ -355,174 +424,100 @@ def export_summary(
 
     ]
 
-    for level, count in statistics[
-
-        "risk_levels"
-
-    ].items():
+    for level, count in statistics["risk_levels"].items():
 
         lines.append(
-
             f"{level:<20}{count}"
-
         )
 
-    write_text(
-
-        SUMMARY_FILE,
-
-        "\n".join(lines),
-
+    return write_text(
+        OUTPUT_DIR / "summary.txt",
+        lines,
     )
 
 
 # ==========================================================
-# High Risk Export
+# Show Summary
 # ==========================================================
 
-def export_high_risk(
-    results,
-):
+def show_summary(
+    analysis: dict[str, Any],
+) -> None:
     """
-    Export High/Critical targets.
+    Display TLS summary.
     """
 
-    targets = [
+    statistics = analysis["statistics"]
 
-        result
+    print()
 
-        for result
+    print("=" * 80)
 
-        in results
-
-        if result.get(
-
-            "risk_level"
-
-        )
-
-        in (
-
-            "High",
-
-            "Critical",
-
-        )
-
-    ]
-
-    lines = []
-
-    for result in targets:
-
-        lines.append(
-
-            f"{result['host']} -> "
-
-            f"{result['risk_level']} "
-
-            f"(Score: {result['risk_score']})"
-
-        )
-
-    write_text(
-
-        HIGH_RISK_FILE,
-
-        "\n".join(lines),
-
+    print(
+        "TLS Analysis Summary".center(80)
     )
+
+    print("=" * 80)
+
+    print(f"Targets             : {statistics['targets']}")
+    print(f"Average Risk        : {statistics['average_risk']}")
+    print(f"Highest Risk        : {statistics['highest_risk']}")
+    print(f"Expired             : {statistics['expired']}")
+    print(f"Self Signed         : {statistics['self_signed']}")
+    print(f"Hostname Mismatch   : {statistics['hostname_mismatch']}")
+    print(f"Weak Protocol       : {statistics['weak_protocol']}")
+    print(f"Weak Cipher         : {statistics['weak_cipher']}")
+    print(f"Wildcard            : {statistics['wildcard']}")
+    print(f"Forward Secrecy     : {statistics['forward_secrecy']}")
+    print(f"Elapsed Time        : {statistics['elapsed']} sec")
+
+    print("-" * 80)
+
+    print("Risk Levels")
+
+    print("-" * 80)
+
+    for level, count in statistics["risk_levels"].items():
+
+        print(
+            f"{level:<30}{count}"
+        )
+
+    print("=" * 80)
 
 
 # ==========================================================
 # Export All
 # ==========================================================
 
-def export_results(
-    results,
-    statistics,
-):
+def export_all(
+    analysis: dict[str, Any],
+) -> None:
     """
-    Export all reports.
+    Export all TLS reports.
     """
 
-    export_txt(
+    create_output_directory()
 
-        results
+    export_json(analysis)
 
-    )
+    export_txt(analysis)
 
-    export_json(
+    export_csv(analysis)
 
-        results
+    export_high_risk(analysis)
 
-    )
+    export_summary(analysis)
 
-    export_csv(
-
-        results
-
-    )
-
-    export_summary(
-
-        statistics
-
-    )
-
-    export_high_risk(
-
-        results
-
-    )
-
-    print(
-
-        f"[SUCCESS] Saved {TXT_FILE}"
-
-    )
-
-    print(
-
-        f"[SUCCESS] Saved {JSON_FILE}"
-
-    )
-
-    print(
-
-        f"[SUCCESS] Saved {CSV_FILE}"
-
-    )
-
-    print(
-
-        f"[SUCCESS] Saved {SUMMARY_FILE}"
-
-    )
-
-    print(
-
-        f"[SUCCESS] Saved {HIGH_RISK_FILE}"
-
-    )
+    show_summary(analysis)
 
 
 # ==========================================================
-# Export
+# Public Exports
 # ==========================================================
 
 __all__ = [
 
-    "export_txt",
-
-    "export_json",
-
-    "export_csv",
-
-    "export_summary",
-
-    "export_high_risk",
-
-    "export_results",
+    "export_all",
 
 ]

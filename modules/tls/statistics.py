@@ -1,13 +1,14 @@
 """
-TLS Statistics
+TLS Security Statistics
 
-Generate statistics for
-TLS Analysis.
+Generate summary statistics
+for TLS Security.
 """
 
 from __future__ import annotations
 
 from collections import Counter
+from typing import Any
 
 
 # ==========================================================
@@ -15,13 +16,10 @@ from collections import Counter
 # ==========================================================
 
 def risk_level_statistics(
-    results,
-):
+    results: list[dict[str, Any]],
+) -> dict[str, int]:
     """
     Count risk levels.
-
-    Returns:
-        dict
     """
 
     order = [
@@ -41,16 +39,11 @@ def risk_level_statistics(
     counter = Counter(
 
         result.get(
-
             "risk_level",
-
             "Safe",
-
         )
 
-        for result
-
-        in results
+        for result in results
 
     )
 
@@ -58,9 +51,7 @@ def risk_level_statistics(
 
         level: counter[level]
 
-        for level
-
-        in order
+        for level in order
 
     }
 
@@ -70,13 +61,10 @@ def risk_level_statistics(
 # ==========================================================
 
 def security_statistics(
-    results,
-):
+    results: list[dict[str, Any]],
+) -> dict[str, int]:
     """
     Count security findings.
-
-    Returns:
-        dict
     """
 
     return {
@@ -84,112 +72,77 @@ def security_statistics(
         "expired": sum(
 
             result.get(
-
                 "expired",
-
                 False,
-
             )
 
-            for result
-
-            in results
+            for result in results
 
         ),
 
         "self_signed": sum(
 
             result.get(
-
                 "self_signed",
-
                 False,
-
             )
 
-            for result
-
-            in results
+            for result in results
 
         ),
 
         "hostname_mismatch": sum(
 
             not result.get(
-
                 "hostname_match",
-
                 True,
-
             )
 
-            for result
-
-            in results
+            for result in results
 
         ),
 
         "weak_protocol": sum(
 
             result.get(
-
                 "weak_protocol",
-
                 False,
-
             )
 
-            for result
-
-            in results
+            for result in results
 
         ),
 
         "weak_cipher": sum(
 
             result.get(
-
                 "weak_cipher",
-
                 False,
-
             )
 
-            for result
-
-            in results
+            for result in results
 
         ),
 
         "wildcard": sum(
 
             result.get(
-
                 "wildcard",
-
                 False,
-
             )
 
-            for result
-
-            in results
+            for result in results
 
         ),
 
         "forward_secrecy": sum(
 
             result.get(
-
                 "forward_secrecy",
-
                 False,
-
             )
 
-            for result
-
-            in results
+            for result in results
 
         ),
 
@@ -201,64 +154,27 @@ def security_statistics(
 # ==========================================================
 
 def generate_statistics(
-    results,
-    elapsed=0.0,
-):
+    results: list[dict[str, Any]],
+) -> dict[str, Any]:
     """
     Generate TLS statistics.
-
-    Returns:
-        dict
     """
 
-    total = len(
-
-        results
-
-    )
+    total = len(results)
 
     scores = [
 
         result.get(
-
             "risk_score",
-
             0,
-
         )
 
-        for result
-
-        in results
+        for result in results
 
     ]
 
-    average_risk = round(
-
-        sum(
-
-            scores
-
-        )
-
-        / total,
-
-        2,
-
-    ) if total else 0.0
-
-    highest_risk = max(
-
-        scores,
-
-        default=0,
-
-    )
-
-    statistics = security_statistics(
-
+    security = security_statistics(
         results,
-
     )
 
     return {
@@ -266,162 +182,82 @@ def generate_statistics(
         "targets": total,
 
         "risk_levels": risk_level_statistics(
-
             results,
+        ),
+
+        "average_risk": (
+
+            round(
+                sum(scores) / total,
+                2,
+            )
+
+            if total
+
+            else 0.0
 
         ),
 
-        "average_risk": average_risk,
-
-        "highest_risk": highest_risk,
-
-        "expired": statistics["expired"],
-
-        "self_signed": statistics["self_signed"],
-
-        "hostname_mismatch": statistics["hostname_mismatch"],
-
-        "weak_protocol": statistics["weak_protocol"],
-
-        "weak_cipher": statistics["weak_cipher"],
-
-        "wildcard": statistics["wildcard"],
-
-        "forward_secrecy": statistics["forward_secrecy"],
-
-        "elapsed": round(
-
-            elapsed,
-
-            2,
-
+        "highest_risk": max(
+            scores,
+            default=0,
         ),
+
+        "expired": security["expired"],
+
+        "self_signed": security["self_signed"],
+
+        "hostname_mismatch": security["hostname_mismatch"],
+
+        "weak_protocol": security["weak_protocol"],
+
+        "weak_cipher": security["weak_cipher"],
+
+        "wildcard": security["wildcard"],
+
+        "forward_secrecy": security["forward_secrecy"],
 
     }
 
 
 # ==========================================================
-# Print Summary
+# Empty Statistics
 # ==========================================================
 
-def print_summary(
-    statistics,
-):
+def empty_statistics() -> dict[str, Any]:
     """
-    Print TLS summary.
+    Return empty statistics.
     """
 
-    print()
+    return {
 
-    print("=" * 80)
+        "targets": 0,
 
-    print(
+        "risk_levels": {},
 
-        "TLS Analysis Summary".center(
+        "average_risk": 0.0,
 
-            80,
+        "highest_risk": 0,
 
-        )
+        "expired": 0,
 
-    )
+        "self_signed": 0,
 
-    print("=" * 80)
+        "hostname_mismatch": 0,
 
-    print(
+        "weak_protocol": 0,
 
-        f"Targets             : {statistics['targets']}"
+        "weak_cipher": 0,
 
-    )
+        "wildcard": 0,
 
-    print(
+        "forward_secrecy": 0,
 
-        f"Average Risk        : {statistics['average_risk']}"
-
-    )
-
-    print(
-
-        f"Highest Risk        : {statistics['highest_risk']}"
-
-    )
-
-    print(
-
-        f"Expired             : {statistics['expired']}"
-
-    )
-
-    print(
-
-        f"Self Signed         : {statistics['self_signed']}"
-
-    )
-
-    print(
-
-        f"Hostname Mismatch   : {statistics['hostname_mismatch']}"
-
-    )
-
-    print(
-
-        f"Weak Protocol       : {statistics['weak_protocol']}"
-
-    )
-
-    print(
-
-        f"Weak Cipher         : {statistics['weak_cipher']}"
-
-    )
-
-    print(
-
-        f"Wildcard            : {statistics['wildcard']}"
-
-    )
-
-    print(
-
-        f"Forward Secrecy     : {statistics['forward_secrecy']}"
-
-    )
-
-    print(
-
-        f"Elapsed Time        : {statistics['elapsed']} sec"
-
-    )
-
-    print("-" * 80)
-
-    print("Risk Levels")
-
-    print("-" * 80)
-
-    if statistics["risk_levels"]:
-
-        for level, count in statistics["risk_levels"].items():
-
-            print(
-
-                f"{level:<30}{count}"
-
-            )
-
-    else:
-
-        print(
-
-            "None"
-
-        )
-
-    print("=" * 80)
+    }
 
 
 # ==========================================================
-# Export
+# Public Exports
 # ==========================================================
 
 __all__ = [
@@ -432,7 +268,6 @@ __all__ = [
 
     "generate_statistics",
 
-    "print_summary",
+    "empty_statistics",
 
 ]
-

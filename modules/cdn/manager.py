@@ -1,8 +1,8 @@
 """
 CDN Manager
 
-Main entry point for
-CDN Detection.
+Coordinates the complete
+CDN Detection pipeline.
 """
 
 from __future__ import annotations
@@ -10,9 +10,12 @@ from __future__ import annotations
 from time import perf_counter
 from typing import Any
 
-from core.logger import info
+from core.logger import (
+    info,
+    success,
+)
 
-from modules.cdn.helpers import (
+from .helpers import (
     normalize_target,
     request_headers,
     extract_headers,
@@ -21,14 +24,16 @@ from modules.cdn.helpers import (
     resolve_ipv4,
 )
 
-from modules.cdn.analyzer import analyze
-from modules.cdn.filters import filter_results
-from modules.cdn.statistics import (
-    generate_statistics,
-    print_summary,
+from .target_analyzer import (
+    analyze_target,
 )
-from modules.cdn.exporter import (
-    export_results,
+
+from .analyzer import (
+    analyze,
+)
+
+from .filters import (
+    filter_results,
 )
 
 
@@ -38,295 +43,120 @@ from modules.cdn.exporter import (
 
 def run_cdn_detection(
     targets: list[str],
-) -> tuple[
-    list[dict[str, Any]],
-    dict[str, Any],
-]:
+) -> dict[str, Any]:
     """
-    Run complete CDN Detection pipeline.
-
-    Pipeline:
-        Headers
-        -> CNAME
-        -> IP
-        -> Analyzer
-        -> Filter
-        -> Statistics
-        -> Export
-
-    Returns:
-        tuple(results, statistics)
+    Run complete CDN Detection.
     """
 
-    print()
+    if not targets:
 
-    print("=" * 80)
-
-    print(
-
-        "CDN Detection".center(
-
-            80,
-
+        return analyze(
+            results=[],
+            elapsed=0,
         )
 
+    info(
+        "Starting CDN Detection..."
     )
-
-    print("=" * 80)
 
     start = perf_counter()
 
-    results = []
+    results: list[dict[str, Any]] = []
 
-    try:
-
-        # --------------------------------------------------
-        # Analyze Targets
-        # --------------------------------------------------
-
-        for target in targets:
-
-            info(
-
-                f"Analyzing {target}..."
-
-            )
-
-            host = normalize_target(
-
-                target,
-
-            )
-
-            if not host:
-
-                info(
-
-                    f"Skipping invalid target: {target}"
-
-                )
-
-                continue
-
-            # ----------------------------------------------
-            # Headers
-            # ----------------------------------------------
-
-            response = request_headers(
-                target,
-            )
-
-            headers = extract_headers(
-                response,
-            )
-
-            server = get_server_header(
-
-                headers,
-
-            )           
-
-            # ----------------------------------------------
-            # CNAME
-            # ----------------------------------------------
-
-            cname = resolve_cname(
-
-                host,
-
-            )
-
-            # ----------------------------------------------
-            # IP
-            # ----------------------------------------------
-
-            ip = resolve_ipv4(
-
-                host,
-
-            )
-
-            # ----------------------------------------------
-            # Analysis
-            # ----------------------------------------------
-
-            result = analyze(
-
-                host,
-
-                headers,
-
-                server,
-
-                cname,
-
-                ip,
-
-            )
-
-            results.append(
-
-                result,
-
-            )
-
-
-        # --------------------------------------------------
-        # Filter Results
-        # --------------------------------------------------
+    for target in targets:
 
         info(
-
-            "Filtering results..."
-
+            f"Analyzing {target}..."
         )
 
-        results = filter_results(
-
-            results,
-
+        host = normalize_target(
+            target,
         )
 
-        # --------------------------------------------------
-        # Statistics
-        # --------------------------------------------------
+        if not host:
+            continue
 
-        elapsed = perf_counter() - start
-
-        statistics = generate_statistics(
-
-            results,
-
-            elapsed,
-
+        response = request_headers(
+            target,
         )
 
-        # --------------------------------------------------
-        # Export Results
-        # --------------------------------------------------
-
-        info(
-
-            "Exporting results..."
-
+        headers = extract_headers(
+            response,
         )
 
-        export_results(
-
-            results,
-
-            statistics,
-
+        server = get_server_header(
+            headers,
         )
 
-        # --------------------------------------------------
-        # Print Summary
-        # --------------------------------------------------
-
-        print_summary(
-
-            statistics,
-
+        cname = resolve_cname(
+            host,
         )
 
-        print()
-
-        print("=" * 80)
-
-        print(
-
-            "[SUCCESS] CDN Detection Completed"
-
+        ip = resolve_ipv4(
+            host,
         )
 
-        print("=" * 80)
-
-        print(
-
-            f"Targets             : {statistics['targets']}"
-
+        result = analyze_target(
+            target=host,
+            headers=headers,
+            server=server,
+            cname=cname,
+            ip=ip,
         )
 
-        print(
-
-            f"CDN Detected        : {statistics['detected']}"
-
+        results.append(
+            result,
         )
 
-        print(
+    results = filter_results(
+        results,
+    )
 
-            f"CDN Not Detected    : {statistics['undetected']}"
+    elapsed = (
+        perf_counter()
+        - start
+    )
 
-        )
+    analysis = analyze(
+        results=results,
+        elapsed=elapsed,
+    )
 
-        print(
+    statistics = analysis[
+        "statistics"
+    ]
 
-            f"Average Confidence  : "
-            f"{statistics['average_confidence']}"
+    success(
+        f"Targets             : {statistics['targets']}"
+    )
 
-        )
+    success(
+        f"CDN Detected        : {statistics['detected']}"
+    )
 
-        print(
+    success(
+        f"CDN Not Detected    : {statistics['undetected']}"
+    )
 
-            f"Highest Confidence  : "
-            f"{statistics['highest_confidence']}"
+    success(
+        f"Average Confidence  : {statistics['average_confidence']}"
+    )
 
-        )
+    success(
+        f"Highest Confidence  : {statistics['highest_confidence']}"
+    )
 
-        print(
+    success(
+        f"Elapsed             : {statistics['elapsed']:.2f} sec"
+    )
 
-            f"Elapsed Time        : "
-            f"{statistics['elapsed']} sec"
-
-        )
-
-        print("=" * 80)
-
-        return (
-
-            results,
-
-            statistics,
-
-        )
-
-    except KeyboardInterrupt:
-
-        print()
-
-        print(
-
-            "[ERROR] CDN Detection cancelled by user."
-
-        )
-
-        raise
-
-    except Exception as error:
-
-        print()
-
-        print(
-
-            "[ERROR] CDN Detection failed."
-
-        )
-
-        print(
-
-            f"[ERROR] {error}"
-
-        )
-
-        raise
+    return analysis
 
 
 # ==========================================================
-# Export
+# Public Exports
 # ==========================================================
 
 __all__ = [
-
     "run_cdn_detection",
-
 ]

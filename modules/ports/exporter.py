@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import csv
 import json
+from typing import Any
 
 from modules.ports.constants import (
     OPEN_PORTS_TXT,
@@ -20,12 +21,12 @@ from modules.ports.constants import (
 
 
 # ==========================================================
-# Create Output Directory
+# Helpers
 # ==========================================================
 
 def create_output_directory() -> None:
     """
-    Create the output directory.
+    Create output directory.
     """
 
     PORT_OUTPUT_DIR.mkdir(
@@ -35,40 +36,32 @@ def create_output_directory() -> None:
 
 
 # ==========================================================
-# Export Results (TXT)
+# Results (TXT)
 # ==========================================================
 
 def export_results_txt(
-    analysis: dict,
+    analysis: dict[str, Any],
 ) -> None:
     """
     Export detailed port scan results.
     """
+
+    create_output_directory()
+
+    results = analysis["results"]
 
     with RESULTS_TXT.open(
         "w",
         encoding="utf-8",
     ) as file:
 
-        for host in sorted(
-            analysis["results"]
-        ):
+        for host in sorted(results):
 
-            file.write(
-                "=" * 70 + "\n"
-            )
+            file.write("=" * 70 + "\n")
+            file.write(f"{host}\n")
+            file.write("=" * 70 + "\n")
 
-            file.write(
-                f"{host}\n"
-            )
-
-            file.write(
-                "=" * 70 + "\n"
-            )
-
-            for port in analysis[
-                "results"
-            ][host]:
+            for port in results[host]:
 
                 file.write(
                     f"{port['port']:>5}/tcp   "
@@ -80,15 +73,17 @@ def export_results_txt(
 
 
 # ==========================================================
-# Export Results (JSON)
+# Results (JSON)
 # ==========================================================
 
 def export_results_json(
-    analysis: dict,
+    analysis: dict[str, Any],
 ) -> None:
     """
     Export results as JSON.
     """
+
+    create_output_directory()
 
     with RESULTS_JSON.open(
         "w",
@@ -104,15 +99,19 @@ def export_results_json(
 
 
 # ==========================================================
-# Export Results (CSV)
+# Results (CSV)
 # ==========================================================
 
 def export_results_csv(
-    analysis: dict,
+    analysis: dict[str, Any],
 ) -> None:
     """
     Export results as CSV.
     """
+
+    create_output_directory()
+
+    results = analysis["results"]
 
     with RESULTS_CSV.open(
         "w",
@@ -120,9 +119,7 @@ def export_results_csv(
         encoding="utf-8",
     ) as file:
 
-        writer = csv.writer(
-            file
-        )
+        writer = csv.writer(file)
 
         writer.writerow(
             [
@@ -133,13 +130,9 @@ def export_results_csv(
             ]
         )
 
-        for host in sorted(
-            analysis["results"]
-        ):
+        for host in sorted(results):
 
-            for port in analysis[
-                "results"
-            ][host]:
+            for port in results[host]:
 
                 writer.writerow(
                     [
@@ -152,19 +145,19 @@ def export_results_csv(
 
 
 # ==========================================================
-# Export Summary
+# Summary
 # ==========================================================
 
 def export_summary(
-    analysis: dict,
+    analysis: dict[str, Any],
 ) -> None:
     """
     Export summary.
     """
 
-    statistics = analysis[
-        "statistics"
-    ]
+    create_output_directory()
+
+    statistics = analysis["statistics"]
 
     with SUMMARY_TXT.open(
         "w",
@@ -172,11 +165,11 @@ def export_summary(
     ) as file:
 
         file.write(
-            "Port Scan Summary\n"
+            "PORT SCAN SUMMARY\n"
         )
 
         file.write(
-            "=" * 60 + "\n\n"
+            "=" * 70 + "\n\n"
         )
 
         file.write(
@@ -206,7 +199,7 @@ def export_summary(
 
         file.write(
             f"Scan Time                : "
-            f"{analysis['scan_time']} sec\n\n"
+            f"{statistics['elapsed']} sec\n\n"
         )
 
         file.write(
@@ -214,7 +207,7 @@ def export_summary(
         )
 
         file.write(
-            "-" * 60 + "\n"
+            "-" * 70 + "\n"
         )
 
         for (
@@ -225,28 +218,31 @@ def export_summary(
         ].items():
 
             file.write(
-                f"{service:<20}"
-                f"{count}\n"
+                f"{service:<20}{count}\n"
             )
 
 
 # ==========================================================
-# Export Open Hosts
+# Open Hosts
 # ==========================================================
 
 def export_open_ports(
-    analysis: dict,
+    analysis: dict[str, Any],
 ) -> None:
     """
     Export hosts with open ports.
     """
+
+    create_output_directory()
+
+    statistics = analysis["statistics"]
 
     with OPEN_PORTS_TXT.open(
         "w",
         encoding="utf-8",
     ) as file:
 
-        for host in analysis[
+        for host in statistics[
             "open_hosts"
         ]:
 
@@ -256,17 +252,15 @@ def export_open_ports(
 
 
 # ==========================================================
-# Export All
+# Export Everything
 # ==========================================================
 
 def export_all(
-    analysis: dict,
+    analysis: dict[str, Any],
 ) -> None:
     """
     Export all output files.
     """
-
-    create_output_directory()
 
     export_results_txt(
         analysis,
@@ -294,11 +288,5 @@ def export_all(
 # ==========================================================
 
 __all__ = [
-    "create_output_directory",
-    "export_results_txt",
-    "export_results_json",
-    "export_results_csv",
-    "export_summary",
-    "export_open_ports",
     "export_all",
 ]

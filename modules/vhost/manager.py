@@ -1,10 +1,8 @@
 """
 Virtual Host Discovery Manager
-
-Coordinates parallel virtual host
-discovery, parsing, filtering,
-statistics and reporting.
 """
+
+from __future__ import annotations
 
 import time
 
@@ -13,141 +11,135 @@ from concurrent.futures import (
     as_completed,
 )
 
-from config.config import (
-    MAX_WORKERS,
-)
+from typing import Any
+
+from config.config import MAX_WORKERS
 
 from core.logger import (
     info,
-    warning,
-    success,
     progress_status,
+    success,
+    warning,
 )
 
-from modules.vhost.scanner import (
-    scan_target,
-    cleanup,
-)
-
-from modules.vhost.parser import (
-    parse_ffuf,
-)
-
-from modules.vhost.filters import (
-    apply_filters,
-)
-
-from modules.vhost.interesting import (
+from .analyzer import analyze
+from .filters import apply_filters
+from .interesting import (
     scan as detect_interesting,
 )
-
-from modules.vhost.statistics import (
-    generate,
-)
-
-from modules.vhost.exporter import (
-    export,
+from .parser import parse_ffuf
+from .scanner import (
+    scan_target,
 )
 
 
 # ==========================================================
-# Process One Target
+# Process Target
 # ==========================================================
 
 def process_target(
     target: str,
-):
+) -> tuple[
+    str,
+    dict[str, Any] | None,
+]:
     """
-    Scan and analyze one target.
+    Scan a single target.
 
     Returns:
-        tuple(
-            target,
-            result | None,
-        )
+        (target, result)
     """
 
-    scan = scan_target(
-        target
-    )
+    scan = scan_target(target)
 
     if not scan["success"]:
-
         return (
-
             target,
-
             None,
-
         )
 
     output = scan["output"]
 
     try:
 
-        parsed = parse_ffuf(
-            output
-        )
+        parsed = parse_ffuf(output)
 
         if parsed is None:
-
             return (
-
                 target,
-
                 None,
-
             )
 
         results = apply_filters(
-
             parsed.get(
-
                 "results",
-
                 [],
-
             )
-
         )
 
         interesting = detect_interesting(
-
-            results
-
-        )
-
-        statistics = generate(
-
             results,
-
-            interesting,
-
         )
 
         return (
-
             target,
-
             {
-
                 "results": results,
-
                 "interesting": interesting,
-
-                "statistics": statistics,
-
             },
-
         )
 
     finally:
 
-        # cleanup(
-        #     output
-        # )
+        # cleanup(output)
         pass
 
+
+# ==========================================================
+# Collect Results
+# ==========================================================
+
+def collect_results(
+    results: dict[
+        str,
+        dict[str, Any],
+    ],
+) -> tuple[
+    list[dict[str, Any]],
+    list[dict[str, Any]],
+]:
+    """
+    Merge all results.
+    """
+
+    findings: list[
+        dict[str, Any]
+    ] = []
+
+    interesting: list[
+        dict[str, Any]
+    ] = []
+
+    for data in results.values():
+
+        findings.extend(
+            data.get(
+                "results",
+                [],
+            )
+        )
+
+        interesting.extend(
+            data.get(
+                "interesting",
+                [],
+            )
+        )
+
+    return (
+        findings,
+        interesting,
+    )
 
 
 # ==========================================================
@@ -156,19 +148,22 @@ def process_target(
 
 def run_vhosts(
     targets: list[str],
-):
+) -> dict[str, Any]:
     """
-    Run Virtual Host Discovery
-    against multiple targets.
+    Run Virtual Host Discovery.
+    """
 
-    Returns:
-        (
-            results,
-            overall,
-            failed,
-            elapsed,
+    if not targets:
+
+        warning(
+            "No targets supplied."
         )
-    """
+
+        return analyze(
+            results=[],
+            interesting=[],
+            elapsed=0,
+        )
 
     info(
         "Starting Virtual Host Discovery..."
@@ -178,19 +173,16 @@ def run_vhosts(
         set(targets)
     )
 
-    results = {}
+    results: dict[
+        str,
+        dict[str, Any],
+    ] = {}
 
-    failed = []
-
-    all_results = []
-
-    all_interesting = []
+    failed: list[str] = []
 
     completed = 0
 
-    total = len(
-        targets
-    )
+    total = len(targets)
 
     start_time = time.perf_counter()
 
@@ -199,23 +191,18 @@ def run_vhosts(
     ) as executor:
 
         futures = {
-
             executor.submit(
                 process_target,
                 target,
             ): target
-
             for target in targets
-
         }
 
         for future in as_completed(
             futures
         ):
 
-            target = futures[
-                future
-            ]
+            target = futures[future]
 
             completed += 1
 
@@ -225,36 +212,16 @@ def run_vhosts(
                     future.result()
                 )
 
-                if data:
+                if data is not None:
 
                     results[
                         hostname
                     ] = data
 
-                    all_results.extend(
-
-                        data[
-                            "results"
-                        ]
-
-                    )
-
-                    all_interesting.extend(
-
-                        data[
-                            "interesting"
-                        ]
-
-                    )
-
                     progress_status(
-
                         completed,
-
                         total,
-
                         f"✓ {hostname}",
-
                     )
 
                 else:
@@ -264,21 +231,16 @@ def run_vhosts(
                     )
 
                     progress_status(
-
                         completed,
-
                         total,
-
                         f"✗ {hostname}",
-
                     )
+
 
             except Exception as error:
 
                 warning(
-
                     f"{target}: {error}"
-
                 )
 
                 failed.append(
@@ -286,211 +248,125 @@ def run_vhosts(
                 )
 
                 progress_status(
-
                     completed,
-
                     total,
-
                     f"✗ {target}",
-
                 )
 
-    elapsed = round(
-
+    elapsed = (
         time.perf_counter()
-
-        - start_time,
-
-        2,
-
+        - start_time
     )
 
-    # ------------------------------------------------------
-    # Overall Statistics
-    # ------------------------------------------------------
-
-    overall = {
-
-        "targets": total,
-
-        "successful": len(
+    findings, interesting = (
+        collect_results(
             results
-        ),
-
-        "failed": len(
-            failed
-        ),
-
-        "total_results": 0,
-
-        "interesting_hosts": 0,
-
-        "status_200": 0,
-
-        "status_204": 0,
-
-        "status_301": 0,
-
-        "status_302": 0,
-
-        "status_307": 0,
-
-        "status_401": 0,
-
-        "status_403": 0,
-
-    }
-
-    for data in results.values():
-
-        stats = data.get(
-
-            "statistics",
-
-            {},
-
         )
+    )
 
-        overall["total_results"] += stats.get(
+    analysis = analyze(
+        results=findings,
+        interesting=interesting,
+        elapsed=elapsed,
+    )
 
-            "total_results",
+    statistics = analysis[
+        "statistics"
+    ]
 
-            0,
-
-        )
-
-        overall["interesting_hosts"] += stats.get(
-
-            "interesting_hosts",
-
-            0,
-
-        )
-
-        overall["status_200"] += stats.get(
-
-            "status_200",
-
-            0,
-
-        )
-
-        overall["status_204"] += stats.get(
-
-            "status_204",
-
-            0,
-
-        )
-
-        overall["status_301"] += stats.get(
-
-            "status_301",
-
-            0,
-
-        )
-
-        overall["status_302"] += stats.get(
-
-            "status_302",
-
-            0,
-
-        )
-
-        overall["status_307"] += stats.get(
-
-            "status_307",
-
-            0,
-
-        )
-
-        overall["status_401"] += stats.get(
-
-            "status_401",
-
-            0,
-
-        )
-
-        overall["status_403"] += stats.get(
-
-            "status_403",
-
-            0,
-
-        )
-
-    # ------------------------------------------------------
-    # Export
-    # ------------------------------------------------------
-
-    if all_results:
-
-        export(
-
-            all_results,
-
-            all_interesting,
-
-            overall,
-
-        )
-
-    # ------------------------------------------------------
-    # Summary
-    # ------------------------------------------------------
-
-    success(
-
-        f"Targets                : {overall['targets']}"
-
+    statistics.update(
+        {
+            "total_targets": total,
+            "successful": len(results),
+            "failed": len(failed),
+        }
     )
 
     success(
-
-        f"Successful             : {overall['successful']}"
-
+        f"Targets             : {total}"
     )
 
     success(
-
-        f"Failed                 : {overall['failed']}"
-
+        f"Successful          : {len(results)}"
     )
 
     success(
-
-        f"Discovered Hosts       : {overall['total_results']}"
-
+        f"Failed              : {len(failed)}"
     )
 
     success(
-
-        f"Interesting Hosts      : {overall['interesting_hosts']}"
-
+        f"Discovered Hosts    : "
+        f"{statistics['total_results']}"
     )
 
     success(
-
-        f"Elapsed                : {elapsed:.2f} sec"
-
+        f"Interesting Hosts   : "
+        f"{statistics['interesting_hosts']}"
     )
 
-    # ------------------------------------------------------
-    # Return
-    # ------------------------------------------------------
-
-    return (
-
-        results,
-
-        overall,
-
-        failed,
-
-        elapsed,
-
+    success(
+        f"Elapsed             : "
+        f"{statistics['elapsed']:.2f} sec"
     )
+
+    analysis["failed"] = failed
+
+    return analysis
+
+
+# ==========================================================
+# Successful Targets
+# ==========================================================
+
+def successful_targets(
+    analysis: dict[str, Any],
+) -> list[str]:
+    """
+    Return successful targets.
+    """
+
+    results = analysis.get(
+        "results",
+        [],
+    )
+
+    return sorted(
+        {
+            result.get(
+                "target",
+                "",
+            )
+            for result in results
+            if result.get("target")
+        }
+    )
+
+
+# ==========================================================
+# Failed Targets
+# ==========================================================
+
+def failed_targets(
+    analysis: dict[str, Any],
+) -> list[str]:
+    """
+    Return failed targets.
+    """
+
+    return sorted(
+        analysis.get(
+            "failed",
+            [],
+        )
+    )
+
+
+# ==========================================================
+# Public Exports
+# ==========================================================
+
+__all__ = [
+    "run_vhosts",
+    "successful_targets",
+    "failed_targets",
+]

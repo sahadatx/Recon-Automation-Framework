@@ -6,9 +6,15 @@ Recon Automation Framework
 Main Entry Point
 """
 
-import argparse
+from __future__ import annotations
 
-import asyncio
+import argparse
+from typing import Any, Callable
+
+from core.analysis import (
+    empty_analysis,
+    empty_list_analysis,
+)
 
 from core.banner import show_banner
 
@@ -17,14 +23,13 @@ from core.logger import (
     warning,
 )
 
-
 # ==========================================================
 # Passive Enumeration
 # ==========================================================
+
 from modules.passive.manager import (
     run as run_passive,
 )
-
 
 # ==========================================================
 # DNS Resolution
@@ -34,7 +39,6 @@ from modules.dns.manager import (
     run as run_dns,
 )
 
-
 # ==========================================================
 # HTTP Probe
 # ==========================================================
@@ -42,7 +46,6 @@ from modules.dns.manager import (
 from modules.http.manager import (
     run as run_http,
 )
-
 
 # ==========================================================
 # Port Scanner
@@ -52,7 +55,6 @@ from modules.ports.manager import (
     run as run_ports,
 )
 
-
 # ==========================================================
 # Technology Detection
 # ==========================================================
@@ -61,7 +63,6 @@ from modules.tech.manager import (
     run as run_technology,
 )
 
-
 # ==========================================================
 # URL Discovery
 # ==========================================================
@@ -69,7 +70,6 @@ from modules.tech.manager import (
 from modules.crawler.manager import (
     run as run_crawler,
 )
-
 
 # ==========================================================
 # JavaScript Analysis
@@ -89,9 +89,7 @@ from modules.fuzzing.manager import (
 
 from modules.fuzzing.exporter import (
     export_all as export_fuzzing_results,
-    show_summary as show_fuzzing_summary,
 )
-
 
 # ==========================================================
 # Screenshot Capture
@@ -101,15 +99,12 @@ from modules.screenshots.manager import (
     execute as run_screenshot,
 )
 
-
 # ==========================================================
 # Virtual Host Discovery
 # ==========================================================
 
 from modules.vhost.manager import (
-
     run_vhosts,
-
 )
 
 # ==========================================================
@@ -117,11 +112,11 @@ from modules.vhost.manager import (
 # ==========================================================
 
 from modules.nuclei.manager import (
+    run_nuclei,
+)
 
-    run_and_export,
-
-    print_summary,
-
+from modules.nuclei.exporter import (
+    export_all as export_nuclei_results,
 )
 
 # ==========================================================
@@ -129,9 +124,7 @@ from modules.nuclei.manager import (
 # ==========================================================
 
 from modules.waf.manager import (
-
     run_waf_detection,
-
 )
 
 # ==========================================================
@@ -139,9 +132,7 @@ from modules.waf.manager import (
 # ==========================================================
 
 from modules.tls.manager import (
-
     run_tls_analysis,
-
 )
 
 # ==========================================================
@@ -149,9 +140,7 @@ from modules.tls.manager import (
 # ==========================================================
 
 from modules.cdn.manager import (
-
     run_cdn_detection,
-
 )
 
 # ==========================================================
@@ -159,9 +148,11 @@ from modules.cdn.manager import (
 # ==========================================================
 
 from modules.takeover.manager import (
-
     run_takeover_detection,
+)
 
+from modules.takeover.exporter import (
+    export_all as export_takeover_results,
 )
 
 # ==========================================================
@@ -169,15 +160,67 @@ from modules.takeover.manager import (
 # ==========================================================
 
 from modules.email.manager import (
-
     run_email_security,
-
 )
+
+# ==========================================================
+# Report Generator
+# ==========================================================
+
+from modules.report.manager import (
+    execute as run_report,
+)
+
+# ==========================================================
+# Helpers
+# ==========================================================
+
+
+def run_module(
+    module_name: str,
+    runner: Callable[..., dict[str, Any]],
+    *args: Any,
+    empty_result: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """
+    Execute a module safely.
+
+    Args:
+        module_name:
+            Friendly module name.
+
+        runner:
+            Module entry function.
+
+        *args:
+            Arguments passed to the module.
+
+        empty_result:
+            Optional fallback result.
+
+    Returns:
+        Analysis dictionary.
+    """
+
+    try:
+        return runner(*args)
+
+    except Exception as error:
+
+        warning(
+            f"{module_name} failed: {error}"
+        )
+
+        if empty_result is None:
+            return empty_analysis()
+
+        return empty_result
 
 
 # ==========================================================
 # Main
 # ==========================================================
+
 
 def main() -> None:
     """
@@ -214,7 +257,7 @@ def main() -> None:
     )
 
     unique_subdomains = passive_analysis[
-        "subdomains"
+         "results"
     ]
 
     # ------------------------------------------------------
@@ -250,22 +293,16 @@ def main() -> None:
     # Live HTTP URLs
     # ------------------------------------------------------
 
-    live_urls = sorted({
-
-        result["url"]
-
-        for result in http_results.values()
-
-        if result.get(
-            "url"
-        )
-
-    })
+    live_urls = sorted(
+        {
+            result["url"]
+            for result in http_results.values()
+            if result.get("url")
+        }
+    )
 
     info(
-
         f"Live HTTP Targets: {len(live_urls)}"
-
     )
 
     # ------------------------------------------------------
@@ -292,12 +329,9 @@ def main() -> None:
         http_results,
     )
 
-    technology_results = (
-        technology_analysis[
-            "results"
-        ]
-    )
-
+    technology_results = technology_analysis[
+        "results"
+    ]
 
     # ------------------------------------------------------
     # URL Discovery
@@ -309,7 +343,9 @@ def main() -> None:
 
     if live_urls:
 
-        crawl_analysis = run_crawler(
+        crawl_analysis = run_module(
+            "URL Discovery",
+            run_crawler,
             live_urls,
         )
 
@@ -319,40 +355,43 @@ def main() -> None:
             "No crawl targets discovered."
         )
 
-        crawl_analysis = {
-            "results": {},
-            "statistics": {},
-        }
-
+        crawl_analysis = empty_analysis()
 
     # ------------------------------------------------------
     # JavaScript Analysis
     # ------------------------------------------------------
 
-    javascript_urls = sorted({
+    javascript_urls = sorted(
+        {
+            script
+            for host in crawl_analysis.get(
+                "results",
+                {},
+            ).values()
+            for page in host.get(
+                "pages",
+                {},
+            ).values()
+            for script in page.get(
+                "parsed",
+                {},
+            ).get(
+                "javascript",
+                [],
+            )
+        }
+    )
 
-        script
-
-        for host in crawl_analysis.get(
-            "results", {}
-        ).values()
-
-        for page in host.get(
-            "pages", {}
-        ).values()
-
-        for script in page.get(
-            "parsed", {}
-        ).get(
-            "javascript", []
-        )
-
-    })
+    info(
+        f"JavaScript Targets: {len(javascript_urls)}"
+    )
 
     if javascript_urls:
 
-        javascript_analysis = run_javascript(
-            javascript_urls
+        javascript_analysis = run_module(
+            "JavaScript Analysis",
+            run_javascript,
+            javascript_urls,
         )
 
     else:
@@ -361,63 +400,36 @@ def main() -> None:
             "No JavaScript files discovered."
         )
 
+        javascript_analysis = empty_analysis()
+
+
     # ------------------------------------------------------
     # Directory Fuzzing
     # ------------------------------------------------------
 
+    info(
+        f"Directory Fuzzing Targets: {len(live_urls)}"
+    )
+
     if live_urls:
 
-        try:
+        directory_analysis = run_module(
+            "Directory Fuzzing",
+            run_fuzzing,
+            live_urls,
+        )
 
-            (
-
-                fuzz_results,
-
-                fuzz_statistics,
-
-                fuzz_failed,
-
-                fuzz_time,
-
-            ) = run_fuzzing(
-
-                live_urls
-
-            )
-
-            export_fuzzing_results(
-
-                fuzz_results
-
-            )
-
-            show_fuzzing_summary(
-
-                fuzz_results,
-
-                fuzz_statistics,
-
-                fuzz_failed,
-
-                fuzz_time,
-
-            )
-
-        except Exception as error:
-
-            warning(
-
-                f"Directory Fuzzing failed: {error}"
-
-            )
+        export_fuzzing_results(
+            directory_analysis,
+        )
 
     else:
 
         info(
-
             "No fuzzing targets discovered."
-
         )
+
+        directory_analysis = empty_analysis()
 
     # ------------------------------------------------------
     # Screenshot Capture
@@ -425,320 +437,248 @@ def main() -> None:
 
     if live_urls:
 
-        screenshot_analysis = run_screenshot(
-
-            http_results
-
+        screenshot_analysis = run_module(
+            "Screenshot Capture",
+            run_screenshot,
+            http_results,
+            empty_result=empty_list_analysis(),
         )
-
 
     else:
 
         info(
-
             "No alive hosts for screenshots."
-
         )
 
-        screenshot_analysis = {
-
-            "total_targets": 0,
-
-            "captured": 0,
-
-            "failed": 0,
-
-            "results": {},
-
-        }
-    
-
+        screenshot_analysis = empty_list_analysis()
 
     # ------------------------------------------------------
     # Virtual Host Discovery
     # ------------------------------------------------------
 
     info(
-
         f"Virtual Host Targets: {len(live_urls)}"
-
     )
 
     if live_urls:
 
-        try:
-
-            run_vhosts(
-
-                live_urls
-
-            )
-
-        except Exception as error:
-
-            warning(
-
-                f"Virtual Host Discovery failed: {error}"
-
-            )
+        vhost_analysis = run_module(
+            "Virtual Host Discovery",
+            run_vhosts,
+            live_urls,
+        )
 
     else:
 
         info(
-
             "No targets for Virtual Host Discovery."
-
         )
 
-
+        vhost_analysis = empty_analysis()
 
     # ------------------------------------------------------
     # Nuclei Scan
     # ------------------------------------------------------
 
     info(
-
         f"Nuclei Targets: {len(live_urls)}"
-
     )
 
     if live_urls:
 
-        try:
+        nuclei_analysis = run_module(
+            "Nuclei Scanner",
+            run_nuclei,
+            live_urls,
+        )
 
-            (
-
-                _,
-
-                nuclei_overall,
-
-                _,
-
-                _,
-
-                _,
-
-            ) = run_and_export(
-
-                live_urls
-
-            )
-
-            print_summary(
-
-                nuclei_overall
-
-            )
-
-        except Exception as error:
-
-            warning(
-
-                f"Nuclei scan failed: {error}"
-
-            )
+        export_nuclei_results(
+            nuclei_analysis,
+        )
 
     else:
 
         info(
-
             "No targets for Nuclei scan."
-
         )
 
-
+        nuclei_analysis = empty_analysis()
 
     # ------------------------------------------------------
     # WAF Detection
     # ------------------------------------------------------
 
     info(
-
         f"WAF Targets: {len(live_urls)}"
-
     )
 
     if live_urls:
 
-        try:
-
-            run_waf_detection(
-
-                live_urls
-
-            )
-
-        except Exception as error:
-
-            warning(
-
-                f"WAF Detection failed: {error}"
-
-            )
+        waf_analysis = run_module(
+            "WAF Detection",
+            run_waf_detection,
+            live_urls,
+        )
 
     else:
 
         info(
-
             "No targets for WAF Detection."
-
         )
 
+        waf_analysis = empty_analysis()
 
-    # ==========================================================
+    # ------------------------------------------------------
     # TLS Analysis
-    # ==========================================================
+    # ------------------------------------------------------
 
     info(
-
         f"TLS Targets: {len(live_urls)}"
-
     )
 
     if live_urls:
 
-        try:
-
-            run_tls_analysis(
-
-                live_urls
-
-            )
-
-        except Exception as error:
-
-            warning(
-
-                f"TLS Analysis failed: {error}"
-
-            )
+        tls_analysis = run_module(
+            "TLS Analysis",
+            run_tls_analysis,
+            live_urls,
+        )
 
     else:
 
         info(
-
             "No targets for TLS Analysis."
-
         )
 
+        tls_analysis = empty_analysis()
 
-
-    # ==========================================================
+    # ------------------------------------------------------
     # CDN Detection
-    # ==========================================================
+    # ------------------------------------------------------
 
     info(
-
         f"CDN Targets: {len(live_urls)}"
-
     )
 
     if live_urls:
 
-        try:
-
-            run_cdn_detection(
-
-                live_urls,
-
-            )
-
-        except Exception as error:
-
-            warning(
-
-                f"CDN Detection failed: {error}"
-
-            )
+        cdn_analysis = run_module(
+            "CDN Detection",
+            run_cdn_detection,
+            live_urls,
+        )
 
     else:
 
         info(
-
             "No targets for CDN Detection."
-
         )
 
+        cdn_analysis = empty_analysis()
 
-
-    # ==========================================================
+    # ------------------------------------------------------
     # Subdomain Takeover Detection
-    # ==========================================================
+    # ------------------------------------------------------
 
     info(
-
         f"Takeover Targets: {len(live_urls)}"
-
     )
 
     if live_urls:
 
-        try:
+        takeover_analysis = run_module(
+            "Subdomain Takeover Detection",
+            run_takeover_detection,
+            live_urls,
+        )
 
-            run_takeover_detection(
+        export_takeover_results(
+            takeover_analysis,
+        )
 
-                live_urls,
-
-            )
-
-        except Exception as error:
-
-            warning(
-
-                f"Takeover Detection failed: {error}"
-
-            )
 
     else:
 
         info(
-
             "No targets for Takeover Detection."
-
         )
 
+        takeover_analysis = empty_analysis()
 
-    # ==========================================================
+    # ------------------------------------------------------
     # Email Security
-    # ==========================================================
+    # ------------------------------------------------------
 
     info(
-
         f"Email Targets: {len(live_urls)}"
-
     )
 
     if live_urls:
 
-        try:
-
-            run_email_security(
-
-                live_urls,
-
-            )
-
-        except Exception as error:
-
-            warning(
-
-                f"Email Security failed: {error}"
-
-            )
+        email_analysis = run_module(
+            "Email Security",
+            run_email_security,
+            live_urls,
+        )
 
     else:
 
         info(
-
             "No targets for Email Security."
-
         )
+
+        email_analysis = empty_analysis()
+
+    # ==========================================================
+    # Report Generator
+    # ==========================================================
+
+    analysis = {
+
+        "passive": passive_analysis,
+
+        "dns": dns_analysis,
+
+        "http": http_analysis,
+
+        "ports": port_analysis,
+
+        "technology": technology_analysis,
+
+        "urls": crawl_analysis,
+
+        "javascript": javascript_analysis,
+
+        "directories": directory_analysis,
+
+        "screenshots": screenshot_analysis,
+
+        "vhosts": vhost_analysis,
+
+        "nuclei": nuclei_analysis,
+
+        "tls": tls_analysis,
+
+        "waf": waf_analysis,
+
+        "cdn": cdn_analysis,
+
+        "takeover": takeover_analysis,
+
+        "email": email_analysis,
+
+    }
+
+    run_report(
+        analysis,
+    )
+
 
 # ==========================================================
 # Entry Point
 # ==========================================================
 
 if __name__ == "__main__":
-    main()
 
+    main()
 

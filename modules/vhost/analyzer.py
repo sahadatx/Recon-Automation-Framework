@@ -1,9 +1,7 @@
 """
-Email Security Analyzer
+Virtual Host Discovery Analyzer
 
-Analyzes email security
-results and generates the
-final analysis.
+Analyze Virtual Host Discovery results.
 """
 
 from __future__ import annotations
@@ -21,19 +19,23 @@ from .statistics import (
 
 def analyze(
     results: list[dict[str, Any]],
+    interesting: list[dict[str, Any]],
     elapsed: float,
 ) -> dict[str, Any]:
     """
-    Analyze email security
-    results.
-
-    Returns:
-        dict[str, Any]
+    Analyze Virtual Host Discovery results.
     """
 
     statistics = {
-        **generate_statistics(results),
-        "elapsed": round(elapsed, 2),
+        **generate_statistics(
+            results=results,
+            interesting=interesting,
+        ),
+        "interesting": interesting,
+        "elapsed": round(
+            elapsed,
+            2,
+        ),
     }
 
     return {

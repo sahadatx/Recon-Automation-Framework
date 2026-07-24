@@ -8,15 +8,32 @@ from __future__ import annotations
 
 import csv
 import json
+from pathlib import Path
+from typing import Any
 
+from core.logger import (
+    success,
+    warning,
+)
 
 from .constants import (
-    TXT_FILE,
-    JSON_FILE,
-    CSV_FILE,
-    SUMMARY_FILE,
-    DETECTED_FILE,
+    OUTPUT_DIR,
 )
+
+
+# ==========================================================
+# Output Directory
+# ==========================================================
+
+def create_output_directory() -> None:
+    """
+    Create output directory.
+    """
+
+    OUTPUT_DIR.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
 
 
 # ==========================================================
@@ -24,246 +41,331 @@ from .constants import (
 # ==========================================================
 
 def write_text(
-    path,
-    content: str,
-) -> None:
+    output_file: Path,
+    lines: list[str],
+) -> Path:
     """
     Write text file.
+
+    Args:
+        output_file:
+            Destination file.
+
+        lines:
+            File content.
+
+    Returns:
+        Output file path.
     """
 
-    path.write_text(
+    try:
 
-        content,
+        output_file.write_text(
+            "\n".join(lines),
+            encoding="utf-8",
+        )
 
-        encoding="utf-8",
+        success(
+            f"Saved {output_file}"
+        )
 
+    except OSError as error:
+
+        warning(
+            f"{output_file}: {error}"
+        )
+
+    return output_file
+
+
+# ==========================================================
+# Write JSON
+# ==========================================================
+
+def write_json(
+    output_file: Path,
+    data: Any,
+) -> Path:
+    """
+    Write JSON file.
+
+    Args:
+        output_file:
+            Destination file.
+
+        data:
+            JSON data.
+
+    Returns:
+        Output file path.
+    """
+
+    try:
+
+        with output_file.open(
+            "w",
+            encoding="utf-8",
+        ) as file:
+
+            json.dump(
+                data,
+                file,
+                indent=4,
+                ensure_ascii=False,
+                sort_keys=True,
+                default=str,
+            )
+
+        success(
+            f"Saved {output_file}"
+        )
+
+    except OSError as error:
+
+        warning(
+            f"{output_file}: {error}"
+        )
+
+    return output_file
+
+
+# ==========================================================
+# Write CSV
+# ==========================================================
+
+def write_csv(
+    output_file: Path,
+    results: list[dict[str, Any]],
+) -> Path:
+    """
+    Write CSV report.
+
+    Args:
+        output_file:
+            Destination file.
+
+        results:
+            CDN analysis results.
+
+    Returns:
+        Output file path.
+    """
+
+    try:
+
+        with output_file.open(
+            "w",
+            newline="",
+            encoding="utf-8",
+        ) as file:
+
+            writer = csv.writer(file)
+
+            writer.writerow(
+                [
+                    "Target",
+                    "CDN",
+                    "Provider",
+                    "Confidence",
+                    "Methods",
+                    "CNAME",
+                    "IP",
+                ]
+            )
+
+            for result in results:
+
+                writer.writerow(
+                    [
+                        result.get("target", ""),
+                        result.get("cdn", False),
+                        result.get("provider", ""),
+                        result.get("confidence", ""),
+                        ", ".join(
+                            result.get(
+                                "method",
+                                [],
+                            )
+                        ),
+                        result.get("cname", ""),
+                        result.get("ip", ""),
+                    ]
+                )
+
+        success(
+            f"Saved {output_file}"
+        )
+
+    except OSError as error:
+
+        warning(
+            f"{output_file}: {error}"
+        )
+
+    return output_file
+
+
+# ==========================================================
+# Export JSON
+# ==========================================================
+
+def export_json(
+    analysis: dict[str, Any],
+) -> Path:
+    """
+    Export JSON report.
+    """
+
+    return write_json(
+        JSON_FILE,
+        analysis,
     )
 
 
 # ==========================================================
-# TXT Export
+# Export TXT
 # ==========================================================
 
 def export_txt(
-    results,
-) -> None:
+    analysis: dict[str, Any],
+) -> Path:
     """
     Export TXT report.
     """
 
-    lines = []
+    results = analysis["results"]
+
+    lines: list[str] = []
 
     for result in results:
 
         lines.append("=" * 80)
 
         lines.append(
-
-            f"Target              : {result['target']}"
-
+            f"Target              : {result.get('target', '-')}"
         )
 
         lines.append(
-
-            f"CDN Detected        : {result['cdn']}"
-
+            f"CDN Detected        : {result.get('cdn', False)}"
         )
 
         lines.append(
-
-            f"Provider            : {result['provider']}"
-
+            f"Provider            : {result.get('provider', '-')}"
         )
 
         lines.append(
-
-            f"Confidence          : {result['confidence']}"
-
+            f"Confidence          : {result.get('confidence', '-')}"
         )
 
         lines.append(
-
-            f"Methods             : "
-
-            f"{', '.join(result['method'])}"
-
+            "Methods             : "
+            + ", ".join(result.get("method", []))
         )
 
         lines.append(
-
-            f"CNAME               : {result['cname']}"
-
+            f"CNAME               : {result.get('cname', '-')}"
         )
 
         lines.append(
-
-            f"IP Address          : {result['ip']}"
-
+            f"IP Address          : {result.get('ip', '-')}"
         )
 
-        lines.append(
-
-            "Recommendations"
-
-        )
+        lines.append("Recommendations")
 
         recommendations = result.get(
-
             "recommendations",
-
             [],
-
         )
 
         if recommendations:
 
-            for item in recommendations:
+            for recommendation in recommendations:
 
                 lines.append(
-
-                    f"  - {item}"
-
+                    f"  - {recommendation}"
                 )
 
         else:
 
             lines.append(
-
                 "  None"
-
             )
 
         lines.append("")
 
-    write_text(
-
+    return write_text(
         TXT_FILE,
-
-        "\n".join(lines),
-
+        lines,
     )
 
 
 # ==========================================================
-# JSON Export
-# ==========================================================
-
-def export_json(
-    results,
-) -> None:
-    """
-    Export JSON report.
-    """
-
-    with JSON_FILE.open(
-
-        "w",
-
-        encoding="utf-8",
-
-    ) as fp:
-
-        json.dump(
-
-            results,
-
-            fp,
-
-            indent=4,
-
-            ensure_ascii=False,
-
-        )
-
-
-# ==========================================================
-# CSV Export
+# Export CSV
 # ==========================================================
 
 def export_csv(
-    results,
-) -> None:
+    analysis: dict[str, Any],
+) -> Path:
     """
     Export CSV report.
     """
 
-    with CSV_FILE.open(
-
-        "w",
-
-        newline="",
-
-        encoding="utf-8",
-
-    ) as fp:
-
-        writer = csv.writer(
-
-            fp,
-
-        )
-
-        writer.writerow(
-
-            [
-
-                "Target",
-
-                "CDN",
-
-                "Provider",
-
-                "Confidence",
-
-                "Methods",
-
-                "CNAME",
-
-                "IP",
-
-            ]
-
-        )
-
-        for result in results:
-
-            writer.writerow(
-
-                [
-
-                    result["target"],
-
-                    result["cdn"],
-
-                    result["provider"],
-
-                    result["confidence"],
-
-                    ", ".join(
-
-                        result["method"]
-
-                    ),
-
-                    result["cname"],
-
-                    result["ip"],
-
-                ]
-
-            )
+    return write_csv(
+        CSV_FILE,
+        analysis["results"],
+    )
 
 
 # ==========================================================
-# Summary Export
+# Export Detected
+# ==========================================================
+
+def export_detected(
+    analysis: dict[str, Any],
+) -> Path:
+    """
+    Export detected CDN targets.
+    """
+
+    results = analysis["results"]
+
+    lines: list[str] = []
+
+    for result in results:
+
+        if not result.get(
+            "cdn",
+            False,
+        ):
+            continue
+
+        lines.append(
+
+            f"{result.get('target', '-')}"
+            f" -> "
+            f"{result.get('provider', '-')}"
+            f" (Confidence: {result.get('confidence', '-')})"
+
+        )
+
+    return write_text(
+        DETECTED_FILE,
+        lines,
+    )
+
+
+# ==========================================================
+# Export Summary
 # ==========================================================
 
 def export_summary(
-    statistics,
-) -> None:
+    analysis: dict[str, Any],
+) -> Path:
     """
     Export summary report.
     """
+
+    statistics = analysis["statistics"]
 
     lines = [
 
@@ -291,204 +393,119 @@ def export_summary(
 
     ]
 
-    for level, count in statistics[
-
-        "confidence_statistics"
-
-    ].items():
+    for level, count in statistics["confidence_statistics"].items():
 
         lines.append(
-
             f"{level:<20}{count}"
-
         )
 
     lines.extend(
-
         [
-
             "",
-
             "Providers",
-
             "-" * 40,
-
         ]
-
     )
 
-    for provider, count in statistics[
-
-        "provider_statistics"
-
-    ].items():
+    for provider, count in statistics["provider_statistics"].items():
 
         lines.append(
-
             f"{provider:<20}{count}"
-
         )
 
-    write_text(
-
+    return write_text(
         SUMMARY_FILE,
-
-        "\n".join(
-
-            lines,
-
-        ),
-
+        lines,
     )
 
 
 # ==========================================================
-# Detected Export
+# Show Summary
 # ==========================================================
 
-def export_detected(
-    results,
+def show_summary(
+    analysis: dict[str, Any],
 ) -> None:
     """
-    Export detected CDN targets.
+    Display CDN summary.
     """
 
-    targets = [
+    statistics = analysis["statistics"]
 
-        result
+    print()
 
-        for result
+    print("=" * 80)
 
-        in results
-
-        if result.get(
-
-            "cdn",
-
-            False,
-
-        )
-
-    ]
-
-    lines = []
-
-    for result in targets:
-
-        lines.append(
-
-            f"{result['target']} -> "
-
-            f"{result['provider']} "
-
-            f"(Confidence: {result['confidence']})"
-
-        )
-
-    write_text(
-
-        DETECTED_FILE,
-
-        "\n".join(
-
-            lines,
-
-        ),
-
+    print(
+        "CDN Detection Summary".center(80)
     )
+
+    print("=" * 80)
+
+    print(f"Targets             : {statistics['targets']}")
+    print(f"CDN Detected        : {statistics['detected']}")
+    print(f"CDN Not Detected    : {statistics['undetected']}")
+    print(f"Average Confidence  : {statistics['average_confidence']}")
+    print(f"Highest Confidence  : {statistics['highest_confidence']}")
+    print(f"Elapsed Time        : {statistics['elapsed']} sec")
+
+    print("-" * 80)
+
+    print("Confidence Levels")
+
+    print("-" * 80)
+
+    for level, count in statistics["confidence_statistics"].items():
+
+        print(
+            f"{level:<30}{count}"
+        )
+
+    print("-" * 80)
+
+    print("Providers")
+
+    print("-" * 80)
+
+    for provider, count in statistics["provider_statistics"].items():
+
+        print(
+            f"{provider:<30}{count}"
+        )
+
+    print("=" * 80)
 
 
 # ==========================================================
 # Export All
 # ==========================================================
 
-def export_results(
-    results,
-    statistics,
+def export_all(
+    analysis: dict[str, Any],
 ) -> None:
     """
     Export all reports.
     """
 
-    export_txt(
+    create_output_directory()
 
-        results,
+    export_json(analysis)
 
-    )
+    export_txt(analysis)
 
-    export_json(
+    export_csv(analysis)
 
-        results,
+    export_detected(analysis)
 
-    )
+    export_summary(analysis)
 
-    export_csv(
-
-        results,
-
-    )
-
-    export_summary(
-
-        statistics,
-
-    )
-
-    export_detected(
-
-        results,
-
-    )
-
-    print(
-
-        f"[SUCCESS] Saved {TXT_FILE}"
-
-    )
-
-    print(
-
-        f"[SUCCESS] Saved {JSON_FILE}"
-
-    )
-
-    print(
-
-        f"[SUCCESS] Saved {CSV_FILE}"
-
-    )
-
-    print(
-
-        f"[SUCCESS] Saved {SUMMARY_FILE}"
-
-    )
-
-    print(
-
-        f"[SUCCESS] Saved {DETECTED_FILE}"
-
-    )
+    show_summary(analysis)
 
 
 # ==========================================================
-# Export
+# Public Exports
 # ==========================================================
 
 __all__ = [
-
-    "export_txt",
-
-    "export_json",
-
-    "export_csv",
-
-    "export_summary",
-
-    "export_detected",
-
-    "export_results",
-
+    "export_all",
 ]
-
-

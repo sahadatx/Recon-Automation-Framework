@@ -1,9 +1,9 @@
 """
 Email Security Manager
 
-Main entry point for
+Coordinates the complete
 Email Security
-Analysis.
+pipeline.
 """
 
 from __future__ import annotations
@@ -11,9 +11,12 @@ from __future__ import annotations
 from time import perf_counter
 from typing import Any
 
-from core.logger import info
+from core.logger import (
+    info,
+    success,
+)
 
-from modules.email.helpers import (
+from .helpers import (
     create_result,
     normalize_target,
     resolve_bimi,
@@ -26,21 +29,16 @@ from modules.email.helpers import (
     resolve_tls_rpt,
 )
 
-from modules.email.analyzer import (
+from .target_analyzer import (
+    analyze_target,
+)
+
+from .analyzer import (
     analyze,
 )
 
-from modules.email.filters import (
+from .filters import (
     filter_results,
-)
-
-from modules.email.statistics import (
-    generate_statistics,
-    print_summary,
-)
-
-from modules.email.exporter import (
-    export_results,
 )
 
 
@@ -50,367 +48,172 @@ from modules.email.exporter import (
 
 def run_email_security(
     targets: list[str],
-) -> tuple[
-    list[dict[str, Any]],
-    dict[str, Any],
-]:
+) -> dict[str, Any]:
     """
     Run complete
-    Email Security
-    pipeline.
-
-    Pipeline:
-        DNS
-        -> Analysis
-        -> Filter
-        -> Statistics
-        -> Export
-
-    Returns:
-        tuple(
-            results,
-            statistics,
-        )
+    Email Security pipeline.
     """
 
-    print()
+    if not targets:
 
-    print("=" * 80)
-
-    print(
-
-        "Email Security Analysis".center(
-
-            80,
-
+        return analyze(
+            results=[],
+            elapsed=0,
         )
 
+    info(
+        "Starting Email Security Analysis..."
     )
-
-    print("=" * 80)
 
     start = perf_counter()
 
-    results = []
+    results: list[dict[str, Any]] = []
 
-    try:
-
-        # --------------------------------------------------
-        # Analyze Targets
-        # --------------------------------------------------
-
-        for target in targets:
-
-            info(
-
-                f"Analyzing {target}..."
-
-            )
-
-            host = normalize_target(
-
-                target,
-
-            )
-
-            if not host:
-
-                info(
-
-                    f"Skipping invalid target: "
-
-                    f"{target}"
-
-                )
-
-                continue
-
-            # ----------------------------------------------
-            # DNS
-            # ----------------------------------------------
-
-            mx = resolve_mx(
-
-                host,
-
-            )
-
-            spf, spf_record = resolve_spf(
-
-                host,
-
-            )
-
-            dkim, dkim_selector = resolve_dkim(
-
-                host,
-
-            )
-
-            dmarc, dmarc_record = resolve_dmarc(
-
-                host,
-
-            )
-
-            mta_sts = resolve_mta_sts(
-
-                host,
-
-            )
-
-            tls_rpt = resolve_tls_rpt(
-
-                host,
-
-            )
-
-            bimi = resolve_bimi(
-
-                host,
-
-            )
-
-            dnssec = resolve_dnskey(
-
-                host,
-
-            )
-
-            # ----------------------------------------------
-            # Create Result
-            # ----------------------------------------------
-
-            result = create_result(
-
-                host,
-
-                mx,
-
-                spf,
-
-                spf_record,
-
-                dkim,
-
-                dkim_selector,
-
-                dmarc,
-
-                dmarc_record,
-
-                mta_sts,
-
-                tls_rpt,
-
-                bimi,
-
-                dnssec,
-
-            )
-
-            # ----------------------------------------------
-            # Analysis
-            # ----------------------------------------------
-
-            result = analyze(
-
-                result,
-
-            )
-
-            results.append(
-
-                result,
-
-            )
-
-
-        # --------------------------------------------------
-        # Filter Results
-        # --------------------------------------------------
+    for target in targets:
 
         info(
-
-            "Filtering results..."
-
+            f"Analyzing {target}..."
         )
 
-        results = filter_results(
+        host = normalize_target(
+            target,
+        )
 
-            results,
+        if not host:
+            continue
 
+        # --------------------------------------------------
+        # DNS
+        # --------------------------------------------------
+
+        mx = resolve_mx(
+            host,
+        )
+
+        spf, spf_record = resolve_spf(
+            host,
+        )
+
+        dkim, dkim_selector = resolve_dkim(
+            host,
+        )
+
+        dmarc, dmarc_record = resolve_dmarc(
+            host,
+        )
+
+        mta_sts = resolve_mta_sts(
+            host,
+        )
+
+        tls_rpt = resolve_tls_rpt(
+            host,
+        )
+
+        bimi = resolve_bimi(
+            host,
+        )
+
+        dnssec = resolve_dnskey(
+            host,
         )
 
         # --------------------------------------------------
-        # Statistics
+        # Create Result
         # --------------------------------------------------
 
-        elapsed = perf_counter() - start
-
-        statistics = generate_statistics(
-
-            results,
-
-            elapsed,
-
-        )
-
-        # --------------------------------------------------
-        # Export Results
-        # --------------------------------------------------
-
-        info(
-
-            "Exporting results..."
-
-        )
-
-        export_results(
-
-            results,
-
-            statistics,
-
+        result = create_result(
+            host,
+            mx,
+            spf,
+            spf_record,
+            dkim,
+            dkim_selector,
+            dmarc,
+            dmarc_record,
+            mta_sts,
+            tls_rpt,
+            bimi,
+            dnssec,
         )
 
         # --------------------------------------------------
-        # Print Summary
+        # Analyze Target
         # --------------------------------------------------
 
-        print_summary(
-
-            statistics,
-
+        result = analyze_target(
+            result,
         )
 
-        print()
-
-        print("=" * 80)
-
-        print(
-
-            "[SUCCESS] Email Security Analysis Completed"
-
+        results.append(
+            result,
         )
 
-        print("=" * 80)
+    # ------------------------------------------------------
+    # Filter Results
+    # ------------------------------------------------------
 
-        print(
+    results = filter_results(
+        results,
+    )
 
-            f"Targets             : "
+    elapsed = (
+        perf_counter()
+        - start
+    )
 
-            f"{statistics['targets']}"
+    # ------------------------------------------------------
+    # Module Analysis
+    # ------------------------------------------------------
 
-        )
+    analysis = analyze(
+        results=results,
+        elapsed=elapsed,
+    )
 
-        print(
+    statistics = analysis[
+        "statistics"
+    ]
 
-            f"Low Risk            : "
+    success(
+        f"Targets             : {statistics['targets']}"
+    )
 
-            f"{statistics['low']}"
+    success(
+        f"Low Risk            : {statistics['low']}"
+    )
 
-        )
+    success(
+        f"Medium Risk         : {statistics['medium']}"
+    )
 
-        print(
+    success(
+        f"High Risk           : {statistics['high']}"
+    )
 
-            f"Medium Risk         : "
+    success(
+        f"Critical Risk       : {statistics['critical']}"
+    )
 
-            f"{statistics['medium']}"
+    success(
+        f"Average Score       : {statistics['average_score']}"
+    )
 
-        )
+    success(
+        f"Highest Score       : {statistics['highest_score']}"
+    )
 
-        print(
+    success(
+        f"Elapsed             : {statistics['elapsed']:.2f} sec"
+    )
 
-            f"High Risk           : "
-
-            f"{statistics['high']}"
-
-        )
-
-        print(
-
-            f"Critical Risk       : "
-
-            f"{statistics['critical']}"
-
-        )
-
-        print(
-
-            f"Average Score       : "
-
-            f"{statistics['average_score']}"
-
-        )
-
-        print(
-
-            f"Highest Score       : "
-
-            f"{statistics['highest_score']}"
-
-        )
-
-        print(
-
-            f"Elapsed Time        : "
-
-            f"{statistics['elapsed']} sec"
-
-        )
-
-        print("=" * 80)
-
-        return (
-
-            results,
-
-            statistics,
-
-        )
-
-    except KeyboardInterrupt:
-
-        print()
-
-        print(
-
-            "[ERROR] Email Security Analysis "
-
-            "cancelled by user."
-
-        )
-
-        raise
-
-    except Exception as error:
-
-        print()
-
-        print(
-
-            "[ERROR] Email Security Analysis "
-
-            "failed."
-
-        )
-
-        print(
-
-            f"[ERROR] {error}"
-
-        )
-
-        raise
+    return analysis
 
 
 # ==========================================================
-# Export
+# Public Exports
 # ==========================================================
 
 __all__ = [
-
     "run_email_security",
-
 ]

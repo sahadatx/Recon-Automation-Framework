@@ -6,6 +6,8 @@ Analyze JavaScript results and generate a summary.
 
 from __future__ import annotations
 
+from typing import Any
+
 from modules.javascript.statistics import (
     generate_statistics,
 )
@@ -16,9 +18,9 @@ from modules.javascript.statistics import (
 # ==========================================================
 
 def analyze(
-    results: dict[str, dict],
+    results: dict[str, dict[str, Any]],
     elapsed: float,
-) -> dict:
+) -> dict[str, Any]:
     """
     Analyze JavaScript results.
 
@@ -30,20 +32,17 @@ def analyze(
             Total analysis time.
 
     Returns:
-        Complete JavaScript analysis.
+        JavaScript analysis.
     """
 
-    statistics = generate_statistics(
-        results=results,
-    )
+    statistics = {
+        **generate_statistics(
+            results=results,
+        ),
+        "elapsed": elapsed,
+    }
 
     return {
-
-        "processed_files": statistics[
-            "processed_files"
-        ],
-
-        "scan_time": elapsed,
 
         "results": results,
 

@@ -6,6 +6,8 @@ Exports screenshot analysis results.
 
 from __future__ import annotations
 
+from typing import Any
+
 import json
 import csv
 
@@ -97,7 +99,7 @@ def write_text(
 
 def write_json(
     path: Path,
-    data: dict,
+    data: Any,
 ) -> Path:
     """
     Write JSON file.
@@ -244,7 +246,7 @@ def write_csv(
 # ==========================================================
 
 def export_results(
-    analysis: dict,
+    analysis: dict[str, Any],
 ) -> Path:
     """
     Export screenshot results.
@@ -307,7 +309,7 @@ def export_results(
 # ==========================================================
 
 def export_json(
-    analysis: dict,
+    analysis: dict[str, Any],
 ) -> Path:
     """
     Export JSON report.
@@ -328,7 +330,7 @@ def export_json(
 # ==========================================================
 
 def export_summary(
-    analysis: dict,
+    analysis: dict[str, Any],
 ) -> Path:
     """
     Export summary file.
@@ -362,7 +364,7 @@ def export_summary(
 
         f"Average Size        : {statistics.get('average_size',0)} bytes",
 
-        f"Scan Time           : {analysis.get('scan_time',0)} sec",
+        f"Scan Time           : {statistics.get('elapsed',0)} sec",
 
         "",
 
@@ -384,7 +386,7 @@ def export_summary(
 # ==========================================================
 
 def export_all(
-    analysis: dict,
+    analysis: dict[str, Any],
 ) -> None:
     """
     Export all screenshot reports.
@@ -429,7 +431,7 @@ def export_all(
 # ==========================================================
 
 def show_summary(
-    analysis: dict,
+    analysis: dict[str, Any],
 ) -> None:
     """
     Display screenshot summary.
@@ -496,7 +498,7 @@ def show_summary(
 
         f"{'Scan Time':<30}"
 
-        f"{analysis.get('scan_time',0)} sec"
+        f"{statistics.get('elapsed',0)} sec"
 
     )
 

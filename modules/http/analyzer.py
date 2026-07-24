@@ -6,6 +6,8 @@ Analyze HTTP probe results and generate a summary.
 
 from __future__ import annotations
 
+from typing import Any
+
 from modules.http.statistics import (
     generate_statistics,
 )
@@ -16,43 +18,40 @@ from modules.http.statistics import (
 # ==========================================================
 
 def analyze(
-    results: dict[str, dict],
+    results: dict[str, dict[str, Any]],
     failed_hosts: list[str],
     elapsed: float,
-) -> dict:
+) -> dict[str, Any]:
     """
     Analyze HTTP probe results.
 
     Args:
-        results: Successful HTTP probe results.
-        failed_hosts: Hosts that failed to respond.
-        elapsed: Total probe time.
+        results:
+            Successful HTTP probe results.
+
+        failed_hosts:
+            Hosts that failed to respond.
+
+        elapsed:
+            Total probe time.
 
     Returns:
         HTTP analysis.
     """
 
-    statistics = generate_statistics(
-        results=results,
-        failed_hosts=failed_hosts,
-    )
+    statistics = {
+        **generate_statistics(
+            results=results,
+            failed_hosts=failed_hosts,
+        ),
+        "elapsed": elapsed,
+        "alive": sorted(results),
+        "dead": sorted(failed_hosts),
+    }
 
     return {
-        "alive_hosts": statistics[
-            "alive_hosts"
-        ],
-        "dead_hosts": statistics[
-            "dead_hosts"
-        ],
-        "scan_time": elapsed,
         "results": results,
         "statistics": statistics,
-        "alive": sorted(
-            results.keys()
-        ),
-        "dead": sorted(
-            failed_hosts
-        ),
     }
 
 

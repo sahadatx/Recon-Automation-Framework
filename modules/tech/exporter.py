@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import csv
 import json
+from typing import Any
 
 from modules.tech.constants import (
     RESULTS_CSV,
@@ -18,9 +19,8 @@ from modules.tech.constants import (
     TECHNOLOGIES_TXT,
 )
 
-
 # ==========================================================
-# Create Output Directory
+# Helpers
 # ==========================================================
 
 def create_output_directory() -> None:
@@ -35,48 +35,35 @@ def create_output_directory() -> None:
 
 
 # ==========================================================
-# Export Results (TXT)
+# Results (TXT)
 # ==========================================================
 
 def export_results_txt(
-    analysis: dict,
+    analysis: dict[str, Any],
 ) -> None:
     """
-    Export detailed technology results.
+    Export technology detection results.
     """
+
+    create_output_directory()
+
+    results = analysis["results"]
 
     with RESULTS_TXT.open(
         "w",
         encoding="utf-8",
     ) as file:
 
-        for host in sorted(
-            analysis["results"]
-        ):
+        for host in sorted(results):
 
-            data = analysis[
-                "results"
-            ][host]
+            data = results[host]
 
-            file.write(
-                "=" * 70 + "\n"
-            )
+            file.write("=" * 70 + "\n")
+            file.write(f"{host}\n")
+            file.write("=" * 70 + "\n\n")
 
-            file.write(
-                f"{host}\n"
-            )
-
-            file.write(
-                "=" * 70 + "\n\n"
-            )
-
-            file.write(
-                "Technologies\n"
-            )
-
-            file.write(
-                "-" * 70 + "\n"
-            )
+            file.write("Technologies\n")
+            file.write("-" * 70 + "\n")
 
             technologies = data.get(
                 "technologies",
@@ -93,9 +80,7 @@ def export_results_txt(
 
             else:
 
-                file.write(
-                    "None\n"
-                )
+                file.write("None\n")
 
             file.write("\n")
 
@@ -122,23 +107,23 @@ def export_results_txt(
 
             else:
 
-                file.write(
-                    "None\n"
-                )
+                file.write("None\n")
 
             file.write("\n")
 
 
 # ==========================================================
-# Export Results (JSON)
+# Results (JSON)
 # ==========================================================
 
 def export_results_json(
-    analysis: dict,
+    analysis: dict[str, Any],
 ) -> None:
     """
-    Export results as JSON.
+    Export JSON results.
     """
+
+    create_output_directory()
 
     with RESULTS_JSON.open(
         "w",
@@ -154,15 +139,19 @@ def export_results_json(
 
 
 # ==========================================================
-# Export Results (CSV)
+# Results (CSV)
 # ==========================================================
 
 def export_results_csv(
-    analysis: dict,
+    analysis: dict[str, Any],
 ) -> None:
     """
-    Export results as CSV.
+    Export CSV results.
     """
+
+    create_output_directory()
+
+    results = analysis["results"]
 
     with RESULTS_CSV.open(
         "w",
@@ -170,9 +159,7 @@ def export_results_csv(
         encoding="utf-8",
     ) as file:
 
-        writer = csv.writer(
-            file
-        )
+        writer = csv.writer(file)
 
         writer.writerow(
             [
@@ -182,13 +169,9 @@ def export_results_csv(
             ]
         )
 
-        for host in sorted(
-            analysis["results"]
-        ):
+        for host in sorted(results):
 
-            data = analysis[
-                "results"
-            ][host]
+            data = results[host]
 
             writer.writerow(
                 [
@@ -210,19 +193,19 @@ def export_results_csv(
 
 
 # ==========================================================
-# Export Summary
+# Summary
 # ==========================================================
 
 def export_summary(
-    analysis: dict,
+    analysis: dict[str, Any],
 ) -> None:
     """
     Export summary.
     """
 
-    statistics = analysis[
-        "statistics"
-    ]
+    create_output_directory()
+
+    statistics = analysis["statistics"]
 
     with SUMMARY_TXT.open(
         "w",
@@ -230,36 +213,36 @@ def export_summary(
     ) as file:
 
         file.write(
-            "Technology Detection Summary\n"
+            "TECHNOLOGY DETECTION SUMMARY\n"
         )
 
         file.write(
-            "=" * 60 + "\n\n"
+            "=" * 70 + "\n\n"
         )
 
         file.write(
-            f"Hosts Analyzed          : "
+            f"Hosts Analyzed        : "
             f"{statistics['hosts_analyzed']}\n"
         )
 
         file.write(
-            f"Failed Hosts            : "
+            f"Failed Hosts          : "
             f"{statistics['failed_hosts']}\n"
         )
 
         file.write(
-            f"Detected Technologies   : "
+            f"Detected Technologies : "
             f"{statistics['technology_count']}\n"
         )
 
         file.write(
-            f"Security Headers        : "
+            f"Security Headers      : "
             f"{statistics['security_header_count']}\n"
         )
 
         file.write(
-            f"Scan Time               : "
-            f"{analysis['scan_time']} sec\n\n"
+            f"Scan Time             : "
+            f"{statistics['elapsed']} sec\n\n"
         )
 
         file.write(
@@ -267,7 +250,7 @@ def export_summary(
         )
 
         file.write(
-            "-" * 60 + "\n"
+            "-" * 70 + "\n"
         )
 
         for (
@@ -278,8 +261,7 @@ def export_summary(
         ].items():
 
             file.write(
-                f"{technology:<30}"
-                f"{count}\n"
+                f"{technology:<30}{count}\n"
             )
 
         file.write("\n")
@@ -289,7 +271,7 @@ def export_summary(
         )
 
         file.write(
-            "-" * 60 + "\n"
+            "-" * 70 + "\n"
         )
 
         for (
@@ -300,28 +282,31 @@ def export_summary(
         ].items():
 
             file.write(
-                f"{header:<30}"
-                f"{count}\n"
+                f"{header:<30}{count}\n"
             )
 
 
 # ==========================================================
-# Export Technologies
+# Technologies
 # ==========================================================
 
 def export_technologies(
-    analysis: dict,
+    analysis: dict[str, Any],
 ) -> None:
     """
     Export unique technologies.
     """
+
+    create_output_directory()
+
+    statistics = analysis["statistics"]
 
     with TECHNOLOGIES_TXT.open(
         "w",
         encoding="utf-8",
     ) as file:
 
-        for technology in analysis[
+        for technology in statistics[
             "technologies"
         ]:
 
@@ -331,17 +316,15 @@ def export_technologies(
 
 
 # ==========================================================
-# Export All
+# Export Everything
 # ==========================================================
 
 def export_all(
-    analysis: dict,
+    analysis: dict[str, Any],
 ) -> None:
     """
     Export all output files.
     """
-
-    create_output_directory()
 
     export_results_txt(
         analysis,
@@ -369,11 +352,5 @@ def export_all(
 # ==========================================================
 
 __all__ = [
-    "create_output_directory",
-    "export_results_txt",
-    "export_results_json",
-    "export_results_csv",
-    "export_summary",
-    "export_technologies",
     "export_all",
 ]

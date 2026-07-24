@@ -1,16 +1,31 @@
 """
 Directory Fuzzing Exporter
 
-Exports directory fuzzing results.
+Export Directory
+Fuzzing analysis
+results.
 """
+
+from __future__ import annotations
 
 import csv
 import json
 
 from pathlib import Path
+from typing import Any
 
 from core.logger import (
     success,
+    warning,
+)
+
+from .constants import (
+    OUTPUT_DIR,
+    TXT_FILE,
+    JSON_FILE,
+    CSV_FILE,
+    SUMMARY_FILE,
+    INTERESTING_FILE,
 )
 
 
@@ -18,148 +33,186 @@ from core.logger import (
 # Output Directory
 # ==========================================================
 
-OUTPUT_DIRECTORY = (
-
-    Path("output")
-
-    / "fuzzing"
-
-)
-
-
-# ==========================================================
-# Create Output Directory
-# ==========================================================
-
-def ensure_output_directory():
+def create_output_directory() -> None:
     """
     Create output directory.
-
-    Returns:
-        Path
     """
 
-    OUTPUT_DIRECTORY.mkdir(
-
+    OUTPUT_DIR.mkdir(
         parents=True,
-
         exist_ok=True,
-
     )
-
-    return OUTPUT_DIRECTORY
 
 
 # ==========================================================
-# Write Text File
+# Write Text
 # ==========================================================
 
 def write_text(
-    filename: str,
+    output_file: Path,
     lines: list[str],
-):
+) -> Path:
     """
     Write text file.
+
+    Args:
+        output_file:
+            Destination file.
+
+        lines:
+            File content.
+
+    Returns:
+        Output file path.
     """
 
-    output = (
+    try:
 
-        ensure_output_directory()
-
-        / filename
-
-    )
-
-    with output.open(
-
-        "w",
-
-        encoding="utf-8",
-
-    ) as file:
-
-        file.write(
-
-            "\n".join(lines)
-
+        output_file.write_text(
+            "\n".join(lines),
+            encoding="utf-8",
         )
 
-    success(
-        f"Saved {output}"
-    )
+        success(
+            f"Saved {output_file}"
+        )
 
-    return output
+    except OSError as error:
+
+        warning(
+            f"{output_file}: {error}"
+        )
+
+    return output_file
 
 
 # ==========================================================
-# Export TXT
+# Write JSON
 # ==========================================================
 
-def export_txt(
-    results: dict,
-    filename: str = "results.txt",
-):
+def write_json(
+    output_file: Path,
+    data: Any,
+) -> Path:
     """
-    Export TXT report.
+    Write JSON file.
+
+    Args:
+        output_file:
+            Destination file.
+
+        data:
+            JSON data.
+
+    Returns:
+        Output file path.
     """
 
-    lines = []
+    try:
 
-    lines.append("=" * 80)
-    lines.append("Directory Fuzzing Results")
-    lines.append("=" * 80)
-    lines.append("")
+        with output_file.open(
+            "w",
+            encoding="utf-8",
+        ) as file:
 
-    for target, data in results.items():
-
-        lines.append(
-            f"Target : {target}"
-        )
-
-        lines.append(
-            "-" * 80
-        )
-
-        statistics = data.get(
-            "statistics",
-            {},
-        )
-
-        lines.append(
-            f"Results                 : {statistics.get('total_results',0)}"
-        )
-
-        lines.append(
-            f"Interesting Files       : {statistics.get('interesting_files',0)}"
-        )
-
-        lines.append(
-            f"Interesting Directories : {statistics.get('interesting_directories',0)}"
-        )
-
-        lines.append("")
-
-        for result in data.get(
-            "results",
-            [],
-        ):
-
-            lines.append(
-
-                f"[{result['status']}] {result['url']}"
-
+            json.dump(
+                data,
+                file,
+                indent=4,
+                ensure_ascii=False,
+                sort_keys=True,
+                default=str,
             )
 
-        lines.append("")
-        lines.append("")
+        success(
+            f"Saved {output_file}"
+        )
 
-    return write_text(
+    except OSError as error:
 
-        filename,
+        warning(
+            f"{output_file}: {error}"
+        )
 
-        lines,
+    return output_file
 
-    )
+
+# ==========================================================
+# Write CSV
+# ==========================================================
+
+def write_csv(
+    output_file: Path,
+    results: dict[str, Any],
+) -> Path:
+    """
+    Write CSV report.
+
+    Args:
+        output_file:
+            Destination file.
+
+        results:
+            Directory Fuzzing results.
+
+    Returns:
+        Output file path.
+    """
+
+    try:
+
+        with output_file.open(
+            "w",
+            newline="",
+            encoding="utf-8",
+        ) as file:
+
+            writer = csv.writer(file)
+
+            writer.writerow(
+                [
+                    "Target",
+                    "URL",
+                    "Status",
+                    "Length",
+                    "Words",
+                    "Lines",
+                    "Content-Type",
+                    "Redirect",
+                ]
+            )
+
+            for target, analysis in results.items():
+
+                for result in analysis.get(
+                    "results",
+                    [],
+                ):
+
+                    writer.writerow(
+                        [
+                            target,
+                            result.get("url", ""),
+                            result.get("status", ""),
+                            result.get("length", ""),
+                            result.get("words", ""),
+                            result.get("lines", ""),
+                            result.get("content_type", ""),
+                            result.get("redirect", ""),
+                        ]
+                    )
+
+        success(
+            f"Saved {output_file}"
+        )
+
+    except OSError as error:
+
+        warning(
+            f"{output_file}: {error}"
+        )
+
+    return output_file
 
 
 # ==========================================================
@@ -167,46 +220,75 @@ def export_txt(
 # ==========================================================
 
 def export_json(
-    results: dict,
-    filename: str = "results.json",
-):
+    analysis: dict[str, Any],
+) -> Path:
     """
     Export JSON report.
     """
 
-    output = (
-
-        ensure_output_directory()
-
-        / filename
-
+    return write_json(
+        JSON_FILE,
+        analysis,
     )
 
-    with output.open(
 
-        "w",
+# ==========================================================
+# Export TXT
+# ==========================================================
 
-        encoding="utf-8",
+def export_txt(
+    analysis: dict[str, Any],
+) -> Path:
+    """
+    Export TXT report.
+    """
 
-    ) as file:
+    results = analysis["results"]
 
-        json.dump(
+    lines: list[str] = []
 
-            results,
+    lines.append("=" * 80)
+    lines.append("Directory Fuzzing Results")
+    lines.append("=" * 80)
+    lines.append("")
 
-            file,
+    for target, target_analysis in results.items():
 
-            indent=4,
+        statistics = target_analysis["statistics"]
 
-            sort_keys=True,
-
+        lines.append(
+            f"Target : {target}"
         )
 
-    success(
-        f"Saved {output}"
-    )
+        lines.append("-" * 80)
 
-    return output
+        lines.append(
+            f"Results                 : {statistics['total_results']}"
+        )
+
+        lines.append(
+            f"Interesting Files       : {statistics['interesting_files']}"
+        )
+
+        lines.append(
+            f"Interesting Directories : {statistics['interesting_directories']}"
+        )
+
+        lines.append("")
+
+        for result in target_analysis["results"]:
+
+            lines.append(
+                f"[{result.get('status', '')}] {result.get('url', '')}"
+            )
+
+        lines.append("")
+        lines.append("")
+
+    return write_text(
+        TXT_FILE,
+        lines,
+    )
 
 
 # ==========================================================
@@ -214,140 +296,41 @@ def export_json(
 # ==========================================================
 
 def export_csv(
-    results: dict,
-    filename: str = "results.csv",
-):
+    analysis: dict[str, Any],
+) -> Path:
     """
     Export CSV report.
     """
 
-    output = (
-
-        ensure_output_directory()
-
-        / filename
-
+    return write_csv(
+        CSV_FILE,
+        analysis["results"],
     )
-
-    with output.open(
-
-        "w",
-
-        newline="",
-
-        encoding="utf-8",
-
-    ) as file:
-
-        writer = csv.writer(
-            file
-        )
-
-        writer.writerow(
-
-            [
-
-                "Target",
-
-                "URL",
-
-                "Status",
-
-                "Length",
-
-                "Words",
-
-                "Lines",
-
-                "Content-Type",
-
-                "Redirect",
-
-            ]
-
-        )
-
-        for target, data in results.items():
-
-            for result in data.get(
-                "results",
-                [],
-            ):
-
-                writer.writerow(
-
-                    [
-
-                        target,
-
-                        result.get(
-                            "url",
-                            "",
-                        ),
-
-                        result.get(
-                            "status",
-                            "",
-                        ),
-
-                        result.get(
-                            "length",
-                            "",
-                        ),
-
-                        result.get(
-                            "words",
-                            "",
-                        ),
-
-                        result.get(
-                            "lines",
-                            "",
-                        ),
-
-                        result.get(
-                            "content_type",
-                            "",
-                        ),
-
-                        result.get(
-                            "redirect",
-                            "",
-                        ),
-
-                    ]
-
-                )
-
-    success(
-        f"Saved {output}"
-    )
-
-    return output
 
 
 # ==========================================================
-# Export Interesting Results
+# Export Interesting
 # ==========================================================
 
 def export_interesting(
-    results: dict,
-    filename: str = "interesting.txt",
-):
+    analysis: dict[str, Any],
+) -> Path:
     """
     Export interesting findings.
     """
 
-    lines = []
+    results = analysis["results"]
+
+    lines: list[str] = []
 
     lines.append("=" * 80)
     lines.append("Interesting Findings")
     lines.append("=" * 80)
     lines.append("")
 
-    for target, data in results.items():
+    for target, target_analysis in results.items():
 
-        interesting = data.get(
+        interesting = target_analysis.get(
             "interesting",
             {},
         )
@@ -375,7 +358,7 @@ def export_interesting(
             for item in files:
 
                 lines.append(
-                    f"  [FILE] {item['url']}"
+                    f"  [FILE] {item.get('url', '')}"
                 )
 
         if directories:
@@ -388,13 +371,13 @@ def export_interesting(
             for item in directories:
 
                 lines.append(
-                    f"  [DIR ] {item['url']}"
+                    f"  [DIR ] {item.get('url', '')}"
                 )
 
         lines.append("")
 
     return write_text(
-        filename,
+        INTERESTING_FILE,
         lines,
     )
 
@@ -404,68 +387,38 @@ def export_interesting(
 # ==========================================================
 
 def export_summary(
-    results: dict,
-    filename: str = "summary.txt",
-):
+    analysis: dict[str, Any],
+) -> Path:
     """
     Export summary report.
     """
 
-    total_targets = len(results)
+    statistics = analysis["statistics"]
 
-    total_results = 0
+    lines = [
 
-    interesting_files = 0
+        "Directory Fuzzing Summary",
 
-    interesting_directories = 0
+        "=" * 40,
 
-    lines = []
+        f"Targets                  : {statistics['targets']}",
 
-    lines.append("=" * 80)
-    lines.append("Directory Fuzzing Summary")
-    lines.append("=" * 80)
-    lines.append("")
+        f"Successful               : {statistics['successful']}",
 
-    for data in results.values():
+        f"Failed                   : {statistics['failed']}",
 
-        statistics = data.get(
-            "statistics",
-            {},
-        )
+        f"Discovered Paths         : {statistics['total_results']}",
 
-        total_results += statistics.get(
-            "total_results",
-            0,
-        )
+        f"Interesting Files        : {statistics['interesting_files']}",
 
-        interesting_files += statistics.get(
-            "interesting_files",
-            0,
-        )
+        f"Interesting Directories  : {statistics['interesting_directories']}",
 
-        interesting_directories += statistics.get(
-            "interesting_directories",
-            0,
-        )
+        f"Elapsed Time             : {statistics['elapsed']} sec",
 
-    lines.append(
-        f"Targets                  : {total_targets}"
-    )
-
-    lines.append(
-        f"Discovered Paths         : {total_results}"
-    )
-
-    lines.append(
-        f"Interesting Files        : {interesting_files}"
-    )
-
-    lines.append(
-        f"Interesting Directories  : {interesting_directories}"
-    )
+    ]
 
     return write_text(
-        filename,
+        SUMMARY_FILE,
         lines,
     )
 
@@ -475,55 +428,34 @@ def export_summary(
 # ==========================================================
 
 def show_summary(
-    results: dict,
-    overall: dict,
-    failed: list,
-    elapsed: float,
-):
+    analysis: dict[str, Any],
+) -> None:
     """
     Display summary.
     """
 
+    statistics = analysis["statistics"]
+
+    failed = analysis.get(
+        "failed",
+        [],
+    )
+
     print()
 
     print("=" * 80)
-    print("Directory Fuzzing Summary")
+    print(
+        "Directory Fuzzing Summary".center(80)
+    )
     print("=" * 80)
 
-    print(
-        f"{'Targets':<25}"
-        f"{overall.get('targets',0)}"
-    )
-
-    print(
-        f"{'Successful':<25}"
-        f"{overall.get('successful',0)}"
-    )
-
-    print(
-        f"{'Failed':<25}"
-        f"{overall.get('failed',0)}"
-    )
-
-    print(
-        f"{'Discovered Paths':<25}"
-        f"{overall.get('total_results',0)}"
-    )
-
-    print(
-        f"{'Interesting Files':<25}"
-        f"{overall.get('interesting_files',0)}"
-    )
-
-    print(
-        f"{'Interesting Directories':<25}"
-        f"{overall.get('interesting_directories',0)}"
-    )
-
-    print(
-        f"{'Elapsed':<25}"
-        f"{elapsed:.2f} sec"
-    )
+    print(f"Targets                  : {statistics['targets']}")
+    print(f"Successful               : {statistics['successful']}")
+    print(f"Failed                   : {statistics['failed']}")
+    print(f"Discovered Paths         : {statistics['total_results']}")
+    print(f"Interesting Files        : {statistics['interesting_files']}")
+    print(f"Interesting Directories  : {statistics['interesting_directories']}")
+    print(f"Elapsed Time             : {statistics['elapsed']} sec")
 
     if failed:
 
@@ -545,34 +477,31 @@ def show_summary(
 # ==========================================================
 
 def export_all(
-    results: dict,
-):
+    analysis: dict[str, Any],
+) -> None:
     """
     Export all reports.
     """
 
-    files = {
+    create_output_directory()
 
-        "text": export_txt(
-            results
-        ),
+    export_json(analysis)
 
-        "json": export_json(
-            results
-        ),
+    export_txt(analysis)
 
-        "csv": export_csv(
-            results
-        ),
+    export_csv(analysis)
 
-        "interesting": export_interesting(
-            results
-        ),
+    export_interesting(analysis)
 
-        "summary": export_summary(
-            results
-        ),
+    export_summary(analysis)
 
-    }
+    show_summary(analysis)
 
-    return files
+
+# ==========================================================
+# Public Exports
+# ==========================================================
+
+__all__ = [
+    "export_all",
+]

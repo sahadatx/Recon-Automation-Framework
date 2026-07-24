@@ -1,17 +1,25 @@
 """
 Nuclei Exporter
-
-Exports Nuclei findings into
-multiple report formats.
 """
 
-import json
+from __future__ import annotations
+
 import csv
+import json
 
 from pathlib import Path
+from typing import Any
 
-from core.logger import (
-    success,
+from core.logger import success
+
+from .constants import (
+    CSV_FILE,
+    CRITICAL_FILE,
+    HIGH_FILE,
+    JSON_FILE,
+    OUTPUT_DIR,
+    SUMMARY_FILE,
+    TXT_FILE,
 )
 
 
@@ -19,91 +27,94 @@ from core.logger import (
 # Output Directory
 # ==========================================================
 
-OUTPUT_DIRECTORY = (
-
-    Path("output")
-
-    / "nuclei"
-
-)
-
-
-# ==========================================================
-# Create Output Directory
-# ==========================================================
-
-def ensure_output_directory():
+def create_output_directory() -> Path:
     """
     Create output directory.
-
-    Returns:
-        Path
     """
 
-    OUTPUT_DIRECTORY.mkdir(
-
+    OUTPUT_DIR.mkdir(
         parents=True,
-
         exist_ok=True,
-
     )
 
-    return OUTPUT_DIRECTORY
+    return OUTPUT_DIR
 
 
 # ==========================================================
-# Save Text
+# Write Helpers
 # ==========================================================
 
 def write_text(
-    filename: str,
+    path: Path,
     lines: list[str],
-):
+) -> Path:
     """
-    Save text report.
-
-    Args:
-        filename:
-            Output filename.
-
-        lines:
-            Text lines.
-
-    Returns:
-        Path
+    Write text file.
     """
 
-    output = (
+    create_output_directory()
 
-        ensure_output_directory()
-
-        / filename
-
+    path.write_text(
+        "\n".join(lines),
+        encoding="utf-8",
     )
 
-    with output.open(
+    success(f"Saved {path}")
 
+    return path
+
+
+def write_json(
+    path: Path,
+    data: dict[str, Any],
+) -> Path:
+    """
+    Write JSON file.
+    """
+
+    create_output_directory()
+
+    with path.open(
         "w",
-
         encoding="utf-8",
-
     ) as file:
 
-        file.write(
-
-            "\n".join(
-                lines
-            )
-
+        json.dump(
+            data,
+            file,
+            indent=4,
+            ensure_ascii=False,
+            sort_keys=True,
         )
 
-    success(
+    success(f"Saved {path}")
 
-        f"Saved {output}"
+    return path
 
-    )
 
-    return output
+def write_csv(
+    path: Path,
+    rows: list[list[Any]],
+) -> Path:
+    """
+    Write CSV file.
+    """
+
+    create_output_directory()
+
+    with path.open(
+        "w",
+        newline="",
+        encoding="utf-8",
+    ) as file:
+
+        writer = csv.writer(file)
+
+        writer.writerows(rows)
+
+    success(f"Saved {path}")
+
+    return path
 
 
 # ==========================================================
@@ -111,199 +122,103 @@ def write_text(
 # ==========================================================
 
 def export_txt(
-    findings: list,
-    statistics: dict,
-    filename: str = "results.txt",
-):
+    analysis: dict[str, Any],
+) -> Path:
     """
     Export TXT report.
-
-    Args:
-        findings:
-            Filtered findings.
-
-        statistics:
-            Generated statistics.
-
-        filename:
-            Output filename.
-
-    Returns:
-        Path
     """
+
+    results = analysis["results"]
+
+    statistics = analysis["statistics"]
 
     lines = []
 
+    lines.append("=" * 80)
+    lines.append("Nuclei Scan Report")
+    lines.append("=" * 80)
+    lines.append("")
+
+    lines.append("Summary")
+    lines.append("-" * 80)
+
     lines.append(
-
-        "=" * 80
-
+        f"Total Findings : {statistics['total_findings']}"
     )
 
     lines.append(
-
-        "Nuclei Scan Report"
-
+        f"Critical       : {statistics['critical']}"
     )
 
     lines.append(
+        f"High           : {statistics['high']}"
+    )
 
-        "=" * 80
+    lines.append(
+        f"Medium         : {statistics['medium']}"
+    )
 
+    lines.append(
+        f"Low            : {statistics['low']}"
+    )
+
+    lines.append(
+        f"Info           : {statistics['info']}"
     )
 
     lines.append("")
 
-    # ------------------------------------------------------
-    # Summary
-    # ------------------------------------------------------
+    lines.append("=" * 80)
+    lines.append("Findings")
+    lines.append("=" * 80)
 
-    lines.append(
-
-        "Summary"
-
-    )
-
-    lines.append(
-
-        "-" * 80
-
-    )
-
-    lines.append(
-
-        f"Total Findings : {statistics.get('total_findings', 0)}"
-
-    )
-
-    lines.append(
-
-        f"Critical       : {statistics.get('critical', 0)}"
-
-    )
-
-    lines.append(
-
-        f"High           : {statistics.get('high', 0)}"
-
-    )
-
-    lines.append(
-
-        f"Medium         : {statistics.get('medium', 0)}"
-
-    )
-
-    lines.append(
-
-        f"Low            : {statistics.get('low', 0)}"
-
-    )
-
-    lines.append(
-
-        f"Info           : {statistics.get('info', 0)}"
-
-    )
-
-    lines.append("")
-
-    lines.append(
-
-        "=" * 80
-
-    )
-
-    lines.append(
-
-        "Findings"
-
-    )
-
-    lines.append(
-
-        "=" * 80
-
-    )
-
-    # ------------------------------------------------------
-    # Findings
-    # ------------------------------------------------------
-
-    for finding in findings:
+    for finding in results:
 
         lines.append(
-
             f"[{finding['severity'].upper()}]"
-
         )
 
         lines.append(
-
-            f"URL          : {finding['url']}"
-
+            f"Target       : {finding.get('target', '')}"
         )
 
         lines.append(
-
-            f"Template     : {finding['template_name']}"
-
+            f"URL          : {finding.get('url', '')}"
         )
 
         lines.append(
-
-            f"Template ID  : {finding['template_id']}"
-
+            f"Template     : {finding.get('template_name', '')}"
         )
 
         lines.append(
-
-            f"Protocol     : {finding['protocol']}"
-
+            f"Template ID  : {finding.get('template_id', '')}"
         )
 
         lines.append(
-
-            f"Matcher      : {finding['matcher']}"
-
+            f"Protocol     : {finding.get('protocol', '')}"
         )
 
-        if finding.get(
+        lines.append(
+            f"Matcher      : {finding.get('matcher', '')}"
+        )
 
-            "description"
-
-        ):
+        if finding.get("description"):
 
             lines.append(
-
                 f"Description  : {finding['description']}"
-
             )
 
-        if finding.get(
-
-            "tags"
-
-        ):
+        if finding.get("tags"):
 
             lines.append(
-
                 f"Tags         : {', '.join(finding['tags'])}"
-
             )
 
-        lines.append(
-
-            "-" * 80
-
-        )
+        lines.append("-" * 80)
 
     return write_text(
-
-        filename,
-
+        TXT_FILE,
         lines,
-
     )
 
 
@@ -312,70 +227,16 @@ def export_txt(
 # ==========================================================
 
 def export_json(
-    findings: list,
-    statistics: dict,
-    filename: str = "results.json",
-):
+    analysis: dict[str, Any],
+) -> Path:
     """
     Export JSON report.
-
-    Args:
-        findings:
-            Filtered findings.
-
-        statistics:
-            Scan statistics.
-
-        filename:
-            Output filename.
-
-    Returns:
-        Path
     """
 
-    output = (
-
-        ensure_output_directory()
-
-        / filename
-
+    return write_json(
+        JSON_FILE,
+        analysis,
     )
-
-    data = {
-
-        "findings": findings,
-
-        "statistics": statistics,
-
-    }
-
-    with output.open(
-
-        "w",
-
-        encoding="utf-8",
-
-    ) as file:
-
-        json.dump(
-
-            data,
-
-            file,
-
-            indent=4,
-
-            sort_keys=True,
-
-        )
-
-    success(
-
-        f"Saved {output}"
-
-    )
-
-    return output
 
 
 # ==========================================================
@@ -383,282 +244,138 @@ def export_json(
 # ==========================================================
 
 def export_csv(
-    findings: list,
-    filename: str = "results.csv",
-):
+    analysis: dict[str, Any],
+) -> Path:
     """
     Export CSV report.
-
-    Args:
-        findings:
-            Filtered findings.
-
-        filename:
-            Output filename.
-
-    Returns:
-        Path
     """
 
-    output = (
+    results = analysis["results"]
 
-        ensure_output_directory()
+    rows: list[list[Any]] = [[
+        "Severity",
+        "Target",
+        "URL",
+        "Template ID",
+        "Template Name",
+        "Protocol",
+        "Matcher",
+        "Tags",
+    ]]
 
-        / filename
+    for finding in results:
 
-    )
-
-    with output.open(
-
-        "w",
-
-        newline="",
-
-        encoding="utf-8",
-
-    ) as file:
-
-        writer = csv.writer(
-            file
-        )
-
-        writer.writerow([
-
-            "Severity",
-
-            "URL",
-
-            "Template ID",
-
-            "Template Name",
-
-            "Protocol",
-
-            "Matcher",
-
-            "Tags",
-
+        rows.append([
+            finding.get("severity", ""),
+            finding.get("target", ""),
+            finding.get("url", ""),
+            finding.get("template_id", ""),
+            finding.get("template_name", ""),
+            finding.get("protocol", ""),
+            finding.get("matcher", ""),
+            ", ".join(
+                finding.get(
+                    "tags",
+                    [],
+                )
+            ),
         ])
 
-        for finding in findings:
-
-            writer.writerow([
-
-                finding.get(
-                    "severity",
-                    "",
-                ),
-
-                finding.get(
-                    "url",
-                    "",
-                ),
-
-                finding.get(
-                    "template_id",
-                    "",
-                ),
-
-                finding.get(
-                    "template_name",
-                    "",
-                ),
-
-                finding.get(
-                    "protocol",
-                    "",
-                ),
-
-                finding.get(
-                    "matcher",
-                    "",
-                ),
-
-                ", ".join(
-
-                    finding.get(
-
-                        "tags",
-
-                        [],
-
-                    )
-
-                ),
-
-            ])
-
-    success(
-
-        f"Saved {output}"
-
+    return write_csv(
+        CSV_FILE,
+        rows,
     )
 
-    return output
-
 
 # ==========================================================
-# Export Markdown
+# Export High
 # ==========================================================
 
-def export_markdown(
-    findings: list,
-    statistics: dict,
-    filename: str = "results.md",
-):
+def export_high(
+    analysis: dict[str, Any],
+) -> Path:
     """
-    Export Markdown report.
-
-    Args:
-        findings:
-            Filtered findings.
-
-        statistics:
-            Scan statistics.
-
-        filename:
-            Output filename.
-
-    Returns:
-        Path
+    Export high findings.
     """
+
+    results = analysis["results"]
 
     lines = []
 
-    lines.append(
+    for finding in results:
 
-        "# Nuclei Scan Report"
-
-    )
-
-    lines.append("")
-
-    lines.append(
-
-        "## Summary"
-
-    )
-
-    lines.append("")
-
-    lines.append(
-
-        f"- **Total Findings:** {statistics.get('total_findings', 0)}"
-
-    )
-
-    lines.append(
-
-        f"- **Critical:** {statistics.get('critical', 0)}"
-
-    )
-
-    lines.append(
-
-        f"- **High:** {statistics.get('high', 0)}"
-
-    )
-
-    lines.append(
-
-        f"- **Medium:** {statistics.get('medium', 0)}"
-
-    )
-
-    lines.append(
-
-        f"- **Low:** {statistics.get('low', 0)}"
-
-    )
-
-    lines.append(
-
-        f"- **Info:** {statistics.get('info', 0)}"
-
-    )
-
-    lines.append("")
-
-    lines.append(
-
-        "## Findings"
-
-    )
-
-    lines.append("")
-
-    for finding in findings:
+        if finding.get("severity") != "high":
+            continue
 
         lines.append(
-
-            f"### {finding['template_name']}"
-
+            finding.get("url", "")
         )
-
-        lines.append("")
-
-        lines.append(
-
-            f"- **Severity:** {finding['severity']}"
-
-        )
-
-        lines.append(
-
-            f"- **URL:** {finding['url']}"
-
-        )
-
-        lines.append(
-
-            f"- **Template ID:** {finding['template_id']}"
-
-        )
-
-        lines.append(
-
-            f"- **Protocol:** {finding['protocol']}"
-
-        )
-
-        lines.append(
-
-            f"- **Matcher:** {finding['matcher']}"
-
-        )
-
-        if finding.get(
-
-            "description"
-
-        ):
-
-            lines.append(
-
-                f"- **Description:** {finding['description']}"
-
-            )
-
-        if finding.get(
-
-            "tags"
-
-        ):
-
-            lines.append(
-
-                f"- **Tags:** {', '.join(finding['tags'])}"
-
-            )
-
-        lines.append("")
 
     return write_text(
-
-        filename,
-
+        HIGH_FILE,
         lines,
+    )
 
+
+# ==========================================================
+# Export Critical
+# ==========================================================
+
+def export_critical(
+    analysis: dict[str, Any],
+) -> Path:
+    """
+    Export critical findings.
+    """
+
+    results = analysis["results"]
+
+    lines = []
+
+    for finding in results:
+
+        if finding.get("severity") != "critical":
+            continue
+
+        lines.append(
+            finding.get("url", "")
+        )
+
+    return write_text(
+        CRITICAL_FILE,
+        lines,
+    )
+
+
+# ==========================================================
+# Export Summary
+# ==========================================================
+
+def export_summary(
+    analysis: dict[str, Any],
+) -> Path:
+    """
+    Export summary.
+    """
+
+    statistics = analysis["statistics"]
+
+    lines = [
+        "Nuclei Summary",
+        "=" * 60,
+        f"Targets         : {statistics.get('total_targets', 0)}",
+        f"Findings        : {statistics.get('total_findings', 0)}",
+        f"Critical        : {statistics.get('critical', 0)}",
+        f"High            : {statistics.get('high', 0)}",
+        f"Medium          : {statistics.get('medium', 0)}",
+        f"Low             : {statistics.get('low', 0)}",
+        f"Info            : {statistics.get('info', 0)}",
+        f"Elapsed         : {statistics.get('elapsed', 0):.2f} sec",
+    ]
+
+    return write_text(
+        SUMMARY_FILE,
+        lines,
     )
 
 
@@ -667,67 +384,61 @@ def export_markdown(
 # ==========================================================
 
 def show_summary(
-    statistics: dict,
-):
+    analysis: dict[str, Any],
+) -> None:
     """
-    Display scan summary.
+    Display summary.
+    """
 
-    Args:
-        statistics:
-            Generated statistics.
-    """
+    statistics = analysis["statistics"]
 
     print()
 
-    print("=" * 80)
+    print("=" * 60)
+    print("Nuclei Scan Summary")
+    print("=" * 60)
 
     print(
-        "Nuclei Scan Summary"
+        f"{'Targets':<25}"
+        f"{statistics.get('total_targets', 0)}"
     )
 
-    print("=" * 80)
-
     print(
-        f"{'Total Findings':<30}"
+        f"{'Findings':<25}"
         f"{statistics.get('total_findings', 0)}"
     )
 
     print(
-        f"{'Critical':<30}"
+        f"{'Critical':<25}"
         f"{statistics.get('critical', 0)}"
     )
 
     print(
-        f"{'High':<30}"
+        f"{'High':<25}"
         f"{statistics.get('high', 0)}"
     )
 
     print(
-        f"{'Medium':<30}"
+        f"{'Medium':<25}"
         f"{statistics.get('medium', 0)}"
     )
 
     print(
-        f"{'Low':<30}"
+        f"{'Low':<25}"
         f"{statistics.get('low', 0)}"
     )
 
     print(
-        f"{'Info':<30}"
+        f"{'Info':<25}"
         f"{statistics.get('info', 0)}"
     )
 
     print(
-        f"{'Unique Templates':<30}"
-        f"{statistics.get('unique_templates', 0)}"
+        f"{'Elapsed':<25}"
+        f"{statistics.get('elapsed', 0):.2f} sec"
     )
 
-    print(
-        f"{'Unique Targets':<30}"
-        f"{statistics.get('unique_targets', 0)}"
-    )
-
-    print("=" * 80)
+    print("=" * 60)
 
 
 # ==========================================================
@@ -735,124 +446,32 @@ def show_summary(
 # ==========================================================
 
 def export_all(
-    findings: list,
-    statistics: dict,
-):
+    analysis: dict[str, Any],
+) -> dict[str, Path]:
     """
-    Export all report formats.
-
-    Args:
-        findings:
-            Filtered findings.
-
-        statistics:
-            Generated statistics.
-
-    Returns:
-        dict
+    Export all reports.
     """
 
     files = {
-
-        "text": export_txt(
-
-            findings,
-
-            statistics,
-
-        ),
-
-        "json": export_json(
-
-            findings,
-
-            statistics,
-
-        ),
-
-        "csv": export_csv(
-
-            findings,
-
-        ),
-
-        "markdown": export_markdown(
-
-            findings,
-
-            statistics,
-
-        ),
-
+        "txt": export_txt(analysis),
+        "json": export_json(analysis),
+        "csv": export_csv(analysis),
+        "summary": export_summary(analysis),
+        "high": export_high(analysis),
+        "critical": export_critical(analysis),
     }
 
     show_summary(
-        statistics
+        analysis,
     )
 
     return files
 
 
 # ==========================================================
-# Self Test
+# Exports
 # ==========================================================
 
-if __name__ == "__main__":
-
-    sample = [
-
-        {
-
-            "severity": "high",
-
-            "url": "https://example.com/.git/config",
-
-            "template_id": "git-config",
-
-            "template_name": "Git Config Disclosure",
-
-            "protocol": "http",
-
-            "matcher": "word",
-
-            "description": "Exposed Git configuration.",
-
-            "tags": [
-
-                "git",
-
-                "exposure",
-
-            ],
-
-        }
-
-    ]
-
-    statistics = {
-
-        "total_findings": 1,
-
-        "critical": 0,
-
-        "high": 1,
-
-        "medium": 0,
-
-        "low": 0,
-
-        "info": 0,
-
-        "unique_templates": 1,
-
-        "unique_targets": 1,
-
-    }
-
-    export_all(
-
-        sample,
-
-        statistics,
-
-    )
+__all__ = [
+    "export_all",
+]

@@ -1,9 +1,12 @@
 """
 Directory Fuzzing Manager
 
-Coordinates parallel directory fuzzing,
-parsing, filtering and reporting.
+Coordinates parallel directory
+fuzzing, parsing, analysis
+and reporting.
 """
+
+from __future__ import annotations
 
 import time
 
@@ -12,23 +15,21 @@ from concurrent.futures import (
     as_completed,
 )
 
+from typing import Any
+
 from config.config import (
     MAX_WORKERS,
 )
 
 from core.logger import (
     info,
+    success,
     warning,
     progress_status,
 )
 
-from modules.fuzzing.scanner import (
-    scan_target,
-    cleanup,
-)
-
-from modules.fuzzing.parser import (
-    parse_ffuf,
+from modules.fuzzing.analyzer import (
+    analyze,
 )
 
 from modules.fuzzing.filters import (
@@ -39,30 +40,43 @@ from modules.fuzzing.interesting import (
     scan as detect_interesting,
 )
 
-from modules.fuzzing.statistics import (
-    generate,
+from modules.fuzzing.parser import (
+    parse_ffuf,
+)
+
+from modules.fuzzing.scanner import (
+    cleanup,
+    scan_target,
 )
 
 
 # ==========================================================
-# Process One Target
+# Process Target
 # ==========================================================
 
 def process_target(
     target: str,
-):
+) -> tuple[
+    str,
+    dict[str, Any] | None,
+]:
     """
-    Scan and analyze one target.
+    Scan and analyze
+    one target.
+
+    Args:
+        target:
+            Target URL.
 
     Returns:
-        tuple(
+        (
             target,
-            result | None,
+            analysis,
         )
     """
 
     scan = scan_target(
-        target
+        target,
     )
 
     if not scan["success"]:
@@ -77,27 +91,15 @@ def process_target(
     try:
 
         parsed = parse_ffuf(
-            output
+            output,
         )
 
         if parsed is None:
-
-            print("[DEBUG] Parser returned None")
 
             return (
                 target,
                 None,
             )
-
-        print(
-            "[DEBUG] Raw Results:",
-            len(
-                parsed.get(
-                    "results",
-                    [],
-                )
-            )
-        )
 
         results = apply_filters(
 
@@ -108,45 +110,26 @@ def process_target(
 
         )
 
-        print(
-
-            "[DEBUG] Filtered Results:",
-
-            len(results)
-
-        )
-
         interesting = detect_interesting(
-            results
+            results,
         )
 
-        statistics = generate(
-
-            results,
-
-            interesting,
-
+        analysis = analyze(
+            results=results,
+            interesting=interesting,
+            elapsed=0,
         )
 
         return (
-
             target,
-
-            {
-
-                "results": results,
-
-                "interesting": interesting,
-
-                "statistics": statistics,
-
-            },
-
+            analysis,
         )
 
     finally:
 
-        pass
+        cleanup(
+            output,
+        )
 
 
 # ==========================================================
@@ -155,18 +138,17 @@ def process_target(
 
 def run_fuzzing(
     targets: list[str],
-):
+) -> dict[str, Any]:
     """
-    Run directory fuzzing against
-    multiple targets.
+    Run directory
+    fuzzing.
+
+    Args:
+        targets:
+            Target URLs.
 
     Returns:
-        (
-            results,
-            overall,
-            failed,
-            elapsed,
-        )
+        Analysis dictionary.
     """
 
     info(
@@ -174,17 +156,20 @@ def run_fuzzing(
     )
 
     targets = sorted(
-        set(targets)
+        set(targets),
     )
 
-    results = {}
+    results: dict[
+        str,
+        dict[str, Any],
+    ] = {}
 
-    failed = []
+    failed: list[str] = []
 
     completed = 0
 
     total = len(
-        targets
+        targets,
     )
 
     start_time = time.perf_counter()
@@ -205,7 +190,7 @@ def run_fuzzing(
         }
 
         for future in as_completed(
-            futures
+            futures,
         ):
 
             target = futures[
@@ -216,40 +201,32 @@ def run_fuzzing(
 
             try:
 
-                hostname, data = (
+                hostname, analysis = (
                     future.result()
                 )
 
-                if data:
+                if analysis:
 
                     results[
                         hostname
-                    ] = data
+                    ] = analysis
 
                     progress_status(
-
                         completed,
-
                         total,
-
                         f"✓ {hostname}",
-
                     )
 
                 else:
 
                     failed.append(
-                        hostname
+                        hostname,
                     )
 
                     progress_status(
-
                         completed,
-
                         total,
-
                         f"✗ {hostname}",
-
                     )
 
             except Exception as error:
@@ -259,44 +236,35 @@ def run_fuzzing(
                 )
 
                 failed.append(
-                    target
+                    target,
                 )
 
                 progress_status(
-
                     completed,
-
                     total,
-
                     f"✗ {target}",
-
                 )
 
     elapsed = round(
-
         time.perf_counter()
-
         - start_time,
-
         2,
-
     )
 
-
-    # ------------------------------------------------------
+    # ======================================================
     # Overall Statistics
-    # ------------------------------------------------------
+    # ======================================================
 
-    overall = {
+    overall: dict[str, Any] = {
 
         "targets": total,
 
         "successful": len(
-            results
+            results,
         ),
 
         "failed": len(
-            failed
+            failed,
         ),
 
         "total_results": 0,
@@ -307,44 +275,31 @@ def run_fuzzing(
 
     }
 
-    for data in results.values():
+    for analysis in results.values():
 
-        stats = data.get(
+        statistics = analysis.get(
             "statistics",
             {},
         )
 
-        overall["total_results"] += stats.get(
-
+        overall["total_results"] += statistics.get(
             "total_results",
-
             0,
-
         )
 
-        overall["interesting_files"] += stats.get(
-
+        overall["interesting_files"] += statistics.get(
             "interesting_files",
-
             0,
-
         )
 
-        overall["interesting_directories"] += stats.get(
-
+        overall["interesting_directories"] += statistics.get(
             "interesting_directories",
-
             0,
-
         )
 
-    # ------------------------------------------------------
+    # ======================================================
     # Summary
-    # ------------------------------------------------------
-
-    from core.logger import (
-        success,
-    )
+    # ======================================================
 
     success(
         f"Targets                  : {overall['targets']}"
@@ -374,18 +329,33 @@ def run_fuzzing(
         f"Elapsed                  : {elapsed:.2f} sec"
     )
 
-    # ------------------------------------------------------
-    # Return
-    # ------------------------------------------------------
+    # ======================================================
+    # Analysis
+    # ======================================================
 
-    return (
+    analysis = {
 
-        results,
+        "results": results,
 
-        overall,
+        "statistics": {
 
-        failed,
+            **overall,
 
-        elapsed,
+            "elapsed": elapsed,
 
-    )
+        },
+
+        "failed": failed,
+
+    }
+
+    return analysis
+
+
+# ==========================================================
+# Public Exports
+# ==========================================================
+
+__all__ = [
+    "run_fuzzing",
+]

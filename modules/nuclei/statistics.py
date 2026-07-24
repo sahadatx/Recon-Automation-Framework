@@ -5,35 +5,71 @@ Generates statistics from
 Nuclei findings.
 """
 
+from __future__ import annotations
+
 from collections import Counter
+
+from .constants import (
+    CRITICAL,
+    HIGH,
+    MEDIUM,
+    LOW,
+    INFO,
+    UNKNOWN,
+)
+
+
+# ==========================================================
+# Empty Statistics
+# ==========================================================
+
+def empty_statistics() -> dict:
+    """
+    Return empty statistics.
+    """
+
+    return {
+        "total_targets": 0,
+        "total_findings": 0,
+        "critical": 0,
+        "high": 0,
+        "medium": 0,
+        "low": 0,
+        "info": 0,
+        "unknown": 0,
+        "severity_statistics": {},
+        "template_statistics": {},
+        "target_statistics": {},
+        "protocol_statistics": {},
+        "tag_statistics": {},
+        "unique_templates": 0,
+        "unique_targets": 0,
+        "top_templates": [],
+        "top_targets": [],
+        "top_tags": [],
+        "cve_count": 0,
+        "average_findings_per_target": 0,
+    }
 
 
 # ==========================================================
 # Generate Statistics
 # ==========================================================
 
-def generate(
-    findings: list,
-):
+def generate_statistics(
+    findings: list[dict],
+) -> dict:
     """
-    Generate scan statistics.
-
-    Args:
-        findings:
-            Normalized findings.
-
-    Returns:
-        dict
+    Generate statistics from findings.
     """
+
+    if not findings:
+        return empty_statistics()
 
     severity = Counter()
-
     templates = Counter()
-
     targets = Counter()
-
     tags = Counter()
-
     protocols = Counter()
 
     cves = 0
@@ -42,7 +78,7 @@ def generate(
 
         sev = finding.get(
             "severity",
-            "info",
+            INFO,
         ).lower()
 
         severity[sev] += 1
@@ -53,10 +89,7 @@ def generate(
         )
 
         if template:
-
-            templates[
-                template
-            ] += 1
+            templates[template] += 1
 
         target = finding.get(
             "target",
@@ -64,10 +97,7 @@ def generate(
         )
 
         if target:
-
-            targets[
-                target
-            ] += 1
+            targets[target] += 1
 
         protocol = finding.get(
             "protocol",
@@ -75,187 +105,99 @@ def generate(
         )
 
         if protocol:
-
-            protocols[
-                protocol
-            ] += 1
+            protocols[protocol] += 1
 
         for tag in finding.get(
             "tags",
             [],
         ):
-
             tags[tag] += 1
 
         cves += len(
-
             finding.get(
-
                 "cves",
-
                 [],
-
             )
-
         )
 
-    total = len(
-        findings
-    )
+    total = len(findings)
 
     average = (
-
         round(
-
             total / len(targets),
-
             2,
-
         )
-
         if targets
-
         else 0
-
     )
 
     return {
-
+        "total_targets": len(targets),
         "total_findings": total,
-
         "critical": severity.get(
-            "critical",
+            CRITICAL,
             0,
         ),
-
         "high": severity.get(
-            "high",
+            HIGH,
             0,
         ),
-
         "medium": severity.get(
-            "medium",
+            MEDIUM,
             0,
         ),
-
         "low": severity.get(
-            "low",
+            LOW,
             0,
         ),
-
         "info": severity.get(
-            "info",
+            INFO,
             0,
         ),
-
         "unknown": severity.get(
-            "unknown",
+            UNKNOWN,
             0,
         ),
-
-        "severity_distribution": dict(
+        "severity_statistics": dict(
             severity
         ),
-
-        "templates": dict(
+        "template_statistics": dict(
             templates
         ),
-
-        "targets": dict(
+        "target_statistics": dict(
             targets
         ),
-
-        "tags": dict(
-            tags
-        ),
-
-        "protocols": dict(
+        "protocol_statistics": dict(
             protocols
         ),
-
+        "tag_statistics": dict(
+            tags
+        ),
         "unique_templates": len(
             templates
         ),
-
         "unique_targets": len(
             targets
         ),
-
-        "top_templates":
-
-            templates.most_common(
-                10
-            ),
-
-        "top_targets":
-
-            targets.most_common(
-                10
-            ),
-
-        "top_tags":
-
-            tags.most_common(
-                10
-            ),
-
+        "top_templates": templates.most_common(
+            10
+        ),
+        "top_targets": targets.most_common(
+            10
+        ),
+        "top_tags": tags.most_common(
+            10
+        ),
         "cve_count": cves,
-
-        "average_findings_per_target":
-
-            average,
-
+        "average_findings_per_target": average,
     }
 
 
 # ==========================================================
-# Self Test
+# Public Exports
 # ==========================================================
 
-if __name__ == "__main__":
-
-    sample = [
-
-        {
-
-            "target":
-
-                "https://example.com",
-
-            "severity":
-
-                "high",
-
-            "template_id":
-
-                "git-config",
-
-            "protocol":
-
-                "http",
-
-            "tags":
-
-                [
-
-                    "git",
-
-                    "exposure",
-
-                ],
-
-            "cves": [],
-
-        }
-
-    ]
-
-    from pprint import pprint
-
-    pprint(
-
-        generate(
-            sample
-        )
-
-    )
+__all__ = [
+    "empty_statistics",
+    "generate_statistics",
+]

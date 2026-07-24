@@ -6,6 +6,8 @@ Analyze crawler results and generate a summary.
 
 from __future__ import annotations
 
+from typing import Any
+
 from modules.crawler.statistics import (
     generate_statistics,
 )
@@ -16,9 +18,9 @@ from modules.crawler.statistics import (
 # ==========================================================
 
 def analyze(
-    results: dict[str, dict],
+    results: dict[str, dict[str, Any]],
     elapsed: float,
-) -> dict:
+) -> dict[str, Any]:
     """
     Analyze crawler results.
 
@@ -30,24 +32,16 @@ def analyze(
             Total crawl time.
 
     Returns:
-        Complete crawler analysis.
+        Crawler analysis.
     """
 
     statistics = generate_statistics(
         results=results,
     )
 
+    statistics["elapsed"] = elapsed
+
     return {
-
-        "hosts": statistics[
-            "hosts"
-        ],
-
-        "total_urls": statistics[
-            "total_urls"
-        ],
-
-        "scan_time": elapsed,
 
         "results": results,
 

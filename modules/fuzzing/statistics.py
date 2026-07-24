@@ -1,9 +1,36 @@
 """
 Directory Fuzzing Statistics
 
-Generates statistics for
-directory fuzzing results.
+Generate statistics for
+Directory Fuzzing results.
 """
+
+from __future__ import annotations
+
+from typing import Any
+
+
+# ==========================================================
+# Empty Statistics
+# ==========================================================
+
+def empty_statistics() -> dict[str, Any]:
+    """
+    Return empty statistics.
+    """
+
+    return {
+        "total_results": 0,
+        "status_codes": {},
+        "responses": {
+            "minimum": 0,
+            "maximum": 0,
+            "average": 0,
+        },
+        "interesting_files": 0,
+        "interesting_directories": 0,
+        "interesting_total": 0,
+    }
 
 
 # ==========================================================
@@ -11,72 +38,52 @@ directory fuzzing results.
 # ==========================================================
 
 def status_statistics(
-    results: list,
-):
+    results: list[dict[str, Any]],
+) -> dict[str, int]:
     """
     Count HTTP status codes.
-
-    Returns:
-        dict
     """
 
-    statistics = {}
+    statistics: dict[str, int] = {}
 
     for result in results:
 
         status = str(
-
             result.get(
                 "status",
                 0,
             )
-
         )
 
         statistics[status] = (
-
-            statistics.get(
-                status,
-                0,
-            )
-
+            statistics.get(status, 0)
             + 1
-
         )
 
     return dict(
-
         sorted(
-            statistics.items()
+            statistics.items(),
         )
-
     )
 
 
 # ==========================================================
-# Response Size Statistics
+# Response Statistics
 # ==========================================================
 
 def response_statistics(
-    results: list,
-):
+    results: list[dict[str, Any]],
+) -> dict[str, float]:
     """
-    Generate response statistics.
-
-    Returns:
-        dict
+    Generate response size statistics.
     """
 
     if not results:
 
         return {
-
             "minimum": 0,
-
             "maximum": 0,
-
             "average": 0,
-
         }
 
     sizes = [
@@ -92,22 +99,14 @@ def response_statistics(
 
     return {
 
-        "minimum": min(
-            sizes
-        ),
+        "minimum": min(sizes),
 
-        "maximum": max(
-            sizes
-        ),
+        "maximum": max(sizes),
 
         "average": round(
-
             sum(sizes)
-
             / len(sizes),
-
             2,
-
         ),
 
     }
@@ -118,91 +117,51 @@ def response_statistics(
 # ==========================================================
 
 def generate_statistics(
-    results: list,
-    interesting: dict,
-):
+    results: list[dict[str, Any]],
+    interesting: dict[str, Any],
+) -> dict[str, Any]:
     """
-    Generate overall statistics.
-
-    Returns:
-        dict
+    Generate Directory
+    Fuzzing statistics.
     """
 
-    interesting_stats = interesting.get(
+    statistics = empty_statistics()
 
+    interesting_statistics = interesting.get(
         "statistics",
-
         {},
-
     )
 
-    return {
+    statistics.update(
+        {
+            "total_results": len(results),
+            "status_codes": status_statistics(results),
+            "responses": response_statistics(results),
+            "interesting_files": interesting_statistics.get(
+                "interesting_files",
+                0,
+            ),
+            "interesting_directories": interesting_statistics.get(
+                "interesting_directories",
+                0,
+            ),
+            "interesting_total": interesting_statistics.get(
+                "total",
+                0,
+            ),
+        }
+    )
 
-        "total_results": len(
-            results
-        ),
-
-        "status_codes": status_statistics(
-            results
-        ),
-
-        "responses": response_statistics(
-            results
-        ),
-
-        "interesting_files": interesting_stats.get(
-
-            "interesting_files",
-
-            0,
-
-        ),
-
-        "interesting_directories": interesting_stats.get(
-
-            "interesting_directories",
-
-            0,
-
-        ),
-
-        "interesting_total": interesting_stats.get(
-
-            "total",
-
-            0,
-
-        ),
-
-    }
+    return statistics
 
 
 # ==========================================================
-# Entry Point
+# Public Exports
 # ==========================================================
 
-def generate(
-    results: list,
-    interesting: dict,
-):
-    """
-    Entry point.
-
-    Args:
-        results:
-            Filtered ffuf results.
-
-        interesting:
-            Interesting findings.
-
-    Returns:
-        dict
-    """
-
-    return generate_statistics(
-
-        results,
-
-        interesting,
-
-    )
+__all__ = [
+    "empty_statistics",
+    "status_statistics",
+    "response_statistics",
+    "generate_statistics",
+]

@@ -6,6 +6,8 @@ Analyze technology detection results.
 
 from __future__ import annotations
 
+from typing import Any
+
 from modules.tech.statistics import (
     generate_statistics,
 )
@@ -16,50 +18,56 @@ from modules.tech.statistics import (
 # ==========================================================
 
 def analyze(
-    results: dict,
+    results: dict[str, dict[str, Any]],
     failed_hosts: list[str],
     elapsed: float,
-) -> dict:
+) -> dict[str, Any]:
     """
     Analyze technology detection results.
 
     Args:
-        results: Successful detection results.
-        failed_hosts: Failed hosts.
-        elapsed: Total execution time.
+        results:
+            Successful detection results.
+
+        failed_hosts:
+            Failed hosts.
+
+        elapsed:
+            Total execution time.
 
     Returns:
-        Analysis dictionary.
+        Technology detection analysis.
     """
 
-    statistics = generate_statistics(
-        results=results,
-        failed_hosts=failed_hosts,
-    )
-
-    technologies = sorted(
-        {
-            technology
-            for data in results.values()
-            for technology in data.get(
-                "technologies",
-                [],
-            )
-        }
-    )
-
-    return {
+    statistics = {
+        **generate_statistics(
+            results=results,
+            failed_hosts=failed_hosts,
+        ),
         "hosts_analyzed": (
             len(results)
             + len(failed_hosts)
         ),
-        "failed_hosts": len(
-            failed_hosts
+        "failed_hosts": len(failed_hosts),
+        "technologies": sorted(
+            {
+                technology
+                for data in results.values()
+                for technology in data.get(
+                    "technologies",
+                    [],
+                )
+            }
         ),
-        "scan_time": elapsed,
+        "elapsed": elapsed,
+    }
+
+    return {
+
         "results": results,
+
         "statistics": statistics,
-        "technologies": technologies,
+
     }
 
 

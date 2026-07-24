@@ -5,13 +5,17 @@ Generate summary statistics
 for Virtual Host Discovery.
 """
 
+from __future__ import annotations
+
+from typing import Any
+
 
 # ==========================================================
-# Count Status Codes
+# Count Status Code
 # ==========================================================
 
 def count_status(
-    results: list,
+    results: list[dict[str, Any]],
     status: int,
 ) -> int:
     """
@@ -19,13 +23,13 @@ def count_status(
 
     Args:
         results:
-            Parsed results.
+            Virtual host results.
 
         status:
             HTTP status code.
 
     Returns:
-        int
+        Number of matching responses.
     """
 
     return sum(
@@ -35,11 +39,8 @@ def count_status(
         for result in results
 
         if result.get(
-
             "status",
-
             0,
-
         ) == status
 
     )
@@ -49,92 +50,63 @@ def count_status(
 # Generate Statistics
 # ==========================================================
 
-def generate(
-    results: list,
-    interesting: list,
-) -> dict:
+def generate_statistics(
+    results: list[dict[str, Any]],
+    interesting: list[dict[str, Any]],
+) -> dict[str, Any]:
     """
-    Generate summary statistics.
+    Generate Virtual Host Discovery statistics.
 
     Args:
         results:
-            Filtered results.
+            Discovered virtual hosts.
 
         interesting:
-            Interesting hosts.
+            Interesting virtual hosts.
 
     Returns:
-        dict
+        Summary statistics.
     """
 
     return {
 
-        "total_results": len(
+        "total_results": len(results),
 
-            results
-
-        ),
-
-        "interesting_hosts": len(
-
-            interesting
-
-        ),
+        "interesting_hosts": len(interesting),
 
         "status_200": count_status(
-
             results,
-
             200,
-
         ),
 
         "status_204": count_status(
-
             results,
-
             204,
-
         ),
 
         "status_301": count_status(
-
             results,
-
             301,
-
         ),
 
         "status_302": count_status(
-
             results,
-
             302,
-
         ),
 
         "status_307": count_status(
-
             results,
-
             307,
-
         ),
 
         "status_401": count_status(
-
             results,
-
             401,
-
         ),
 
         "status_403": count_status(
-
             results,
-
             403,
-
         ),
 
     }
@@ -144,12 +116,12 @@ def generate(
 # Empty Statistics
 # ==========================================================
 
-def empty() -> dict:
+def empty_statistics() -> dict[str, Any]:
     """
-    Return empty statistics.
+    Return empty Virtual Host Discovery statistics.
 
     Returns:
-        dict
+        Empty statistics dictionary.
     """
 
     return {
@@ -173,3 +145,13 @@ def empty() -> dict:
         "status_403": 0,
 
     }
+
+
+# ==========================================================
+# Public Exports
+# ==========================================================
+
+__all__ = [
+    "generate_statistics",
+    "empty_statistics",
+]

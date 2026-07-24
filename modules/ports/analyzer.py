@@ -6,6 +6,8 @@ Analyze port scan results.
 
 from __future__ import annotations
 
+from typing import Any
+
 from modules.ports.statistics import (
     generate_statistics,
 )
@@ -16,49 +18,44 @@ from modules.ports.statistics import (
 # ==========================================================
 
 def analyze(
-    results: dict,
+    results: dict[str, dict[str, Any]],
     failed_hosts: list[str],
     elapsed: float,
-) -> dict:
+) -> dict[str, Any]:
     """
     Analyze port scan results.
 
     Args:
-        results: Successful scan results.
-        failed_hosts: Hosts without open ports.
-        elapsed: Total scan time.
+        results:
+            Successful scan results.
+
+        failed_hosts:
+            Hosts without open ports.
+
+        elapsed:
+            Total scan time.
 
     Returns:
-        Analysis dictionary.
+        Port scan analysis.
     """
 
-    statistics = generate_statistics(
-        results=results,
-        failed_hosts=failed_hosts,
-    )
-
-    return {
-        "hosts_scanned": (
-            len(results)
-            + len(failed_hosts)
+    statistics = {
+        **generate_statistics(
+            results=results,
+            failed_hosts=failed_hosts,
         ),
-        "hosts_with_open_ports": len(
-            results
-        ),
-        "hosts_without_open_ports": len(
-            failed_hosts
-        ),
-        "scan_time": elapsed,
-        "results": results,
-        "statistics": statistics,
-        "open_hosts": sorted(
-            results.keys()
-        ),
-        "closed_hosts": sorted(
-            failed_hosts
-        ),
+        "open_hosts": sorted(results),
+        "closed_hosts": sorted(failed_hosts),
+        "elapsed": elapsed,
     }
 
+    return {
+
+        "results": results,
+
+        "statistics": statistics,
+
+    }
 
 # ==========================================================
 # Public Exports

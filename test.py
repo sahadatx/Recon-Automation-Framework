@@ -1,193 +1,39 @@
 """
-Screenshot Module Test
-
-Integration test for Screenshot Engine.
+Directory Fuzzing Test
 """
 
+from __future__ import annotations
 
-from modules.screenshots.manager import (
-    execute,
+from modules.fuzzing.manager import (
+    run_fuzzing,
+)
+
+from modules.fuzzing.exporter import (
+    export_all,
 )
 
 
+def main() -> None:
+    """
+    Test Directory Fuzzing module.
+    """
 
-# ==========================================================
-# Main Test
-# ==========================================================
+    targets = [
 
-def main():
+        "https://kubernetes.io",
 
+        # "https://scanme.nmap.org",
 
-    http_results = {
+    ]
 
-        "example.com": {
-
-            "url":
-                "https://example.com",
-
-            "status":
-                200,
-
-        },
-
-    }
-
-
-    print(
-        "=" * 70
+    analysis = run_fuzzing(
+        targets,
     )
 
-    print(
-        "Screenshot Module Integration Test"
+    export_all(
+        analysis,
     )
 
-    print(
-        "=" * 70
-    )
-
-
-    analysis = execute(
-
-        http_results
-
-    )
-
-
-    print()
-
-
-    print(
-        "=" * 70
-    )
-
-    print(
-        "TEST RESULT"
-    )
-
-    print(
-        "=" * 70
-    )
-
-
-    print(
-        "Type:",
-        type(analysis)
-    )
-
-
-    print(
-        "Keys:",
-        list(
-            analysis.keys()
-        )
-    )
-
-
-    print()
-
-
-    print(
-        "Total Targets:",
-        analysis.get(
-            "total_targets"
-        )
-    )
-
-
-    print(
-        "Captured:",
-        analysis.get(
-            "captured"
-        )
-    )
-
-
-    print(
-        "Failed:",
-        analysis.get(
-            "failed"
-        )
-    )
-
-
-    print(
-        "Scan Time:",
-        analysis.get(
-            "scan_time"
-        )
-    )
-
-
-    print()
-
-
-    print(
-        "Screenshots:"
-    )
-
-
-    print(
-        "-" * 70
-    )
-
-
-    for item in analysis.get(
-
-        "results",
-
-        []
-
-    ):
-
-
-        print(
-            "URL:",
-            item.get(
-                "url"
-            )
-        )
-
-
-        print(
-            "Captured:",
-            item.get(
-                "captured"
-            )
-        )
-
-
-        print(
-            "Status:",
-            item.get(
-                "status"
-            )
-        )
-
-
-        print(
-            "Image:",
-            item.get(
-                "path"
-            )
-        )
-
-
-        print(
-            "-" * 70
-        )
-
-
-    print()
-
-    print(
-        "Done."
-    )
-
-
-
-# ==========================================================
-# Entry
-# ==========================================================
 
 if __name__ == "__main__":
 

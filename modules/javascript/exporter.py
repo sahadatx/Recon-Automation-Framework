@@ -664,7 +664,7 @@ def export_csv(
 # ==========================================================
 
 def export_summary(
-    analysis: dict,
+    analysis: dict[str, Any],
 ) -> Path:
     """
     Export summary report.
@@ -702,7 +702,7 @@ def export_summary(
 
         f"Average URLs / File       : {statistics['average_urls_per_file']}",
 
-        f"Scan Time                 : {analysis['scan_time']:.2f} sec",
+        f"Scan Time                 : {statistics['elapsed']:.2f} sec",
 
     ]
 
@@ -975,7 +975,7 @@ def export_all(
 # ==========================================================
 
 def show_summary(
-    analysis: dict,
+    analysis: dict[str, Any],
 ) -> None:
     """
     Display JavaScript analysis summary.
@@ -1060,7 +1060,7 @@ def show_summary(
 
     print(
         f"{'Scan Time':<30}"
-        f"{analysis['scan_time']:.2f} sec"
+        f"{statistics['elapsed']:.2f} sec"
     )
 
     print(

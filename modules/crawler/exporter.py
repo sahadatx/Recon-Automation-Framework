@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import csv
 import json
+from typing import Any
 
 from modules.crawler.constants import (
     CRAWLER_OUTPUT_DIR,
@@ -19,7 +20,7 @@ from modules.crawler.constants import (
 
 
 # ==========================================================
-# Create Output Directory
+# Helpers
 # ==========================================================
 
 def create_output_directory() -> None:
@@ -38,11 +39,15 @@ def create_output_directory() -> None:
 # ==========================================================
 
 def export_results_txt(
-    analysis: dict,
+    analysis: dict[str, Any],
 ) -> None:
     """
     Export crawler results as text.
     """
+
+    create_output_directory()
+
+    results = analysis["results"]
 
     with RESULTS_TXT.open(
         "w",
@@ -53,7 +58,7 @@ def export_results_txt(
             host,
             result,
         ) in sorted(
-            analysis["results"].items()
+            results.items()
         ):
 
             file.write(
@@ -84,11 +89,13 @@ def export_results_txt(
 # ==========================================================
 
 def export_results_json(
-    analysis: dict,
+    analysis: dict[str, Any],
 ) -> None:
     """
     Export crawler results as JSON.
     """
+
+    create_output_directory()
 
     data = json.loads(
         json.dumps(
@@ -115,11 +122,15 @@ def export_results_json(
 # ==========================================================
 
 def export_results_csv(
-    analysis: dict,
+    analysis: dict[str, Any],
 ) -> None:
     """
     Export crawler results as CSV.
     """
+
+    create_output_directory()
+
+    results = analysis["results"]
 
     with RESULTS_CSV.open(
         "w",
@@ -145,7 +156,7 @@ def export_results_csv(
             host,
             result,
         ) in sorted(
-            analysis["results"].items()
+            results.items()
         ):
 
             for (
@@ -171,11 +182,13 @@ def export_results_csv(
 # ==========================================================
 
 def export_summary(
-    analysis: dict,
+    analysis: dict[str, Any],
 ) -> None:
     """
     Export crawler summary.
     """
+
+    create_output_directory()
 
     statistics = analysis[
         "statistics"
@@ -187,55 +200,66 @@ def export_summary(
     ) as file:
 
         file.write(
-            "Crawler Summary\n"
+            "CRAWLER SUMMARY\n"
         )
 
         file.write(
-            "=" * 60 + "\n\n"
+            "=" * 70 + "\n\n"
         )
 
         file.write(
-            f"Hosts             : {statistics['hosts']}\n"
+            f"Hosts             : "
+            f"{statistics['hosts']}\n"
         )
 
         file.write(
-            f"Total URLs        : {statistics['total_urls']}\n"
+            f"Total URLs        : "
+            f"{statistics['total_urls']}\n"
         )
 
         file.write(
-            f"Average URLs/Host : {statistics['average_urls_per_host']}\n"
+            f"Average URLs/Host : "
+            f"{statistics['average_urls_per_host']}\n"
         )
 
         file.write(
-            f"Failed Pages      : {statistics['failed']}\n"
+            f"Failed Pages      : "
+            f"{statistics['failed']}\n"
         )
 
         file.write(
-            f"Internal URLs     : {statistics['internal_urls']}\n"
+            f"Internal URLs     : "
+            f"{statistics['internal_urls']}\n"
         )
 
         file.write(
-            f"External URLs     : {statistics['external_urls']}\n"
+            f"External URLs     : "
+            f"{statistics['external_urls']}\n"
         )
 
         file.write(
-            f"JavaScript Files  : {statistics['javascript']}\n"
+            f"JavaScript Files  : "
+            f"{statistics['javascript']}\n"
         )
 
         file.write(
-            f"CSS Files         : {statistics['css']}\n"
+            f"CSS Files         : "
+            f"{statistics['css']}\n"
         )
 
         file.write(
-            f"Forms             : {statistics['forms']}\n"
+            f"Forms             : "
+            f"{statistics['forms']}\n"
         )
 
         file.write(
-            f"Emails            : {statistics['emails']}\n"
+            f"Emails            : "
+            f"{statistics['emails']}\n"
         )
 
         file.write(
-            f"Scan Time         : {analysis['scan_time']} sec\n\n"
+            f"Scan Time         : "
+            f"{statistics['elapsed']} sec\n\n"
         )
 
         file.write(
@@ -243,7 +267,7 @@ def export_summary(
         )
 
         file.write(
-            "-" * 60 + "\n"
+            "-" * 70 + "\n"
         )
 
         for (
@@ -263,13 +287,11 @@ def export_summary(
 # ==========================================================
 
 def export_all(
-    analysis: dict,
+    analysis: dict[str, Any],
 ) -> None:
     """
     Export all crawler output files.
     """
-
-    create_output_directory()
 
     export_results_txt(
         analysis,
@@ -293,10 +315,5 @@ def export_all(
 # ==========================================================
 
 __all__ = [
-    "create_output_directory",
-    "export_results_txt",
-    "export_results_json",
-    "export_results_csv",
-    "export_summary",
     "export_all",
 ]

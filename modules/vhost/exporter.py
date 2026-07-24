@@ -5,20 +5,21 @@ Export Virtual Host Discovery
 results into multiple formats.
 """
 
+from __future__ import annotations
+
+from typing import Any
+
 import json
 
 from pathlib import Path
 
 from config.config import (
-
     VHOST_OUTPUT_DIR,
-
 )
 
 from core.logger import (
-
     success,
-
+    warning,
 )
 
 
@@ -28,21 +29,124 @@ from core.logger import (
 
 def create_output_directory() -> Path:
     """
-    Create output directory.
+    Create Virtual Host Discovery output directory.
 
     Returns:
-        Path
+        Output directory path.
     """
 
     VHOST_OUTPUT_DIR.mkdir(
-
         parents=True,
-
         exist_ok=True,
-
     )
 
     return VHOST_OUTPUT_DIR
+
+
+# ==========================================================
+# Write Text File
+# ==========================================================
+
+def write_text(
+    output_file: Path,
+    lines: list[str],
+) -> Path:
+    """
+    Write text lines to a file.
+
+    Args:
+        output_file:
+            Destination file.
+
+        lines:
+            Text lines.
+
+    Returns:
+        Output file path.
+    """
+
+    create_output_directory()
+
+    try:
+
+        with output_file.open(
+            "w",
+            encoding="utf-8",
+        ) as file:
+
+            for line in lines:
+
+                file.write(
+                    f"{line}\n"
+                )
+
+    except Exception as error:
+
+        warning(
+            f"{output_file}: {error}"
+        )
+
+        return output_file
+
+    success(
+        f"Saved {output_file}"
+    )
+
+    return output_file
+
+
+# ==========================================================
+# Write JSON File
+# ==========================================================
+
+def write_json(
+    output_file: Path,
+    data: Any,
+) -> Path:
+    """
+    Write JSON data.
+
+    Args:
+        output_file:
+            Destination file.
+
+        data:
+            JSON serializable object.
+
+    Returns:
+        Output file path.
+    """
+
+    create_output_directory()
+
+    try:
+
+        with output_file.open(
+            "w",
+            encoding="utf-8",
+        ) as file:
+
+            json.dump(
+                data,
+                file,
+                indent=4,
+                sort_keys=True,
+                default=str,
+            )
+
+    except Exception as error:
+
+        warning(
+            f"{output_file}: {error}"
+        )
+
+        return output_file
+
+    success(
+        f"Saved {output_file}"
+    )
+
+    return output_file
 
 
 # ==========================================================
@@ -50,38 +154,23 @@ def create_output_directory() -> Path:
 # ==========================================================
 
 def export_json(
-    results: list,
+    analysis: dict[str, Any],
 ) -> Path:
     """
-    Export JSON results.
+    Export JSON report.
+
+    Args:
+        analysis:
+            Virtual Host Discovery analysis.
 
     Returns:
-        Path
+        Output file path.
     """
 
-    output = create_output_directory()
-
-    file = output / "results.json"
-
-    with file.open(
-
-        "w",
-
-        encoding="utf-8",
-
-    ) as handle:
-
-        json.dump(
-
-            results,
-
-            handle,
-
-            indent=4,
-
-        )
-
-    return file
+    return write_json(
+        VHOST_OUTPUT_DIR / "results.json",
+        analysis,
+    )
 
 
 # ==========================================================
@@ -89,46 +178,39 @@ def export_json(
 # ==========================================================
 
 def export_txt(
-    results: list,
+    analysis: dict[str, Any],
 ) -> Path:
     """
-    Export TXT results.
+    Export discovered virtual hosts.
+
+    Args:
+        analysis:
+            Virtual Host Discovery analysis.
 
     Returns:
-        Path
+        Output file path.
     """
 
-    output = create_output_directory()
+    results = analysis["results"]
 
-    file = output / "results.txt"
+    lines: list[str] = []
 
-    with file.open(
+    for result in results:
 
-        "w",
+        lines.append(
 
-        encoding="utf-8",
+            f"{result.get('host','-')}"
+            f"\t"
+            f"{result.get('status','-')}"
+            f"\t"
+            f"{result.get('url','-')}"
 
-    ) as handle:
+        )
 
-        for result in results:
-
-            handle.write(
-
-                f"{result['host']}"
-
-                f"\t"
-
-                f"{result['status']}"
-
-                f"\t"
-
-                f"{result['url']}"
-
-                "\n"
-
-            )
-
-    return file
+    return write_text(
+        VHOST_OUTPUT_DIR / "results.txt",
+        lines,
+    )
 
 
 # ==========================================================
@@ -136,46 +218,44 @@ def export_txt(
 # ==========================================================
 
 def export_interesting(
-    interesting: list,
+    analysis: dict[str, Any],
 ) -> Path:
     """
-    Export interesting hosts.
+    Export interesting virtual hosts.
+
+    Args:
+        analysis:
+            Virtual Host Discovery analysis.
 
     Returns:
-        Path
+        Output file path.
     """
 
-    output = create_output_directory()
+    statistics = analysis["statistics"]
 
-    file = output / "interesting.txt"
+    interesting = statistics.get(
+        "interesting",
+        [],
+    )
 
-    with file.open(
+    lines: list[str] = []
 
-        "w",
+    for result in interesting:
 
-        encoding="utf-8",
+        lines.append(
 
-    ) as handle:
+            f"{result.get('host','-')}"
+            f"\t"
+            f"{result.get('status','-')}"
+            f"\t"
+            f"{result.get('url','-')}"
 
-        for result in interesting:
+        )
 
-            handle.write(
-
-                f"{result['host']}"
-
-                f"\t"
-
-                f"{result['status']}"
-
-                f"\t"
-
-                f"{result['url']}"
-
-                "\n"
-
-            )
-
-    return file
+    return write_text(
+        VHOST_OUTPUT_DIR / "interesting.txt",
+        lines,
+    )
 
 
 # ==========================================================
@@ -183,166 +263,187 @@ def export_interesting(
 # ==========================================================
 
 def export_summary(
-    statistics: dict,
+    analysis: dict[str, Any],
 ) -> Path:
     """
-    Export summary.
+    Export summary report.
+
+    Args:
+        analysis:
+            Virtual Host Discovery analysis.
 
     Returns:
-        Path
+        Output file path.
     """
 
-    output = create_output_directory()
+    statistics = analysis["statistics"]
 
-    file = output / "summary.txt"
+    lines = [
 
-    with file.open(
+        "Virtual Host Discovery Summary",
 
-        "w",
+        "=" * 80,
 
-        encoding="utf-8",
+        f"Discovered Hosts        : {statistics['total_results']}",
 
-    ) as handle:
+        f"Interesting Hosts       : {statistics['interesting_hosts']}",
 
-        handle.write(
+        "",
 
-            "Virtual Host Discovery Summary\n"
+        f"HTTP 200                : {statistics['status_200']}",
 
-        )
+        f"HTTP 204                : {statistics['status_204']}",
 
-        handle.write(
+        f"HTTP 301                : {statistics['status_301']}",
 
-            "=" * 40
+        f"HTTP 302                : {statistics['status_302']}",
 
-            + "\n\n"
+        f"HTTP 307                : {statistics['status_307']}",
 
-        )
+        f"HTTP 401                : {statistics['status_401']}",
 
-        handle.write(
+        f"HTTP 403                : {statistics['status_403']}",
 
-            f"Discovered Hosts       : "
+        "",
 
-            f"{statistics['total_results']}\n"
+        f"Scan Time               : {statistics['elapsed']:.2f} sec",
 
-        )
+    ]
 
-        handle.write(
-
-            f"Interesting Hosts      : "
-
-            f"{statistics['interesting_hosts']}\n\n"
-
-        )
-
-        handle.write(
-
-            f"HTTP 200               : "
-
-            f"{statistics['status_200']}\n"
-
-        )
-
-        handle.write(
-
-            f"HTTP 204               : "
-
-            f"{statistics['status_204']}\n"
-
-        )
-
-        handle.write(
-
-            f"HTTP 301               : "
-
-            f"{statistics['status_301']}\n"
-
-        )
-
-        handle.write(
-
-            f"HTTP 302               : "
-
-            f"{statistics['status_302']}\n"
-
-        )
-
-        handle.write(
-
-            f"HTTP 307               : "
-
-            f"{statistics['status_307']}\n"
-
-        )
-
-        handle.write(
-
-            f"HTTP 401               : "
-
-            f"{statistics['status_401']}\n"
-
-        )
-
-        handle.write(
-
-            f"HTTP 403               : "
-
-            f"{statistics['status_403']}\n"
-
-        )
-
-    return file
+    return write_text(
+        VHOST_OUTPUT_DIR / "summary.txt",
+        lines,
+    )
 
 
 # ==========================================================
 # Export All
 # ==========================================================
 
-def export(
-    results: list,
-    interesting: list,
-    statistics: dict,
-) -> dict:
+def export_all(
+    analysis: dict[str, Any],
+) -> None:
     """
-    Export all reports.
+    Export all Virtual Host Discovery reports.
 
-    Returns:
-        dict
+    Args:
+        analysis:
+            Virtual Host Discovery analysis.
     """
 
-    files = {
+    exporters = (
 
-        "json": export_json(
+        export_json,
 
-            results
+        export_txt,
 
-        ),
+        export_interesting,
 
-        "txt": export_txt(
-
-            results
-
-        ),
-
-        "interesting": export_interesting(
-
-            interesting
-
-        ),
-
-        "summary": export_summary(
-
-            statistics
-
-        ),
-
-    }
-
-    success(
-
-        "Virtual Host Discovery "
-
-        "results exported."
+        export_summary,
 
     )
 
-    return files
+    for exporter in exporters:
+
+        try:
+
+            exporter(
+                analysis
+            )
+
+        except Exception as error:
+
+            warning(
+                f"{exporter.__name__}: {error}"
+            )
+
+    success(
+        "Virtual Host Discovery reports exported successfully."
+    )
+
+
+# ==========================================================
+# Show Summary
+# ==========================================================
+
+def show_summary(
+    analysis: dict[str, Any],
+) -> None:
+    """
+    Display Virtual Host Discovery summary.
+    """
+
+    statistics = analysis["statistics"]
+
+    print()
+
+    print("=" * 80)
+
+    print(
+        "Virtual Host Discovery Summary"
+    )
+
+    print("=" * 80)
+
+    print(
+        f"{'Discovered Hosts':<30}"
+        f"{statistics['total_results']}"
+    )
+
+    print(
+        f"{'Interesting Hosts':<30}"
+        f"{statistics['interesting_hosts']}"
+    )
+
+    print(
+        f"{'HTTP 200':<30}"
+        f"{statistics['status_200']}"
+    )
+
+    print(
+        f"{'HTTP 204':<30}"
+        f"{statistics['status_204']}"
+    )
+
+    print(
+        f"{'HTTP 301':<30}"
+        f"{statistics['status_301']}"
+    )
+
+    print(
+        f"{'HTTP 302':<30}"
+        f"{statistics['status_302']}"
+    )
+
+    print(
+        f"{'HTTP 307':<30}"
+        f"{statistics['status_307']}"
+    )
+
+    print(
+        f"{'HTTP 401':<30}"
+        f"{statistics['status_401']}"
+    )
+
+    print(
+        f"{'HTTP 403':<30}"
+        f"{statistics['status_403']}"
+    )
+
+    print("-" * 80)
+
+    print(
+        f"{'Scan Time':<30}"
+        f"{statistics['elapsed']:.2f} sec"
+    )
+
+    print("=" * 80)
+
+
+# ==========================================================
+# Public Exports
+# ==========================================================
+
+__all__ = [
+    "export_all",
+]

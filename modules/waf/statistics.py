@@ -1,40 +1,41 @@
 """
-WAF Statistics
+WAF Detection Statistics
 
-Generate statistics for
-WAF Detection.
+Generate summary statistics
+for WAF Detection.
 """
 
 from __future__ import annotations
 
 from collections import Counter
+from typing import Any
 
 
 # ==========================================================
 # Vendor Statistics
 # ==========================================================
 
-def vendor_statistics(results):
+def vendor_statistics(
+    results: list[dict[str, Any]],
+) -> dict[str, int]:
     """
-    Count detected vendors.
+    Count detected WAF vendors.
+
+    Args:
+        results:
+            WAF detection results.
 
     Returns:
-        dict
+        Vendor counts.
     """
 
     vendors = [
 
         result["vendor"]
 
-        for result
+        for result in results
 
-        in results
-
-        if result.get(
-
-            "vendor"
-
-        )
+        if result.get("vendor")
 
     ]
 
@@ -42,18 +43,11 @@ def vendor_statistics(results):
 
         sorted(
 
-            Counter(
-
-                vendors
-
-            ).items(),
+            Counter(vendors).items(),
 
             key=lambda item: (
-
                 -item[1],
-
                 item[0],
-
             ),
 
         )
@@ -65,12 +59,18 @@ def vendor_statistics(results):
 # Confidence Statistics
 # ==========================================================
 
-def confidence_statistics(results):
+def confidence_statistics(
+    results: list[dict[str, Any]],
+) -> dict[str, int]:
     """
     Count confidence levels.
 
+    Args:
+        results:
+            WAF detection results.
+
     Returns:
-        dict
+        Confidence counts.
     """
 
     order = [
@@ -88,16 +88,11 @@ def confidence_statistics(results):
     counter = Counter(
 
         result.get(
-
             "confidence",
-
             "Unknown",
-
         )
 
-        for result
-
-        in results
+        for result in results
 
     )
 
@@ -105,9 +100,7 @@ def confidence_statistics(results):
 
         level: counter[level]
 
-        for level
-
-        in order
+        for level in order
 
         if counter[level]
 
@@ -119,74 +112,59 @@ def confidence_statistics(results):
 # ==========================================================
 
 def generate_statistics(
-    results,
-    elapsed=0.0,
-):
+    results: list[dict[str, Any]],
+) -> dict[str, Any]:
     """
-    Generate statistics.
+    Generate summary statistics.
+
+    Args:
+        results:
+            WAF detection results.
 
     Returns:
-        dict
+        Summary statistics.
     """
 
-    total = len(
-
-        results
-
-    )
+    total = len(results)
 
     detected = sum(
 
         result.get(
-
             "detected",
-
             False,
-
         )
 
-        for result
-
-        in results
+        for result in results
 
     )
 
     scores = [
 
         result.get(
-
             "score",
-
             0,
-
         )
 
-        for result
-
-        in results
+        for result in results
 
     ]
 
-    average_score = round(
+    average_score = (
 
-        sum(
-
-            scores
-
+        round(
+            sum(scores) / total,
+            2,
         )
 
-        / total,
+        if total
 
-        2,
+        else 0.0
 
-    ) if total else 0.0
+    )
 
     highest_score = max(
-
         scores,
-
         default=0,
-
     )
 
     return {
@@ -197,162 +175,75 @@ def generate_statistics(
 
         "not_detected": total - detected,
 
-        "success_rate": round(
+        "success_rate": (
 
-            (
+            round(
+                detected / total * 100,
+                2,
+            )
 
-                detected
+            if total
 
-                / total
+            else 0.0
 
-                * 100
-
-            ),
-
-            2,
-
-        ) if total else 0.0,
+        ),
 
         "average_score": average_score,
 
         "highest_score": highest_score,
 
         "vendors": vendor_statistics(
-
-            results
-
+            results,
         ),
 
         "confidence": confidence_statistics(
-
-            results
-
-        ),
-
-        "elapsed": round(
-
-            elapsed,
-
-            2,
-
+            results,
         ),
 
     }
 
 
 # ==========================================================
-# Print Summary
+# Empty Statistics
 # ==========================================================
 
-def print_summary(statistics):
+def empty_statistics() -> dict[str, Any]:
     """
-    Print summary.
+    Return empty statistics.
+
+    Returns:
+        Empty statistics dictionary.
     """
 
-    print()
+    return {
 
-    print("=" * 80)
+        "targets": 0,
 
-    print(
+        "detected": 0,
 
-        "WAF Detection Summary".center(
+        "not_detected": 0,
 
-            80
+        "success_rate": 0.0,
 
-        )
+        "average_score": 0.0,
 
-    )
+        "highest_score": 0,
 
-    print("=" * 80)
+        "vendors": {},
 
-    print(
+        "confidence": {},
 
-        f"Targets             : {statistics['targets']}"
+    }
 
-    )
 
-    print(
+# ==========================================================
+# Public Exports
+# ==========================================================
 
-        f"WAF Detected        : {statistics['detected']}"
+__all__ = [
 
-    )
+    "generate_statistics",
 
-    print(
+    "empty_statistics",
 
-        f"Not Detected        : {statistics['not_detected']}"
-
-    )
-
-    print(
-
-        f"Success Rate        : {statistics['success_rate']}%"
-
-    )
-
-    print(
-
-        f"Average Score       : {statistics['average_score']}"
-
-    )
-
-    print(
-
-        f"Highest Score       : {statistics['highest_score']}"
-
-    )
-
-    print(
-
-        f"Elapsed Time        : {statistics['elapsed']} sec"
-
-    )
-
-    print("-" * 80)
-
-    print("Detected Vendors")
-
-    print("-" * 80)
-
-    if statistics["vendors"]:
-
-        for vendor, count in statistics["vendors"].items():
-
-            print(
-
-                f"{vendor:<30}{count}"
-
-            )
-
-    else:
-
-        print(
-
-            "None"
-
-        )
-
-    print("-" * 80)
-
-    print("Confidence Levels")
-
-    print("-" * 80)
-
-    if statistics["confidence"]:
-
-        for level, count in statistics["confidence"].items():
-
-            print(
-
-                f"{level:<30}{count}"
-
-            )
-
-    else:
-
-        print(
-
-            "None"
-
-        )
-
-    print("=" * 80)
+]

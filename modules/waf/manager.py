@@ -1,8 +1,8 @@
 """
 WAF Manager
 
-Main entry point for
-WAF Detection.
+Coordinates the complete
+WAF Detection pipeline.
 """
 
 from __future__ import annotations
@@ -10,16 +10,15 @@ from __future__ import annotations
 from time import perf_counter
 from typing import Any
 
-from core.logger import info
-
-from modules.waf.scanner import scan_targets
-from modules.waf.detector import detect_all
-from modules.waf.filters import filter_results
-from modules.waf.statistics import (
-    generate_statistics,
-    print_summary,
+from core.logger import (
+    info,
+    success,
 )
-from modules.waf.exporter import export_results
+
+from .analyzer import analyze
+from .detector import detect_all
+from .filters import filter_results
+from .scanner import scan_targets
 
 
 # ==========================================================
@@ -28,116 +27,116 @@ from modules.waf.exporter import export_results
 
 def run_waf_detection(
     targets: list[str],
-) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+) -> dict[str, Any]:
     """
-    Run complete WAF Detection pipeline.
-
-    Pipeline:
-        Scan
-        -> Detect
-        -> Filter
-        -> Statistics
-        -> Export
+    Run the complete WAF Detection pipeline.
 
     Returns:
-        tuple(results, statistics)
+        WAF analysis.
     """
 
-    print()
-    print("=" * 80)
-    print("WAF Detection".center(80))
-    print("=" * 80)
+    if not targets:
+
+        return analyze(
+            results=[],
+            elapsed=0,
+        )
+
+    info(
+        "Starting WAF Detection..."
+    )
 
     start = perf_counter()
 
-    try:
+    # ------------------------------------------------------
+    # Scan Targets
+    # ------------------------------------------------------
 
-        # --------------------------------------------------
-        # Scan Targets
-        # --------------------------------------------------
+    info(
+        "Scanning targets..."
+    )
 
-        info("Scanning targets...")
+    scans = scan_targets(
+        targets
+    )
 
-        scans = scan_targets(
-            targets
-        )
+    # ------------------------------------------------------
+    # Detect WAF
+    # ------------------------------------------------------
 
-        # --------------------------------------------------
-        # Detect WAF
-        # --------------------------------------------------
+    info(
+        "Matching fingerprints..."
+    )
 
-        info("Matching fingerprints...")
+    results = detect_all(
+        scans
+    )
 
-        results = detect_all(
-            scans
-        )
+    # ------------------------------------------------------
+    # Filter Results
+    # ------------------------------------------------------
 
-        # --------------------------------------------------
-        # Filter Results
-        # --------------------------------------------------
+    info(
+        "Filtering results..."
+    )
 
-        info("Filtering results...")
+    results = filter_results(
+        results
+    )
 
-        results = filter_results(
-            results
-        )
+    # ------------------------------------------------------
+    # Analyze
+    # ------------------------------------------------------
 
-        # --------------------------------------------------
-        # Statistics
-        # --------------------------------------------------
+    elapsed = (
+        perf_counter()
+        - start
+    )
 
-        elapsed = perf_counter() - start
+    analysis = analyze(
+        results=results,
+        elapsed=elapsed,
+    )
 
-        statistics = generate_statistics(
-            results,
-            elapsed,
-        )
+    statistics = analysis[
+        "statistics"
+    ]
 
-        # --------------------------------------------------
-        # Export Results
-        # --------------------------------------------------
+    success(
+        f"Targets          : {statistics['targets']}"
+    )
 
-        info("Exporting results...")
+    success(
+        f"WAF Detected     : {statistics['detected']}"
+    )
 
-        export_results(
-            results
-        )
+    success(
+        f"Not Detected     : {statistics['not_detected']}"
+    )
 
-        # --------------------------------------------------
-        # Print Summary
-        # --------------------------------------------------
+    success(
+        f"Success Rate     : {statistics['success_rate']}%"
+    )
 
-        print_summary(
-            statistics
-        )
+    success(
+        f"Average Score    : {statistics['average_score']}"
+    )
 
-        print()
-        print("=" * 80)
-        print("[SUCCESS] WAF Detection Completed")
-        print("=" * 80)
-        print(f"Targets          : {statistics['targets']}")
-        print(f"WAF Detected     : {statistics['detected']}")
-        print(f"Not Detected     : {statistics['not_detected']}")
-        print(f"Success Rate     : {statistics['success_rate']}%")
-        print(f"Average Score    : {statistics['average_score']}")
-        print(f"Highest Score    : {statistics['highest_score']}")
-        print(f"Elapsed Time     : {statistics['elapsed']} sec")
-        print("=" * 80)
+    success(
+        f"Highest Score    : {statistics['highest_score']}"
+    )
 
-        return (
-            results,
-            statistics,
-        )
+    success(
+        f"Elapsed          : {statistics['elapsed']:.2f} sec"
+    )
 
-    except KeyboardInterrupt:
+    return analysis
 
-        print()
-        print("[ERROR] WAF Detection cancelled by user.")
-        raise
 
-    except Exception as error:
+# ==========================================================
+# Public Exports
+# ==========================================================
 
-        print()
-        print("[ERROR] WAF Detection failed.")
-        print(f"[ERROR] {error}")
-        raise
+__all__ = [
+    "run_waf_detection",
+]

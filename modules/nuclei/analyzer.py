@@ -1,18 +1,12 @@
 """
-Email Security Analyzer
-
-Analyzes email security
-results and generates the
-final analysis.
+Nuclei Analyzer
 """
 
 from __future__ import annotations
 
 from typing import Any
 
-from .statistics import (
-    generate_statistics,
-)
+from .statistics import generate_statistics
 
 
 # ==========================================================
@@ -21,14 +15,24 @@ from .statistics import (
 
 def analyze(
     results: list[dict[str, Any]],
+    failed: list[str],
     elapsed: float,
 ) -> dict[str, Any]:
     """
-    Analyze email security
-    results.
+    Analyze Nuclei scan results.
+
+    Args:
+        results:
+            Parsed findings.
+
+        failed:
+            Failed targets.
+
+        elapsed:
+            Total execution time.
 
     Returns:
-        dict[str, Any]
+        Analysis dictionary.
     """
 
     statistics = {
@@ -39,11 +43,12 @@ def analyze(
     return {
         "results": results,
         "statistics": statistics,
+        "failed": failed,
     }
 
 
 # ==========================================================
-# Public Exports
+# Exports
 # ==========================================================
 
 __all__ = [

@@ -1,9 +1,7 @@
 """
-Email Security Analyzer
+WAF Detection Analyzer
 
-Analyzes email security
-results and generates the
-final analysis.
+Analyze WAF detection results.
 """
 
 from __future__ import annotations
@@ -24,16 +22,27 @@ def analyze(
     elapsed: float,
 ) -> dict[str, Any]:
     """
-    Analyze email security
-    results.
+    Analyze WAF detection results.
+
+    Args:
+        results:
+            WAF detection results.
+
+        elapsed:
+            Total execution time.
 
     Returns:
-        dict[str, Any]
+        WAF detection analysis.
     """
 
     statistics = {
-        **generate_statistics(results),
-        "elapsed": round(elapsed, 2),
+        **generate_statistics(
+            results,
+        ),
+        "elapsed": round(
+            elapsed,
+            2,
+        ),
     }
 
     return {
