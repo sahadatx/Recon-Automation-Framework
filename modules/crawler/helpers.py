@@ -21,6 +21,10 @@ urllib3.disable_warnings(
 
 import requests
 
+import time
+
+from requests.adapters import HTTPAdapter
+
 from requests.exceptions import (
 
     ConnectionError,
@@ -75,7 +79,7 @@ RETRY_STATUS_CODES = {
 # Create Session
 # ==========================================================
 
-def create_session():
+def create_session() -> requests.Session:
     """
     Create reusable HTTP session.
 
@@ -101,15 +105,35 @@ def create_session():
 
             ),
 
-            "Accept-Encoding": (
-
-                "gzip, deflate, br"
-
-            ),
+            "Accept-Encoding": "gzip, deflate",
 
             "Connection": "keep-alive",
 
         }
+
+    )
+
+    adapter = HTTPAdapter(
+
+        pool_connections=20,
+
+        pool_maxsize=20,
+
+    )
+
+    session.mount(
+
+        "http://",
+
+        adapter,
+
+    )
+
+    session.mount(
+
+        "https://",
+
+        adapter,
 
     )
 
@@ -330,13 +354,11 @@ def download_page(
         requests.Response | None
     """
 
-    for attempt in range(
-
-        CRAWLER_RETRIES
-
-    ):
+    for attempt in range(CRAWLER_RETRIES):
 
         try:
+
+            start = time.perf_counter()
 
             response = SESSION.get(
 
@@ -350,13 +372,17 @@ def download_page(
 
             )
 
+            response.elapsed_time = round(
+
+                time.perf_counter() - start,
+
+                3,
+
+            )
+
             response.raise_for_status()
 
-            if not is_html(
-
-                response
-
-            ):
+            if not is_html(response):
 
                 debug(
 
@@ -380,19 +406,15 @@ def download_page(
 
         except requests.RequestException as error:
 
-            if not should_retry(
+            if not should_retry(error):
 
-                error
+                if (
 
-            ):
+                    isinstance(error, HTTPError)
 
-                if isinstance(
+                    and error.response is not None
 
-                    error,
-
-                    HTTPError,
-
-                ) and error.response is not None:
+                ):
 
                     debug(
 
@@ -410,45 +432,23 @@ def download_page(
 
                 return None
 
-            if isinstance(
+            debug(
 
-                error,
+                f"Retry ({attempt + 1}/{CRAWLER_RETRIES}): {url}"
 
-                HTTPError,
+            )
 
-            ) and error.response is not None:
+            if attempt < CRAWLER_RETRIES - 1:
 
-                debug(
+                time.sleep(
 
-                    f"Retry "
-
-                    f"({attempt + 1}/{CRAWLER_RETRIES}) "
-
-                    f"HTTP {error.response.status_code}: "
-
-                    f"{url}"
-
-                )
-
-            else:
-
-                debug(
-
-                    f"Retry "
-
-                    f"({attempt + 1}/{CRAWLER_RETRIES}): "
-
-                    f"{url} ({error})"
+                    2 ** attempt
 
                 )
 
     debug(
 
-        f"Failed after "
-
-        f"{CRAWLER_RETRIES} attempts: "
-
-        f"{url}"
+        f"Failed after {CRAWLER_RETRIES} attempts: {url}"
 
     )
 

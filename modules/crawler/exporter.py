@@ -1,16 +1,20 @@
 """
 Crawler Exporter
 
-Export URL discovery results.
+Export crawler results.
 """
+
+from __future__ import annotations
 
 import csv
 import json
-from pathlib import Path
 
-from core.logger import (
-    info,
-    success,
+from modules.crawler.constants import (
+    CRAWLER_OUTPUT_DIR,
+    RESULTS_CSV,
+    RESULTS_JSON,
+    RESULTS_TXT,
+    SUMMARY_TXT,
 )
 
 
@@ -18,281 +22,240 @@ from core.logger import (
 # Create Output Directory
 # ==========================================================
 
-def create_output_dir(
-    output_dir: str,
-):
+def create_output_directory() -> None:
     """
-    Create output directory.
-
-    Returns:
-        Path
+    Create the crawler output directory.
     """
 
-    path = Path(
-        output_dir
-    )
-
-    path.mkdir(
-
+    CRAWLER_OUTPUT_DIR.mkdir(
         parents=True,
-
         exist_ok=True,
-
     )
-
-    return path
 
 
 # ==========================================================
-# Export TXT
+# Export Results (TXT)
 # ==========================================================
 
-def export_txt(
-    results: dict,
-    output_dir: str = "output",
-):
+def export_results_txt(
+    analysis: dict,
+) -> None:
     """
-    Export discovered URLs
-    into TXT file.
-
-    Returns:
-        str
+    Export crawler results as text.
     """
 
-    output = create_output_dir(
-        output_dir
-    )
-
-    file_path = output / "urls.txt"
-
-    with open(
-
-        file_path,
-
+    with RESULTS_TXT.open(
         "w",
-
         encoding="utf-8",
-
     ) as file:
 
-        for host in results.values():
+        for (
+            host,
+            result,
+        ) in sorted(
+            analysis["results"].items()
+        ):
 
-            for url in host.get(
-                "pages",
-                {},
+            file.write(
+                "=" * 70 + "\n"
+            )
+
+            file.write(
+                f"{host}\n"
+            )
+
+            file.write(
+                "=" * 70 + "\n"
+            )
+
+            for url in sorted(
+                result["pages"]
             ):
 
                 file.write(
                     f"{url}\n"
                 )
 
-    success(
-        f"TXT Export: {file_path}"
-    )
-
-    return str(
-        file_path
-    )
+            file.write("\n")
 
 
 # ==========================================================
-# Export JSON
+# Export Results (JSON)
 # ==========================================================
 
-def export_json(
-    results: dict,
-    output_dir: str = "output",
-):
+def export_results_json(
+    analysis: dict,
+) -> None:
     """
-    Export full crawl
-    results into JSON.
-
-    Returns:
-        str
+    Export crawler results as JSON.
     """
 
-    output = create_output_dir(
-        output_dir
+    data = json.loads(
+        json.dumps(
+            analysis,
+            default=list,
+        )
     )
 
-    file_path = output / "results.json"
-
-    with open(
-
-        file_path,
-
+    with RESULTS_JSON.open(
         "w",
-
         encoding="utf-8",
-
     ) as file:
 
         json.dump(
-
-            results,
-
+            data,
             file,
-
             indent=4,
-
-            ensure_ascii=False,
-
+            sort_keys=True,
         )
 
-    success(
-        f"JSON Export: {file_path}"
-    )
-
-    return str(
-        file_path
-    )
-
 
 # ==========================================================
-# Export CSV
+# Export Results (CSV)
 # ==========================================================
 
-def export_csv(
-    results: dict,
-    output_dir: str = "output",
-):
+def export_results_csv(
+    analysis: dict,
+) -> None:
     """
-    Export discovered URLs
-    into CSV.
-
-    Returns:
-        str
+    Export crawler results as CSV.
     """
 
-    output = create_output_dir(
-        output_dir
-    )
-
-    file_path = output / "urls.csv"
-
-    with open(
-
-        file_path,
-
+    with RESULTS_CSV.open(
         "w",
-
         newline="",
-
         encoding="utf-8",
-
-    ) as csvfile:
+    ) as file:
 
         writer = csv.writer(
-            csvfile
+            file,
         )
 
         writer.writerow(
-
             [
-
                 "Host",
-
                 "URL",
-
                 "Status",
-
-                "Content-Type",
-
-                "Content-Length",
-
+                "Content Type",
+                "Content Length",
             ]
-
         )
 
-        for host, data in results.items():
+        for (
+            host,
+            result,
+        ) in sorted(
+            analysis["results"].items()
+        ):
 
-            for url, page in data.get(
-                "pages",
-                {},
-            ).items():
+            for (
+                url,
+                page,
+            ) in sorted(
+                result["pages"].items()
+            ):
 
                 writer.writerow(
-
                     [
-
                         host,
-
                         url,
-
-                        page.get(
-                            "status",
-                            "",
-                        ),
-
-                        page.get(
-                            "content_type",
-                            "",
-                        ),
-
-                        page.get(
-                            "content_length",
-                            "",
-                        ),
-
+                        page["status"],
+                        page["content_type"],
+                        page["content_length"],
                     ]
-
                 )
 
-    success(
-        f"CSV Export: {file_path}"
-    )
-
-    return str(
-        file_path
-    )
-
 
 # ==========================================================
-# Show Summary
+# Export Summary
 # ==========================================================
 
-def show_summary(
-    summary: dict,
-):
+def export_summary(
+    analysis: dict,
+) -> None:
     """
-    Print crawl summary.
+    Export crawler summary.
     """
 
-    info(
-        "-" * 60
-    )
+    statistics = analysis[
+        "statistics"
+    ]
 
-    info(
-        "URL Discovery Summary"
-    )
+    with SUMMARY_TXT.open(
+        "w",
+        encoding="utf-8",
+    ) as file:
 
-    info(
-        "-" * 60
-    )
+        file.write(
+            "Crawler Summary\n"
+        )
 
-    info(
-        f"Hosts          : {summary.get('hosts', 0)}"
-    )
+        file.write(
+            "=" * 60 + "\n\n"
+        )
 
-    info(
-        f"Success        : {summary.get('success', 0)}"
-    )
+        file.write(
+            f"Hosts             : {statistics['hosts']}\n"
+        )
 
-    info(
-        f"Failed         : {summary.get('failed', 0)}"
-    )
+        file.write(
+            f"Total URLs        : {statistics['total_urls']}\n"
+        )
 
-    info(
-        f"Pages          : {summary.get('pages', 0)}"
-    )
+        file.write(
+            f"Average URLs/Host : {statistics['average_urls_per_host']}\n"
+        )
 
-    info(
-        f"Elapsed        : {summary.get('elapsed', 0)} sec"
-    )
+        file.write(
+            f"Failed Pages      : {statistics['failed']}\n"
+        )
 
-    info(
-        "-" * 60
-    )
+        file.write(
+            f"Internal URLs     : {statistics['internal_urls']}\n"
+        )
+
+        file.write(
+            f"External URLs     : {statistics['external_urls']}\n"
+        )
+
+        file.write(
+            f"JavaScript Files  : {statistics['javascript']}\n"
+        )
+
+        file.write(
+            f"CSS Files         : {statistics['css']}\n"
+        )
+
+        file.write(
+            f"Forms             : {statistics['forms']}\n"
+        )
+
+        file.write(
+            f"Emails            : {statistics['emails']}\n"
+        )
+
+        file.write(
+            f"Scan Time         : {analysis['scan_time']} sec\n\n"
+        )
+
+        file.write(
+            "URLs Per Host\n"
+        )
+
+        file.write(
+            "-" * 60 + "\n"
+        )
+
+        for (
+            host,
+            count,
+        ) in statistics[
+            "urls_per_host"
+        ].items():
+
+            file.write(
+                f"{host:<40}{count}\n"
+            )
 
 
 # ==========================================================
@@ -300,60 +263,40 @@ def show_summary(
 # ==========================================================
 
 def export_all(
-    crawl_result: dict,
-    output_dir: str = "output",
-):
+    analysis: dict,
+) -> None:
     """
-    Export all results.
-
-    Returns:
-        dict
+    Export all crawler output files.
     """
 
-    results = crawl_result.get(
-        "results",
-        {},
+    create_output_directory()
+
+    export_results_txt(
+        analysis,
     )
 
-    summary = crawl_result.get(
-        "summary",
-        {},
+    export_results_json(
+        analysis,
     )
 
-    txt_file = export_txt(
-
-        results,
-
-        output_dir,
-
+    export_results_csv(
+        analysis,
     )
 
-    json_file = export_json(
-
-        results,
-
-        output_dir,
-
+    export_summary(
+        analysis,
     )
 
-    csv_file = export_csv(
 
-        results,
+# ==========================================================
+# Public Exports
+# ==========================================================
 
-        output_dir,
-
-    )
-
-    show_summary(
-        summary
-    )
-
-    return {
-
-        "txt": txt_file,
-
-        "json": json_file,
-
-        "csv": csv_file,
-
-    }
+__all__ = [
+    "create_output_directory",
+    "export_results_txt",
+    "export_results_json",
+    "export_results_csv",
+    "export_summary",
+    "export_all",
+]

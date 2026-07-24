@@ -1,8 +1,10 @@
 """
 Technology Detection Manager
 
-Coordinates parallel technology detection.
+Coordinates technology detection.
 """
+
+from __future__ import annotations
 
 import time
 from concurrent.futures import (
@@ -16,13 +18,19 @@ from config.config import (
 
 from core.logger import (
     info,
+    progress_status,
     success,
     warning,
-    progress_status,
 )
 
+from modules.tech.analyzer import (
+    analyze,
+)
 from modules.tech.detector import (
     detect_technologies,
+)
+from modules.tech.exporter import (
+    export_all,
 )
 
 
@@ -33,43 +41,38 @@ from modules.tech.detector import (
 def detect_one_host(
     host: str,
     response: dict,
-):
+) -> tuple[str, dict]:
     """
     Detect technologies for one host.
-
-    Returns:
-        tuple[str, dict]
     """
-
-    technologies = detect_technologies(
-        response
-    )
 
     return (
         host,
-        technologies,
+        detect_technologies(
+            response,
+        ),
     )
 
 
 # ==========================================================
-# Detect All Hosts
+# Detect Hosts
 # ==========================================================
 
 def detect_hosts(
     http_results: dict,
-):
+) -> tuple[
+    dict,
+    list[str],
+    float,
+]:
     """
-    Detect technologies for every alive host.
-
-    Args:
-        http_results:
-            Output of HTTP Probe module.
+    Detect technologies for all hosts.
 
     Returns:
         (
             results,
-            failed,
-            elapsed
+            failed_hosts,
+            elapsed,
         )
     """
 
@@ -77,15 +80,19 @@ def detect_hosts(
         "Starting Technology Detection..."
     )
 
-    results = {}
+    results: dict = {}
 
-    failed = []
+    failed_hosts: list[str] = []
 
     completed = 0
 
-    total = len(http_results)
+    total = len(
+        http_results
+    )
 
-    start_time = time.perf_counter()
+    start_time = (
+        time.perf_counter()
+    )
 
     with ThreadPoolExecutor(
         max_workers=MAX_WORKERS,
@@ -105,7 +112,7 @@ def detect_hosts(
         }
 
         for future in as_completed(
-            futures
+            futures,
         ):
 
             host = futures[
@@ -116,34 +123,30 @@ def detect_hosts(
 
             try:
 
-                hostname, technologies = (
-                    future.result()
-                )
+                (
+                    hostname,
+                    technologies,
+                ) = future.result()
 
                 results[
                     hostname
                 ] = technologies
-
-                tech_count = len(
-                    technologies.get(
-                        "technologies",
-                        [],
-                    )
-                )
 
                 progress_status(
                     completed,
                     total,
                     (
                         f"✓ {hostname} "
-                        f"[{tech_count} tech]"
+                        f"["
+                        f"{len(technologies.get('technologies', []))}"
+                        f" tech]"
                     ),
                 )
 
             except Exception as error:
 
-                failed.append(
-                    host
+                failed_hosts.append(
+                    host,
                 )
 
                 warning(
@@ -163,104 +166,61 @@ def detect_hosts(
     )
 
     success(
-        f"Technology Detection Completed : {len(results)}"
+        f"Technology Detection Completed: "
+        f"{len(results)}"
     )
 
     success(
-        f"Failed Hosts : {len(failed)}"
+        f"Failed Hosts: "
+        f"{len(failed_hosts)}"
     )
 
     return (
         results,
-        failed,
+        failed_hosts,
         elapsed,
     )
 
 
 # ==========================================================
-# Statistics
+# Run
 # ==========================================================
 
-def get_statistics(
-    results: dict,
-):
+def run(
+    http_results: dict,
+) -> dict:
     """
-    Generate technology statistics.
+    Run technology detection workflow.
 
     Returns:
-        dict
+        Analysis dictionary.
     """
 
-    technologies = {}
+    (
+        results,
+        failed_hosts,
+        elapsed,
+    ) = detect_hosts(
+        http_results,
+    )
 
-    security_headers = {}
+    analysis = analyze(
+        results=results,
+        failed_hosts=failed_hosts,
+        elapsed=elapsed,
+    )
 
-    for data in results.values():
+    export_all(
+        analysis,
+    )
 
-        # -------------------------------------
-        # Technologies
-        # -------------------------------------
+    return analysis
 
-        for tech in data.get(
-            "technologies",
-            [],
-        ):
 
-            technologies[
-                tech
-            ] = technologies.get(
-                tech,
-                0,
-            ) + 1
+# ==========================================================
+# Public Exports
+# ==========================================================
 
-        # -------------------------------------
-        # Security Headers
-        # -------------------------------------
-
-        for header in data.get(
-            "security_headers",
-            [],
-        ):
-
-            security_headers[
-                header
-            ] = security_headers.get(
-                header,
-                0,
-            ) + 1
-
-    return {
-
-        "technologies":
-
-            dict(
-
-                sorted(
-
-                    technologies.items(),
-
-                    key=lambda item: item[1],
-
-                    reverse=True,
-
-                )
-
-            ),
-
-        "security_headers":
-
-            dict(
-
-                sorted(
-
-                    security_headers.items(),
-
-                    key=lambda item: item[1],
-
-                    reverse=True,
-
-                )
-
-            ),
-
-    }
+__all__ = [
+    "run",
+]

@@ -1,8 +1,10 @@
 """
 HTTP Probe Manager
 
-Coordinates parallel HTTP probing.
+Coordinate HTTP probing, analysis, and exporting.
 """
+
+from __future__ import annotations
 
 import time
 from concurrent.futures import (
@@ -21,6 +23,14 @@ from core.logger import (
     progress_status,
 )
 
+from modules.http.analyzer import (
+    analyze,
+)
+
+from modules.http.exporter import (
+    export_all,
+)
+
 from modules.http.probe import (
     probe_host,
 )
@@ -32,51 +42,58 @@ from modules.http.probe import (
 
 def probe_one_host(
     host: str,
-):
+) -> tuple[str, dict | None]:
     """
     Probe a single host.
 
-    Returns:
-        tuple[str, dict | None]
-    """
+    Args:
+        host: Target hostname.
 
-    result = probe_host(
-        host
-    )
+    Returns:
+        Hostname and probe result.
+    """
 
     return (
         host,
-        result,
+        probe_host(host),
     )
 
 
 # ==========================================================
-# Probe All Hosts
+# Probe Hosts
 # ==========================================================
 
 def probe_hosts(
     hosts: list[str],
-):
+) -> tuple[
+    dict[str, dict],
+    list[str],
+    float,
+]:
     """
-    Probe all hosts in parallel.
+    Probe multiple hosts in parallel.
+
+    Args:
+        hosts: Target hosts.
 
     Returns:
-        (
-            alive_results,
-            failed_hosts,
-            elapsed
-        )
+        Probe results,
+        failed hosts,
+        elapsed time.
     """
 
     info(
         "Starting HTTP Probe..."
     )
 
-    results = {}
+    results: dict[
+        str,
+        dict,
+    ] = {}
 
-    failed = []
-
-    retry_queue = []
+    failed_hosts: list[
+        str
+    ] = []
 
     completed = 0
 
@@ -84,7 +101,9 @@ def probe_hosts(
         hosts
     )
 
-    start_time = time.perf_counter()
+    start_time = (
+        time.perf_counter()
+    )
 
     with ThreadPoolExecutor(
         max_workers=MAX_WORKERS,
@@ -98,24 +117,24 @@ def probe_hosts(
             ): host
 
             for host in hosts
-
         }
 
         for future in as_completed(
             futures
         ):
 
+            completed += 1
+
             host = futures[
                 future
             ]
 
-            completed += 1
-
             try:
 
-                hostname, response = (
-                    future.result()
-                )
+                (
+                    hostname,
+                    response,
+                ) = future.result()
 
                 if response:
 
@@ -135,7 +154,7 @@ def probe_hosts(
 
                 else:
 
-                    failed.append(
+                    failed_hosts.append(
                         hostname
                     )
 
@@ -147,11 +166,7 @@ def probe_hosts(
 
             except Exception as error:
 
-                failed.append(
-                    host
-                )
-
-                retry_queue.append(
+                failed_hosts.append(
                     host
                 )
 
@@ -165,19 +180,6 @@ def probe_hosts(
                     f"✗ {host}",
                 )
 
-    # ------------------------------------------------------
-    # Retry Queue (Future)
-    # ------------------------------------------------------
-
-    if retry_queue:
-
-        info(
-            f"Retry Queue: {len(retry_queue)} host(s)"
-        )
-
-        # Future:
-        # Retry failed hosts here.
-
     elapsed = round(
         time.perf_counter()
         - start_time,
@@ -189,11 +191,58 @@ def probe_hosts(
     )
 
     success(
-        f"Dead Hosts  : {len(failed)}"
+        f"Dead Hosts  : {len(failed_hosts)}"
     )
 
     return (
         results,
-        failed,
+        failed_hosts,
         elapsed,
     )
+
+
+# ==========================================================
+# Run HTTP Probe
+# ==========================================================
+
+def run(
+    hosts: list[str],
+) -> dict:
+    """
+    Run the HTTP Probe module.
+
+    Args:
+        hosts: Target hosts.
+
+    Returns:
+        HTTP analysis.
+    """
+
+    (
+        results,
+        failed_hosts,
+        elapsed,
+    ) = probe_hosts(
+        hosts,
+    )
+
+    analysis = analyze(
+        results=results,
+        failed_hosts=failed_hosts,
+        elapsed=elapsed,
+    )
+
+    export_all(
+        analysis,
+    )
+
+    return analysis
+
+
+# ==========================================================
+# Public Exports
+# ==========================================================
+
+__all__ = [
+    "run",
+]

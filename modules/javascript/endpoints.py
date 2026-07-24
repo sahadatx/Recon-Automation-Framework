@@ -5,6 +5,8 @@ Filters interesting endpoints extracted
 from JavaScript files.
 """
 
+from __future__ import annotations
+
 import re
 
 
@@ -15,6 +17,7 @@ import re
 INTERESTING_KEYWORDS = (
 
     "/api",
+
     "/v1",
     "/v2",
     "/v3",
@@ -60,9 +63,9 @@ INTERESTING_KEYWORDS = (
 
 def normalize_endpoint(
     endpoint: str,
-):
+) -> str:
     """
-    Normalize endpoint.
+    Normalize an endpoint.
 
     Returns:
         str
@@ -78,13 +81,17 @@ def normalize_endpoint(
 
         return ""
 
-    endpoint = endpoint.split("?")[0]
+    endpoint = endpoint.split(
+        "?",
+        1,
+    )[0]
 
-    endpoint = endpoint.split("#")[0]
+    endpoint = endpoint.split(
+        "#",
+        1,
+    )[0]
 
-    endpoint = endpoint.rstrip("/")
-
-    return endpoint
+    return endpoint.rstrip("/")
 
 
 # ==========================================================
@@ -93,9 +100,10 @@ def normalize_endpoint(
 
 def is_interesting(
     endpoint: str,
-):
+) -> bool:
     """
-    Check whether endpoint is interesting.
+    Check whether an endpoint
+    is interesting.
 
     Returns:
         bool
@@ -107,7 +115,9 @@ def is_interesting(
 
         keyword in endpoint
 
-        for keyword in INTERESTING_KEYWORDS
+        for keyword
+
+        in INTERESTING_KEYWORDS
 
     )
 
@@ -118,22 +128,20 @@ def is_interesting(
 
 def filter_endpoints(
     urls: list[str],
-):
+) -> list[str]:
     """
     Filter interesting endpoints.
 
     Returns:
-        list
+        list[str]
     """
 
-    endpoints = set()
+    endpoints: set[str] = set()
 
     for url in urls:
 
         endpoint = normalize_endpoint(
-
             url
-
         )
 
         if not endpoint:
@@ -141,36 +149,30 @@ def filter_endpoints(
             continue
 
         if is_interesting(
-
             endpoint
-
         ):
 
             endpoints.add(
-
                 endpoint
-
             )
 
     return sorted(
-
         endpoints
-
     )
 
 
 # ==========================================================
-# API Endpoint Detection
+# API Version Detection
 # ==========================================================
 
 def detect_api_versions(
     urls: list[str],
-):
+) -> list[str]:
     """
-    Detect versioned APIs.
+    Detect versioned API endpoints.
 
     Returns:
-        list
+        list[str]
     """
 
     pattern = re.compile(
@@ -184,25 +186,19 @@ def detect_api_versions(
     apis = {
 
         normalize_endpoint(
-
             url
-
         )
 
         for url in urls
 
         if pattern.search(
-
             url
-
         )
 
     }
 
     return sorted(
-
         apis
-
     )
 
 
@@ -212,20 +208,18 @@ def detect_api_versions(
 
 def detect_graphql(
     urls: list[str],
-):
+) -> list[str]:
     """
     Detect GraphQL endpoints.
 
     Returns:
-        list
+        list[str]
     """
 
     graphql = {
 
         normalize_endpoint(
-
             url
-
         )
 
         for url in urls
@@ -237,34 +231,30 @@ def detect_graphql(
     }
 
     return sorted(
-
         graphql
-
     )
 
 
 # ==========================================================
-# Entry Point
+# Extract Endpoints
 # ==========================================================
 
 def extract_endpoints(
     urls: list[str],
-):
+) -> list[str]:
     """
     Extract interesting endpoints.
 
     Returns:
-        list
+        list[str]
     """
 
-    endpoints = set()
+    endpoints: set[str] = set()
 
     endpoints.update(
 
         filter_endpoints(
-
             urls
-
         )
 
     )
@@ -272,9 +262,7 @@ def extract_endpoints(
     endpoints.update(
 
         detect_api_versions(
-
             urls
-
         )
 
     )
@@ -282,15 +270,34 @@ def extract_endpoints(
     endpoints.update(
 
         detect_graphql(
-
             urls
-
         )
 
     )
 
     return sorted(
-
         endpoints
-
     )
+
+
+# ==========================================================
+# Public Exports
+# ==========================================================
+
+__all__ = [
+
+    "INTERESTING_KEYWORDS",
+
+    "normalize_endpoint",
+
+    "is_interesting",
+
+    "filter_endpoints",
+
+    "detect_api_versions",
+
+    "detect_graphql",
+
+    "extract_endpoints",
+
+]

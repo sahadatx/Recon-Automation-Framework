@@ -5,23 +5,23 @@ Downloads JavaScript files discovered
 by the URL Discovery module.
 """
 
+from __future__ import annotations
+
 from modules.javascript.helpers import (
 
     download_file,
 
+    is_valid_url,
+
     safe_filename,
 
     save_javascript,
-
-    is_valid_url,
 
 )
 
 from core.logger import (
 
     debug,
-
-    info,
 
     warning,
 
@@ -34,48 +34,39 @@ from core.logger import (
 
 def download_one(
     url: str,
-):
+) -> dict | None:
     """
-    Download one JavaScript file.
+    Download a single
+    JavaScript file.
 
     Returns:
         dict | None
     """
 
     if not is_valid_url(
-
         url
-
     ):
 
         warning(
-
             f"Invalid JavaScript URL: {url}"
-
         )
 
         return None
 
     debug(
-
         f"Downloading {url}"
-
     )
 
     try:
 
         response = download_file(
-
             url
-
         )
 
     except Exception as error:
 
         warning(
-
             f"{url}: {error}"
-
         )
 
         return None
@@ -83,9 +74,7 @@ def download_one(
     if response is None:
 
         warning(
-
             f"Failed: {url}"
-
         )
 
         return None
@@ -93,9 +82,7 @@ def download_one(
     try:
 
         filename = safe_filename(
-
             url
-
         )
 
         filepath = save_javascript(
@@ -109,9 +96,7 @@ def download_one(
     except Exception as error:
 
         warning(
-
             f"{url}: {error}"
-
         )
 
         return None
@@ -123,17 +108,13 @@ def download_one(
         "filename": filename,
 
         "path": str(
-
             filepath
-
         ),
 
         "status": response.status_code,
 
         "size": len(
-
             response.text
-
         ),
 
         "content_type": response.headers.get(
@@ -153,64 +134,58 @@ def download_one(
 
 def download_multiple(
     urls: list[str],
-):
+) -> tuple[list[dict], list[str]]:
     """
     Download multiple
     JavaScript files.
 
     Returns:
-        tuple(
-            results,
-            failed,
-        )
+        tuple[
+            list[dict],
+            list[str],
+        ]
     """
 
     info(
-
         "Downloading JavaScript files..."
-
     )
 
-    urls = sorted({
+    urls = sorted(
 
-        url
-
-        for url in urls
-
-        if is_valid_url(
+        {
 
             url
 
-        )
+            for url in urls
 
-    })
+            if is_valid_url(
+                url
+            )
 
-    results = []
+        }
 
-    failed = []
+    )
+
+    results: list[dict] = []
+
+    failed: list[str] = []
 
     for url in urls:
 
         metadata = download_one(
-
             url
-
         )
 
         if metadata is None:
 
             failed.append(
-
                 url
-
             )
 
             continue
 
         results.append(
-
             metadata
-
         )
 
     info(
@@ -250,14 +225,33 @@ def download_multiple(
 
 def download_javascript(
     javascript_urls: list[str],
-):
+) -> tuple[list[dict], list[str]]:
     """
     JavaScript downloader
     entry point.
+
+    Returns:
+        tuple[
+            list[dict],
+            list[str],
+        ]
     """
 
     return download_multiple(
-
         javascript_urls
-
     )
+
+
+# ==========================================================
+# Public Exports
+# ==========================================================
+
+__all__ = [
+
+    "download_one",
+
+    "download_multiple",
+
+    "download_javascript",
+
+]

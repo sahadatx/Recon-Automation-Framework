@@ -5,6 +5,8 @@ Generic extraction functions used by the
 JavaScript Analysis module.
 """
 
+from __future__ import annotations
+
 import re
 
 from urllib.parse import (
@@ -37,15 +39,10 @@ COMMENT_PATTERN = re.compile(
     r"""
     (?:
         (?<!:)
-
         //[^\r\n]*
-
         |
-
         /\*
-
         [\s\S]*?
-
         \*/
     )
     """,
@@ -80,7 +77,7 @@ SOURCEMAP_PATTERN = re.compile(
 
 def is_valid_url(
     url: str,
-):
+) -> bool:
     """
     Validate extracted URL.
 
@@ -105,9 +102,7 @@ def is_valid_url(
     try:
 
         parsed = urlparse(
-
             url
-
         )
 
     except ValueError:
@@ -116,11 +111,7 @@ def is_valid_url(
 
     return (
 
-        parsed.scheme
-
-        in
-
-        {
+        parsed.scheme in {
 
             "http",
 
@@ -131,21 +122,19 @@ def is_valid_url(
         and
 
         bool(
-
             parsed.netloc
-
         )
 
     )
 
 
 # ==========================================================
-# Normalize
+# Normalize Values
 # ==========================================================
 
 def normalize(
-    items,
-):
+    items: list,
+) -> list:
     """
     Normalize extracted values.
 
@@ -159,9 +148,7 @@ def normalize(
 
             str(item).strip()
 
-            for item
-
-            in items
+            for item in items
 
             if item
 
@@ -178,12 +165,12 @@ def normalize(
 
 def extract_urls(
     content: str,
-):
+) -> list[str]:
     """
     Extract valid URLs.
 
     Returns:
-        list
+        list[str]
     """
 
     return normalize(
@@ -192,18 +179,12 @@ def extract_urls(
 
             url
 
-            for url
-
-            in URL_PATTERN.findall(
-
+            for url in URL_PATTERN.findall(
                 content
-
             )
 
             if is_valid_url(
-
                 url
-
             )
 
         ]
@@ -217,40 +198,32 @@ def extract_urls(
 
 def extract_comments(
     content: str,
-):
+) -> list[str]:
     """
     Extract JavaScript comments.
 
     Returns:
-        list
+        list[str]
     """
 
-    comments = []
+    comments: list[str] = []
 
     for match in COMMENT_PATTERN.finditer(
-
         content
-
     ):
 
         value = match.group(
-
             0
-
         ).strip()
 
         if value:
 
             comments.append(
-
                 value
-
             )
 
     return normalize(
-
         comments
-
     )
 
 
@@ -260,45 +233,35 @@ def extract_comments(
 
 def extract_strings(
     content: str,
-):
+) -> list[str]:
     """
     Extract quoted strings.
 
     Returns:
-        list
+        list[str]
     """
 
-    strings = []
+    strings: list[str] = []
 
     for match in STRING_PATTERN.finditer(
-
         content
-
     ):
 
         value = match.group(
-
             2
-
         ).strip()
 
         if value:
 
             strings.append(
-
                 value
-
             )
-
-    strings = normalize(
-
-        strings
-
-    )
 
     return filter_strings(
 
-        strings
+        normalize(
+            strings
+        )
 
     )
 
@@ -309,39 +272,35 @@ def extract_strings(
 
 def extract_source_maps(
     content: str,
-):
+) -> list[str]:
     """
     Extract source maps.
 
     Returns:
-        list
+        list[str]
     """
-
-    maps = SOURCEMAP_PATTERN.findall(
-
-        content
-
-    )
 
     return normalize(
 
-        maps
+        SOURCEMAP_PATTERN.findall(
+            content
+        )
 
     )
 
 
 # ==========================================================
-# Statistics
+# Generate Statistics
 # ==========================================================
 
 def generate_statistics(
-    urls: list,
-    comments: list,
-    strings: list,
-    source_maps: list,
-):
+    urls: list[str],
+    comments: list[str],
+    strings: list[str],
+    source_maps: list[str],
+) -> dict:
     """
-    Generate statistics.
+    Generate parser statistics.
 
     Returns:
         dict
@@ -350,27 +309,19 @@ def generate_statistics(
     return {
 
         "urls": len(
-
             urls
-
         ),
 
         "comments": len(
-
             comments
-
         ),
 
         "strings": len(
-
             strings
-
         ),
 
         "source_maps": len(
-
             source_maps
-
         ),
 
     }
@@ -382,7 +333,7 @@ def generate_statistics(
 
 def parse_content(
     content: str,
-):
+) -> dict:
     """
     Parse JavaScript content.
 
@@ -391,39 +342,19 @@ def parse_content(
     """
 
     urls = extract_urls(
-
         content
-
     )
 
     comments = extract_comments(
-
         content
-
     )
 
     strings = extract_strings(
-
         content
-
     )
 
     source_maps = extract_source_maps(
-
         content
-
-    )
-
-    statistics = generate_statistics(
-
-        urls,
-
-        comments,
-
-        strings,
-
-        source_maps,
-
     )
 
     return {
@@ -436,6 +367,37 @@ def parse_content(
 
         "source_maps": source_maps,
 
-        "statistics": statistics,
+        "statistics": generate_statistics(
+
+            urls,
+
+            comments,
+
+            strings,
+
+            source_maps,
+
+        ),
 
     }
+
+
+# ==========================================================
+# Public Exports
+# ==========================================================
+
+__all__ = [
+
+    "extract_urls",
+
+    "extract_comments",
+
+    "extract_strings",
+
+    "extract_source_maps",
+
+    "generate_statistics",
+
+    "parse_content",
+
+]

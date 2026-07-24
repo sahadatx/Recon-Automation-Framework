@@ -1,244 +1,194 @@
 """
-Unit tests for
-email.manager
+Screenshot Module Test
+
+Integration test for Screenshot Engine.
 """
 
-from __future__ import annotations
 
-import unittest
-from unittest.mock import patch
-
-from modules.email.manager import (
-    run_email_security,
+from modules.screenshots.manager import (
+    execute,
 )
 
 
-class TestEmailManager(
-    unittest.TestCase,
-):
 
-    @patch(
-        "modules.email.manager.export_results",
+# ==========================================================
+# Main Test
+# ==========================================================
+
+def main():
+
+
+    http_results = {
+
+        "example.com": {
+
+            "url":
+                "https://example.com",
+
+            "status":
+                200,
+
+        },
+
+    }
+
+
+    print(
+        "=" * 70
     )
-    @patch(
-        "modules.email.manager.print_summary",
+
+    print(
+        "Screenshot Module Integration Test"
     )
-    @patch(
-        "modules.email.manager.generate_statistics",
+
+    print(
+        "=" * 70
     )
-    @patch(
-        "modules.email.manager.filter_results",
+
+
+    analysis = execute(
+
+        http_results
+
     )
-    @patch(
-        "modules.email.manager.analyze",
+
+
+    print()
+
+
+    print(
+        "=" * 70
     )
-    @patch(
-        "modules.email.manager.create_result",
+
+    print(
+        "TEST RESULT"
     )
-    @patch(
-        "modules.email.manager.resolve_dnskey",
+
+    print(
+        "=" * 70
     )
-    @patch(
-        "modules.email.manager.resolve_bimi",
+
+
+    print(
+        "Type:",
+        type(analysis)
     )
-    @patch(
-        "modules.email.manager.resolve_tls_rpt",
+
+
+    print(
+        "Keys:",
+        list(
+            analysis.keys()
+        )
     )
-    @patch(
-        "modules.email.manager.resolve_mta_sts",
+
+
+    print()
+
+
+    print(
+        "Total Targets:",
+        analysis.get(
+            "total_targets"
+        )
     )
-    @patch(
-        "modules.email.manager.resolve_dmarc",
+
+
+    print(
+        "Captured:",
+        analysis.get(
+            "captured"
+        )
     )
-    @patch(
-        "modules.email.manager.resolve_dkim",
+
+
+    print(
+        "Failed:",
+        analysis.get(
+            "failed"
+        )
     )
-    @patch(
-        "modules.email.manager.resolve_spf",
+
+
+    print(
+        "Scan Time:",
+        analysis.get(
+            "scan_time"
+        )
     )
-    @patch(
-        "modules.email.manager.resolve_mx",
+
+
+    print()
+
+
+    print(
+        "Screenshots:"
     )
-    @patch(
-        "modules.email.manager.normalize_target",
+
+
+    print(
+        "-" * 70
     )
-    def test_run_email_security(
 
-        self,
 
-        mock_normalize,
+    for item in analysis.get(
 
-        mock_mx,
+        "results",
 
-        mock_spf,
-
-        mock_dkim,
-
-        mock_dmarc,
-
-        mock_mta_sts,
-
-        mock_tls_rpt,
-
-        mock_bimi,
-
-        mock_dnssec,
-
-        mock_create,
-
-        mock_analyze,
-
-        mock_filter,
-
-        mock_statistics,
-
-        mock_summary,
-
-        mock_export,
+        []
 
     ):
 
-        mock_normalize.return_value = (
 
-            "example.com"
-
+        print(
+            "URL:",
+            item.get(
+                "url"
+            )
         )
 
-        mock_mx.return_value = [
 
-            "mx.example.com",
-
-        ]
-
-        mock_spf.return_value = (
-
-            True,
-
-            "v=spf1",
-
+        print(
+            "Captured:",
+            item.get(
+                "captured"
+            )
         )
 
-        mock_dkim.return_value = (
 
-            True,
-
-            "default",
-
+        print(
+            "Status:",
+            item.get(
+                "status"
+            )
         )
 
-        mock_dmarc.return_value = (
 
-            True,
-
-            "v=DMARC1",
-
+        print(
+            "Image:",
+            item.get(
+                "path"
+            )
         )
 
-        mock_mta_sts.return_value = True
 
-        mock_tls_rpt.return_value = True
-
-        mock_bimi.return_value = False
-
-        mock_dnssec.return_value = False
-
-        result = {
-
-            "target": "example.com",
-
-            "provider": "Google Workspace",
-
-            "score": 20,
-
-            "risk": "Low",
-
-            "spf": True,
-
-            "dkim": True,
-
-            "dmarc": True,
-
-        }
-
-        mock_create.return_value = result
-
-        mock_analyze.return_value = result
-
-        mock_filter.return_value = [
-
-            result,
-
-        ]
-
-        statistics = {
-
-            "targets": 1,
-
-            "low": 1,
-
-            "medium": 0,
-
-            "high": 0,
-
-            "critical": 0,
-
-            "average_score": 20,
-
-            "highest_score": 20,
-
-            "elapsed": 0.01,
-
-        }
-
-        mock_statistics.return_value = (
-
-            statistics
-
+        print(
+            "-" * 70
         )
 
-        results, stats = run_email_security(
 
-            [
+    print()
 
-                "example.com",
+    print(
+        "Done."
+    )
 
-            ],
 
-        )
 
-        self.assertEqual(
-
-            len(
-
-                results,
-
-            ),
-
-            1,
-
-        )
-
-        self.assertEqual(
-
-            stats[
-
-                "targets"
-
-            ],
-
-            1,
-
-        )
-
-        mock_export.assert_called_once()
-
-        mock_summary.assert_called_once()
-
+# ==========================================================
+# Entry
+# ==========================================================
 
 if __name__ == "__main__":
 
-    unittest.main(
-
-        verbosity=2,
-
-    )
+    main()

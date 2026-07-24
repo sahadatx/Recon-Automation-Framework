@@ -5,6 +5,8 @@ Detects interesting files and directories
 referenced inside JavaScript.
 """
 
+from __future__ import annotations
+
 from pathlib import PurePosixPath
 from urllib.parse import urlparse
 
@@ -130,7 +132,7 @@ def normalize(
     value: str,
 ) -> str:
     """
-    Normalize URL path.
+    Normalize a URL path.
 
     Returns:
         str
@@ -143,17 +145,13 @@ def normalize(
     try:
 
         parsed = urlparse(
-
             value
-
         )
 
     except ValueError as error:
 
         debug(
-
             f"Skipping invalid URL: {value} ({error})"
-
         )
 
         return ""
@@ -163,9 +161,7 @@ def normalize(
         path = str(
 
             PurePosixPath(
-
                 parsed.path
-
             )
 
         )
@@ -185,7 +181,11 @@ def is_interesting_file(
     path: str,
 ) -> bool:
     """
-    Check interesting filename.
+    Check whether a path
+    references an interesting file.
+
+    Returns:
+        bool
     """
 
     if not path:
@@ -193,9 +193,7 @@ def is_interesting_file(
         return False
 
     filename = PurePosixPath(
-
         path
-
     ).name.lower()
 
     return (
@@ -217,7 +215,11 @@ def is_interesting_directory(
     path: str,
 ) -> bool:
     """
-    Check interesting directory.
+    Check whether a path
+    contains an interesting directory.
+
+    Returns:
+        bool
     """
 
     if not path:
@@ -249,19 +251,20 @@ def is_interesting_directory(
 
 def detect_interesting_files(
     urls: list[str],
-):
+) -> list[str]:
     """
     Detect interesting files.
+
+    Returns:
+        list[str]
     """
 
-    findings = set()
+    findings: set[str] = set()
 
     for url in urls:
 
         path = normalize(
-
             url
-
         )
 
         if not path:
@@ -269,22 +272,17 @@ def detect_interesting_files(
             continue
 
         if is_interesting_file(
-
             path
-
         ):
 
             findings.add(
-
                 path
-
             )
 
     return sorted(
-
         findings
-
     )
+
 
 
 # ==========================================================
@@ -293,19 +291,20 @@ def detect_interesting_files(
 
 def detect_interesting_directories(
     urls: list[str],
-):
+) -> list[str]:
     """
     Detect interesting directories.
+
+    Returns:
+        list[str]
     """
 
-    findings = set()
+    findings: set[str] = set()
 
     for url in urls:
 
         path = normalize(
-
             url
-
         )
 
         if not path:
@@ -313,57 +312,50 @@ def detect_interesting_directories(
             continue
 
         if is_interesting_directory(
-
             path
-
         ):
 
             findings.add(
-
                 path
-
             )
 
     return sorted(
-
         findings
-
     )
 
 
 # ==========================================================
-# Statistics
+# Generate Statistics
 # ==========================================================
 
 def generate_statistics(
-    files,
-    directories,
-):
+    files: list[str],
+    directories: list[str],
+) -> dict[str, int]:
     """
-    Generate statistics.
+    Generate scan statistics.
+
+    Returns:
+        dict[str, int]
     """
 
     return {
 
         "interesting_files": len(
-
             files
-
         ),
 
         "interesting_directories": len(
-
             directories
-
         ),
 
-        "total": len(
+        "total": (
 
-            files
+            len(files)
 
-        ) + len(
+            +
 
-            directories
+            len(directories)
 
         ),
 
@@ -375,23 +367,22 @@ def generate_statistics(
 # ==========================================================
 
 def scan(
-    urls,
-):
+    urls: list[str],
+) -> dict:
     """
-    Scan interesting files
-    and directories.
+    Scan URLs for interesting
+    files and directories.
+
+    Returns:
+        dict
     """
 
     files = detect_interesting_files(
-
         urls
-
     )
 
     directories = detect_interesting_directories(
-
         urls
-
     )
 
     return {
@@ -416,14 +407,45 @@ def scan(
 # ==========================================================
 
 def detect_interesting(
-    urls,
-):
+    urls: list[str],
+) -> dict:
     """
-    Entry point.
+    Interesting files detector
+    entry point.
+
+    Returns:
+        dict
     """
 
     return scan(
-
         urls
-
     )
+
+
+# ==========================================================
+# Public Exports
+# ==========================================================
+
+__all__ = [
+
+    "INTERESTING_FILES",
+
+    "INTERESTING_DIRECTORIES",
+
+    "normalize",
+
+    "is_interesting_file",
+
+    "is_interesting_directory",
+
+    "detect_interesting_files",
+
+    "detect_interesting_directories",
+
+    "generate_statistics",
+
+    "scan",
+
+    "detect_interesting",
+
+]

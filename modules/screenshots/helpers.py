@@ -4,6 +4,8 @@ Screenshot Helper Functions
 Production Async Playwright Browser Engine.
 """
 
+from __future__ import annotations
+
 from playwright.async_api import (
     async_playwright,
     Playwright,
@@ -12,14 +14,15 @@ from playwright.async_api import (
     Page,
 )
 
-from config.config import (
-    SCREENSHOT_HEADLESS,
+from modules.screenshots.constants import (
     SCREENSHOT_WIDTH,
     SCREENSHOT_HEIGHT,
+    HEADLESS,
 )
 
 from core.logger import (
     debug,
+    warning,
 )
 
 
@@ -29,17 +32,32 @@ from core.logger import (
 
 async def start_playwright() -> Playwright:
     """
-    Start Playwright engine.
+    Initialize Playwright engine.
 
     Returns:
-        Playwright
+        Playwright instance
     """
 
     debug(
-        "Starting Playwright..."
+        "Starting Playwright engine..."
     )
 
-    return await async_playwright().start()
+    try:
+
+        playwright = await (
+            async_playwright()
+            .start()
+        )
+
+        return playwright
+
+    except Exception as error:
+
+        warning(
+            f"Playwright start failed: {error}"
+        )
+
+        raise
 
 
 # ==========================================================
@@ -57,36 +75,46 @@ async def launch_browser(
             Playwright instance.
 
     Returns:
-        Browser
+        Browser instance
     """
 
     debug(
-        "Launching Chromium..."
+        "Launching Chromium browser..."
     )
 
-    browser = await playwright.chromium.launch(
+    try:
 
-        headless=SCREENSHOT_HEADLESS,
+        browser = await playwright.chromium.launch(
 
-        args=[
+            headless=HEADLESS,
 
-            "--disable-dev-shm-usage",
+            args=[
 
-            "--disable-gpu",
+                "--disable-dev-shm-usage",
 
-            "--disable-setuid-sandbox",
+                "--disable-gpu",
 
-            "--no-sandbox",
+                "--no-sandbox",
 
-        ],
+                "--disable-setuid-sandbox",
 
-    )
+            ],
 
-    return browser
+        )
+
+        return browser
+
+    except Exception as error:
+
+        warning(
+            f"Browser launch failed: {error}"
+        )
+
+        raise
 
 
 # ==========================================================
-# Create Browser Context
+# Create Context
 # ==========================================================
 
 async def create_context(
@@ -95,13 +123,13 @@ async def create_context(
     """
     Create isolated browser context.
 
-    Args:
-        browser:
-            Browser instance.
-
     Returns:
         BrowserContext
     """
+
+    debug(
+        "Creating browser context..."
+    )
 
     context = await browser.new_context(
 
@@ -136,7 +164,9 @@ async def create_page(
         Page
     """
 
-    return await context.new_page()
+    page = await context.new_page()
+
+    return page
 
 
 # ==========================================================
@@ -144,19 +174,25 @@ async def create_page(
 # ==========================================================
 
 async def close_page(
-    page: Page,
-):
+    page: Page | None,
+) -> None:
     """
-    Close page.
+    Close browser page.
     """
+
+    if page is None:
+
+        return
 
     try:
 
         await page.close()
 
-    except Exception:
+    except Exception as error:
 
-        pass
+        debug(
+            f"Page close failed: {error}"
+        )
 
 
 # ==========================================================
@@ -164,19 +200,25 @@ async def close_page(
 # ==========================================================
 
 async def close_context(
-    context: BrowserContext,
-):
+    context: BrowserContext | None,
+) -> None:
     """
     Close browser context.
     """
+
+    if context is None:
+
+        return
 
     try:
 
         await context.close()
 
-    except Exception:
+    except Exception as error:
 
-        pass
+        debug(
+            f"Context close failed: {error}"
+        )
 
 
 # ==========================================================
@@ -184,19 +226,25 @@ async def close_context(
 # ==========================================================
 
 async def close_browser(
-    browser: Browser,
-):
+    browser: Browser | None,
+) -> None:
     """
-    Close browser.
+    Close browser instance.
     """
+
+    if browser is None:
+
+        return
 
     try:
 
         await browser.close()
 
-    except Exception:
+    except Exception as error:
 
-        pass
+        debug(
+            f"Browser close failed: {error}"
+        )
 
 
 # ==========================================================
@@ -204,19 +252,25 @@ async def close_browser(
 # ==========================================================
 
 async def stop_playwright(
-    playwright: Playwright,
-):
+    playwright: Playwright | None,
+) -> None:
     """
-    Stop Playwright.
+    Stop Playwright engine.
     """
+
+    if playwright is None:
+
+        return
 
     try:
 
         await playwright.stop()
 
-    except Exception:
+    except Exception as error:
 
-        pass
+        debug(
+            f"Playwright stop failed: {error}"
+        )
 
 
 # ==========================================================
@@ -224,14 +278,14 @@ async def stop_playwright(
 # ==========================================================
 
 async def cleanup(
-    playwright: Playwright,
-    browser: Browser,
-):
+    playwright: Playwright | None,
+    browser: Browser | None,
+) -> None:
     """
     Cleanup Playwright resources.
 
-    BrowserContext cleanup is handled
-    by each capture task individually.
+    Context and page cleanup should
+    happen inside capture workflow.
     """
 
     await close_browser(
@@ -241,3 +295,30 @@ async def cleanup(
     await stop_playwright(
         playwright
     )
+
+
+# ==========================================================
+# Public Exports
+# ==========================================================
+
+__all__ = [
+
+    "start_playwright",
+
+    "launch_browser",
+
+    "create_context",
+
+    "create_page",
+
+    "close_page",
+
+    "close_context",
+
+    "close_browser",
+
+    "stop_playwright",
+
+    "cleanup",
+
+]

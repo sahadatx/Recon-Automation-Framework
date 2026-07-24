@@ -1,66 +1,56 @@
 """
 JavaScript Manager
 
-Coordinates JavaScript download,
-parsing and security analysis.
+Coordinates JavaScript analysis workflow.
 """
+
+from __future__ import annotations
 
 import time
 
 from concurrent.futures import (
-
     ThreadPoolExecutor,
-
     as_completed,
-
 )
 
 from config.config import (
-
     MAX_WORKERS,
-
 )
 
 from core.logger import (
-
     info,
-
     success,
-
     warning,
-
     progress_status,
-
 )
 
 from modules.javascript.helpers import (
-
     is_valid_url,
-
 )
 
 from modules.javascript.downloader import (
-
     download_one,
-
 )
 
 from modules.javascript.parser import (
-
     parse_file,
-
 )
 
 from modules.javascript.detectors import (
-
     scan_content,
-
 )
 
 from modules.javascript.interesting import (
-
     detect_interesting,
+)
 
+from modules.javascript.analyzer import (
+    analyze,
+)
+
+from modules.javascript.exporter import (
+    export_all,
+    show_summary,
 )
 
 
@@ -70,10 +60,9 @@ from modules.javascript.interesting import (
 
 def process_javascript(
     url: str,
-):
+) -> tuple[str, dict | None]:
     """
-    Download and analyze one
-    JavaScript file.
+    Download and analyze one JavaScript file.
 
     Returns:
         tuple(
@@ -82,70 +71,45 @@ def process_javascript(
         )
     """
 
-    if not is_valid_url(
-
-        url
-
-    ):
+    if not is_valid_url(url):
 
         warning(
-
             f"Invalid JavaScript URL: {url}"
-
         )
 
         return (
-
             url,
-
             None,
-
         )
 
     metadata = download_one(
-
         url
-
     )
 
     if metadata is None:
 
         return (
-
             url,
-
             None,
-
         )
 
     filepath = metadata.get(
-
         "path"
-
     )
 
     if not filepath:
 
         metadata.update(
-
             {
-
                 "analysis": None,
-
                 "interesting": None,
-
                 "secrets": None,
-
             }
-
         )
 
         return (
-
             url,
-
             metadata,
-
         )
 
     # ------------------------------------------------------
@@ -155,46 +119,16 @@ def process_javascript(
     try:
 
         analysis = parse_file(
-
             filepath
-
         )
 
     except Exception as error:
 
         warning(
-
-            f"Parse failed: "
-
-            f"{filepath} ({error})"
-
+            f"Parse failed: {filepath} ({error})"
         )
 
         analysis = None
-
-    if analysis is None:
-
-        metadata.update(
-
-            {
-
-                "analysis": None,
-
-                "interesting": None,
-
-                "secrets": None,
-
-            }
-
-        )
-
-        return (
-
-            url,
-
-            metadata,
-
-        )
 
     metadata["analysis"] = analysis
 
@@ -205,29 +139,20 @@ def process_javascript(
     try:
 
         metadata["interesting"] = (
-
             detect_interesting(
-
                 analysis.get(
-
                     "urls",
-
                     [],
-
                 )
-
             )
-
+            if analysis
+            else None
         )
 
     except Exception as error:
 
         warning(
-
-            f"Interesting detection failed: "
-
-            f"{filepath} ({error})"
-
+            f"Interesting detection failed: {filepath} ({error})"
         )
 
         metadata["interesting"] = None
@@ -239,15 +164,10 @@ def process_javascript(
     try:
 
         with open(
-
             filepath,
-
             "r",
-
             encoding="utf-8",
-
             errors="ignore",
-
         ) as file:
 
             content = file.read()
@@ -255,9 +175,7 @@ def process_javascript(
     except Exception as error:
 
         warning(
-
             f"{filepath}: {error}"
-
         )
 
         content = ""
@@ -265,245 +183,40 @@ def process_javascript(
     try:
 
         metadata["secrets"] = (
-
             scan_content(
-
                 content
-
             )
-
             if content
-
             else None
-
         )
 
     except Exception as error:
 
         warning(
-
-            f"Secret detection failed: "
-
-            f"{filepath} ({error})"
-
+            f"Secret detection failed: {filepath} ({error})"
         )
 
         metadata["secrets"] = None
 
     return (
-
         url,
-
         metadata,
-
     )
 
 # ==========================================================
-# Generate Statistics
+# Collect Results
 # ==========================================================
 
-def generate_statistics(
-    results: dict,
-):
-    """
-    Generate overall JavaScript
-    analysis statistics.
-
-    Args:
-        results:
-            JavaScript analysis results.
-
-    Returns:
-        dict
-    """
-
-    statistics = {
-
-        "processed_files": len(
-
-            results
-
-        ),
-
-        "urls": 0,
-
-        "comments": 0,
-
-        "strings": 0,
-
-        "source_maps": 0,
-
-        "endpoints": 0,
-
-        "interesting_files": 0,
-
-        "interesting_directories": 0,
-
-        "secret_types": 0,
-
-        "total_secrets": 0,
-
-    }
-
-    for metadata in results.values():
-
-        if not metadata:
-
-            continue
-
-        # --------------------------------------------------
-        # Parser Statistics
-        # --------------------------------------------------
-
-        analysis = metadata.get(
-
-            "analysis"
-
-        ) or {}
-
-        parser_stats = analysis.get(
-
-            "statistics",
-
-            {},
-
-        )
-
-        statistics["urls"] += parser_stats.get(
-
-            "urls",
-
-            0,
-
-        )
-
-        statistics["comments"] += parser_stats.get(
-
-            "comments",
-
-            0,
-
-        )
-
-        statistics["strings"] += parser_stats.get(
-
-            "strings",
-
-            0,
-
-        )
-
-        statistics["source_maps"] += parser_stats.get(
-
-            "source_maps",
-
-            0,
-
-        )
-
-        statistics["endpoints"] += parser_stats.get(
-
-            "endpoints",
-
-            0,
-
-        )
-
-        # --------------------------------------------------
-        # Interesting Statistics
-        # --------------------------------------------------
-
-        interesting = metadata.get(
-
-            "interesting"
-
-        ) or {}
-
-        interesting_stats = interesting.get(
-
-            "statistics",
-
-            {},
-
-        )
-
-        statistics["interesting_files"] += (
-
-            interesting_stats.get(
-
-                "interesting_files",
-
-                0,
-
-            )
-
-        )
-
-        statistics["interesting_directories"] += (
-
-            interesting_stats.get(
-
-                "interesting_directories",
-
-                0,
-
-            )
-
-        )
-
-        # --------------------------------------------------
-        # Secret Statistics
-        # --------------------------------------------------
-
-        secrets = metadata.get(
-
-            "secrets"
-
-        ) or {}
-
-        secret_stats = secrets.get(
-
-            "statistics",
-
-            {},
-
-        )
-
-        statistics["secret_types"] += secret_stats.get(
-
-            "secret_types",
-
-            0,
-
-        )
-
-        statistics["total_secrets"] += secret_stats.get(
-
-            "total_secrets",
-
-            0,
-
-        )
-
-    return statistics
-
-
-
-
-# ==========================================================
-# Download & Analyze
-# ==========================================================
-
-def download_javascript(
+def collect_results(
     javascript_urls: list[str],
-):
+) -> tuple[
+    dict,
+    list[str],
+    float,
+]:
     """
-    Download and analyze
+    Download and analyze all
     JavaScript files.
-
-    Args:
-        javascript_urls:
-            List of JavaScript URLs.
 
     Returns:
         tuple(
@@ -514,95 +227,63 @@ def download_javascript(
     """
 
     info(
-
-        "Starting JavaScript Analysis..."
-
+        "Starting JavaScript analysis..."
     )
 
-    # ------------------------------------------------------
-    # Remove Duplicates & Invalid URLs
-    # ------------------------------------------------------
-
-    javascript_urls = sorted({
-
-        url
-
-        for url in javascript_urls
-
-        if is_valid_url(
-
+    javascript_urls = sorted(
+        {
             url
-
-        )
-
-    })
+            for url in javascript_urls
+            if is_valid_url(url)
+        }
+    )
 
     if not javascript_urls:
 
         warning(
-
-            "No valid JavaScript files found."
-
+            "No valid JavaScript URLs found."
         )
 
         return (
-
             {},
-
             [],
-
             0.0,
-
         )
 
-    results = {}
+    results: dict = {}
 
-    failed = []
+    failed: list[str] = []
+
+    total = len(
+        javascript_urls
+    )
 
     completed = 0
 
-    total = len(
-
-        javascript_urls
-
-    )
-
-    start_time = time.perf_counter()
-
-    # ------------------------------------------------------
-    # Thread Pool
-    # ------------------------------------------------------
+    start = time.perf_counter()
 
     with ThreadPoolExecutor(
-
         max_workers=MAX_WORKERS,
-
     ) as executor:
 
         futures = {
 
             executor.submit(
-
                 process_javascript,
-
                 url,
-
             ): url
 
-            for url in javascript_urls
+            for url
+            in javascript_urls
 
         }
 
         for future in as_completed(
-
             futures
-
         ):
 
             url = futures[
-
                 future
-
             ]
 
             completed += 1
@@ -610,59 +291,17 @@ def download_javascript(
             try:
 
                 js_url, metadata = (
-
                     future.result()
-
                 )
-
-                if metadata is not None:
-
-                    results[
-
-                        js_url
-
-                    ] = metadata
-
-                    progress_status(
-
-                        completed,
-
-                        total,
-
-                        f"✓ {js_url}",
-
-                    )
-
-                else:
-
-                    failed.append(
-
-                        js_url
-
-                    )
-
-                    progress_status(
-
-                        completed,
-
-                        total,
-
-                        f"✗ {js_url}",
-
-                    )
 
             except Exception as error:
 
-                failed.append(
-
-                    url
-
+                warning(
+                    f"{url}: {error}"
                 )
 
-                warning(
-
-                    f"{url}: {error}"
-
+                failed.append(
+                    url
                 )
 
                 progress_status(
@@ -675,123 +314,47 @@ def download_javascript(
 
                 )
 
+                continue
+
+            if metadata is None:
+
+                failed.append(
+                    js_url
+                )
+
+                progress_status(
+
+                    completed,
+
+                    total,
+
+                    f"✗ {js_url}",
+
+                )
+
+                continue
+
+            results[
+                js_url
+            ] = metadata
+
+            progress_status(
+
+                completed,
+
+                total,
+
+                f"✓ {js_url}",
+
+            )
+
     elapsed = round(
 
         time.perf_counter()
 
-        - start_time,
+        - start,
 
         2,
-
-    )
-
-    # ------------------------------------------------------
-    # Statistics
-    # ------------------------------------------------------
-
-    statistics = generate_statistics(
-
-        results
-
-    )
-
-    # ------------------------------------------------------
-    # Summary
-    # ------------------------------------------------------
-
-    success(
-
-        f"Processed Files        : "
-
-        f"{statistics['processed_files']}"
-
-    )
-
-    success(
-
-        f"Failed Files           : "
-
-        f"{len(failed)}"
-
-    )
-
-    success(
-
-        f"URLs Found             : "
-
-        f"{statistics['urls']}"
-
-    )
-
-    success(
-
-        f"Endpoints              : "
-
-        f"{statistics['endpoints']}"
-
-    )
-
-    success(
-
-        f"Comments               : "
-
-        f"{statistics['comments']}"
-
-    )
-
-    success(
-
-        f"Strings                : "
-
-        f"{statistics['strings']}"
-
-    )
-
-    success(
-
-        f"Source Maps            : "
-
-        f"{statistics['source_maps']}"
-
-    )
-
-    success(
-
-        f"Interesting Files      : "
-
-        f"{statistics['interesting_files']}"
-
-    )
-
-    success(
-
-        f"Interesting Directories: "
-
-        f"{statistics['interesting_directories']}"
-
-    )
-
-    success(
-
-        f"Secret Types           : "
-
-        f"{statistics['secret_types']}"
-
-    )
-
-    success(
-
-        f"Secrets Found          : "
-
-        f"{statistics['total_secrets']}"
-
-    )
-
-    success(
-
-        f"Elapsed                : "
-
-        f"{elapsed:.2f} sec"
 
     )
 
@@ -804,3 +367,89 @@ def download_javascript(
         elapsed,
 
     )
+
+# ==========================================================
+# Run JavaScript Analysis
+# ==========================================================
+
+def run(
+    javascript_urls: list[str],
+) -> dict:
+    """
+    Run JavaScript analysis pipeline.
+
+    Workflow
+
+        Download
+            ↓
+        Parse
+            ↓
+        Interesting Detection
+            ↓
+        Secret Detection
+            ↓
+        Analyze
+            ↓
+        Export
+            ↓
+        Summary
+    """
+
+    results, failed, elapsed = (
+        collect_results(
+            javascript_urls
+        )
+    )
+
+    analysis = analyze(
+
+        results=results,
+
+        elapsed=elapsed,
+
+    )
+
+    analysis["failed"] = failed
+
+    export_all(
+        analysis
+    )
+
+    show_summary(
+        analysis
+    )
+
+    success(
+
+        f"Processed "
+        f"{analysis['processed_files']} "
+        f"JavaScript file(s)."
+
+    )
+
+    if failed:
+
+        warning(
+
+            f"Failed "
+            f"{len(failed)} "
+            f"JavaScript file(s)."
+
+        )
+
+    return analysis
+
+
+# ==========================================================
+# Public Exports
+# ==========================================================
+
+__all__ = [
+
+    "process_javascript",
+
+    "collect_results",
+
+    "run",
+
+]

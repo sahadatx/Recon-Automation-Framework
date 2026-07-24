@@ -1,24 +1,34 @@
 """
 Crawler Manager
 
-Coordinates parallel URL discovery.
+Coordinate URL crawling, analysis, and exporting.
 """
 
-import time
+from __future__ import annotations
 
+import time
 from concurrent.futures import (
     ThreadPoolExecutor,
     as_completed,
 )
 
 from config.config import (
-    CRAWLER_THREADS,
+    MAX_WORKERS,
 )
 
 from core.logger import (
     info,
-    success,
     warning,
+    success,
+    progress_status,
+)
+
+from modules.crawler.analyzer import (
+    analyze,
+)
+
+from modules.crawler.exporter import (
+    export_all,
 )
 
 from modules.crawler.crawler import (
@@ -27,141 +37,86 @@ from modules.crawler.crawler import (
 
 
 # ==========================================================
-# Retry Count
-# ==========================================================
-
-RETRY_COUNT = 2
-
-
-# ==========================================================
 # Crawl One Host
 # ==========================================================
 
-def crawl_one(
+def crawl_one_host(
     host: str,
-):
+) -> tuple[
+    str,
+    dict | None,
+]:
     """
     Crawl a single host.
 
+    Args:
+        host:
+            Target hostname.
+
     Returns:
-        tuple[str, dict | None]
+        Hostname and crawl result.
     """
 
-    for attempt in range(
-
-        RETRY_COUNT + 1
-
-    ):
-
-        try:
-
-            result = crawl_host(
-                host
-            )
-
-            return (
-
-                host,
-
-                result,
-
-            )
-
-        except Exception as error:
-
-            warning(
-
-                f"{host} "
-
-                f"(Attempt {attempt + 1}) "
-
-                f"{error}"
-
-            )
-
     return (
-
         host,
-
-        None,
-
+        crawl_host(
+            host,
+        ),
     )
 
 
 # ==========================================================
-# Create Summary
-# ==========================================================
-
-def create_summary():
-    """
-    Initialize manager statistics.
-    """
-
-    return {
-
-        "hosts": 0,
-
-        "success": 0,
-
-        "failed": 0,
-
-        "pages": 0,
-
-        "elapsed": 0.0,
-
-    }
-
-
-# ==========================================================
-# Crawl Multiple Hosts
+# Crawl Hosts
 # ==========================================================
 
 def crawl_hosts(
     hosts: list[str],
-):
+) -> tuple[
+    dict[str, dict],
+    float,
+]:
     """
-    Crawl multiple hosts.
+    Crawl multiple hosts in parallel.
+
+    Args:
+        hosts:
+            Target hosts.
 
     Returns:
-        dict
+        Crawl results and elapsed time.
     """
 
     info(
-        "Starting URL Discovery..."
+        "Starting URL Crawling..."
     )
 
-    start_time = time.perf_counter()
-
-    results = {}
-
-    failed = []
-
-    summary = create_summary()
-
-    summary["hosts"] = len(
-        hosts
-    )
+    results: dict[
+        str,
+        dict,
+    ] = {}
 
     completed = 0
 
+    total = len(
+        hosts
+    )
+
+    start_time = (
+        time.perf_counter()
+    )
+
     with ThreadPoolExecutor(
-
-        max_workers=CRAWLER_THREADS,
-
+        max_workers=MAX_WORKERS,
     ) as executor:
 
         futures = {
 
             executor.submit(
-
-                crawl_one,
-
+                crawl_one_host,
                 host,
-
             ): host
 
             for host in hosts
-
         }
 
         for future in as_completed(
@@ -176,148 +131,109 @@ def crawl_hosts(
 
             try:
 
-                hostname, result = (
+                (
+                    hostname,
+                    result,
+                ) = future.result()
 
-                    future.result()
-
-                )
-
-                if result:
+                if result is not None:
 
                     results[
                         hostname
                     ] = result
 
-                    summary[
-                        "success"
-                    ] += 1
-
-                    summary[
-                        "pages"
-                    ] += result[
+                    pages = result[
                         "statistics"
                     ][
                         "pages"
                     ]
 
-                    info(
-
-                        f"[{completed}/"
-
-                        f"{summary['hosts']}] "
-
-                        f"✓ {hostname}"
-
+                    progress_status(
+                        completed,
+                        total,
+                        (
+                            f"✓ {hostname} "
+                            f"({pages} pages)"
+                        ),
                     )
 
                 else:
 
-                    failed.append(
-                        hostname
-                    )
-
-                    summary[
-                        "failed"
-                    ] += 1
-
-                    warning(
-
-                        f"[{completed}/"
-
-                        f"{summary['hosts']}] "
-
-                        f"✗ {hostname}"
-
+                    progress_status(
+                        completed,
+                        total,
+                        f"✗ {hostname}",
                     )
 
             except Exception as error:
 
-                failed.append(
-                    host
-                )
-
-                summary[
-                    "failed"
-                ] += 1
-
                 warning(
-
                     f"{host}: {error}"
-
                 )
 
-    summary["elapsed"] = round(
+                progress_status(
+                    completed,
+                    total,
+                    f"✗ {host}",
+                )
 
+    elapsed = round(
         time.perf_counter()
-
         - start_time,
-
         2,
-
     )
 
     success(
-        "-" * 50
+        f"Hosts Crawled : {len(results)}"
     )
 
-    success(
-        "URL Discovery Completed"
+    return (
+        results,
+        elapsed,
     )
 
-    success(
-        "-" * 50
+
+# ==========================================================
+# Run Crawler
+# ==========================================================
+
+def run(
+    hosts: list[str],
+) -> dict:
+    """
+    Run the URL Discovery module.
+
+    Args:
+        hosts:
+            Target hosts.
+
+    Returns:
+        Crawl analysis.
+    """
+
+    (
+        results,
+        elapsed,
+    ) = crawl_hosts(
+        hosts,
     )
 
-    success(
-
-        f"Hosts      : "
-
-        f"{summary['hosts']}"
-
+    analysis = analyze(
+        results=results,
+        elapsed=elapsed,
     )
 
-    success(
-
-        f"Success    : "
-
-        f"{summary['success']}"
-
+    export_all(
+        analysis,
     )
 
-    success(
+    return analysis
 
-        f"Failed     : "
 
-        f"{summary['failed']}"
+# ==========================================================
+# Public Exports
+# ==========================================================
 
-    )
-
-    success(
-
-        f"Pages      : "
-
-        f"{summary['pages']}"
-
-    )
-
-    success(
-
-        f"Elapsed    : "
-
-        f"{summary['elapsed']} sec"
-
-    )
-
-    success(
-        "-" * 50
-    )
-
-    return {
-
-        "results": results,
-
-        "failed": failed,
-
-        "summary": summary,
-
-    }
+__all__ = [
+    "run",
+]

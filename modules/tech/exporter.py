@@ -1,138 +1,100 @@
 """
 Technology Detection Exporter
 
-Exports technology detection results.
+Export technology detection results.
 """
+
+from __future__ import annotations
 
 import csv
 import json
-from pathlib import Path
 
-from core.logger import (
-    success,
-    section,
+from modules.tech.constants import (
+    RESULTS_CSV,
+    RESULTS_JSON,
+    RESULTS_TXT,
+    SUMMARY_TXT,
+    TECH_OUTPUT_DIR,
+    TECHNOLOGIES_TXT,
 )
 
 
 # ==========================================================
-# Save Technologies
+# Create Output Directory
 # ==========================================================
 
-def save_technologies(
-    results: dict,
-    filename: str = "technologies.txt",
-) -> Path:
+def create_output_directory() -> None:
     """
-    Save detected technologies only.
+    Create output directory.
     """
 
-    output_dir = Path("output")
-
-    output_dir.mkdir(
+    TECH_OUTPUT_DIR.mkdir(
         parents=True,
         exist_ok=True,
     )
 
-    output_file = output_dir / filename
 
-    with output_file.open(
+# ==========================================================
+# Export Results (TXT)
+# ==========================================================
+
+def export_results_txt(
+    analysis: dict,
+) -> None:
+    """
+    Export detailed technology results.
+    """
+
+    with RESULTS_TXT.open(
         "w",
         encoding="utf-8",
     ) as file:
 
-        for host in sorted(results):
+        for host in sorted(
+            analysis["results"]
+        ):
 
-            technologies = results[
-                host
-            ].get(
-                "technologies",
-                [],
+            data = analysis[
+                "results"
+            ][host]
+
+            file.write(
+                "=" * 70 + "\n"
             )
-
-            if not technologies:
-                continue
 
             file.write(
                 f"{host}\n"
             )
 
-            for technology in technologies:
-
-                file.write(
-                    f"  - {technology}\n"
-                )
-
-            file.write("\n")
-
-    success(
-        f"Technologies saved to {output_file}"
-    )
-
-    return output_file
-
-
-# ==========================================================
-# Save Technology Results
-# ==========================================================
-
-def save_technology_results(
-    results: dict,
-    filename: str = "technology_results.txt",
-) -> Path:
-    """
-    Save complete technology detection results.
-    """
-
-    output_dir = Path("output")
-
-    output_dir.mkdir(
-        parents=True,
-        exist_ok=True,
-    )
-
-    output_file = output_dir / filename
-
-    with output_file.open(
-        "w",
-        encoding="utf-8",
-    ) as file:
-
-        for host in sorted(results):
-
-            file.write("=" * 70 + "\n")
-            file.write(f"{host}\n")
-            file.write("=" * 70 + "\n\n")
-
-            technologies = results[
-                host
-            ].get(
-                "technologies",
-                [],
-            )
-
-            security = results[
-                host
-            ].get(
-                "security_headers",
-                [],
+            file.write(
+                "=" * 70 + "\n\n"
             )
 
             file.write(
                 "Technologies\n"
             )
 
+            file.write(
+                "-" * 70 + "\n"
+            )
+
+            technologies = data.get(
+                "technologies",
+                [],
+            )
+
             if technologies:
 
-                for tech in technologies:
+                for technology in technologies:
 
                     file.write(
-                        f"  - {tech}\n"
+                        f"- {technology}\n"
                     )
 
             else:
 
                 file.write(
-                    "  None\n"
+                    "None\n"
                 )
 
             file.write("\n")
@@ -141,98 +103,75 @@ def save_technology_results(
                 "Security Headers\n"
             )
 
-            if security:
+            file.write(
+                "-" * 70 + "\n"
+            )
 
-                for header in security:
+            headers = data.get(
+                "security_headers",
+                [],
+            )
+
+            if headers:
+
+                for header in headers:
 
                     file.write(
-                        f"  - {header}\n"
+                        f"- {header}\n"
                     )
 
             else:
 
                 file.write(
-                    "  None\n"
+                    "None\n"
                 )
 
             file.write("\n")
 
-    success(
-        f"Technology results saved to {output_file}"
-    )
-
-    return output_file
-
 
 # ==========================================================
-# Export JSON
+# Export Results (JSON)
 # ==========================================================
 
-def export_technology_json(
-    results: dict,
-    filename: str = "technology_results.json",
-) -> Path:
+def export_results_json(
+    analysis: dict,
+) -> None:
     """
-    Export JSON results.
+    Export results as JSON.
     """
 
-    output_dir = Path("output")
-
-    output_dir.mkdir(
-        parents=True,
-        exist_ok=True,
-    )
-
-    output_file = output_dir / filename
-
-    with output_file.open(
+    with RESULTS_JSON.open(
         "w",
         encoding="utf-8",
     ) as file:
 
         json.dump(
-            results,
+            analysis,
             file,
             indent=4,
             sort_keys=True,
         )
 
-    success(
-        f"JSON exported to {output_file}"
-    )
-
-    return output_file
-
 
 # ==========================================================
-# Export CSV
+# Export Results (CSV)
 # ==========================================================
 
-def export_technology_csv(
-    results: dict,
-    filename: str = "technologies.csv",
-) -> Path:
+def export_results_csv(
+    analysis: dict,
+) -> None:
     """
-    Export CSV report.
+    Export results as CSV.
     """
 
-    output_dir = Path("output")
-
-    output_dir.mkdir(
-        parents=True,
-        exist_ok=True,
-    )
-
-    output_file = output_dir / filename
-
-    with output_file.open(
+    with RESULTS_CSV.open(
         "w",
         newline="",
         encoding="utf-8",
-    ) as csvfile:
+    ) as file:
 
         writer = csv.writer(
-            csvfile
+            file
         )
 
         writer.writerow(
@@ -243,159 +182,198 @@ def export_technology_csv(
             ]
         )
 
-        for host in sorted(results):
+        for host in sorted(
+            analysis["results"]
+        ):
+
+            data = analysis[
+                "results"
+            ][host]
 
             writer.writerow(
-
                 [
-
                     host,
-
                     ", ".join(
-
-                        results[host].get(
+                        data.get(
                             "technologies",
                             [],
                         )
-
                     ),
-
                     ", ".join(
-
-                        results[host].get(
+                        data.get(
                             "security_headers",
                             [],
                         )
-
                     ),
-
                 ]
-
             )
-
-    success(
-        f"CSV exported to {output_file}"
-    )
-
-    return output_file
 
 
 # ==========================================================
-# Summary
+# Export Summary
 # ==========================================================
 
-def show_summary(
-    results: dict,
-    failed: list,
-    elapsed: float,
-):
+def export_summary(
+    analysis: dict,
+) -> None:
     """
-    Display technology detection summary.
+    Export summary.
     """
 
-    section(
-        "Technology Detection Summary"
-    )
+    statistics = analysis[
+        "statistics"
+    ]
 
-    hosts = len(results)
+    with SUMMARY_TXT.open(
+        "w",
+        encoding="utf-8",
+    ) as file:
 
-    technology_total = 0
-
-    security_total = 0
-
-    technology_counts = {}
-
-    for data in results.values():
-
-        technologies = data.get(
-            "technologies",
-            [],
+        file.write(
+            "Technology Detection Summary\n"
         )
 
-        security = data.get(
-            "security_headers",
-            [],
+        file.write(
+            "=" * 60 + "\n\n"
         )
 
-        technology_total += len(
-            technologies
+        file.write(
+            f"Hosts Analyzed          : "
+            f"{statistics['hosts_analyzed']}\n"
         )
 
-        security_total += len(
-            security
+        file.write(
+            f"Failed Hosts            : "
+            f"{statistics['failed_hosts']}\n"
         )
 
-        for technology in technologies:
-
-            technology_counts[
-                technology
-            ] = technology_counts.get(
-                technology,
-                0,
-            ) + 1
-
-    print(
-        f"{'Hosts Analysed':<25}{hosts}"
-    )
-
-    print(
-        f"{'Failed Hosts':<25}{len(failed)}"
-    )
-
-    print("-" * 75)
-
-    print(
-        f"{'Detected Technologies':<25}{technology_total}"
-    )
-
-    print(
-        f"{'Security Headers':<25}{security_total}"
-    )
-
-    print("-" * 75)
-
-    print(
-        "Top Technologies"
-    )
-
-    print("-" * 75)
-
-    for technology, count in sorted(
-
-        technology_counts.items(),
-
-        key=lambda item: item[1],
-
-        reverse=True,
-
-    ):
-
-        print(
-            f"{technology:<30}{count}"
+        file.write(
+            f"Detected Technologies   : "
+            f"{statistics['technology_count']}\n"
         )
 
-    print("-" * 75)
-
-    print(
-        f"{'Total Time':<25}{elapsed:.2f} sec"
-    )
-
-    print("=" * 75)
-
-    if failed:
-
-        print()
-
-        print(
-            "Failed Hosts"
+        file.write(
+            f"Security Headers        : "
+            f"{statistics['security_header_count']}\n"
         )
 
-        print("-" * 75)
+        file.write(
+            f"Scan Time               : "
+            f"{analysis['scan_time']} sec\n\n"
+        )
 
-        for host in failed:
+        file.write(
+            "Technology Breakdown\n"
+        )
 
-            print(
-                f" • {host}"
+        file.write(
+            "-" * 60 + "\n"
+        )
+
+        for (
+            technology,
+            count,
+        ) in statistics[
+            "technology_counts"
+        ].items():
+
+            file.write(
+                f"{technology:<30}"
+                f"{count}\n"
             )
 
-        print("-" * 75)
+        file.write("\n")
+
+        file.write(
+            "Security Header Breakdown\n"
+        )
+
+        file.write(
+            "-" * 60 + "\n"
+        )
+
+        for (
+            header,
+            count,
+        ) in statistics[
+            "security_header_counts"
+        ].items():
+
+            file.write(
+                f"{header:<30}"
+                f"{count}\n"
+            )
+
+
+# ==========================================================
+# Export Technologies
+# ==========================================================
+
+def export_technologies(
+    analysis: dict,
+) -> None:
+    """
+    Export unique technologies.
+    """
+
+    with TECHNOLOGIES_TXT.open(
+        "w",
+        encoding="utf-8",
+    ) as file:
+
+        for technology in analysis[
+            "technologies"
+        ]:
+
+            file.write(
+                f"{technology}\n"
+            )
+
+
+# ==========================================================
+# Export All
+# ==========================================================
+
+def export_all(
+    analysis: dict,
+) -> None:
+    """
+    Export all output files.
+    """
+
+    create_output_directory()
+
+    export_results_txt(
+        analysis,
+    )
+
+    export_results_json(
+        analysis,
+    )
+
+    export_results_csv(
+        analysis,
+    )
+
+    export_summary(
+        analysis,
+    )
+
+    export_technologies(
+        analysis,
+    )
+
+
+# ==========================================================
+# Public Exports
+# ==========================================================
+
+__all__ = [
+    "create_output_directory",
+    "export_results_txt",
+    "export_results_json",
+    "export_results_csv",
+    "export_summary",
+    "export_technologies",
+    "export_all",
+]

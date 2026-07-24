@@ -21,13 +21,8 @@ from core.logger import (
 # ==========================================================
 # Passive Enumeration
 # ==========================================================
-
 from modules.passive.manager import (
-    collect_subdomains,
-    merge_results,
-    save_results,
-    export_results,
-    show_summary as show_passive_summary,
+    run as run_passive,
 )
 
 
@@ -36,10 +31,7 @@ from modules.passive.manager import (
 # ==========================================================
 
 from modules.dns.manager import (
-    resolve_subdomains,
-    save_dns_results,
-    export_dns_json,
-    show_summary as show_dns_summary,
+    run as run_dns,
 )
 
 
@@ -48,14 +40,7 @@ from modules.dns.manager import (
 # ==========================================================
 
 from modules.http.manager import (
-    probe_hosts,
-)
-
-from modules.http.exporter import (
-    save_alive_hosts,
-    save_http_results,
-    export_http_json,
-    show_summary as show_http_summary,
+    run as run_http,
 )
 
 
@@ -64,15 +49,7 @@ from modules.http.exporter import (
 # ==========================================================
 
 from modules.ports.manager import (
-    scan_hosts,
-)
-
-from modules.ports.exporter import (
-    save_open_ports,
-    save_port_results,
-    export_port_json,
-    export_open_ports_csv,
-    show_summary as show_port_summary,
+    run as run_ports,
 )
 
 
@@ -81,15 +58,7 @@ from modules.ports.exporter import (
 # ==========================================================
 
 from modules.tech.manager import (
-    detect_hosts,
-)
-
-from modules.tech.exporter import (
-    save_technologies,
-    save_technology_results,
-    export_technology_json,
-    export_technology_csv,
-    show_summary as show_technology_summary,
+    run as run_technology,
 )
 
 
@@ -98,11 +67,7 @@ from modules.tech.exporter import (
 # ==========================================================
 
 from modules.crawler.manager import (
-    crawl_hosts,
-)
-
-from modules.crawler.exporter import (
-    export_all as export_crawler_results,
+    run as run_crawler,
 )
 
 
@@ -111,14 +76,8 @@ from modules.crawler.exporter import (
 # ==========================================================
 
 from modules.javascript.manager import (
-    download_javascript,
+    run as run_javascript,
 )
-
-from modules.javascript.exporter import (
-    export_all as export_javascript_results,
-    show_summary as show_javascript_summary,
-)
-
 
 # ==========================================================
 # Directory Fuzzing
@@ -138,14 +97,8 @@ from modules.fuzzing.exporter import (
 # Screenshot Capture
 # ==========================================================
 
-from modules.screenshot.manager import (
-    capture_hosts,
-)
-
-from modules.screenshot.exporter import (
-    save_screenshot_results,
-    export_screenshot_json,
-    show_summary as show_screenshot_summary,
+from modules.screenshots.manager import (
+    execute as run_screenshot,
 )
 
 
@@ -256,56 +209,25 @@ def main() -> None:
     # Passive Enumeration
     # ------------------------------------------------------
 
-    passive_results, timings, passive_failed, passive_time = (
-        collect_subdomains(
-            args.domain
-        )
-    )
-
-    unique_subdomains = merge_results(
-        passive_results,
+    passive_analysis = run_passive(
         args.domain,
     )
 
-    save_results(
-        unique_subdomains
-    )
-
-    export_results(
-        passive_results
-    )
-
-    show_passive_summary(
-        passive_results,
-        timings,
-        passive_failed,
-        unique_subdomains,
-        passive_time,
-    )
+    unique_subdomains = passive_analysis[
+        "subdomains"
+    ]
 
     # ------------------------------------------------------
     # DNS Resolution
     # ------------------------------------------------------
 
-    dns_results, dns_failed, dns_time = (
-        resolve_subdomains(
-            unique_subdomains
-        )
+    dns_analysis = run_dns(
+        unique_subdomains,
     )
 
-    save_dns_results(
-        dns_results
-    )
-
-    export_dns_json(
-        dns_results
-    )
-
-    show_dns_summary(
-        dns_results,
-        dns_failed,
-        dns_time,
-    )
+    dns_results = dns_analysis[
+        "results"
+    ]
 
     # ------------------------------------------------------
     # HTTP Probe
@@ -315,29 +237,13 @@ def main() -> None:
         dns_results.keys()
     )
 
-    http_results, http_failed, http_time = (
-        probe_hosts(
-            http_hosts
-        )
+    http_analysis = run_http(
+        http_hosts,
     )
 
-    save_alive_hosts(
-        http_results
-    )
-
-    save_http_results(
-        http_results
-    )
-
-    export_http_json(
-        http_results
-    )
-
-    show_http_summary(
-        http_results,
-        http_failed,
-        http_time,
-    )
+    http_results = http_analysis[
+        "results"
+    ]
 
 
     # ------------------------------------------------------
@@ -370,64 +276,26 @@ def main() -> None:
         http_results.keys()
     )
 
-    port_results, port_failed, port_time = (
-        scan_hosts(
-            port_hosts
-        )
+    port_analysis = run_ports(
+        port_hosts,
     )
 
-    save_open_ports(
-        port_results
-    )
-
-    save_port_results(
-        port_results
-    )
-
-    export_port_json(
-        port_results
-    )
-
-    export_open_ports_csv(
-        port_results
-    )
-
-    show_port_summary(
-        port_results,
-        port_failed,
-        port_time,
-    )
+    port_results = port_analysis[
+        "results"
+    ]
 
     # ------------------------------------------------------
     # Technology Detection
     # ------------------------------------------------------
 
-    technology_results, technology_failed, technology_time = (
-        detect_hosts(
-            http_results
-        )
+    technology_analysis = run_technology(
+        http_results,
     )
 
-    save_technologies(
-        technology_results
-    )
-
-    save_technology_results(
-        technology_results
-    )
-
-    export_technology_json(
-        technology_results
-    )
-
-    export_technology_csv(
-        technology_results
-    )
-
-    show_technology_summary(
-        technology_results,
-        technology_failed,
-        technology_time,
+    technology_results = (
+        technology_analysis[
+            "results"
+        ]
     )
 
 
@@ -436,39 +304,25 @@ def main() -> None:
     # ------------------------------------------------------
 
     info(
-
         f"Crawl Targets: {len(live_urls)}"
-
     )
 
     if live_urls:
 
-        crawl_results = crawl_hosts(
-
-            live_urls
-
+        crawl_analysis = run_crawler(
+            live_urls,
         )
 
     else:
 
         info(
-
             "No crawl targets discovered."
-
         )
 
-        crawl_results = {
-
-            "results": {}
-
+        crawl_analysis = {
+            "results": {},
+            "statistics": {},
         }
-
-    export_crawler_results(
-
-        crawl_results
-
-    )
-
 
 
     # ------------------------------------------------------
@@ -479,74 +333,33 @@ def main() -> None:
 
         script
 
-        for host in crawl_results.get(
-
-            "results",
-
-            {},
-
+        for host in crawl_analysis.get(
+            "results", {}
         ).values()
 
         for page in host.get(
-
-            "pages",
-
-            {},
-
+            "pages", {}
         ).values()
 
         for script in page.get(
-
-            "parsed",
-
-            {},
-
+            "parsed", {}
         ).get(
-
-            "javascript",
-
-            [],
-
+            "javascript", []
         )
 
     })
 
     if javascript_urls:
 
-        javascript_results, javascript_failed, javascript_time = (
-
-            download_javascript(
-
-                javascript_urls
-
-            )
-
-        )
-
-        export_javascript_results(
-
-            javascript_results
-
-        )
-
-        show_javascript_summary(
-
-            javascript_results,
-
-            javascript_failed,
-
-            javascript_time,
-
+        javascript_analysis = run_javascript(
+            javascript_urls
         )
 
     else:
 
         info(
-
             "No JavaScript files discovered."
-
         )
-
 
     # ------------------------------------------------------
     # Directory Fuzzing
@@ -612,41 +425,12 @@ def main() -> None:
 
     if live_urls:
 
-        screenshot_results, screenshot_failed, screenshot_time = (
+        screenshot_analysis = run_screenshot(
 
-            asyncio.run(
-
-                capture_hosts(
-
-                    http_results
-
-                )
-
-            )
+            http_results
 
         )
 
-        save_screenshot_results(
-
-            screenshot_results
-
-        )
-
-        export_screenshot_json(
-
-            screenshot_results
-
-        )
-
-        show_screenshot_summary(
-
-            screenshot_results,
-
-            screenshot_failed,
-
-            screenshot_time,
-
-        )
 
     else:
 
@@ -655,6 +439,18 @@ def main() -> None:
             "No alive hosts for screenshots."
 
         )
+
+        screenshot_analysis = {
+
+            "total_targets": 0,
+
+            "captured": 0,
+
+            "failed": 0,
+
+            "results": {},
+
+        }
     
 
 

@@ -1,92 +1,78 @@
 """
-HTTP Exporter
+HTTP Probe Exporter
 
-Export HTTP probe results and display summary.
+Export HTTP probe results.
 """
 
-import json
-from pathlib import Path
+from __future__ import annotations
 
-from core.logger import (
-    success,
-    section,
+import json
+
+from modules.http.constants import (
+    ALIVE_TXT,
+    DEAD_TXT,
+    HTTP_OUTPUT_DIR,
+    RESULTS_JSON,
+    RESULTS_TXT,
+    SUMMARY_TXT,
 )
 
 
 # ==========================================================
-# Save Alive Hosts
+# Create Output Directory
 # ==========================================================
 
-def save_alive_hosts(
-    results: dict,
-    filename: str = "alive.txt",
-) -> Path:
+def create_output_directory() -> None:
     """
-    Save alive hosts.
+    Create the HTTP output directory.
     """
 
-    output_dir = Path("output")
-
-    output_dir.mkdir(
+    HTTP_OUTPUT_DIR.mkdir(
         parents=True,
         exist_ok=True,
     )
 
-    output_file = output_dir / filename
 
-    with output_file.open(
+# ==========================================================
+# Export Results (TXT)
+# ==========================================================
+
+def export_results_txt(
+    analysis: dict,
+) -> None:
+    """
+    Export HTTP results as text.
+    """
+
+    with RESULTS_TXT.open(
         "w",
         encoding="utf-8",
     ) as file:
 
-        for host in sorted(results):
+        for host in sorted(
+            analysis["results"]
+        ):
+
+            data = analysis["results"][
+                host
+            ]
 
             file.write(
-                host + "\n"
+                "=" * 70 + "\n"
             )
 
-    success(
-        f"Alive hosts saved to {output_file}"
-    )
+            file.write(
+                f"{host}\n"
+            )
 
-    return output_file
+            file.write(
+                "=" * 70 + "\n"
+            )
 
-
-# ==========================================================
-# Save HTTP Results
-# ==========================================================
-
-def save_http_results(
-    results: dict,
-    filename: str = "http_results.txt",
-) -> Path:
-    """
-    Save HTTP probe results.
-    """
-
-    output_dir = Path("output")
-
-    output_dir.mkdir(
-        parents=True,
-        exist_ok=True,
-    )
-
-    output_file = output_dir / filename
-
-    with output_file.open(
-        "w",
-        encoding="utf-8",
-    ) as file:
-
-        for host in sorted(results):
-
-            data = results[host]
-
-            file.write("=" * 70 + "\n")
-            file.write(host + "\n")
-            file.write("=" * 70 + "\n")
-
-            for key, value in data.items():
+            for (
+                key,
+                value,
+            ) in data.items():
 
                 file.write(
                     f"{key:<18}: {value}\n"
@@ -94,165 +80,204 @@ def save_http_results(
 
             file.write("\n")
 
-    success(
-        f"HTTP results saved to {output_file}"
-    )
-
-    return output_file
-
 
 # ==========================================================
-# Export JSON
+# Export Results (JSON)
 # ==========================================================
 
-def export_http_json(
-    results: dict,
-    filename: str = "http_results.json",
-) -> Path:
+def export_results_json(
+    analysis: dict,
+) -> None:
     """
     Export HTTP results as JSON.
     """
 
-    output_dir = Path("output")
-
-    output_dir.mkdir(
-        parents=True,
-        exist_ok=True,
-    )
-
-    output_file = output_dir / filename
-
-    with output_file.open(
+    with RESULTS_JSON.open(
         "w",
         encoding="utf-8",
     ) as file:
 
         json.dump(
-            results,
+            analysis,
             file,
             indent=4,
             sort_keys=True,
         )
 
-    success(
-        f"JSON exported to {output_file}"
-    )
-
-    return output_file
-
 
 # ==========================================================
-# Summary
+# Export Summary
 # ==========================================================
 
-def show_summary(
-    results: dict,
-    failed: list,
-    elapsed: float,
-):
+def export_summary(
+    analysis: dict,
+) -> None:
     """
-    Display HTTP summary.
+    Export HTTP summary.
     """
 
-    section(
-        "HTTP Probe Summary"
-    )
+    statistics = analysis[
+        "statistics"
+    ]
 
-    alive = len(results)
+    with SUMMARY_TXT.open(
+        "w",
+        encoding="utf-8",
+    ) as file:
 
-    dead = len(failed)
-
-    http_hosts = 0
-
-    https_hosts = 0
-
-    status_codes = {}
-
-    total_response = 0.0
-
-    for data in results.values():
-
-        if data["scheme"] == "http":
-
-            http_hosts += 1
-
-        else:
-
-            https_hosts += 1
-
-        status = data["status"]
-
-        status_codes[status] = (
-            status_codes.get(status, 0)
-            + 1
+        file.write(
+            "HTTP Probe Summary\n"
         )
 
-        total_response += data[
-            "response_time"
-        ]
-
-    average = 0.0
-
-    if alive:
-
-        average = round(
-            total_response / alive,
-            3,
+        file.write(
+            "=" * 60 + "\n\n"
         )
 
-    print(
-        f"{'Alive Hosts':<25}{alive}"
-    )
-
-    print(
-        f"{'Dead Hosts':<25}{dead}"
-    )
-
-    print("-" * 75)
-
-    print(
-        f"{'HTTP':<25}{http_hosts}"
-    )
-
-    print(
-        f"{'HTTPS':<25}{https_hosts}"
-    )
-
-    print("-" * 75)
-
-    for code in sorted(status_codes):
-
-        print(
-            f"{str(code):<25}"
-            f"{status_codes[code]}"
+        file.write(
+            f"Alive Hosts     : "
+            f"{analysis['alive_hosts']}\n"
         )
 
-    print("-" * 75)
+        file.write(
+            f"Dead Hosts      : "
+            f"{analysis['dead_hosts']}\n"
+        )
 
-    print(
-        f"{'Average Response':<25}"
-        f"{average} sec"
-    )
+        file.write(
+            f"HTTP Hosts      : "
+            f"{statistics['http_hosts']}\n"
+        )
 
-    print(
-        f"{'Total Time':<25}"
-        f"{elapsed:.2f} sec"
-    )
+        file.write(
+            f"HTTPS Hosts     : "
+            f"{statistics['https_hosts']}\n"
+        )
 
-    print("=" * 75)
+        file.write(
+            f"Average Response: "
+            f"{statistics['average_response_time']} sec\n"
+        )
 
-    if failed:
+        file.write(
+            f"Scan Time       : "
+            f"{analysis['scan_time']} sec\n\n"
+        )
 
-        print()
+        file.write(
+            "Status Codes\n"
+        )
 
-        print("Dead Hosts")
+        file.write(
+            "-" * 60 + "\n"
+        )
 
-        print("-" * 75)
+        for (
+            status,
+            count,
+        ) in statistics[
+            "status_codes"
+        ].items():
 
-        for host in failed:
-
-            print(
-                f" • {host}"
+            file.write(
+                f"{status:<10}"
+                f"{count}\n"
             )
 
-        print("-" * 75)
+
+# ==========================================================
+# Export Alive Hosts
+# ==========================================================
+
+def export_alive(
+    analysis: dict,
+) -> None:
+    """
+    Export alive hosts.
+    """
+
+    with ALIVE_TXT.open(
+        "w",
+        encoding="utf-8",
+    ) as file:
+
+        for host in analysis[
+            "alive"
+        ]:
+
+            file.write(
+                f"{host}\n"
+            )
+
+
+# ==========================================================
+# Export Dead Hosts
+# ==========================================================
+
+def export_dead(
+    analysis: dict,
+) -> None:
+    """
+    Export dead hosts.
+    """
+
+    with DEAD_TXT.open(
+        "w",
+        encoding="utf-8",
+    ) as file:
+
+        for host in analysis[
+            "dead"
+        ]:
+
+            file.write(
+                f"{host}\n"
+            )
+
+
+# ==========================================================
+# Export All
+# ==========================================================
+
+def export_all(
+    analysis: dict,
+) -> None:
+    """
+    Export all HTTP output files.
+    """
+
+    create_output_directory()
+
+    export_results_txt(
+        analysis,
+    )
+
+    export_results_json(
+        analysis,
+    )
+
+    export_summary(
+        analysis,
+    )
+
+    export_alive(
+        analysis,
+    )
+
+    export_dead(
+        analysis,
+    )
+
+
+# ==========================================================
+# Public Exports
+# ==========================================================
+
+__all__ = [
+    "create_output_directory",
+    "export_results_txt",
+    "export_results_json",
+    "export_summary",
+    "export_alive",
+    "export_dead",
+    "export_all",
+]

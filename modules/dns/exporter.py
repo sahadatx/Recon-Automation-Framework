@@ -1,21 +1,19 @@
 """
-Port Scanner Exporter
+DNS Resolution Exporter
 
-Export port scan results.
+Export DNS resolution results to output files.
 """
 
 from __future__ import annotations
 
-import csv
 import json
 
-from modules.ports.constants import (
-    OPEN_PORTS_TXT,
-    PORT_OUTPUT_DIR,
-    RESULTS_CSV,
+from modules.dns.constants import (
+    DNS_OUTPUT_DIR,
     RESULTS_JSON,
     RESULTS_TXT,
     SUMMARY_TXT,
+    UNRESOLVED_TXT,
 )
 
 
@@ -25,10 +23,10 @@ from modules.ports.constants import (
 
 def create_output_directory() -> None:
     """
-    Create the output directory.
+    Create the DNS output directory.
     """
 
-    PORT_OUTPUT_DIR.mkdir(
+    DNS_OUTPUT_DIR.mkdir(
         parents=True,
         exist_ok=True,
     )
@@ -42,7 +40,7 @@ def export_results_txt(
     analysis: dict,
 ) -> None:
     """
-    Export detailed port scan results.
+    Export DNS results as text.
     """
 
     with RESULTS_TXT.open(
@@ -55,10 +53,6 @@ def export_results_txt(
         ):
 
             file.write(
-                "=" * 70 + "\n"
-            )
-
-            file.write(
                 f"{host}\n"
             )
 
@@ -66,15 +60,32 @@ def export_results_txt(
                 "=" * 70 + "\n"
             )
 
-            for port in analysis[
+            records = analysis[
                 "results"
-            ][host]:
+            ][host]
+
+            for (
+                record_type,
+                values,
+            ) in records.items():
 
                 file.write(
-                    f"{port['port']:>5}/tcp   "
-                    f"{port['state']:<6}   "
-                    f"{port['service']}\n"
+                    f"\n{record_type}\n"
                 )
+
+                if values:
+
+                    for value in values:
+
+                        file.write(
+                            f"  - {value}\n"
+                        )
+
+                else:
+
+                    file.write(
+                        "  No Record\n"
+                    )
 
             file.write("\n")
 
@@ -87,7 +98,7 @@ def export_results_json(
     analysis: dict,
 ) -> None:
     """
-    Export results as JSON.
+    Export DNS results as JSON.
     """
 
     with RESULTS_JSON.open(
@@ -104,54 +115,6 @@ def export_results_json(
 
 
 # ==========================================================
-# Export Results (CSV)
-# ==========================================================
-
-def export_results_csv(
-    analysis: dict,
-) -> None:
-    """
-    Export results as CSV.
-    """
-
-    with RESULTS_CSV.open(
-        "w",
-        newline="",
-        encoding="utf-8",
-    ) as file:
-
-        writer = csv.writer(
-            file
-        )
-
-        writer.writerow(
-            [
-                "Host",
-                "Port",
-                "Service",
-                "State",
-            ]
-        )
-
-        for host in sorted(
-            analysis["results"]
-        ):
-
-            for port in analysis[
-                "results"
-            ][host]:
-
-                writer.writerow(
-                    [
-                        host,
-                        port["port"],
-                        port["service"],
-                        port["state"],
-                    ]
-                )
-
-
-# ==========================================================
 # Export Summary
 # ==========================================================
 
@@ -159,7 +122,7 @@ def export_summary(
     analysis: dict,
 ) -> None:
     """
-    Export summary.
+    Export DNS summary.
     """
 
     statistics = analysis[
@@ -172,7 +135,7 @@ def export_summary(
     ) as file:
 
         file.write(
-            "Port Scan Summary\n"
+            "DNS Resolution Summary\n"
         )
 
         file.write(
@@ -180,37 +143,27 @@ def export_summary(
         )
 
         file.write(
-            f"Hosts Scanned            : "
-            f"{statistics['hosts_scanned']}\n"
+            f"Resolved Hosts : "
+            f"{analysis['resolved_hosts']}\n"
         )
 
         file.write(
-            f"Hosts With Open Ports    : "
-            f"{statistics['hosts_with_open_ports']}\n"
+            f"Failed Hosts   : "
+            f"{analysis['failed_hosts']}\n"
         )
 
         file.write(
-            f"Hosts Without Open Ports : "
-            f"{statistics['hosts_without_open_ports']}\n"
+            f"Total Records  : "
+            f"{statistics['total_records']}\n"
         )
 
         file.write(
-            f"Total Open Ports         : "
-            f"{statistics['total_open_ports']}\n"
-        )
-
-        file.write(
-            f"Average Open Ports       : "
-            f"{statistics['average_open_ports']}\n"
-        )
-
-        file.write(
-            f"Scan Time                : "
+            f"Scan Time      : "
             f"{analysis['scan_time']} sec\n\n"
         )
 
         file.write(
-            "Service Breakdown\n"
+            "Record Counts\n"
         )
 
         file.write(
@@ -218,36 +171,58 @@ def export_summary(
         )
 
         for (
-            service,
+            record_type,
             count,
         ) in statistics[
-            "service_counts"
+            "record_counts"
         ].items():
 
             file.write(
-                f"{service:<20}"
+                f"{record_type:<10}"
+                f"{count}\n"
+            )
+
+        file.write("\n")
+
+        file.write(
+            "Hosts Containing Records\n"
+        )
+
+        file.write(
+            "-" * 60 + "\n"
+        )
+
+        for (
+            record_type,
+            count,
+        ) in statistics[
+            "enabled_hosts"
+        ].items():
+
+            file.write(
+                f"{record_type:<10}"
                 f"{count}\n"
             )
 
 
 # ==========================================================
-# Export Open Hosts
+# Export Unresolved Hosts
 # ==========================================================
 
-def export_open_ports(
+def export_unresolved(
     analysis: dict,
 ) -> None:
     """
-    Export hosts with open ports.
+    Export unresolved hosts.
     """
 
-    with OPEN_PORTS_TXT.open(
+    with UNRESOLVED_TXT.open(
         "w",
         encoding="utf-8",
     ) as file:
 
         for host in analysis[
-            "open_hosts"
+            "unresolved"
         ]:
 
             file.write(
@@ -263,7 +238,7 @@ def export_all(
     analysis: dict,
 ) -> None:
     """
-    Export all output files.
+    Export all DNS output files.
     """
 
     create_output_directory()
@@ -276,15 +251,11 @@ def export_all(
         analysis,
     )
 
-    export_results_csv(
-        analysis,
-    )
-
     export_summary(
         analysis,
     )
 
-    export_open_ports(
+    export_unresolved(
         analysis,
     )
 
@@ -297,8 +268,7 @@ __all__ = [
     "create_output_directory",
     "export_results_txt",
     "export_results_json",
-    "export_results_csv",
     "export_summary",
-    "export_open_ports",
+    "export_unresolved",
     "export_all",
 ]

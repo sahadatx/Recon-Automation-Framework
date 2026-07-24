@@ -424,9 +424,9 @@ DEFAULT_PORTS = (
 # URL Discovery (Crawler)
 # ==========================================================
 
-CRAWLER_DEPTH = 2
+CRAWLER_DEPTH = 1
 
-CRAWLER_MAX_URLS = 500
+CRAWLER_MAX_URLS = 10
 
 CRAWLER_TIMEOUT = 10
 

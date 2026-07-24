@@ -4,6 +4,8 @@ URL Discovery Engine
 Core crawler for discovering URLs.
 """
 
+from __future__ import annotations
+
 import time
 
 from modules.crawler.queue import (
@@ -22,6 +24,14 @@ from modules.crawler.filters import (
     should_enqueue,
 )
 
+from modules.crawler.robots import (
+    fetch_robots,
+)
+
+from modules.crawler.sitemap import (
+    fetch_sitemap,
+)
+
 from core.logger import (
     debug,
     info,
@@ -34,24 +44,13 @@ from config.config import (
 )
 
 
-from modules.crawler.robots import (
-    fetch_robots,
-)
-
-from modules.crawler.sitemap import (
-    fetch_sitemap,
-)
-
 # ==========================================================
 # Create Statistics
 # ==========================================================
 
-def create_statistics():
+def create_statistics() -> dict:
     """
-    Initialize crawl statistics.
-
-    Returns:
-        dict
+    Initialize crawler statistics.
     """
 
     return {
@@ -79,7 +78,7 @@ def create_statistics():
         "elapsed": 0.0,
 
         "unique_javascript": set(),
-        
+
         "unique_css": set(),
 
         "failed_urls": [],
@@ -93,12 +92,9 @@ def create_statistics():
 
 def create_result(
     host: str,
-):
+) -> dict:
     """
-    Create crawl result object.
-
-    Returns:
-        dict
+    Create crawler result object.
     """
 
     return {
@@ -118,7 +114,7 @@ def create_result(
 
 def crawl_url(
     url: str,
-):
+) -> dict | None:
     """
     Crawl a single URL.
 
@@ -127,7 +123,7 @@ def crawl_url(
             Target URL.
 
     Returns:
-        dict | None
+        Parsed page information.
     """
 
     debug(
@@ -137,7 +133,7 @@ def crawl_url(
     try:
 
         response = download_page(
-            url
+            url,
         )
 
         if response is None:
@@ -164,7 +160,7 @@ def crawl_url(
             ),
 
             "content_length": len(
-                response.text
+                response.text,
             ),
 
             "parsed": parsed,
@@ -178,8 +174,312 @@ def crawl_url(
         )
 
         return None
-    
 
+
+# ==========================================================
+# Initialize Queue
+# ==========================================================
+
+def initialize_queue(
+    host: str,
+) -> CrawlQueue:
+    """
+    Create crawl queue with seed URL.
+    """
+
+    queue = CrawlQueue()
+
+    queue.enqueue(
+
+        host,
+
+        depth=0,
+
+        parent=None,
+
+    )
+
+    return queue
+
+
+# ==========================================================
+# Load Robots Rules
+# ==========================================================
+
+def load_robots(
+    host: str,
+) -> list[str]:
+    """
+    Load robots.txt rules.
+    """
+
+    try:
+
+        robots = fetch_robots(
+            host,
+        )
+
+        return robots.get(
+            "disallow",
+            [],
+        )
+
+    except Exception:
+
+        return []
+
+
+# ==========================================================
+# Load Sitemap
+# ==========================================================
+
+def load_sitemap(
+    queue: CrawlQueue,
+    host: str,
+) -> None:
+    """
+    Seed queue using sitemap URLs.
+    """
+
+    try:
+
+        sitemap = fetch_sitemap(
+            host,
+        )
+
+        for url in sitemap.get(
+            "urls",
+            [],
+        ):
+
+            queue.enqueue(
+                url,
+                depth=1,
+                parent=host,
+            )
+
+        info(
+            f"Sitemap URLs: "
+            f"{sitemap.get('count', 0)}"
+        )
+
+    except Exception as error:
+
+        warning(
+            f"Sitemap: {error}"
+        )
+
+# ==========================================================
+# Update Statistics
+# ==========================================================
+
+def update_statistics(
+    result: dict,
+    queue: CrawlQueue,
+    parsed: dict,
+) -> None:
+    """
+    Update crawler statistics.
+    """
+
+    statistics = result[
+        "statistics"
+    ]
+
+    internal = parsed.get(
+        "internal_links",
+        [],
+    )
+
+    external = parsed.get(
+        "external_links",
+        [],
+    )
+
+    javascript = parsed.get(
+        "javascript",
+        [],
+    )
+
+    css = parsed.get(
+        "css",
+        [],
+    )
+
+    forms = parsed.get(
+        "forms",
+        [],
+    )
+
+    emails = parsed.get(
+        "emails",
+        [],
+    )
+
+    statistics[
+        "pages"
+    ] += 1
+
+    statistics[
+        "visited"
+    ] = queue.visited_count()
+
+    statistics[
+        "queued"
+    ] = queue.size()
+
+    statistics[
+        "internal_urls"
+    ] += len(
+        internal
+    )
+
+    statistics[
+        "external_urls"
+    ] += len(
+        external
+    )
+
+    statistics[
+        "unique_javascript"
+    ].update(
+        javascript
+    )
+
+    statistics[
+        "unique_css"
+    ].update(
+        css
+    )
+
+    statistics[
+        "javascript"
+    ] = len(
+        statistics[
+            "unique_javascript"
+        ]
+    )
+
+    statistics[
+        "css"
+    ] = len(
+        statistics[
+            "unique_css"
+        ]
+    )
+
+    statistics[
+        "forms"
+    ] += len(
+        forms
+    )
+
+    statistics[
+        "emails"
+    ] += len(
+        emails
+    )
+
+
+# ==========================================================
+# Enqueue Internal Links
+# ==========================================================
+
+def enqueue_links(
+    queue: CrawlQueue,
+    host: str,
+    parent: str,
+    depth: int,
+    links: list[str],
+    robots_rules: list[str],
+) -> None:
+    """
+    Add internal links into the queue.
+    """
+
+    for url in links:
+
+        if not should_enqueue(
+
+            root_url=host,
+
+            url=url,
+
+            visited=queue.visited_urls(),
+
+            robots_rules=robots_rules,
+
+            depth=depth + 1,
+
+            max_depth=CRAWLER_DEPTH,
+
+        ):
+
+            continue
+
+        queue.enqueue(
+
+            url,
+
+            depth=depth + 1,
+
+            parent=parent,
+
+        )
+
+
+# ==========================================================
+# Finalize Statistics
+# ==========================================================
+
+def finalize_statistics(
+    result: dict,
+    queue: CrawlQueue,
+    start_time: float,
+) -> None:
+    """
+    Finalize crawler statistics.
+    """
+
+    statistics = result[
+        "statistics"
+    ]
+
+    statistics[
+        "visited"
+    ] = queue.visited_count()
+
+    statistics[
+        "queued"
+    ] = queue.size()
+
+    statistics[
+        "unique_javascript"
+    ] = sorted(
+        statistics[
+            "unique_javascript"
+        ]
+    )
+
+    statistics[
+        "unique_css"
+    ] = sorted(
+        statistics[
+            "unique_css"
+        ]
+    )
+
+    statistics[
+        "elapsed"
+    ] = round(
+
+        time.perf_counter()
+
+        - start_time,
+
+        2,
+
+    )
 
 # ==========================================================
 # Crawl Host
@@ -188,109 +488,56 @@ def crawl_url(
 def crawl_host(
     host: str,
     use_sitemap: bool = False,
-):
+) -> dict:
     """
-    Crawl one host using BFS.
+    Crawl one host using Breadth-First Search.
 
     Args:
         host:
             Target host.
 
+        use_sitemap:
+            Seed the queue from sitemap.xml.
+
     Returns:
-        dict
+        Crawl result.
     """
 
     info(
         f"Starting crawl: {host}"
     )
 
-    start_time = time.perf_counter()
+    start_time = (
+        time.perf_counter()
+    )
 
     result = create_result(
-        host
-    )
-
-    queue = CrawlQueue()
-
-    # ----------------------------------------------------------
-    # Seed URL
-    # ----------------------------------------------------------
-
-    queue.enqueue(
         host,
-        depth=0,
-        parent=None,
     )
 
-    # ----------------------------------------------------------
-    # robots.txt
-    # ----------------------------------------------------------
+    queue = initialize_queue(
+        host,
+    )
 
-    try:
-
-        robots = fetch_robots(
-            host
-        )
-
-        robots_rules = robots.get(
-            "disallow",
-            [],
-        )
-
-    except Exception:
-
-        robots_rules = []
-
-    # ----------------------------------------------------------
-    # Sitemap Integration (Optional)
-    # ----------------------------------------------------------
+    robots_rules = load_robots(
+        host,
+    )
 
     if use_sitemap:
 
-        try:
+        load_sitemap(
 
-            sitemap = fetch_sitemap(
-                host
-            )
+            queue,
 
-            for sitemap_url in sitemap.get(
-                "urls",
-                [],
-            ):
+            host,
 
-                if not queue.visited(
-                    sitemap_url
-                ):
-
-                    queue.enqueue(
-
-                        sitemap_url,
-
-                        depth=1,
-
-                        parent=host,
-
-                    )
-
-            info(
-                f"Sitemap URLs: {sitemap.get('count', 0)}"
-            )
-
-        except Exception as error:
-
-            warning(
-                f"Sitemap: {error}"
-            )
-
-    # ----------------------------------------------------------
-    # BFS Crawl
-    # ----------------------------------------------------------
+        )
 
     while not queue.empty():
 
-        # -----------------------------------------
+        # --------------------------------------------------
         # Maximum URL Limit
-        # -----------------------------------------
+        # --------------------------------------------------
 
         if (
 
@@ -314,32 +561,38 @@ def crawl_host(
 
             break
 
-        url = item["url"]
+        url = item[
+            "url"
+        ]
 
-        depth = item["depth"]
+        depth = item[
+            "depth"
+        ]
 
-        parent = item["parent"]
+        parent = item[
+            "parent"
+        ]
 
-        # -----------------------------------------
+        # --------------------------------------------------
         # Depth Control
-        # -----------------------------------------
+        # --------------------------------------------------
 
         if depth > CRAWLER_DEPTH:
 
             continue
 
-        # -----------------------------------------
+        # --------------------------------------------------
         # Duplicate Check
-        # -----------------------------------------
+        # --------------------------------------------------
 
         if queue.visited(
-            url
+            url,
         ):
 
             continue
 
         queue.mark_visited(
-            url
+            url,
         )
 
         debug(
@@ -347,327 +600,83 @@ def crawl_host(
         )
 
         page = crawl_url(
-            url
+            url,
         )
 
         if page is None:
 
-            stats = result["statistics"]
+            statistics = result["statistics"]
 
-            stats["failed"] += 1
+            statistics["failed"] += 1
 
-            stats["failed_urls"].append(
-                url
-            )
+            statistics["failed_urls"].append(url)
+
+            statistics["visited"] = queue.visited_count()
+
+            statistics["queued"] = queue.size()
 
             continue
 
-        result["pages"][url] = page
+        result[
+            "pages"
+        ][
+            url
+        ] = page
 
-        parsed = page["parsed"]
+        parsed = page[
+            "parsed"
+        ]
 
-        internal = parsed.get(
-            "internal_links",
-            []
+        update_statistics(
+
+            result=result,
+
+            queue=queue,
+
+            parsed=parsed,
+
         )
 
-        external = parsed.get(
-            "external_links",
-            []
+        enqueue_links(
+
+            queue=queue,
+
+            host=host,
+
+            parent=url,
+
+            depth=depth,
+
+            links=parsed.get(
+                "internal_links",
+                [],
+            ),
+
+            robots_rules=robots_rules,
+
         )
 
-        javascript = parsed.get(
-            "javascript",
-            []
-        )
+    finalize_statistics(
 
-        css = parsed.get(
-            "css",
-            []
-        )
+        result=result,
 
-        forms = parsed.get(
-            "forms",
-            []
-        )
+        queue=queue,
 
-        emails = parsed.get(
-            "emails",
-            []
-        )
+        start_time=start_time,
 
-        # -----------------------------------------
-        # Update Statistics
-        # -----------------------------------------
-
-        stats = result["statistics"]
-
-        stats["pages"] += 1
-
-        stats["visited"] = queue.visited_count()
-
-        stats["queued"] = queue.size()
-
-        stats["internal_urls"] += len(
-            internal
-        )
-
-        stats["external_urls"] += len(
-            external
-        )
-
-        stats["unique_javascript"].update(
-            javascript
-        )
-
-        stats["unique_css"].update(
-            css
-        )
-
-        stats["javascript"] = len(
-            stats["unique_javascript"]
-        )
-
-        stats["css"] = len(
-            stats["unique_css"]
-        )
-
-        stats["forms"] += len(
-            forms
-        )
-
-        stats["emails"] += len(
-            emails
-        )
-
-        # -----------------------------------------
-        # Queue Internal Links
-        # -----------------------------------------
-
-        for link in internal:
-
-            if should_enqueue(
-
-                root_url=host,
-
-                url=link,
-
-                visited=queue.visited_urls(),
-
-                robots_rules=robots_rules,
-
-                depth=depth + 1,
-
-                max_depth=CRAWLER_DEPTH,
-
-            ):
-
-                queue.enqueue(
-
-                    link,
-
-                    depth=depth + 1,
-
-                    parent=url,
-
-                )
-
-
-    # -----------------------------------------
-    # Finalize Statistics
-    # -----------------------------------------
-
-    stats = result["statistics"]
-
-    stats["visited"] = queue.visited_count()
-
-    stats["queued"] = queue.size()
-
-    stats["unique_javascript"] = sorted(
-        stats["unique_javascript"]
-    )
-
-    stats["unique_css"] = sorted(
-        stats["unique_css"]
-    )
-
-    result["statistics"]["elapsed"] = round(
-        time.perf_counter() - start_time,
-        2,
     )
 
     return result
 
 
-
 # ==========================================================
-# Crawl Multiple Hosts
+# Public Exports
 # ==========================================================
 
-def crawl(
-    hosts: list[str],
-):
-    """
-    Crawl multiple hosts.
+__all__ = [
 
-    Args:
-        hosts:
-            List of target hosts.
+    "crawl_host",
 
-    Returns:
-        dict
-    """
+]
 
-    info(
-        "Starting URL Discovery Engine..."
-    )
 
-    start = time.perf_counter()
-
-    results = {}
-
-    total_pages = 0
-
-    total_failed = 0
-
-    total_internal = 0
-
-    total_external = 0
-
-    total_js = 0
-
-    total_css = 0
-
-    total_forms = 0
-
-    total_emails = 0
-
-    for host in hosts:
-
-        # -----------------------------------------
-        # Crawl Host
-        # -----------------------------------------
-
-        result = crawl_host(
-            host
-        )
-
-        results[host] = result
-
-        stats = result["statistics"]
-
-        total_pages += stats["pages"]
-
-        total_failed += stats["failed"]
-
-        total_internal += stats["internal_urls"]
-
-        total_external += stats["external_urls"]
-
-        total_js += stats["javascript"]
-
-        total_css += stats["css"]
-
-        total_forms += stats["forms"]
-
-        total_emails += stats["emails"]
-
-    elapsed = round(
-
-        time.perf_counter()
-
-        - start,
-
-        2,
-
-    )
-
-    summary = {
-
-        "hosts": len(
-            hosts
-        ),
-
-        "pages": total_pages,
-
-        "failed": total_failed,
-
-        "internal_urls": total_internal,
-
-        "external_urls": total_external,
-
-        "javascript": total_js,
-
-        "css": total_css,
-
-        "forms": total_forms,
-
-        "emails": total_emails,
-
-        "elapsed": elapsed,
-
-    }
-
-    info(
-        "-" * 60
-    )
-
-    info(
-        "URL Discovery Summary"
-    )
-
-    info(
-        "-" * 60
-    )
-
-    info(
-        f"Hosts          : {summary['hosts']}"
-    )
-
-    info(
-        f"Pages          : {summary['pages']}"
-    )
-
-    info(
-        f"Failed         : {summary['failed']}"
-    )
-
-    info(
-        f"Internal URLs  : {summary['internal_urls']}"
-    )
-
-    info(
-        f"External URLs  : {summary['external_urls']}"
-    )
-
-    info(
-        f"JavaScript     : {summary['javascript']}"
-    )
-
-    info(
-        f"CSS            : {summary['css']}"
-    )
-
-    info(
-        f"Forms          : {summary['forms']}"
-    )
-
-    info(
-        f"Emails         : {summary['emails']}"
-    )
-
-    info(
-        f"Elapsed        : {summary['elapsed']} sec"
-    )
-
-    info(
-        "-" * 60
-    )
-
-    return {
-
-        "results": results,
-
-        "summary": summary,
-
-    }

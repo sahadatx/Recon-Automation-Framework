@@ -4,13 +4,9 @@ robots.txt Parser
 Downloads and parses robots.txt.
 """
 
-from urllib.parse import (
-    urljoin,
-)
+from urllib.parse import urljoin
 
-from modules.crawler.helpers import (
-    download_page,
-)
+from modules.crawler.helpers import download_page
 
 
 # ==========================================================
@@ -19,16 +15,9 @@ from modules.crawler.helpers import (
 
 def download_robots(
     base_url: str,
-):
+) -> str | None:
     """
     Download robots.txt.
-
-    Args:
-        base_url:
-            Target website.
-
-    Returns:
-        str | None
     """
 
     robots_url = urljoin(
@@ -41,7 +30,6 @@ def download_robots(
     )
 
     if response is None:
-
         return None
 
     return response.text
@@ -53,12 +41,9 @@ def download_robots(
 
 def parse_robots(
     content: str,
-):
+) -> dict:
     """
     Parse robots.txt.
-
-    Returns:
-        dict
     """
 
     result = {
@@ -68,6 +53,12 @@ def parse_robots(
         "disallow": [],
 
         "sitemaps": [],
+
+        "user_agents": [],
+
+        "crawl_delay": None,
+
+        "host": None,
 
     }
 
@@ -79,68 +70,90 @@ def parse_robots(
 
         line = line.strip()
 
-        if (
-
-            not line
-
-            or
-
-            line.startswith("#")
-
-        ):
+        if not line:
 
             continue
 
-        lower = line.lower()
+        if "#" in line:
 
-        if lower.startswith(
-            "allow:"
-        ):
-
-            value = line.split(
-                ":",
+            line = line.split(
+                "#",
                 1,
-            )[1].strip()
+            )[0].strip()
 
-            if value:
+        if not line:
 
-                result[
-                    "allow"
-                ].append(
-                    value
-                )
+            continue
 
-        elif lower.startswith(
-            "disallow:"
-        ):
+        key, sep, value = line.partition(":")
 
-            value = line.split(
-                ":",
-                1,
-            )[1].strip()
+        if not sep:
 
-            result[
-                "disallow"
-            ].append(
+            continue
+
+        key = key.lower().strip()
+
+        value = value.strip()
+
+        if not value:
+
+            continue
+
+        if key == "allow":
+
+            result["allow"].append(
                 value
             )
 
-        elif lower.startswith(
-            "sitemap:"
-        ):
+        elif key == "disallow":
 
-            value = line.split(
-                ":",
-                1,
-            )[1].strip()
+            result["disallow"].append(
+                value
+            )
 
-            if value:
+        elif key == "sitemap":
 
-                result[
-                    "sitemaps"
-                ].append(
+            result["sitemaps"].append(
+                value
+            )
+
+        elif key == "user-agent":
+
+            result["user_agents"].append(
+                value
+            )
+
+        elif key == "crawl-delay":
+
+            try:
+
+                result["crawl_delay"] = float(
                     value
                 )
+
+            except ValueError:
+
+                pass
+
+        elif key == "host":
+
+            result["host"] = value
+
+    result["allow"] = sorted(
+        set(result["allow"])
+    )
+
+    result["disallow"] = sorted(
+        set(result["disallow"])
+    )
+
+    result["sitemaps"] = sorted(
+        set(result["sitemaps"])
+    )
+
+    result["user_agents"] = sorted(
+        set(result["user_agents"])
+    )
 
     return result
 
@@ -151,12 +164,9 @@ def parse_robots(
 
 def fetch_robots(
     base_url: str,
-):
+) -> dict:
     """
     Download and parse robots.txt.
-
-    Returns:
-        dict
     """
 
     content = download_robots(
@@ -175,14 +185,18 @@ def fetch_robots(
 
             "sitemaps": [],
 
+            "user_agents": [],
+
+            "crawl_delay": None,
+
+            "host": None,
+
         }
 
     result = parse_robots(
         content
     )
 
-    result[
-        "robots"
-    ] = True
+    result["robots"] = True
 
     return result

@@ -4,123 +4,210 @@ Passive Enumeration Manager
 Coordinates all passive enumeration sources.
 """
 
+from __future__ import annotations
+
 import re
 import time
-from pathlib import Path
-from concurrent.futures import ThreadPoolExecutor, as_completed
+
+from concurrent.futures import (
+    ThreadPoolExecutor,
+    as_completed,
+)
+
+from typing import Callable
 
 from config.config import MAX_WORKERS
 
 from core.logger import (
     info,
     warning,
-    success,
 )
 
-from modules.passive.subfinder import run_subfinder
+from modules.passive.analyzer import analyze
+from modules.passive.exporter import export_all
+
 from modules.passive.assetfinder import run_assetfinder
-from modules.passive.crtsh import run_crtsh
 from modules.passive.chaos import run_chaos
+from modules.passive.crtsh import run_crtsh
 from modules.passive.findomain import run_findomain
 from modules.passive.securitytrails import run_securitytrails
+from modules.passive.subfinder import run_subfinder
 
+PassiveSource = Callable[
+    [str],
+    list[str],
+]
 
 # ==========================================================
 # Tool Registry
 # ==========================================================
 
-PASSIVE_SOURCES = [
-    ("Subfinder", run_subfinder),
-    ("Assetfinder", run_assetfinder),
-    ("crt.sh", run_crtsh),
-    ("Chaos", run_chaos),
-    ("Findomain", run_findomain),
-    ("SecurityTrails", run_securitytrails),
+PASSIVE_SOURCES: list[
+    tuple[
+        str,
+       PassiveSource,
+    ]
+] = [
+    (
+        "Subfinder",
+        run_subfinder,
+    ),
+    (
+        "Assetfinder",
+        run_assetfinder,
+    ),
+    (
+        "crt.sh",
+        run_crtsh,
+    ),
+    (
+        "Chaos",
+        run_chaos,
+    ),
+    (
+        "Findomain",
+        run_findomain,
+    ),
+    (
+        "SecurityTrails",
+        run_securitytrails,
+    ),
 ]
 
-RETRYABLE_TOOLS = {
-    "crt.sh",
-}
+RETRYABLE_TOOLS: frozenset[str] = frozenset(
+    {
+        "crt.sh",
+    }
+)
+
+DOMAIN_RE = re.compile(
+    r"^(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$"
+)
 
 
 # ==========================================================
 # Timed Runner
 # ==========================================================
 
-def timed_runner(function, domain):
+def timed_runner(
+    function: PassiveSource,
+    domain: str,
+) -> tuple[list[str], float]:
     """
     Execute a passive source and measure execution time.
+
+    Args:
+        function: Passive enumeration function.
+        domain: Target domain.
+
+    Returns:
+        Tuple containing discovered subdomains and
+        execution time.
     """
 
-    start = time.perf_counter()
+    start_time = time.perf_counter()
 
-    result = function(domain)
+    results = function(domain)
 
-    elapsed = round(
-        time.perf_counter() - start,
+    elapsed_time = round(
+        time.perf_counter() - start_time,
         2,
     )
 
-    return result, elapsed
+    return (
+        results,
+        elapsed_time,
+    )
 
 
 # ==========================================================
 # Collect Passive Enumeration
 # ==========================================================
 
-def collect_subdomains(domain: str):
+def collect_subdomains(
+    domain: str,
+) -> tuple[
+    dict[str, list[str]],
+    dict[str, float],
+    list[str],
+    float,
+]:
     """
-    Execute every passive enumeration source in parallel.
+    Run all passive enumeration sources concurrently.
+
+    Args:
+        domain: Target domain.
+
+    Returns:
+        Tuple containing:
+            - Results grouped by source.
+            - Execution time per source.
+            - Failed sources.
+            - Total scan time.
     """
 
-    info("Starting Passive Enumeration...")
+    info(
+        "Starting Passive Enumeration..."
+    )
 
-    results = {}
-    timings = {}
-    failed = []
-    retry_queue = []
+    results: dict[
+        str,
+        list[str],
+    ] = {}
 
-    completed = 0
-    total_sources = len(PASSIVE_SOURCES)
+    timings: dict[
+        str,
+        float,
+    ] = {}
 
-    start_time = time.perf_counter()
+    failed_sources: list[str] = []
+
+    retry_queue: list[
+        tuple[
+            str,
+            PassiveSource,
+        ]
+    ] = []
+
+    total_sources = len(
+        PASSIVE_SOURCES
+    )
+
+    completed_sources = 0
+
+    scan_start = time.perf_counter()
 
     with ThreadPoolExecutor(
-        max_workers=MAX_WORKERS
+        max_workers=MAX_WORKERS,
     ) as executor:
 
-        futures = {}
-
-        # --------------------------------------------------
-        # Submit Jobs
-        # --------------------------------------------------
-
-        for name, function in PASSIVE_SOURCES:
-
-            future = executor.submit(
+        futures = {
+            executor.submit(
                 timed_runner,
                 function,
                 domain,
-            )
-
-            futures[future] = (
+            ): (
                 name,
                 function,
             )
+            for name, function in PASSIVE_SOURCES
+        }
 
-        # --------------------------------------------------
-        # Collect Results
-        # --------------------------------------------------
+        for future in as_completed(
+            futures,
+        ):
 
-        for future in as_completed(futures):
+            name, function = futures[
+                future
+            ]
 
-            name, function = futures[future]
-
-            completed += 1
+            completed_sources += 1
 
             try:
 
-                output, elapsed = future.result()
+                subdomains, elapsed = (
+                    future.result()
+                )
 
             except Exception as error:
 
@@ -128,20 +215,24 @@ def collect_subdomains(domain: str):
                     f"{name} crashed: {error}"
                 )
 
-                output = []
+                subdomains = []
                 elapsed = 0.0
 
-                failed.append(name)
+                failed_sources.append(
+                    name,
+                )
 
-            info(
-                f"[{completed}/{total_sources}] {name} completed."
-            )
+            results[name] = subdomains
 
-            results[name] = output
             timings[name] = elapsed
 
+            info(
+                f"[{completed_sources}/{total_sources}] "
+                f"{name} completed."
+            )
+
             if (
-                not output
+                not subdomains
                 and name in RETRYABLE_TOOLS
             ):
 
@@ -152,27 +243,39 @@ def collect_subdomains(domain: str):
                     )
                 )
 
-    # --------------------------------------------------
-    # Retry Queue
-    # --------------------------------------------------
+    # ------------------------------------------------------
+    # Retry Failed Sources
+    # ------------------------------------------------------
 
     if retry_queue:
 
-        info("Retrying failed sources...")
+        info(
+            "Retrying failed sources..."
+        )
 
-        for name, function in retry_queue:
+        for (
+            name,
+            function,
+        ) in retry_queue:
 
             try:
 
-                retry_results = function(domain)
+                retry_results = function(
+                    domain,
+                )
 
                 if retry_results:
 
                     results[name] = retry_results
 
-                    if name in failed:
+                    if (
+                        name
+                        in failed_sources
+                    ):
 
-                        failed.remove(name)
+                        failed_sources.remove(
+                            name,
+                        )
 
             except Exception as error:
 
@@ -180,16 +283,16 @@ def collect_subdomains(domain: str):
                     f"{name} retry failed: {error}"
                 )
 
-    total_time = round(
-        time.perf_counter() - start_time,
+    total_scan_time = round(
+        time.perf_counter() - scan_start,
         2,
     )
 
     return (
         results,
         timings,
-        failed,
-        total_time,
+        failed_sources,
+        total_scan_time,
     )
 
 
@@ -197,22 +300,26 @@ def collect_subdomains(domain: str):
 # Merge Results
 # ==========================================================
 
-DOMAIN_RE = re.compile(
-    r"^(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$"
-)
-
-
 def merge_results(
-    results: dict,
+    results: dict[str, list[str]],
     domain: str,
 ) -> list[str]:
     """
-    Merge, validate and normalize subdomains.
+    Merge, normalize, validate and deduplicate subdomains.
+
+    Args:
+        results: Raw results grouped by source.
+        domain: Target domain.
+
+    Returns:
+        Sorted list of unique subdomains.
     """
 
-    unique = set()
+    target_domain = domain.lower()
 
-    suffix = "." + domain.lower()
+    suffix = f".{target_domain}"
+
+    unique_subdomains: set[str] = set()
 
     for subdomains in results.values():
 
@@ -221,229 +328,91 @@ def merge_results(
             if not subdomain:
                 continue
 
-            subdomain = subdomain.strip().lower()
+            normalized = (
+                subdomain
+                .strip()
+                .lower()
+                .rstrip(".")
+            )
 
-            # Remove trailing dot
-            subdomain = subdomain.rstrip(".")
-
-            # Keep only target domain
             if (
-                subdomain != domain.lower()
-                and not subdomain.endswith(suffix)
+                normalized != target_domain
+                and not normalized.endswith(
+                    suffix
+                )
             ):
                 continue
 
-            # Validate hostname
             if not DOMAIN_RE.fullmatch(
-                subdomain
+                normalized
             ):
                 continue
 
-            unique.add(
-                subdomain
+            unique_subdomains.add(
+                normalized
             )
 
     return sorted(
-        unique
+        unique_subdomains,
     )
 
 
 # ==========================================================
-# Save Results
+# Run Passive Enumeration
 # ==========================================================
 
-def save_results(
-    subdomains: list[str],
-    filename: str = "subdomains.txt",
-) -> Path:
+def run(
+    domain: str,
+) -> dict[str, object]:
     """
-    Save subdomains to output directory.
+    Execute the complete passive enumeration workflow.
+
+    Workflow:
+        Collect
+            ↓
+        Merge
+            ↓
+        Analyze
+            ↓
+        Export
 
     Args:
-        subdomains: List of discovered subdomains.
-        filename: Output filename.
+        domain: Target domain.
 
     Returns:
-        Output file path.
+        Analysis dictionary.
     """
 
-    output_dir = Path("output")
-
-    output_dir.mkdir(
-        parents=True,
-        exist_ok=True,
+    (
+        results,
+        timings,
+        failed_sources,
+        total_scan_time,
+    ) = collect_subdomains(
+        domain,
     )
 
-    output_file = output_dir / filename
-
-    with output_file.open(
-        "w",
-        encoding="utf-8",
-    ) as file:
-
-        for subdomain in subdomains:
-
-            file.write(
-                subdomain + "\n"
-            )
-
-    success(
-        f"Saved {len(subdomains)} unique subdomains."
+    unique_subdomains = merge_results(
+        results,
+        domain,
     )
 
-    info(
-        f"Output File : {output_file}"
+    analysis = analyze(
+        target=domain,
+        results=results,
+        unique_subdomains=unique_subdomains,
+        timings=timings,
+        failed_sources=failed_sources,
+        total_scan_time=total_scan_time,
     )
 
-    return output_file
-
-
-# ==========================================================
-# Export Results (Future Use)
-# ==========================================================
-
-def export_results(
-    results: dict,
-    filename: str = "raw_results.txt",
-) -> Path:
-    """
-    Export raw results grouped by source.
-
-    Useful for debugging and future reporting.
-    """
-
-    output_dir = Path("output")
-
-    output_dir.mkdir(
-        parents=True,
-        exist_ok=True,
+    export_all(
+        analysis,
     )
 
-    output_file = output_dir / filename
-
-    with output_file.open(
-        "w",
-        encoding="utf-8",
-    ) as file:
-
-        for source, subdomains in results.items():
-
-            file.write("=" * 60 + "\n")
-            file.write(f"{source}\n")
-            file.write("=" * 60 + "\n")
-
-            for subdomain in subdomains:
-
-                file.write(
-                    subdomain + "\n"
-                )
-
-            file.write("\n")
-
-    success(
-        f"Raw results exported to {output_file}"
-    )
-
-    return output_file
+    return analysis
 
 
-# ==========================================================
-# Summary
-# ==========================================================
-
-def show_summary(
-    results: dict,
-    timings: dict,
-    failed: list,
-    unique: list[str],
-    total_time: float,
-) -> None:
-    """
-    Display passive enumeration summary.
-    """
-
-    print()
-
-    print("=" * 78)
-    print(" Passive Enumeration Summary ".center(78))
-    print("=" * 78)
-
-    print(
-        f"{'Source':<20}"
-        f"{'Subdomains':>12}"
-        f"{'Time':>12}"
-        f"{'Status':>15}"
-    )
-
-    print("-" * 78)
-
-    success_count = 0
-
-    for source, _ in PASSIVE_SOURCES:
-
-        count = len(results.get(source, []))
-
-        elapsed = timings.get(source, 0.0)
-
-        if source in failed:
-
-            status = "FAILED"
-
-        elif count == 0:
-
-            status = "EMPTY"
-
-        else:
-
-            status = "SUCCESS"
-
-            success_count += 1
-
-        print(
-            f"{source:<20}"
-            f"{count:>12}"
-            f"{elapsed:>10.2f}s"
-            f"{status:>15}"
-        )
-
-    print("-" * 78)
-
-    print(
-        f"{'Unique Subdomains':<20}"
-        f"{len(unique):>12}"
-    )
-
-    success_ratio = f"{success_count}/{len(PASSIVE_SOURCES)}"
-
-    print(
-        f"{'Successful Tools':<20}"
-        f"{success_ratio:>12}"
-    )
-
-    print(
-        f"{'Failed Tools':<20}"
-        f"{len(failed):>12}"
-    )
-
-    print(
-        f"{'Total Scan Time':<20}"
-        f"{total_time:>10.2f}s"
-    )
-
-    print("=" * 78)
-
-    # ------------------------------------------------------
-    # Failed Sources
-    # ------------------------------------------------------
-
-    if failed:
-
-        print()
-        print("Failed Sources")
-        print("-" * 78)
-
-        for source in failed:
-
-            print(f" • {source}")
-
-        print("-" * 78)
+__all__ = [
+    "run",
+]

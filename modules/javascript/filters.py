@@ -5,6 +5,8 @@ Removes false positives from
 detected JavaScript secrets.
 """
 
+from __future__ import annotations
+
 import re
 
 
@@ -61,28 +63,45 @@ MIN_SECRET_LENGTH = 20
 
 def is_empty(
     value: str,
-):
+) -> bool:
     """
-    Empty value.
+    Check whether a value is empty.
+
+    Returns:
+        bool
     """
 
     return not value.strip()
 
 
 # ==========================================================
-# Placeholder
+# Placeholder Value
 # ==========================================================
 
 def is_placeholder(
     value: str,
-):
+) -> bool:
     """
-    Placeholder value.
+    Check whether a value is
+    a known placeholder.
+
+    Returns:
+        bool
     """
 
-    value = value.lower().strip()
+    return (
 
-    return value in PLACEHOLDERS
+        value
+
+        .strip()
+
+        .lower()
+
+        in
+
+        PLACEHOLDERS
+
+    )
 
 
 # ==========================================================
@@ -91,16 +110,29 @@ def is_placeholder(
 
 def is_short(
     value: str,
-):
+) -> bool:
     """
-    Too short.
+    Check whether a value is
+    shorter than the minimum
+    secret length.
+
+    Returns:
+        bool
     """
 
-    return len(
+    return (
 
-        value.strip()
+        len(
 
-    ) < MIN_SECRET_LENGTH
+            value.strip()
+
+        )
+
+        <
+
+        MIN_SECRET_LENGTH
+
+    )
 
 
 # ==========================================================
@@ -109,9 +141,12 @@ def is_short(
 
 def is_base64_noise(
     value: str,
-):
+) -> bool:
     """
     Ignore generic Base64 strings.
+
+    Returns:
+        bool
     """
 
     return (
@@ -135,17 +170,33 @@ def is_base64_noise(
 
 def is_repeated(
     value: str,
-):
+) -> bool:
     """
-    aaaaaaaaaaaaa
-    111111111111
+    Detect repeated characters.
+
+    Examples:
+        aaaaaaaaaaaaa
+        111111111111
+
+    Returns:
+        bool
     """
 
-    return len(
+    return (
 
-        set(value)
+        len(
 
-    ) <= 2
+            set(
+
+                value
+
+            )
+
+        )
+
+        <= 2
+
+    )
 
 
 # ==========================================================
@@ -154,25 +205,31 @@ def is_repeated(
 
 def is_generic_noise(
     value: str,
-):
+) -> bool:
     """
-    Generic API key
-    false positive.
+    Detect weak generic API keys.
+
+    Returns:
+        bool
     """
 
     has_letter = any(
 
-        c.isalpha()
+        char.isalpha()
 
-        for c in value
+        for char
+
+        in value
 
     )
 
     has_digit = any(
 
-        c.isdigit()
+        char.isdigit()
 
-        for c in value
+        for char
+
+        in value
 
     )
 
@@ -193,10 +250,13 @@ def is_generic_noise(
 
 def is_valid_jwt(
     value: str,
-):
+) -> bool:
     """
     JWT must contain
-    3 sections.
+    three sections.
+
+    Returns:
+        bool
     """
 
     return (
@@ -209,62 +269,53 @@ def is_valid_jwt(
 
 
 # ==========================================================
-# Keep Secret?
+# Keep Secret
 # ==========================================================
 
 def keep_secret(
     secret_type: str,
     value: str,
-):
+) -> bool:
     """
-    Decide whether a
+    Decide whether a detected
     secret should be kept.
+
+    Returns:
+        bool
     """
 
     if is_empty(
-
         value
-
     ):
 
         return False
 
     if is_placeholder(
-
         value
-
     ):
 
         return False
 
     if is_short(
-
         value
-
     ):
 
         return False
 
     if is_repeated(
-
         value
-
     ):
 
         return False
 
     if (
 
-        secret_type
-
-        == "jwt"
+        secret_type == "jwt"
 
         and
 
         not is_valid_jwt(
-
             value
-
         )
 
     ):
@@ -273,16 +324,12 @@ def keep_secret(
 
     if (
 
-        secret_type
-
-        == "generic_api_key"
+        secret_type == "generic_api_key"
 
         and
 
         is_generic_noise(
-
             value
-
         )
 
     ):
@@ -291,16 +338,12 @@ def keep_secret(
 
     if (
 
-        secret_type
-
-        == "generic_api_key"
+        secret_type == "generic_api_key"
 
         and
 
         is_base64_noise(
-
             value
-
         )
 
     ):
@@ -315,47 +358,75 @@ def keep_secret(
 # ==========================================================
 
 def filter_findings(
-    findings: dict,
-):
+    findings: dict[str, list[str]],
+) -> dict[str, list[str]]:
     """
-    Remove false positives.
+    Remove false positives from
+    detected secrets.
 
     Returns:
-        dict
+        dict[str, list[str]]
     """
 
-    filtered = {}
+    filtered: dict[str, list[str]] = {}
 
     for secret_type, values in findings.items():
 
-        kept = [
+        kept = sorted(
 
-            value
+            {
 
-            for value
+                value
 
-            in values
+                for value in values
 
-            if keep_secret(
+                if keep_secret(
 
-                secret_type,
+                    secret_type,
 
-                value,
+                    value,
 
-            )
+                )
 
-        ]
+            }
+
+        )
 
         if kept:
 
             filtered[
-
                 secret_type
-
-            ] = sorted(
-
-                set(kept)
-
-            )
+            ] = kept
 
     return filtered
+
+
+# ==========================================================
+# Public Exports
+# ==========================================================
+
+__all__ = [
+
+    "MIN_SECRET_LENGTH",
+
+    "PLACEHOLDERS",
+
+    "is_empty",
+
+    "is_placeholder",
+
+    "is_short",
+
+    "is_base64_noise",
+
+    "is_repeated",
+
+    "is_generic_noise",
+
+    "is_valid_jwt",
+
+    "keep_secret",
+
+    "filter_findings",
+
+]

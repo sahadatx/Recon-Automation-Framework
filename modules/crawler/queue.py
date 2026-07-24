@@ -1,10 +1,14 @@
 """
 Crawler Queue
 
-Queue management for BFS crawling.
+Thread-safe Breadth-First Search queue used by the
+URL Discovery module.
 """
 
+from __future__ import annotations
+
 from collections import deque
+from threading import Lock
 
 
 # ==========================================================
@@ -13,13 +17,13 @@ from collections import deque
 
 class CrawlQueue:
     """
-    Breadth-First Search queue.
+    Thread-safe Breadth-First Search queue.
 
     Stores:
 
-        URL
-        Depth
-        Parent URL
+        • URL
+        • Crawl depth
+        • Parent URL
     """
 
     def __init__(self):
@@ -27,6 +31,10 @@ class CrawlQueue:
         self._queue = deque()
 
         self._visited = set()
+
+        self._queued = set()
+
+        self._lock = Lock()
 
     # ------------------------------------------------------
     # Enqueue
@@ -37,24 +45,36 @@ class CrawlQueue:
         url: str,
         depth: int = 0,
         parent: str | None = None,
-    ):
+    ) -> bool:
         """
         Add URL into queue.
+
+        Returns:
+            True  -> queued
+            False -> already queued/visited
         """
 
-        self._queue.append(
+        with self._lock:
 
-            {
+            if url in self._visited:
 
-                "url": url,
+                return False
 
-                "depth": depth,
+            if url in self._queued:
 
-                "parent": parent,
+                return False
 
-            }
+            self._queue.append(
+                {
+                    "url": url,
+                    "depth": depth,
+                    "parent": parent,
+                }
+            )
 
-        )
+            self._queued.add(url)
+
+            return True
 
     # ------------------------------------------------------
     # Dequeue
@@ -62,19 +82,24 @@ class CrawlQueue:
 
     def dequeue(
         self,
-    ):
+    ) -> dict | None:
         """
-        Remove next URL.
-
-        Returns:
-            dict | None
+        Remove next URL from queue.
         """
 
-        if self.empty():
+        with self._lock:
 
-            return None
+            if not self._queue:
 
-        return self._queue.popleft()
+                return None
+
+            item = self._queue.popleft()
+
+            self._queued.discard(
+                item["url"]
+            )
+
+            return item
 
     # ------------------------------------------------------
     # Empty
@@ -82,14 +107,14 @@ class CrawlQueue:
 
     def empty(
         self,
-    ):
+    ) -> bool:
         """
         Check whether queue is empty.
         """
 
-        return len(
-            self._queue
-        ) == 0
+        with self._lock:
+
+            return len(self._queue) == 0
 
     # ------------------------------------------------------
     # Queue Size
@@ -97,14 +122,14 @@ class CrawlQueue:
 
     def size(
         self,
-    ):
+    ) -> int:
         """
         Current queue size.
         """
 
-        return len(
-            self._queue
-        )
+        with self._lock:
+
+            return len(self._queue)
 
     # ------------------------------------------------------
     # Mark Visited
@@ -113,14 +138,16 @@ class CrawlQueue:
     def mark_visited(
         self,
         url: str,
-    ):
+    ) -> None:
         """
         Mark URL as visited.
         """
 
-        self._visited.add(
-            url
-        )
+        with self._lock:
+
+            self._visited.add(url)
+
+            self._queued.discard(url)
 
     # ------------------------------------------------------
     # Is Visited
@@ -129,12 +156,31 @@ class CrawlQueue:
     def visited(
         self,
         url: str,
-    ):
+    ) -> bool:
         """
-        Check visited URL.
+        Check whether URL has been visited.
         """
 
-        return url in self._visited
+        with self._lock:
+
+            return url in self._visited
+
+    # ------------------------------------------------------
+    # Is Queued
+    # ------------------------------------------------------
+
+    def queued(
+        self,
+        url: str,
+    ) -> bool:
+        """
+        Check whether URL is already waiting
+        inside the queue.
+        """
+
+        with self._lock:
+
+            return url in self._queued
 
     # ------------------------------------------------------
     # Total Visited
@@ -142,16 +188,14 @@ class CrawlQueue:
 
     def visited_count(
         self,
-    ):
+    ) -> int:
         """
         Number of visited URLs.
         """
 
-        return len(
-            self._visited
-        )
+        with self._lock:
 
-
+            return len(self._visited)
 
     # ------------------------------------------------------
     # Visited URLs
@@ -159,16 +203,29 @@ class CrawlQueue:
 
     def visited_urls(
         self,
-    ):
+    ) -> set:
         """
         Return visited URL set.
-
-        Returns:
-            set
         """
 
-        return self._visited
+        with self._lock:
 
+            return set(self._visited)
+
+    # ------------------------------------------------------
+    # Queued URLs
+    # ------------------------------------------------------
+
+    def queued_urls(
+        self,
+    ) -> set:
+        """
+        Return queued URL set.
+        """
+
+        with self._lock:
+
+            return set(self._queued)
 
     # ------------------------------------------------------
     # Clear
@@ -176,13 +233,15 @@ class CrawlQueue:
 
     def clear(
         self,
-    ):
+    ) -> None:
         """
-        Reset queue.
+        Reset queue state.
         """
 
-        self._queue.clear()
+        with self._lock:
 
-        self._visited.clear()
+            self._queue.clear()
 
+            self._visited.clear()
 
+            self._queued.clear()

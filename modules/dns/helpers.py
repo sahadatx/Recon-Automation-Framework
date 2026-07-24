@@ -5,14 +5,16 @@ Shared helper functions used by the DNS
 Resolution module.
 """
 
+from __future__ import annotations
+
 import dns.exception
 import dns.resolver
 
 from config.config import (
-    DNS_TIMEOUT,
     DNS_LIFETIME,
     DNS_RETRIES,
     DNS_SERVERS,
+    DNS_TIMEOUT,
 )
 
 from core.logger import (
@@ -25,31 +27,19 @@ from core.logger import (
 # Create Resolver
 # ==========================================================
 
-def create_resolver():
+def create_resolver() -> dns.resolver.Resolver:
     """
     Create and configure a DNS resolver.
 
     Returns:
-        dns.resolver.Resolver
+        Configured DNS resolver.
     """
 
     resolver = dns.resolver.Resolver()
 
-    # ------------------------------------------
-    # Enable DNS Cache
-    # ------------------------------------------
-
     resolver.cache = dns.resolver.Cache()
 
-    # ------------------------------------------
-    # Public DNS Servers
-    # ------------------------------------------
-
     resolver.nameservers = DNS_SERVERS
-
-    # ------------------------------------------
-    # Timeout Configuration
-    # ------------------------------------------
 
     resolver.timeout = DNS_TIMEOUT
 
@@ -65,25 +55,24 @@ def create_resolver():
 def resolve_record(
     domain: str,
     record_type: str,
-):
+) -> list[str]:
     """
     Resolve a DNS record.
 
     Args:
-        domain: Target domain/subdomain.
+        domain: Target domain.
         record_type: DNS record type.
 
     Returns:
-        list[str]
+        Resolved DNS records.
     """
 
     resolver = create_resolver()
 
-    # ------------------------------------------
-    # Retry Loop
-    # ------------------------------------------
-
-    for attempt in range(DNS_RETRIES + 1):
+    for attempt in range(
+        1,
+        DNS_RETRIES + 2,
+    ):
 
         try:
 
@@ -94,7 +83,6 @@ def resolve_record(
             )
 
             if answers.rrset is None:
-
                 return []
 
             return sorted(
@@ -106,18 +94,19 @@ def resolve_record(
 
         except dns.exception.Timeout:
 
-            if attempt < DNS_RETRIES:
+            if attempt <= DNS_RETRIES:
 
                 warning(
                     f"{record_type} lookup timeout "
-                    f"({attempt + 1}/{DNS_RETRIES + 1}) "
+                    f"({attempt}/{DNS_RETRIES + 1}) "
                     f"for {domain}. Retrying..."
                 )
 
                 continue
 
             warning(
-                f"{record_type} lookup timed out for {domain}"
+                f"{record_type} lookup timed out "
+                f"for {domain}."
             )
 
             return []
@@ -133,7 +122,8 @@ def resolve_record(
         except dns.resolver.NoNameservers:
 
             warning(
-                f"No nameservers available for {domain}."
+                f"No nameservers available "
+                f"for {domain}."
             )
 
             return []
@@ -141,8 +131,8 @@ def resolve_record(
         except Exception as error:
 
             warning(
-                f"{record_type} lookup failed for "
-                f"{domain}: {error}"
+                f"{record_type} lookup failed "
+                f"for {domain}: {error}"
             )
 
             return []
@@ -157,11 +147,27 @@ def resolve_record(
 def show_lookup(
     domain: str,
     record_type: str,
-):
+) -> None:
     """
-    Display lookup information.
+    Display DNS lookup information.
+
+    Args:
+        domain: Target domain.
+        record_type: DNS record type.
     """
 
     info(
-        f"Resolving {record_type} records for {domain}"
+        f"Resolving {record_type} "
+        f"records for {domain}"
     )
+
+
+# ==========================================================
+# Public Exports
+# ==========================================================
+
+__all__ = [
+    "create_resolver",
+    "resolve_record",
+    "show_lookup",
+]

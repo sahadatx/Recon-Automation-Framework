@@ -1,8 +1,10 @@
 """
 Port Scanner Manager
 
-Coordinates parallel port scanning.
+Coordinate port scanning, analysis, and exporting.
 """
+
+from __future__ import annotations
 
 import time
 from concurrent.futures import (
@@ -16,9 +18,17 @@ from config.config import (
 
 from core.logger import (
     info,
-    warning,
-    success,
     progress_status,
+    success,
+    warning,
+)
+
+from modules.ports.analyzer import (
+    analyze,
+)
+
+from modules.ports.exporter import (
+    export_all,
 )
 
 from modules.ports.scanner import (
@@ -32,57 +42,71 @@ from modules.ports.scanner import (
 
 def scan_one_host(
     host: str,
-):
+) -> tuple[
+    str,
+    list[dict],
+]:
     """
     Scan common TCP ports for one host.
 
-    Returns:
-        tuple[str, list]
-    """
+    Args:
+        host: Target hostname.
 
-    ports = scan_common_ports(
-        host
-    )
+    Returns:
+        Hostname and open ports.
+    """
 
     return (
         host,
-        ports,
+        scan_common_ports(host),
     )
 
 
 # ==========================================================
-# Scan All Hosts
+# Scan Hosts
 # ==========================================================
 
 def scan_hosts(
     hosts: list[str],
-):
+) -> tuple[
+    dict[str, list[dict]],
+    list[str],
+    float,
+]:
     """
-    Scan all hosts in parallel.
+    Scan multiple hosts in parallel.
+
+    Args:
+        hosts: Target hosts.
 
     Returns:
-        (
-            results,
-            failed,
-            elapsed
-        )
+        Scan results,
+        failed hosts,
+        elapsed time.
     """
 
     info(
         "Starting Port Scan..."
     )
 
-    results = {}
+    results: dict[
+        str,
+        list[dict],
+    ] = {}
 
-    failed = []
-
-    retry_queue = []
+    failed_hosts: list[
+        str
+    ] = []
 
     completed = 0
 
-    total = len(hosts)
+    total = len(
+        hosts
+    )
 
-    start_time = time.perf_counter()
+    start_time = (
+        time.perf_counter()
+    )
 
     with ThreadPoolExecutor(
         max_workers=PORT_HOST_WORKERS,
@@ -96,24 +120,24 @@ def scan_hosts(
             ): host
 
             for host in hosts
-
         }
 
         for future in as_completed(
             futures
         ):
 
+            completed += 1
+
             host = futures[
                 future
             ]
 
-            completed += 1
-
             try:
 
-                hostname, open_ports = (
-                    future.result()
-                )
+                (
+                    hostname,
+                    open_ports,
+                ) = future.result()
 
                 if open_ports:
 
@@ -132,7 +156,7 @@ def scan_hosts(
 
                 else:
 
-                    failed.append(
+                    failed_hosts.append(
                         hostname
                     )
 
@@ -144,11 +168,7 @@ def scan_hosts(
 
             except Exception as error:
 
-                failed.append(
-                    host
-                )
-
-                retry_queue.append(
+                failed_hosts.append(
                     host
                 )
 
@@ -162,38 +182,10 @@ def scan_hosts(
                     f"✗ {host}",
                 )
 
-    # ======================================================
-    # Retry Queue (Future)
-    # ======================================================
-
-    if retry_queue:
-
-        info(
-            f"Retry Queue: "
-            f"{len(retry_queue)} host(s)"
-        )
-
-        # Future:
-        # Retry failed hosts using
-        # PORT_SCAN_RETRY.
-
     elapsed = round(
         time.perf_counter()
         - start_time,
         2,
-    )
-
-    # ======================================================
-    # Statistics
-    # ======================================================
-
-    total_open_ports = sum(
-        len(ports)
-        for ports in results.values()
-    )
-
-    success(
-        f"Scanned Hosts : {total}"
     )
 
     success(
@@ -201,15 +193,58 @@ def scan_hosts(
     )
 
     success(
-        f"Hosts Without Open Ports : {len(failed)}"
-    )
-
-    success(
-        f"Total Open Ports : {total_open_ports}"
+        f"Hosts Without Open Ports : {len(failed_hosts)}"
     )
 
     return (
         results,
-        failed,
+        failed_hosts,
         elapsed,
     )
+
+
+# ==========================================================
+# Run Port Scanner
+# ==========================================================
+
+def run(
+    hosts: list[str],
+) -> dict:
+    """
+    Run the Port Scanner module.
+
+    Args:
+        hosts: Target hosts.
+
+    Returns:
+        Port scan analysis.
+    """
+
+    (
+        results,
+        failed_hosts,
+        elapsed,
+    ) = scan_hosts(
+        hosts,
+    )
+
+    analysis = analyze(
+        results=results,
+        failed_hosts=failed_hosts,
+        elapsed=elapsed,
+    )
+
+    export_all(
+        analysis,
+    )
+
+    return analysis
+
+
+# ==========================================================
+# Public Exports
+# ==========================================================
+
+__all__ = [
+    "run",
+]

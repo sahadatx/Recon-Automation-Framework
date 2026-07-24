@@ -4,12 +4,16 @@ Screenshot Manager
 Production Async Screenshot Manager.
 """
 
+from __future__ import annotations
+
 import asyncio
 import time
+
 
 from config.config import (
     SCREENSHOT_WORKERS,
 )
+
 
 from core.logger import (
     info,
@@ -18,7 +22,8 @@ from core.logger import (
     progress_status,
 )
 
-from modules.screenshot.helpers import (
+
+from modules.screenshots.helpers import (
     start_playwright,
     launch_browser,
     create_context,
@@ -26,9 +31,22 @@ from modules.screenshot.helpers import (
     cleanup,
 )
 
-from modules.screenshot.capture import (
+
+from modules.screenshots.capture import (
     capture_host,
 )
+
+
+from modules.screenshots.analyzer import (
+    analyze,
+)
+
+
+from modules.screenshots.exporter import (
+    export_all,
+    show_summary,
+)
+
 
 
 # ==========================================================
@@ -36,30 +54,36 @@ from modules.screenshot.capture import (
 # ==========================================================
 
 async def capture_one(
-    semaphore,
+    semaphore: asyncio.Semaphore,
     browser,
     host: str,
     response: dict,
-):
+) -> tuple[str, dict]:
     """
-    Capture one host.
+    Capture screenshot for one host.
 
-    Each task gets its own
+    Each target gets isolated
     BrowserContext.
     """
 
     async with semaphore:
 
+
         context = await create_context(
             browser
         )
 
+
         try:
 
             metadata = await capture_host(
+
                 context,
+
                 response,
+
             )
+
 
             return (
 
@@ -69,11 +93,13 @@ async def capture_one(
 
             )
 
+
         finally:
 
             await close_context(
                 context
             )
+
 
 
 # ==========================================================
@@ -82,45 +108,81 @@ async def capture_one(
 
 async def capture_hosts(
     http_results: dict,
-):
+) -> tuple[
+    dict,
+    list[str],
+    float,
+]:
     """
-    Capture screenshots.
+    Capture screenshots for
+    HTTP probe results.
 
     Returns:
-        (
-            results,
-            failed,
-            elapsed,
-        )
+
+        results,
+        failed,
+        elapsed
+
     """
+
 
     info(
         "Starting Screenshot Capture..."
     )
 
-    start_time = time.perf_counter()
 
-    semaphore = asyncio.Semaphore(
-        SCREENSHOT_WORKERS
-    )
+    start = time.perf_counter()
 
-    results = {}
 
-    failed = []
+    results: dict = {}
 
-    completed = 0
+    failed: list[str] = []
+
 
     total = len(
         http_results
     )
 
-    playwright = await start_playwright()
 
-    browser = await launch_browser(
-        playwright
+    completed = 0
+
+
+    if total == 0:
+
+        warning(
+            "No HTTP targets found."
+        )
+
+        return (
+
+            {},
+
+            [],
+
+            0.0,
+
+        )
+
+
+    semaphore = asyncio.Semaphore(
+
+        SCREENSHOT_WORKERS
+
     )
 
+
+    playwright = await start_playwright()
+
+
+    browser = await launch_browser(
+
+        playwright
+
+    )
+
+
     try:
+
 
         tasks = [
 
@@ -142,24 +204,40 @@ async def capture_hosts(
 
         ]
 
+
         for task in asyncio.as_completed(
+
             tasks
+
         ):
+
 
             completed += 1
 
+
             try:
+
 
                 host, metadata = await task
 
+
+
                 if metadata.get(
+
                     "captured",
+
                     False,
+
                 ):
 
+
                     results[
+
                         host
+
                     ] = metadata
+
+
 
                     progress_status(
 
@@ -171,11 +249,16 @@ async def capture_hosts(
 
                     )
 
+
                 else:
 
+
                     failed.append(
+
                         host
+
                     )
+
 
                     progress_status(
 
@@ -187,13 +270,21 @@ async def capture_hosts(
 
                     )
 
+
+
             except Exception as error:
 
+
                 warning(
+
                     str(error)
+
                 )
 
+
+
     finally:
+
 
         await cleanup(
 
@@ -203,27 +294,39 @@ async def capture_hosts(
 
         )
 
+
+
     elapsed = round(
 
         time.perf_counter()
 
-        - start_time,
+        - start,
 
         2,
 
     )
 
-    success(
-        f"Screenshots : {len(results)}"
-    )
 
     success(
-        f"Failed : {len(failed)}"
+
+        f"Captured Screenshots : {len(results)}"
+
     )
 
+
+    warning(
+
+        f"Failed Screenshots : {len(failed)}"
+
+    )
+
+
     success(
+
         f"Elapsed : {elapsed:.2f} sec"
+
     )
+
 
     return (
 
@@ -234,3 +337,116 @@ async def capture_hosts(
         elapsed,
 
     )
+
+
+
+# ==========================================================
+# Run Screenshot Pipeline
+# ==========================================================
+
+async def run(
+    http_results: dict,
+) -> dict:
+    """
+    Run complete screenshot workflow.
+
+    Workflow:
+
+        HTTP Results
+              |
+              v
+        Screenshot Capture
+              |
+              v
+        Analyze
+              |
+              v
+        Export
+              |
+              v
+        Summary
+
+    """
+
+
+    results, failed, elapsed = await capture_hosts(
+
+        http_results
+
+    )
+
+
+    analysis = analyze(
+
+        results=list(
+
+            results.values()
+
+        ),
+
+        elapsed=elapsed,
+
+    )
+
+
+    analysis["failed_hosts"] = failed
+
+
+
+    export_all(
+
+        analysis
+
+    )
+
+
+    show_summary(
+
+        analysis
+
+    )
+
+
+    return analysis
+
+
+
+# ==========================================================
+# Sync Entry Point
+# ==========================================================
+
+def execute(
+    http_results: dict,
+) -> dict:
+    """
+    Synchronous wrapper.
+
+    """
+
+    return asyncio.run(
+
+        run(
+
+            http_results
+
+        )
+
+    )
+
+
+
+# ==========================================================
+# Public Exports
+# ==========================================================
+
+__all__ = [
+
+    "capture_one",
+
+    "capture_hosts",
+
+    "run",
+
+    "execute",
+
+]
