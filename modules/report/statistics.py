@@ -13,8 +13,9 @@ from typing import Any
 # Helpers
 # ==========================================================
 
-
-def _count(value: Any) -> int:
+def _count(
+    value: Any,
+) -> int:
     """
     Return the number of items in a collection.
     """
@@ -35,7 +36,6 @@ def _count(value: Any) -> int:
 # Statistics
 # ==========================================================
 
-
 def generate_statistics(
     report: dict[str, Any],
 ) -> dict[str, Any]:
@@ -43,101 +43,210 @@ def generate_statistics(
     Generate report statistics.
     """
 
-    passive = report.get("passive", {})
-    dns = report.get("dns", {})
-    http = report.get("http", {})
-    ports = report.get("ports", {})
-    technology = report.get("technology", {})
-    screenshots = report.get("screenshots", {})
-    urls = report.get("urls", {})
-    javascript = report.get("javascript", {})
-    directories = report.get("directories", {})
-    vhosts = report.get("vhosts", {})
-    tls = report.get("tls", {})
-    waf = report.get("waf", {})
-    cdn = report.get("cdn", {})
-    takeover = report.get("takeover", {})
-    email = report.get("email", {})
+    modules = report.get(
+        "modules",
+        {},
+    )
+
+    passive = modules.get(
+        "passive",
+        {},
+    )
+
+    dns = modules.get(
+        "dns",
+        {},
+    )
+
+    http = modules.get(
+        "http",
+        {},
+    )
+
+    ports = modules.get(
+        "ports",
+        {},
+    )
+
+    technology = modules.get(
+        "technology",
+        {},
+    )
+
+    screenshots = modules.get(
+        "screenshots",
+        {},
+    )
+
+    urls = modules.get(
+        "urls",
+        {},
+    )
+
+    javascript = modules.get(
+        "javascript",
+        {},
+    )
+
+    directories = modules.get(
+        "directories",
+        {},
+    )
+
+    vhosts = modules.get(
+        "vhosts",
+        {},
+    )
+
+    tls = modules.get(
+        "tls",
+        {},
+    )
+
+    waf = modules.get(
+        "waf",
+        {},
+    )
+
+    cdn = modules.get(
+        "cdn",
+        {},
+    )
+
+    takeover = modules.get(
+        "takeover",
+        {},
+    )
+
+    email = modules.get(
+        "email",
+        {},
+    )
 
     statistics = {
 
         "total_subdomains": passive.get(
+            "statistics",
+            {},
+        ).get(
             "total_subdomains",
             _count(
                 passive.get(
                     "results",
-                    {},
+                    [],
                 )
             ),
         ),
 
         "resolved_hosts": dns.get(
-            "resolved",
+            "statistics",
+            {},
+        ).get(
+            "resolved_hosts",
             0,
         ),
 
         "alive_hosts": http.get(
-            "alive",
+            "statistics",
+            {},
+        ).get(
+            "alive_hosts",
             0,
         ),
 
         "open_ports": ports.get(
-            "open_ports",
+            "statistics",
+            {},
+        ).get(
+            "total_open_ports",
             0,
         ),
 
         "technologies": technology.get(
-            "total_technologies",
+            "statistics",
+            {},
+        ).get(
+            "technology_count",
             0,
         ),
 
         "screenshots": screenshots.get(
+            "statistics",
+            {},
+        ).get(
             "captured",
             0,
         ),
 
         "urls": urls.get(
+            "statistics",
+            {},
+        ).get(
             "total_urls",
             0,
         ),
 
         "javascript_files": javascript.get(
+            "statistics",
+            {},
+        ).get(
             "processed_files",
             0,
         ),
 
         "directories": directories.get(
-            "found_directories",
+            "statistics",
+            {},
+        ).get(
+            "total_results",
             0,
         ),
 
         "virtual_hosts": vhosts.get(
-            "total_vhosts",
+            "statistics",
+            {},
+        ).get(
+            "total_results",
             0,
         ),
 
         "tls_hosts": tls.get(
-            "analyzed_hosts",
+            "statistics",
+            {},
+        ).get(
+            "targets",
             0,
         ),
 
         "waf_hosts": waf.get(
-            "detected_hosts",
+            "statistics",
+            {},
+        ).get(
+            "detected",
             0,
         ),
 
         "cdn_hosts": cdn.get(
-            "detected_hosts",
+            "statistics",
+            {},
+        ).get(
+            "detected",
             0,
         ),
 
         "takeover_candidates": takeover.get(
-            "possible_takeovers",
+            "statistics",
+            {},
+        ).get(
+            "vulnerable",
             0,
         ),
 
         "email_records": email.get(
-            "total_records",
+            "statistics",
+            {},
+        ).get(
+            "targets",
             0,
         ),
 
@@ -149,7 +258,6 @@ def generate_statistics(
 # ==========================================================
 # Summary
 # ==========================================================
-
 
 def generate_summary(
     statistics: dict[str, Any],
@@ -177,9 +285,13 @@ def generate_summary(
             f"{name:<30} {value}"
         )
 
-    lines.append("=" * 80)
+    lines.append(
+        "=" * 80
+    )
 
-    return "\n".join(lines)
+    return "\n".join(
+        lines
+    )
 
 
 # ==========================================================

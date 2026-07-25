@@ -13,7 +13,6 @@ from .constants import (
     REPORT_TITLE,
     REPORT_VERSION,
 )
-
 from .helpers import (
     current_timestamp,
 )
@@ -23,12 +22,18 @@ from .helpers import (
 # Report Generator
 # ==========================================================
 
-
 def generate_report(
     analyses: dict[str, Any],
 ) -> dict[str, Any]:
     """
     Generate the master report.
+
+    Args:
+        analyses:
+            Analysis results from all modules.
+
+    Returns:
+        Master report.
     """
 
     report = {
@@ -53,7 +58,7 @@ def generate_report(
         # Module Results
         # --------------------------------------------------
 
-        **analyses,
+        "modules": analyses,
 
     }
 

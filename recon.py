@@ -172,6 +172,14 @@ from modules.report.manager import (
 )
 
 # ==========================================================
+# Dashboard
+# ==========================================================
+
+from modules.dashboard.manager import (
+    run_dashboard,
+)
+
+# ==========================================================
 # Helpers
 # ==========================================================
 
@@ -629,6 +637,7 @@ def main() -> None:
 
         email_analysis = empty_analysis()
 
+
     # ==========================================================
     # Report Generator
     # ==========================================================
@@ -669,9 +678,11 @@ def main() -> None:
 
     }
 
-    run_report(
+    report_analysis = run_report(
         analysis,
     )
+
+    dashboard_analysis = run_dashboard()
 
 
 # ==========================================================
