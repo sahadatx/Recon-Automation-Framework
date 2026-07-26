@@ -39,9 +39,22 @@ def run_dashboard() -> dict[str, Any]:
 
 
 # ==========================================================
+# Public Entry Point
+# ==========================================================
+
+def run() -> dict[str, Any]:
+    """
+    Public entry point for the Dashboard module.
+    """
+
+    return run_dashboard()
+
+
+# ==========================================================
 # Public Exports
 # ==========================================================
 
 __all__ = [
+    "run",
     "run_dashboard",
 ]

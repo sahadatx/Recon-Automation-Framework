@@ -73,9 +73,26 @@ def execute(
 
 
 # ==========================================================
+# Public Entry Point
+# ==========================================================
+
+def run(
+    analyses: dict[str, Any],
+) -> dict[str, Any]:
+    """
+    Public entry point for the Report module.
+    """
+
+    return execute(
+        analyses,
+    )
+
+
+# ==========================================================
 # Public API
 # ==========================================================
 
 __all__ = [
+    "run",
     "execute",
 ]

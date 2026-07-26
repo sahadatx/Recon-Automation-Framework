@@ -19,8 +19,14 @@ from .certificate import collect_certificate
 from .protocols import collect_protocols
 from .ciphers import collect_cipher
 
-from .analyzer import analyze
-from .filters import filter_results
+from .analyzer import (
+    analyze,
+    analyze_host,
+)
+
+from .filters import (
+    filter_results,
+)
 
 
 # ==========================================================
@@ -56,31 +62,29 @@ def run_tls_analysis(
         )
 
         certificate = collect_certificate(
-            target
+            target,
         )
 
         protocols = collect_protocols(
-            target
+            target,
         )
 
         cipher = collect_cipher(
-            target
+            target,
         )
 
-        result = analyze(
-            certificate,
-            protocols,
-            cipher,
+        result = analyze_host(
+            certificate=certificate,
+            protocols=protocols,
+            cipher=cipher,
         )
-
-        result["host"] = target
 
         results.append(
-            result
+            result,
         )
 
     results = filter_results(
-        results
+        results,
     )
 
     elapsed = (
@@ -145,9 +149,26 @@ def run_tls_analysis(
 
 
 # ==========================================================
+# Public Entry Point
+# ==========================================================
+
+def run(
+    targets: list[str],
+) -> dict[str, Any]:
+    """
+    Public entry point for the TLS module.
+    """
+
+    return run_tls_analysis(
+        targets,
+    )
+
+
+# ==========================================================
 # Public Exports
 # ==========================================================
 
 __all__ = [
+    "run",
     "run_tls_analysis",
 ]

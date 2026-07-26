@@ -314,6 +314,23 @@ def run_vhosts(
     return analysis
 
 
+
+# ==========================================================
+# Public Entry Point
+# ==========================================================
+
+def run(
+    targets: list[str],
+) -> dict[str, Any]:
+    """
+    Public entry point for the Virtual Host Discovery module.
+    """
+
+    return run_vhosts(
+        targets,
+    )
+
+
 # ==========================================================
 # Successful Targets
 # ==========================================================
@@ -366,6 +383,7 @@ def failed_targets(
 # ==========================================================
 
 __all__ = [
+    "run",
     "run_vhosts",
     "successful_targets",
     "failed_targets",

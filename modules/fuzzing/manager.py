@@ -353,9 +353,26 @@ def run_fuzzing(
 
 
 # ==========================================================
+# Public Entry Point
+# ==========================================================
+
+def run(
+    targets: list[str],
+) -> dict[str, Any]:
+    """
+    Public entry point for the Directory Fuzzing module.
+    """
+
+    return run_fuzzing(
+        targets,
+    )
+
+
+# ==========================================================
 # Public Exports
 # ==========================================================
 
 __all__ = [
+    "run",
     "run_fuzzing",
 ]

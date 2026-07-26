@@ -420,11 +420,9 @@ def run(
     )
 
     success(
-
         f"Processed "
-        f"{analysis['processed_files']} "
+        f"{analysis['statistics']['processed_files']} "
         f"JavaScript file(s)."
-
     )
 
     if failed:

@@ -134,9 +134,26 @@ def run_waf_detection(
 
 
 # ==========================================================
+# Public Entry Point
+# ==========================================================
+
+def run(
+    targets: list[str],
+) -> dict[str, Any]:
+    """
+    Public entry point for the WAF module.
+    """
+
+    return run_waf_detection(
+        targets,
+    )
+
+
+# ==========================================================
 # Public Exports
 # ==========================================================
 
 __all__ = [
+    "run",
     "run_waf_detection",
 ]

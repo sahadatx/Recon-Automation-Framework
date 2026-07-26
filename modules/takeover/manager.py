@@ -178,10 +178,28 @@ def run_takeover_detection(
     return analysis
 
 
+
+# ==========================================================
+# Public Entry Point
+# ==========================================================
+
+def run(
+    targets: list[str],
+) -> dict[str, Any]:
+    """
+    Public entry point for the Takeover module.
+    """
+
+    return run_takeover_detection(
+        targets,
+    )
+
+
 # ==========================================================
 # Public Exports
 # ==========================================================
 
 __all__ = [
+    "run",
     "run_takeover_detection",
 ]

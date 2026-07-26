@@ -211,9 +211,26 @@ def run_email_security(
 
 
 # ==========================================================
+# Public Entry Point
+# ==========================================================
+
+def run(
+    targets: list[str],
+) -> dict[str, Any]:
+    """
+    Public entry point for the Email Security module.
+    """
+
+    return run_email_security(
+        targets,
+    )
+
+
+# ==========================================================
 # Public Exports
 # ==========================================================
 
 __all__ = [
+    "run",
     "run_email_security",
 ]

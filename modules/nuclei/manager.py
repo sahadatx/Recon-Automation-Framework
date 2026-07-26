@@ -254,6 +254,22 @@ def run_nuclei(
 
 
 # ==========================================================
+# Public Entry Point
+# ==========================================================
+
+def run(
+    targets: list[str],
+) -> dict[str, Any]:
+    """
+    Public entry point for the Nuclei module.
+    """
+
+    return run_nuclei(
+        targets,
+    )
+
+
+# ==========================================================
 # Successful Targets
 # ==========================================================
 
@@ -300,6 +316,7 @@ def failed_targets(
 # ==========================================================
 
 __all__ = [
+    "run",
     "run_nuclei",
     "successful_targets",
     "failed_targets",

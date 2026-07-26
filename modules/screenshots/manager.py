@@ -340,15 +340,16 @@ async def capture_hosts(
 
 
 
+
 # ==========================================================
-# Run Screenshot Pipeline
+# Run Screenshot Pipeline (Async)
 # ==========================================================
 
-async def run(
+async def run_async(
     http_results: dict,
 ) -> dict:
     """
-    Run complete screenshot workflow.
+    Execute the asynchronous screenshot pipeline.
 
     Workflow:
 
@@ -368,71 +369,46 @@ async def run(
 
     """
 
-
     results, failed, elapsed = await capture_hosts(
-
         http_results
-
     )
-
 
     analysis = analyze(
-
         results=list(
-
             results.values()
-
         ),
-
         elapsed=elapsed,
-
     )
-
 
     analysis["failed_hosts"] = failed
 
-
-
     export_all(
-
         analysis
-
     )
-
 
     show_summary(
-
         analysis
-
     )
-
 
     return analysis
 
 
-
 # ==========================================================
-# Sync Entry Point
+# Public Entry Point
 # ==========================================================
 
-def execute(
+def run(
     http_results: dict,
 ) -> dict:
     """
-    Synchronous wrapper.
-
+    Public entry point for the Screenshot module.
     """
 
     return asyncio.run(
-
-        run(
-
-            http_results
-
+        run_async(
+            http_results,
         )
-
     )
-
 
 
 # ==========================================================
@@ -440,13 +416,8 @@ def execute(
 # ==========================================================
 
 __all__ = [
-
     "capture_one",
-
     "capture_hosts",
-
+    "run_async",
     "run",
-
-    "execute",
-
 ]
