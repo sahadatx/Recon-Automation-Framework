@@ -1,7 +1,9 @@
+#!/usr/bin/env python3
+
 """
 Report Manager
 
-Main entry point for the Report Generator module.
+Coordinate report generation.
 """
 
 from __future__ import annotations
@@ -9,11 +11,6 @@ from __future__ import annotations
 from typing import Any
 
 from core.context import ExecutionContext
-
-from .exporter import (
-    export_all,
-    show_summary,
-)
 
 from .generator import (
     generate_report,
@@ -34,19 +31,14 @@ def execute(
     analyses: dict[str, Any],
 ) -> dict[str, Any]:
     """
-    Generate and export the final report.
-
-    Workflow
+    Execute the complete
+    report workflow.
 
         Generate Report
               ↓
         Generate Statistics
               ↓
-        Export
-              ↓
-        Show Summary
-              ↓
-        Store Analysis
+        Store Context
               ↓
         Return Report
     """
@@ -70,23 +62,6 @@ def execute(
     report["statistics"] = statistics
 
     # ------------------------------------------------------
-    # Export Report
-    # ------------------------------------------------------
-
-    export_all(
-        report=report,
-        statistics=statistics,
-    )
-
-    # ------------------------------------------------------
-    # Console Summary
-    # ------------------------------------------------------
-
-    show_summary(
-        statistics,
-    )
-
-    # ------------------------------------------------------
     # Store Analysis
     # ------------------------------------------------------
 
@@ -108,7 +83,8 @@ def run(
     analyses: dict[str, Any],
 ) -> dict[str, Any]:
     """
-    Public entry point for the Report module.
+    Public entry point for the
+    Report module.
     """
 
     return execute(

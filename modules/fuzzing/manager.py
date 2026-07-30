@@ -1,9 +1,10 @@
+#!/usr/bin/env python3
+
 """
 Directory Fuzzing Manager
 
-Coordinates parallel directory
-fuzzing, parsing, analysis
-and reporting.
+Coordinate parallel directory
+fuzzing and analysis.
 """
 
 from __future__ import annotations
@@ -110,7 +111,16 @@ def run_fuzzing(
     targets: list[str],
 ) -> dict[str, Any]:
     """
-    Run directory fuzzing.
+    Execute the complete directory
+    fuzzing workflow.
+
+        Scan
+            ↓
+        Analyze
+            ↓
+        Store Context
+            ↓
+        Return Analysis
     """
 
     info(
@@ -240,12 +250,8 @@ def run_fuzzing(
 
     overall: dict[str, Any] = {
         "targets": total,
-        "successful": len(
-            results,
-        ),
-        "failed": len(
-            failed,
-        ),
+        "successful": len(results),
+        "failed": len(failed),
         "total_results": 0,
         "interesting_files": 0,
         "interesting_directories": 0,

@@ -1,7 +1,9 @@
+#!/usr/bin/env python3
+
 """
 Dashboard Manager
 
-Dashboard workflow manager.
+Coordinate dashboard analysis.
 """
 
 from __future__ import annotations
@@ -11,7 +13,6 @@ from typing import Any
 from core.context import ExecutionContext
 
 from .analyzer import analyze
-from .exporter import export_all
 from .loader import load_report
 
 
@@ -24,10 +25,15 @@ def run_dashboard(
     context: ExecutionContext,
 ) -> dict[str, Any]:
     """
-    Run the Dashboard module.
+    Execute the complete dashboard workflow.
 
-    Returns:
-        Dashboard analysis.
+        Load Report
+             ↓
+        Analyze
+             ↓
+        Store Context
+             ↓
+        Return Analysis
     """
 
     report = load_report()
@@ -38,10 +44,6 @@ def run_dashboard(
 
     context.set_analysis(
         "dashboard",
-        analysis,
-    )
-
-    export_all(
         analysis,
     )
 

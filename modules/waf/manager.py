@@ -1,13 +1,13 @@
+#!/usr/bin/env python3
+
 """
 WAF Manager
 
-Coordinates the complete
-WAF Detection pipeline.
+Coordinate WAF detection
+and analysis.
 """
 
 from __future__ import annotations
-
-from typing import Any
 
 from core.context import ExecutionContext
 
@@ -16,10 +16,21 @@ from core.logger import (
     success,
 )
 
-from .analyzer import analyze
-from .detector import detect_all
-from .filters import filter_results
-from .scanner import scan_targets
+from .analyzer import (
+    analyze,
+)
+
+from .detector import (
+    detect_all,
+)
+
+from .filters import (
+    filter_results,
+)
+
+from .scanner import (
+    scan_targets,
+)
 
 
 # ==========================================================
@@ -30,12 +41,22 @@ from .scanner import scan_targets
 def run_waf_detection(
     context: ExecutionContext,
     targets: list[str],
-) -> dict[str, Any]:
+) -> dict[str, object]:
     """
-    Run the complete WAF Detection pipeline.
+    Execute the complete
+    WAF detection workflow.
 
-    Returns:
-        WAF analysis.
+        Scan
+            ↓
+        Detect
+            ↓
+        Filter
+            ↓
+        Analyze
+            ↓
+        Store Context
+            ↓
+        Return Analysis
     """
 
     if not targets:
@@ -52,16 +73,12 @@ def run_waf_detection(
         return analysis
 
     info(
-        "Starting WAF Detection..."
+        "Starting WAF Detection...",
     )
 
     # ------------------------------------------------------
     # Scan Targets
     # ------------------------------------------------------
-
-    info(
-        "Scanning targets..."
-    )
 
     scans = scan_targets(
         context,
@@ -72,10 +89,6 @@ def run_waf_detection(
     # Detect WAF
     # ------------------------------------------------------
 
-    info(
-        "Matching fingerprints..."
-    )
-
     results = detect_all(
         scans,
     )
@@ -83,10 +96,6 @@ def run_waf_detection(
     # ------------------------------------------------------
     # Filter Results
     # ------------------------------------------------------
-
-    info(
-        "Filtering results..."
-    )
 
     results = filter_results(
         results,
@@ -110,27 +119,27 @@ def run_waf_detection(
     ]
 
     success(
-        f"Targets          : {statistics['targets']}"
+        f"Targets          : {statistics['targets']}",
     )
 
     success(
-        f"WAF Detected     : {statistics['detected']}"
+        f"WAF Detected     : {statistics['detected']}",
     )
 
     success(
-        f"Not Detected     : {statistics['not_detected']}"
+        f"Not Detected     : {statistics['not_detected']}",
     )
 
     success(
-        f"Success Rate     : {statistics['success_rate']}%"
+        f"Success Rate     : {statistics['success_rate']}%",
     )
 
     success(
-        f"Average Score    : {statistics['average_score']}"
+        f"Average Score    : {statistics['average_score']}",
     )
 
     success(
-        f"Highest Score    : {statistics['highest_score']}"
+        f"Highest Score    : {statistics['highest_score']}",
     )
 
     return analysis
@@ -144,9 +153,10 @@ def run_waf_detection(
 def run(
     context: ExecutionContext,
     targets: list[str],
-) -> dict[str, Any]:
+) -> dict[str, object]:
     """
-    Public entry point for the WAF module.
+    Public entry point for the
+    WAF module.
     """
 
     return run_waf_detection(
@@ -156,7 +166,7 @@ def run(
 
 
 # ==========================================================
-# Public Exports
+# Public API
 # ==========================================================
 
 __all__ = [

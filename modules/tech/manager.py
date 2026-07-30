@@ -1,7 +1,10 @@
+#!/usr/bin/env python3
+
 """
 Technology Detection Manager
 
-Coordinates technology detection.
+Coordinate technology
+detection and analysis.
 """
 
 from __future__ import annotations
@@ -31,10 +34,6 @@ from modules.tech.detector import (
     detect_technologies,
 )
 
-from modules.tech.exporter import (
-    export_all,
-)
-
 
 # ==========================================================
 # Detect One Host
@@ -49,7 +48,8 @@ def detect_one_host(
     dict[str, Any],
 ]:
     """
-    Detect technologies for one host.
+    Detect technologies
+    for one host.
     """
 
     return (
@@ -73,7 +73,8 @@ def detect_hosts(
     list[str],
 ]:
     """
-    Detect technologies for all hosts.
+    Detect technologies
+    for all hosts.
     """
 
     info(
@@ -179,7 +180,7 @@ def detect_hosts(
 
 
 # ==========================================================
-# Run
+# Run Technology Detection
 # ==========================================================
 
 
@@ -188,19 +189,15 @@ def run(
     http_results: dict[str, dict[str, Any]],
 ) -> dict[str, Any]:
     """
-    Run the complete technology
-    detection workflow.
-
-    Workflow
+    Execute the complete
+    technology detection workflow.
 
         Detect
-          ↓
+            ↓
         Analyze
-          ↓
+            ↓
         Store Context
-          ↓
-        Export
-          ↓
+            ↓
         Return Analysis
     """
 
@@ -219,10 +216,6 @@ def run(
 
     context.set_analysis(
         "technology",
-        analysis,
-    )
-
-    export_all(
         analysis,
     )
 

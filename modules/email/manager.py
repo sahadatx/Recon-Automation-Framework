@@ -1,8 +1,9 @@
+#!/usr/bin/env python3
+
 """
 Email Security Manager
 
-Coordinates the complete
-Email Security pipeline.
+Coordinate Email Security analysis.
 """
 
 from __future__ import annotations
@@ -42,7 +43,15 @@ def run_email_security(
     targets: list[str],
 ) -> dict[str, Any]:
     """
-    Run the complete Email Security pipeline.
+    Execute the complete Email Security workflow.
+
+        Collect
+            ↓
+        Analyze
+            ↓
+        Store Context
+            ↓
+        Return Analysis
     """
 
     if not targets:
@@ -77,37 +86,21 @@ def run_email_security(
         if not host:
             continue
 
-        mx = resolve_mx(
-            host,
-        )
+        mx = resolve_mx(host)
 
-        spf, spf_record = resolve_spf(
-            host,
-        )
+        spf, spf_record = resolve_spf(host)
 
-        dkim, dkim_selector = resolve_dkim(
-            host,
-        )
+        dkim, dkim_selector = resolve_dkim(host)
 
-        dmarc, dmarc_record = resolve_dmarc(
-            host,
-        )
+        dmarc, dmarc_record = resolve_dmarc(host)
 
-        mta_sts = resolve_mta_sts(
-            host,
-        )
+        mta_sts = resolve_mta_sts(host)
 
-        tls_rpt = resolve_tls_rpt(
-            host,
-        )
+        tls_rpt = resolve_tls_rpt(host)
 
-        bimi = resolve_bimi(
-            host,
-        )
+        bimi = resolve_bimi(host)
 
-        dnssec = resolve_dnskey(
-            host,
-        )
+        dnssec = resolve_dnskey(host)
 
         result = create_result(
             host,
@@ -124,12 +117,8 @@ def run_email_security(
             dnssec,
         )
 
-        result = analyze_target(
-            result,
-        )
-
         results.append(
-            result,
+            analyze_target(result),
         )
 
     analysis = analyze(

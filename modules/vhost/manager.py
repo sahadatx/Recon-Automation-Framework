@@ -1,5 +1,10 @@
+#!/usr/bin/env python3
+
 """
 Virtual Host Discovery Manager
+
+Coordinate virtual host
+discovery and analysis.
 """
 
 from __future__ import annotations
@@ -54,10 +59,7 @@ def process_target(
     dict[str, Any] | None,
 ]:
     """
-    Scan a single target.
-
-    Returns:
-        (target, result)
+    Scan one target.
     """
 
     scan = scan_target(
@@ -71,7 +73,9 @@ def process_target(
             None,
         )
 
-    output = scan["output"]
+    output = scan[
+        "output"
+    ]
 
     try:
 
@@ -90,7 +94,7 @@ def process_target(
             parsed.get(
                 "results",
                 [],
-            )
+            ),
         )
 
         interesting = detect_interesting(
@@ -126,7 +130,7 @@ def collect_results(
     list[dict[str, Any]],
 ]:
     """
-    Merge all results.
+    Merge scan results.
     """
 
     findings: list[
@@ -143,14 +147,14 @@ def collect_results(
             data.get(
                 "results",
                 [],
-            )
+            ),
         )
 
         interesting.extend(
             data.get(
                 "interesting",
                 [],
-            )
+            ),
         )
 
     return (
@@ -169,13 +173,25 @@ def run_vhosts(
     targets: list[str],
 ) -> dict[str, Any]:
     """
-    Run Virtual Host Discovery.
+    Execute the complete
+    virtual host discovery
+    workflow.
+
+        Scan
+            ↓
+        Collect
+            ↓
+        Analyze
+            ↓
+        Store Context
+            ↓
+        Return Analysis
     """
 
     if not targets:
 
         warning(
-            "No targets supplied."
+            "No targets supplied.",
         )
 
         analysis = analyze(
@@ -191,13 +207,13 @@ def run_vhosts(
         return analysis
 
     info(
-        "Starting Virtual Host Discovery..."
+        "Starting Virtual Host Discovery...",
     )
 
     targets = sorted(
         set(
             targets,
-        )
+        ),
     )
 
     executor = context.get_thread_pool()
@@ -205,7 +221,7 @@ def run_vhosts(
     if executor is None:
 
         raise RuntimeError(
-            "Shared thread pool is not initialized."
+            "Shared thread pool is not initialized.",
         )
 
     results: dict[
@@ -249,19 +265,7 @@ def run_vhosts(
                 data,
             ) = future.result()
 
-            if data is not None:
-
-                results[
-                    hostname
-                ] = data
-
-                progress_status(
-                    completed,
-                    total,
-                    f"✓ {hostname}",
-                )
-
-            else:
+            if data is None:
 
                 failed.append(
                     hostname,
@@ -273,14 +277,26 @@ def run_vhosts(
                     f"✗ {hostname}",
                 )
 
-        except Exception as error:
+                continue
 
-            warning(
-                f"{target}: {error}"
+            results[
+                hostname
+            ] = data
+
+            progress_status(
+                completed,
+                total,
+                f"✓ {hostname}",
             )
+
+        except Exception as error:
 
             failed.append(
                 target,
+            )
+
+            warning(
+                f"{target}: {error}",
             )
 
             progress_status(
@@ -308,12 +324,18 @@ def run_vhosts(
     statistics.update(
         {
             "total_targets": total,
-            "successful": len(results),
-            "failed": len(failed),
-        }
+            "successful": len(
+                results,
+            ),
+            "failed": len(
+                failed,
+            ),
+        },
     )
 
-    analysis["failed"] = sorted(
+    analysis[
+        "failed"
+    ] = sorted(
         failed,
     )
 
@@ -323,25 +345,25 @@ def run_vhosts(
     )
 
     success(
-        f"Targets             : {total}"
+        f"Targets             : {total}",
     )
 
     success(
-        f"Successful          : {len(results)}"
+        f"Successful          : {len(results)}",
     )
 
     success(
-        f"Failed              : {len(failed)}"
+        f"Failed              : {len(failed)}",
     )
 
     success(
         f"Discovered Hosts    : "
-        f"{statistics['total_results']}"
+        f"{statistics['total_results']}",
     )
 
     success(
         f"Interesting Hosts   : "
-        f"{statistics['interesting_hosts']}"
+        f"{statistics['interesting_hosts']}",
     )
 
     return analysis
@@ -385,14 +407,16 @@ def successful_targets(
                 "target",
                 "",
             )
+
             for result in analysis.get(
                 "results",
                 [],
             )
+
             if result.get(
                 "target",
             )
-        }
+        },
     )
 
 
@@ -412,12 +436,12 @@ def failed_targets(
         analysis.get(
             "failed",
             [],
-        )
+        ),
     )
 
 
 # ==========================================================
-# Public Exports
+# Public API
 # ==========================================================
 
 __all__ = [

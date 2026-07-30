@@ -1,5 +1,10 @@
+#!/usr/bin/env python3
+
 """
 Nuclei Manager
+
+Coordinate vulnerability
+scanning and analysis.
 """
 
 from __future__ import annotations
@@ -8,7 +13,6 @@ from concurrent.futures import as_completed
 from typing import Any
 
 from core.context import ExecutionContext
-
 from core.logger import (
     info,
     progress_status,
@@ -123,7 +127,16 @@ def run_nuclei(
     targets: list[str],
 ) -> dict[str, Any]:
     """
-    Run Nuclei against targets.
+    Execute the complete
+    Nuclei workflow.
+
+        Scan
+            ↓
+        Analyze
+            ↓
+        Store Context
+            ↓
+        Return Analysis
     """
 
     if not targets:
@@ -306,7 +319,8 @@ def run(
     targets: list[str],
 ) -> dict[str, Any]:
     """
-    Public entry point for the Nuclei module.
+    Public entry point for the
+    Nuclei module.
     """
 
     return run_nuclei(

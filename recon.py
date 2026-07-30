@@ -11,39 +11,16 @@ from __future__ import annotations
 import sys
 
 from concurrent.futures import ThreadPoolExecutor
+from typing import Any
 
-from typing import (
-    Any,
-    Callable,
-)
+from cli.config import build_config
+from cli.parser import parse_arguments
+from cli.pipeline import build_pipeline
 
-from cli.config import (
-    build_config,
-)
-
-from cli.parser import (
-    parse_arguments,
-)
-
-from cli.pipeline import (
-    build_pipeline,
-)
-
-from core.banner import (
-    show_banner,
-)
-
-from core.context import (
-    ExecutionContext,
-)
-
-from core.executor import (
-    execute_module,
-)
-
-from core.http import (
-    create_http_session,
-)
+from core.banner import show_banner
+from core.context import ExecutionContext
+from core.executor import execute_module
+from core.http import create_http_session
 
 from core.logger import (
     divider,
@@ -52,75 +29,54 @@ from core.logger import (
     success,
 )
 
-from modules.fuzzing.exporter import (
-    export_all as export_fuzzing_results,
-)
-
-from modules.nuclei.exporter import (
-    export_all as export_nuclei_results,
-)
-
-from modules.takeover.exporter import (
-    export_all as export_takeover_results,
+from core.plugins.manager import (
+    plugin_manager,
 )
 
 
 # ==========================================================
-# Types
-# ==========================================================
-
-Exporter = Callable[
-    [
-        dict[str, Any],
-    ],
-    None,
-]
-
-
-# ==========================================================
-# Exporters
-# ==========================================================
-
-EXPORTERS: dict[
-    str,
-    Exporter,
-] = {
-    "fuzzing": export_fuzzing_results,
-    "nuclei": export_nuclei_results,
-    "takeover": export_takeover_results,
-}
-
-
-# ==========================================================
-# Export Analysis
+# Context
 # ==========================================================
 
 
-def export_analysis(
-    module: str,
-    analysis: dict[str, Any] | None,
-) -> None:
+def create_context(
+    config: dict[str, Any],
+) -> tuple[
+    ExecutionContext,
+    Any,
+    ThreadPoolExecutor,
+]:
     """
-    Export module analysis.
-
-    Only modules registered in
-    EXPORTERS are exported.
+    Create the shared execution context.
     """
 
-    if analysis is None:
+    context = ExecutionContext()
 
-        return
+    session = create_http_session()
 
-    exporter = EXPORTERS.get(
-        module,
+    thread_pool = ThreadPoolExecutor(
+        max_workers=config["threads"],
     )
 
-    if exporter is None:
+    context.set_http_session(
+        session,
+    )
 
-        return
+    context.set_thread_pool(
+        thread_pool,
+    )
 
-    exporter(
-        analysis,
+    context.performance.set_target_count(
+        config.get(
+            "target_count",
+            1,
+        )
+    )
+
+    return (
+        context,
+        session,
+        thread_pool,
     )
 
 
@@ -129,7 +85,7 @@ def export_analysis(
 # ==========================================================
 
 
-def execute_module_pipeline(
+def execute_pipeline_module(
     context: ExecutionContext,
     module: str,
     index: int,
@@ -138,31 +94,21 @@ def execute_module_pipeline(
 ) -> None:
     """
     Execute one framework module.
-
-    Workflow
-
-        Start Timer
-              ↓
-        Execute Module
-              ↓
-        Stop Timer
-              ↓
-        Export
-              ↓
-        Success Message
     """
 
     if not config["quiet"]:
 
         info(
             f"[{index}/{total}] "
-            f"Running {module} module..."
+            f"Running {module}..."
         )
 
-    arguments: tuple[
-        Any,
-        ...,
-    ] = ()
+    arguments: tuple[Any, ...] = ()
+
+    #
+    # Only Passive Enumeration
+    # needs the initial target.
+    #
 
     if module == "passive":
 
@@ -170,41 +116,16 @@ def execute_module_pipeline(
             config["target"],
         )
 
-    analysis: dict[
-        str,
-        Any,
-    ] | None = None
-
-    context.performance.start_module(
+    execute_module(
+        context,
         module,
-    )
-
-    try:
-
-        analysis = execute_module(
-            context,
-            module,
-            *arguments,
-        )
-
-    finally:
-
-        elapsed = (
-            context.performance.stop_module(
-                module,
-            )
-        )
-
-    export_analysis(
-        module,
-        analysis,
+        *arguments,
     )
 
     if not config["quiet"]:
 
         success(
-            f"Completed {module} module "
-            f"({elapsed:.2f} sec)"
+            f"Completed {module}"
         )
 
 
@@ -214,7 +135,7 @@ def execute_module_pipeline(
 
 
 def print_summary(
-    total_modules: int,
+    pipeline: list[str],
     elapsed: float,
     quiet: bool,
 ) -> None:
@@ -233,13 +154,11 @@ def print_summary(
     )
 
     info(
-        f"Modules Executed : "
-        f"{total_modules}",
+        f"Modules Executed : {len(pipeline)}",
     )
 
     info(
-        f"Elapsed Time     : "
-        f"{elapsed:.2f} sec",
+        f"Elapsed Time     : {elapsed:.2f} sec",
     )
 
     info(
@@ -259,8 +178,7 @@ def print_performance_summary(
     quiet: bool,
 ) -> None:
     """
-    Display framework performance
-    summary.
+    Display framework performance summary.
     """
 
     if quiet:
@@ -289,6 +207,30 @@ def print_performance_summary(
 
 
 # ==========================================================
+# Cleanup
+# ==========================================================
+
+
+def cleanup(
+    context: ExecutionContext,
+    session: Any,
+    thread_pool: ThreadPoolExecutor,
+) -> None:
+    """
+    Release framework resources.
+    """
+
+    plugin_manager.shutdown()
+
+    thread_pool.shutdown(
+        wait=True,
+    )
+
+    session.close()
+
+    context.clear()
+
+# ==========================================================
 # Main
 # ==========================================================
 
@@ -312,35 +254,30 @@ def main() -> None:
 
         show_banner()
 
-    context = ExecutionContext()
+    (
+        context,
+        session,
+        thread_pool,
+    ) = create_context(
+        config,
+    )
+
+    #
+    # Start framework timer
+    #
 
     context.performance.start()
 
-    session = create_http_session()
+    #
+    # Discover and initialize plugins
+    #
 
-    thread_pool = ThreadPoolExecutor(
-        max_workers=config["threads"],
-    )
-
-    context.set_http_session(
-        session,
-    )
-
-    context.set_thread_pool(
-        thread_pool,
-    )
+    plugin_manager.initialize()
 
     try:
 
         total_modules = len(
             pipeline,
-        )
-
-        context.performance.set_target_count(
-            config.get(
-                "target_count",
-                1,
-            )
         )
 
         for (
@@ -351,7 +288,7 @@ def main() -> None:
             start=1,
         ):
 
-            execute_module_pipeline(
+            execute_pipeline_module(
                 context=context,
                 module=module,
                 index=index,
@@ -359,9 +296,17 @@ def main() -> None:
                 config=config,
             )
 
+        #
+        # Stop framework timer
+        #
+
         framework_elapsed = (
             context.performance.stop()
         )
+
+        #
+        # Store statistics
+        #
 
         context.set_statistic(
             "framework_time",
@@ -383,10 +328,18 @@ def main() -> None:
             context.performance.summary(),
         )
 
+        #
+        # Generate reports
+        #
+
         context.performance.generate_report()
 
+        #
+        # Print summaries
+        #
+
         print_summary(
-            total_modules=total_modules,
+            pipeline=pipeline,
             elapsed=framework_elapsed,
             quiet=config["quiet"],
         )
@@ -405,13 +358,11 @@ def main() -> None:
 
     finally:
 
-        thread_pool.shutdown(
-            wait=True,
+        cleanup(
+            context=context,
+            session=session,
+            thread_pool=thread_pool,
         )
-
-        session.close()
-
-        context.clear()
 
 
 # ==========================================================
@@ -466,8 +417,9 @@ if __name__ == "__main__":
 
 __all__ = [
     "main",
-    "execute_module_pipeline",
-    "export_analysis",
+    "create_context",
+    "execute_pipeline_module",
     "print_summary",
     "print_performance_summary",
+    "cleanup",
 ]

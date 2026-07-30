@@ -1,7 +1,10 @@
+#!/usr/bin/env python3
+
 """
 Screenshot Manager
 
-Production Async Screenshot Manager.
+Coordinate asynchronous
+screenshot capture and analysis.
 """
 
 from __future__ import annotations
@@ -13,7 +16,6 @@ from typing import Any
 from config.config import SCREENSHOT_WORKERS
 
 from core.context import ExecutionContext
-
 from core.logger import (
     info,
     progress_status,
@@ -23,10 +25,6 @@ from core.logger import (
 
 from modules.screenshots.analyzer import analyze
 from modules.screenshots.capture import capture_host
-from modules.screenshots.exporter import (
-    export_all,
-    show_summary,
-)
 from modules.screenshots.helpers import (
     cleanup,
     close_context,
@@ -48,10 +46,11 @@ async def capture_one(
     response: dict[str, Any],
 ) -> tuple[str, dict[str, Any]]:
     """
-    Capture screenshot for one host.
+    Capture a screenshot
+    for one host.
 
-    Each target receives an isolated
-    BrowserContext.
+    Each target receives
+    its own BrowserContext.
     """
 
     async with semaphore:
@@ -139,13 +138,19 @@ async def capture_hosts(
     try:
 
         tasks = [
+
             capture_one(
                 semaphore,
                 browser,
                 host,
                 response,
             )
-            for host, response in http_results.items()
+
+            for (
+                host,
+                response,
+            ) in http_results.items()
+
         ]
 
         for task in asyncio.as_completed(
@@ -218,7 +223,7 @@ async def capture_hosts(
 
 
 # ==========================================================
-# Run Screenshot Pipeline (Async)
+# Run Screenshot Pipeline
 # ==========================================================
 
 
@@ -227,8 +232,16 @@ async def run_async(
     http_results: dict[str, dict[str, Any]],
 ) -> dict[str, Any]:
     """
-    Execute the asynchronous
-    screenshot pipeline.
+    Execute the complete
+    screenshot workflow.
+
+        Capture
+            ↓
+        Analyze
+            ↓
+        Store Context
+            ↓
+        Return Analysis
     """
 
     (
@@ -254,14 +267,6 @@ async def run_async(
         analysis,
     )
 
-    export_all(
-        analysis,
-    )
-
-    show_summary(
-        analysis,
-    )
-
     return analysis
 
 
@@ -275,8 +280,8 @@ def run(
     http_results: dict[str, dict[str, Any]],
 ) -> dict[str, Any]:
     """
-    Public entry point for
-    the Screenshot module.
+    Public entry point for the
+    Screenshot module.
     """
 
     return asyncio.run(

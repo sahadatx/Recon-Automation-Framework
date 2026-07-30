@@ -13,6 +13,7 @@ from typing import Any
 # Helpers
 # ==========================================================
 
+
 def _count(
     value: Any,
 ) -> int:
@@ -32,103 +33,157 @@ def _count(
     return 1
 
 
+def _module(
+    modules: dict[str, Any],
+    name: str,
+) -> dict[str, Any]:
+    """
+    Safely return a module analysis.
+    """
+
+    module = modules.get(
+        name,
+        {},
+    )
+
+    if isinstance(
+        module,
+        dict,
+    ):
+
+        return module
+
+    return {}
+
+
+def _stat(
+    module: dict[str, Any],
+    key: str,
+    default: int = 0,
+) -> int:
+    """
+    Return one statistic from a module.
+    """
+
+    return (
+        module.get(
+            "statistics",
+            {},
+        ).get(
+            key,
+            default,
+        )
+    )
+
+
 # ==========================================================
 # Statistics
 # ==========================================================
+
 
 def generate_statistics(
     report: dict[str, Any],
 ) -> dict[str, Any]:
     """
-    Generate report statistics.
+    Generate summary statistics from
+    all module analyses.
     """
 
-    modules = report.get(
-        "modules",
-        {},
+    analyses = (
+        report
+        .get(
+            "modules",
+            {},
+        )
+        .get(
+            "analysis",
+            {},
+        )
     )
 
-    passive = modules.get(
+    passive = _module(
+        analyses,
         "passive",
-        {},
     )
 
-    dns = modules.get(
+    dns = _module(
+        analyses,
         "dns",
-        {},
     )
 
-    http = modules.get(
+    http = _module(
+        analyses,
         "http",
-        {},
     )
 
-    ports = modules.get(
+    ports = _module(
+        analyses,
         "ports",
-        {},
     )
 
-    technology = modules.get(
-        "technology",
-        {},
+    tech = _module(
+        analyses,
+        "tech",
     )
 
-    screenshots = modules.get(
-        "screenshots",
-        {},
+    crawler = _module(
+        analyses,
+        "crawler",
     )
 
-    urls = modules.get(
-        "urls",
-        {},
-    )
-
-    javascript = modules.get(
+    javascript = _module(
+        analyses,
         "javascript",
-        {},
     )
 
-    directories = modules.get(
-        "directories",
-        {},
+    fuzzing = _module(
+        analyses,
+        "fuzzing",
     )
 
-    vhosts = modules.get(
-        "vhosts",
-        {},
+    vhost = _module(
+        analyses,
+        "vhost",
     )
 
-    tls = modules.get(
+    screenshots = _module(
+        analyses,
+        "screenshots",
+    )
+
+    tls = _module(
+        analyses,
         "tls",
-        {},
     )
 
-    waf = modules.get(
+    waf = _module(
+        analyses,
         "waf",
-        {},
     )
 
-    cdn = modules.get(
+    cdn = _module(
+        analyses,
         "cdn",
-        {},
     )
 
-    takeover = modules.get(
+    takeover = _module(
+        analyses,
         "takeover",
-        {},
     )
 
-    email = modules.get(
+    email = _module(
+        analyses,
         "email",
-        {},
     )
 
     statistics = {
 
-        "total_subdomains": passive.get(
-            "statistics",
-            {},
-        ).get(
+        # --------------------------------------------------
+        # Enumeration
+        # --------------------------------------------------
+
+        "total_subdomains": _stat(
+            passive,
             "total_subdomains",
             _count(
                 passive.get(
@@ -138,116 +193,82 @@ def generate_statistics(
             ),
         ),
 
-        "resolved_hosts": dns.get(
-            "statistics",
-            {},
-        ).get(
+        "resolved_hosts": _stat(
+            dns,
             "resolved_hosts",
-            0,
         ),
 
-        "alive_hosts": http.get(
-            "statistics",
-            {},
-        ).get(
+        "alive_hosts": _stat(
+            http,
             "alive_hosts",
-            0,
         ),
 
-        "open_ports": ports.get(
-            "statistics",
-            {},
-        ).get(
+        "open_ports": _stat(
+            ports,
             "total_open_ports",
-            0,
         ),
 
-        "technologies": technology.get(
-            "statistics",
-            {},
-        ).get(
+        # --------------------------------------------------
+        # Discovery
+        # --------------------------------------------------
+
+        "technologies": _stat(
+            tech,
             "technology_count",
-            0,
         ),
 
-        "screenshots": screenshots.get(
-            "statistics",
-            {},
-        ).get(
-            "captured",
-            0,
-        ),
-
-        "urls": urls.get(
-            "statistics",
-            {},
-        ).get(
+        "urls": _stat(
+            crawler,
             "total_urls",
-            0,
         ),
 
-        "javascript_files": javascript.get(
-            "statistics",
-            {},
-        ).get(
+        "javascript_files": _stat(
+            javascript,
             "processed_files",
-            0,
         ),
 
-        "directories": directories.get(
-            "statistics",
-            {},
-        ).get(
+        "directories": _stat(
+            fuzzing,
             "total_results",
-            0,
         ),
 
-        "virtual_hosts": vhosts.get(
-            "statistics",
-            {},
-        ).get(
+        "virtual_hosts": _stat(
+            vhost,
             "total_results",
-            0,
         ),
 
-        "tls_hosts": tls.get(
-            "statistics",
-            {},
-        ).get(
+        "screenshots": _stat(
+            screenshots,
+            "captured",
+        ),
+
+        # --------------------------------------------------
+        # Security
+        # --------------------------------------------------
+
+        "tls_hosts": _stat(
+            tls,
             "targets",
-            0,
         ),
 
-        "waf_hosts": waf.get(
-            "statistics",
-            {},
-        ).get(
+        "waf_hosts": _stat(
+            waf,
             "detected",
-            0,
         ),
 
-        "cdn_hosts": cdn.get(
-            "statistics",
-            {},
-        ).get(
+        "cdn_hosts": _stat(
+            cdn,
             "detected",
-            0,
         ),
 
-        "takeover_candidates": takeover.get(
-            "statistics",
-            {},
-        ).get(
+        "takeover_candidates": _stat(
+            takeover,
             "vulnerable",
-            0,
         ),
 
-        "email_records": email.get(
-            "statistics",
-            {},
-        ).get(
+        "email_records": _stat(
+            email,
             "targets",
-            0,
         ),
 
     }
@@ -259,11 +280,12 @@ def generate_statistics(
 # Summary
 # ==========================================================
 
+
 def generate_summary(
     statistics: dict[str, Any],
 ) -> str:
     """
-    Generate a printable summary.
+    Generate a printable statistics summary.
     """
 
     lines = [
@@ -274,15 +296,31 @@ def generate_summary(
 
     ]
 
-    for key, value in statistics.items():
+    labels = {
 
-        name = key.replace(
-            "_",
-            " ",
-        ).title()
+        "total_subdomains": "Total Subdomains",
+        "resolved_hosts": "Resolved Hosts",
+        "alive_hosts": "Alive Hosts",
+        "open_ports": "Open Ports",
+        "technologies": "Technologies",
+        "screenshots": "Screenshots",
+        "urls": "URLs",
+        "javascript_files": "JavaScript Files",
+        "directories": "Directories",
+        "virtual_hosts": "Virtual Hosts",
+        "tls_hosts": "TLS Hosts",
+        "waf_hosts": "WAF Hosts",
+        "cdn_hosts": "CDN Hosts",
+        "takeover_candidates": "Takeover Candidates",
+        "email_records": "Email Records",
+
+    }
+
+    for key, label in labels.items():
 
         lines.append(
-            f"{name:<30} {value}"
+            f"{label:<30} "
+            f"{statistics.get(key, 0)}"
         )
 
     lines.append(
@@ -290,7 +328,7 @@ def generate_summary(
     )
 
     return "\n".join(
-        lines
+        lines,
     )
 
 

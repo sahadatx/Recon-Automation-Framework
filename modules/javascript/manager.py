@@ -3,7 +3,7 @@
 """
 JavaScript Manager
 
-Coordinates JavaScript analysis workflow.
+Coordinate JavaScript analysis.
 """
 
 from __future__ import annotations
@@ -22,10 +22,6 @@ from core.logger import (
 from modules.javascript.analyzer import analyze
 from modules.javascript.detectors import scan_content
 from modules.javascript.downloader import download_one
-from modules.javascript.exporter import (
-    export_all,
-    show_summary,
-)
 from modules.javascript.helpers import is_valid_url
 from modules.javascript.interesting import detect_interesting
 from modules.javascript.parser import parse_file
@@ -41,7 +37,8 @@ def process_javascript(
     url: str,
 ) -> tuple[str, dict[str, Any] | None]:
     """
-    Download and analyze one JavaScript file.
+    Download and analyze one
+    JavaScript file.
     """
 
     if not is_valid_url(url):
@@ -318,6 +315,10 @@ def collect_results(
             f"✓ {js_url}",
         )
 
+    success(
+        f"Processed {len(results)} JavaScript file(s)."
+    )
+
     return (
         results,
         sorted(
@@ -336,8 +337,16 @@ def run(
     javascript_urls: list[str],
 ) -> dict[str, Any]:
     """
-    Run the JavaScript
-    analysis pipeline.
+    Execute the complete
+    JavaScript workflow.
+
+        Collect
+            ↓
+        Analyze
+            ↓
+        Store Context
+            ↓
+        Return Analysis
     """
 
     (
@@ -357,20 +366,6 @@ def run(
     context.set_analysis(
         "javascript",
         analysis,
-    )
-
-    export_all(
-        analysis,
-    )
-
-    show_summary(
-        analysis,
-    )
-
-    success(
-        "Processed "
-        f"{analysis['statistics']['processed_files']} "
-        "JavaScript file(s)."
     )
 
     if failed:

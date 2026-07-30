@@ -18,8 +18,12 @@ from core.logger import (
 
 from .constants import (
     OUTPUT_DIR,
+    TXT_FILE,
+    JSON_FILE,
+    CSV_FILE,
+    SUMMARY_FILE,
+    DETECTED_FILE,
 )
-
 
 # ==========================================================
 # Output Directory

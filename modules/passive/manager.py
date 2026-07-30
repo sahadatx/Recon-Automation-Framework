@@ -1,7 +1,9 @@
+#!/usr/bin/env python3
+
 """
 Passive Enumeration Manager
 
-Coordinates all passive enumeration sources.
+Coordinate passive enumeration.
 """
 
 from __future__ import annotations
@@ -41,10 +43,6 @@ from modules.passive.chaos import (
 
 from modules.passive.crtsh import (
     run_crtsh,
-)
-
-from modules.passive.exporter import (
-    export_all,
 )
 
 from modules.passive.findomain import (
@@ -134,12 +132,8 @@ def timed_runner(
     float,
 ]:
     """
-    Execute a passive source and measure
-    execution time.
-
-    NOTE:
-        This timing is benchmark data,
-        not framework performance.
+    Execute one passive source and
+    measure execution time.
     """
 
     start_time = time.perf_counter()
@@ -175,16 +169,8 @@ def collect_subdomains(
     list[str],
 ]:
     """
-    Run all passive enumeration
-    sources concurrently.
-
-    Returns:
-
-        (
-            results,
-            timings,
-            failed_sources,
-        )
+    Run all passive sources
+    concurrently.
     """
 
     info(
@@ -302,10 +288,6 @@ def collect_subdomains(
                 )
             )
 
-    # ------------------------------------------------------
-    # Retry Failed Sources
-    # ------------------------------------------------------
-
     if retry_queue:
 
         info(
@@ -364,17 +346,15 @@ def merge_results(
     domain: str,
 ) -> list[str]:
     """
-    Merge, normalize, validate
-    and deduplicate subdomains.
+    Merge, normalize and validate
+    discovered subdomains.
     """
 
     target_domain = domain.lower()
 
     suffix = f".{target_domain}"
 
-    unique_subdomains: set[
-        str
-    ] = set()
+    unique_subdomains: set[str] = set()
 
     for subdomains in results.values():
 
@@ -429,16 +409,14 @@ def run(
     enumeration workflow.
 
         Collect
-           ↓
+            ↓
         Merge
-           ↓
+            ↓
         Analyze
-           ↓
+            ↓
         Store Context
-           ↓
-        Export
-           ↓
-        Return
+            ↓
+        Return Analysis
     """
 
     (
@@ -465,10 +443,6 @@ def run(
 
     context.set_analysis(
         "passive",
-        analysis,
-    )
-
-    export_all(
         analysis,
     )
 

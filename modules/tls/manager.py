@@ -1,8 +1,9 @@
+#!/usr/bin/env python3
+
 """
 TLS Manager
 
-Coordinates the complete
-TLS Analysis pipeline.
+Coordinate TLS analysis.
 """
 
 from __future__ import annotations
@@ -10,7 +11,6 @@ from __future__ import annotations
 from typing import Any
 
 from core.context import ExecutionContext
-
 from core.logger import (
     info,
     success,
@@ -36,10 +36,18 @@ def run_tls_analysis(
     targets: list[str],
 ) -> dict[str, Any]:
     """
-    Run the complete TLS Analysis pipeline.
+    Execute the complete
+    TLS analysis workflow.
 
-    Returns:
-        TLS analysis.
+        Collect
+            ↓
+        Filter
+            ↓
+        Analyze
+            ↓
+        Store Context
+            ↓
+        Return Analysis
     """
 
     if not targets:
@@ -161,7 +169,8 @@ def run(
     targets: list[str],
 ) -> dict[str, Any]:
     """
-    Public entry point for the TLS module.
+    Public entry point for the
+    TLS module.
     """
 
     return run_tls_analysis(

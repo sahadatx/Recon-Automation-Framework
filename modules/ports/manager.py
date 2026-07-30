@@ -3,8 +3,8 @@
 """
 Port Scanner Manager
 
-Coordinate port scanning,
-analysis, and exporting.
+Coordinate port scanning
+and analysis.
 """
 
 from __future__ import annotations
@@ -30,10 +30,6 @@ from modules.ports.analyzer import (
     analyze,
 )
 
-from modules.ports.exporter import (
-    export_all,
-)
-
 from modules.ports.scanner import (
     scan_common_ports,
 )
@@ -52,7 +48,8 @@ def scan_one_host(
     list[dict[str, Any]],
 ]:
     """
-    Scan common TCP ports for one host.
+    Scan common TCP ports
+    for one host.
     """
 
     return (
@@ -208,18 +205,15 @@ def run(
     hosts: list[str],
 ) -> dict[str, Any]:
     """
-    Run the Port Scanner module.
-
-    Workflow
+    Execute the complete
+    port scanning workflow.
 
         Scan
-          ↓
+            ↓
         Analyze
-          ↓
+            ↓
         Store Context
-          ↓
-        Export
-          ↓
+            ↓
         Return Analysis
     """
 
@@ -238,10 +232,6 @@ def run(
 
     context.set_analysis(
         "ports",
-        analysis,
-    )
-
-    export_all(
         analysis,
     )
 

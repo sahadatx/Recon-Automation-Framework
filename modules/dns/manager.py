@@ -1,8 +1,9 @@
+#!/usr/bin/env python3
+
 """
 DNS Resolution Manager
 
-Coordinate DNS resolution,
-analysis, and exporting.
+Coordinate DNS resolution and analysis.
 """
 
 from __future__ import annotations
@@ -19,7 +20,6 @@ from core.logger import (
 )
 
 from modules.dns.analyzer import analyze
-from modules.dns.exporter import export_all
 from modules.dns.records import resolve_all_records
 
 
@@ -186,8 +186,6 @@ def run(
             ↓
         Store Context
             ↓
-        Export
-            ↓
         Return Analysis
     """
 
@@ -206,10 +204,6 @@ def run(
 
     context.set_analysis(
         "dns",
-        analysis,
-    )
-
-    export_all(
         analysis,
     )
 

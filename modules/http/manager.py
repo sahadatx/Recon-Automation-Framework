@@ -3,8 +3,8 @@
 """
 HTTP Probe Manager
 
-Coordinate HTTP probing,
-analysis, and exporting.
+Coordinate HTTP probing
+and analysis.
 """
 
 from __future__ import annotations
@@ -28,10 +28,6 @@ from core.logger import (
 
 from modules.http.analyzer import (
     analyze,
-)
-
-from modules.http.exporter import (
-    export_all,
 )
 
 from modules.http.probe import (
@@ -228,8 +224,6 @@ def run(
           ↓
         Store Context
           ↓
-        Export
-          ↓
         Return Analysis
     """
 
@@ -248,10 +242,6 @@ def run(
 
     context.set_analysis(
         "http",
-        analysis,
-    )
-
-    export_all(
         analysis,
     )
 

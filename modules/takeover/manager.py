@@ -1,9 +1,10 @@
+#!/usr/bin/env python3
+
 """
 Takeover Manager
 
-Coordinates the complete
-Subdomain Takeover
-Detection pipeline.
+Coordinate subdomain takeover
+detection and analysis.
 """
 
 from __future__ import annotations
@@ -123,9 +124,18 @@ def run_takeover_detection(
     targets: list[str],
 ) -> dict[str, Any]:
     """
-    Run the complete
-    Subdomain Takeover
-    Detection pipeline.
+    Execute the complete
+    takeover detection workflow.
+
+        Scan
+            ↓
+        Filter
+            ↓
+        Analyze
+            ↓
+        Store Context
+            ↓
+        Return Analysis
     """
 
     if not targets:

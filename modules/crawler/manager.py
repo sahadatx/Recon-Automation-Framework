@@ -3,8 +3,7 @@
 """
 Crawler Manager
 
-Coordinate URL crawling, analysis,
-and exporting.
+Coordinate URL crawling and analysis.
 """
 
 from __future__ import annotations
@@ -22,7 +21,6 @@ from core.logger import (
 
 from modules.crawler.analyzer import analyze
 from modules.crawler.crawler import crawl_host
-from modules.crawler.exporter import export_all
 
 
 # ==========================================================
@@ -170,7 +168,15 @@ def run(
     hosts: list[str],
 ) -> dict[str, Any]:
     """
-    Run the URL Discovery module.
+    Execute the complete crawler workflow.
+
+        Crawl
+           ↓
+        Analyze
+           ↓
+        Store Context
+           ↓
+        Return Analysis
     """
 
     results = crawl_hosts(
@@ -184,10 +190,6 @@ def run(
 
     context.set_analysis(
         "crawler",
-        analysis,
-    )
-
-    export_all(
         analysis,
     )
 
