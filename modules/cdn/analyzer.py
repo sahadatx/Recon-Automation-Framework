@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """
 CDN Analyzer
 
@@ -19,25 +21,24 @@ from .statistics import (
 # Analyze Results
 # ==========================================================
 
+
 def analyze(
     results: list[dict[str, Any]],
-    elapsed: float,
 ) -> dict[str, Any]:
     """
     Analyze CDN detection results.
 
-    Returns:
-        dict[str, Any]
+    Returns
+    -------
+    dict[str, Any]
+        Complete CDN analysis.
     """
-
-    statistics = {
-        **generate_statistics(results),
-        "elapsed": round(elapsed, 2),
-    }
 
     return {
         "results": results,
-        "statistics": statistics,
+        "statistics": generate_statistics(
+            results,
+        ),
     }
 
 

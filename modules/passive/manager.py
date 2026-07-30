@@ -10,33 +10,68 @@ import re
 import time
 
 from concurrent.futures import (
-    ThreadPoolExecutor,
     as_completed,
 )
 
-from typing import Callable
+from typing import (
+    Any,
+    Callable,
+)
 
-from config.config import MAX_WORKERS
+from core.context import (
+    ExecutionContext,
+)
 
 from core.logger import (
     info,
     warning,
 )
 
-from modules.passive.analyzer import analyze
-from modules.passive.exporter import export_all
+from modules.passive.analyzer import (
+    analyze,
+)
 
-from modules.passive.assetfinder import run_assetfinder
-from modules.passive.chaos import run_chaos
-from modules.passive.crtsh import run_crtsh
-from modules.passive.findomain import run_findomain
-from modules.passive.securitytrails import run_securitytrails
-from modules.passive.subfinder import run_subfinder
+from modules.passive.assetfinder import (
+    run_assetfinder,
+)
+
+from modules.passive.chaos import (
+    run_chaos,
+)
+
+from modules.passive.crtsh import (
+    run_crtsh,
+)
+
+from modules.passive.exporter import (
+    export_all,
+)
+
+from modules.passive.findomain import (
+    run_findomain,
+)
+
+from modules.passive.securitytrails import (
+    run_securitytrails,
+)
+
+from modules.passive.subfinder import (
+    run_subfinder,
+)
+
+
+# ==========================================================
+# Type Definitions
+# ==========================================================
 
 PassiveSource = Callable[
-    [str],
+    [
+        ExecutionContext,
+        str,
+    ],
     list[str],
 ]
+
 
 # ==========================================================
 # Tool Registry
@@ -45,7 +80,7 @@ PassiveSource = Callable[
 PASSIVE_SOURCES: list[
     tuple[
         str,
-       PassiveSource,
+        PassiveSource,
     ]
 ] = [
     (
@@ -89,34 +124,40 @@ DOMAIN_RE = re.compile(
 # Timed Runner
 # ==========================================================
 
+
 def timed_runner(
+    context: ExecutionContext,
     function: PassiveSource,
     domain: str,
-) -> tuple[list[str], float]:
+) -> tuple[
+    list[str],
+    float,
+]:
     """
-    Execute a passive source and measure execution time.
+    Execute a passive source and measure
+    execution time.
 
-    Args:
-        function: Passive enumeration function.
-        domain: Target domain.
-
-    Returns:
-        Tuple containing discovered subdomains and
-        execution time.
+    NOTE:
+        This timing is benchmark data,
+        not framework performance.
     """
 
     start_time = time.perf_counter()
 
-    results = function(domain)
+    results = function(
+        context,
+        domain,
+    )
 
-    elapsed_time = round(
-        time.perf_counter() - start_time,
+    elapsed = round(
+        time.perf_counter()
+        - start_time,
         2,
     )
 
     return (
         results,
-        elapsed_time,
+        elapsed,
     )
 
 
@@ -124,31 +165,39 @@ def timed_runner(
 # Collect Passive Enumeration
 # ==========================================================
 
+
 def collect_subdomains(
+    context: ExecutionContext,
     domain: str,
 ) -> tuple[
     dict[str, list[str]],
     dict[str, float],
     list[str],
-    float,
 ]:
     """
-    Run all passive enumeration sources concurrently.
-
-    Args:
-        domain: Target domain.
+    Run all passive enumeration
+    sources concurrently.
 
     Returns:
-        Tuple containing:
-            - Results grouped by source.
-            - Execution time per source.
-            - Failed sources.
-            - Total scan time.
+
+        (
+            results,
+            timings,
+            failed_sources,
+        )
     """
 
     info(
         "Starting Passive Enumeration..."
     )
+
+    executor = context.get_thread_pool()
+
+    if executor is None:
+
+        raise RuntimeError(
+            "Thread pool not initialized."
+        )
 
     results: dict[
         str,
@@ -170,78 +219,88 @@ def collect_subdomains(
     ] = []
 
     total_sources = len(
-        PASSIVE_SOURCES
+        PASSIVE_SOURCES,
     )
 
     completed_sources = 0
 
-    scan_start = time.perf_counter()
+    futures = {
 
-    with ThreadPoolExecutor(
-        max_workers=MAX_WORKERS,
-    ) as executor:
+        executor.submit(
+            timed_runner,
+            context,
+            function,
+            domain,
+        ): (
+            name,
+            function,
+        )
 
-        futures = {
-            executor.submit(
-                timed_runner,
-                function,
-                domain,
-            ): (
-                name,
-                function,
+        for (
+            name,
+            function,
+        ) in PASSIVE_SOURCES
+
+    }
+
+    for future in as_completed(
+        futures,
+    ):
+
+        (
+            name,
+            function,
+        ) = futures[
+            future
+        ]
+
+        completed_sources += 1
+
+        try:
+
+            (
+                subdomains,
+                elapsed,
+            ) = future.result()
+
+        except Exception as exc:
+
+            warning(
+                f"{name} crashed: {exc}"
             )
-            for name, function in PASSIVE_SOURCES
-        }
 
-        for future in as_completed(
-            futures,
+            subdomains = []
+
+            elapsed = 0.0
+
+            failed_sources.append(
+                name,
+            )
+
+        results[
+            name
+        ] = subdomains
+
+        timings[
+            name
+        ] = elapsed
+
+        info(
+            f"[{completed_sources}/{total_sources}] "
+            f"{name} completed."
+        )
+
+        if (
+            not subdomains
+            and name in RETRYABLE_TOOLS
         ):
 
-            name, function = futures[
-                future
-            ]
-
-            completed_sources += 1
-
-            try:
-
-                subdomains, elapsed = (
-                    future.result()
-                )
-
-            except Exception as error:
-
-                warning(
-                    f"{name} crashed: {error}"
-                )
-
-                subdomains = []
-                elapsed = 0.0
-
-                failed_sources.append(
+            retry_queue.append(
+                (
                     name,
+                    function,
                 )
-
-            results[name] = subdomains
-
-            timings[name] = elapsed
-
-            info(
-                f"[{completed_sources}/{total_sources}] "
-                f"{name} completed."
             )
-
-            if (
-                not subdomains
-                and name in RETRYABLE_TOOLS
-            ):
-
-                retry_queue.append(
-                    (
-                        name,
-                        function,
-                    )
-                )
 
     # ------------------------------------------------------
     # Retry Failed Sources
@@ -261,12 +320,15 @@ def collect_subdomains(
             try:
 
                 retry_results = function(
+                    context,
                     domain,
                 )
 
                 if retry_results:
 
-                    results[name] = retry_results
+                    results[
+                        name
+                    ] = retry_results
 
                     if (
                         name
@@ -277,22 +339,18 @@ def collect_subdomains(
                             name,
                         )
 
-            except Exception as error:
+            except Exception as exc:
 
                 warning(
-                    f"{name} retry failed: {error}"
+                    f"{name} retry failed: {exc}"
                 )
-
-    total_scan_time = round(
-        time.perf_counter() - scan_start,
-        2,
-    )
 
     return (
         results,
         timings,
-        failed_sources,
-        total_scan_time,
+        sorted(
+            failed_sources,
+        ),
     )
 
 
@@ -300,32 +358,30 @@ def collect_subdomains(
 # Merge Results
 # ==========================================================
 
+
 def merge_results(
     results: dict[str, list[str]],
     domain: str,
 ) -> list[str]:
     """
-    Merge, normalize, validate and deduplicate subdomains.
-
-    Args:
-        results: Raw results grouped by source.
-        domain: Target domain.
-
-    Returns:
-        Sorted list of unique subdomains.
+    Merge, normalize, validate
+    and deduplicate subdomains.
     """
 
     target_domain = domain.lower()
 
     suffix = f".{target_domain}"
 
-    unique_subdomains: set[str] = set()
+    unique_subdomains: set[
+        str
+    ] = set()
 
     for subdomains in results.values():
 
         for subdomain in subdomains:
 
             if not subdomain:
+
                 continue
 
             normalized = (
@@ -338,18 +394,20 @@ def merge_results(
             if (
                 normalized != target_domain
                 and not normalized.endswith(
-                    suffix
+                    suffix,
                 )
             ):
+
                 continue
 
             if not DOMAIN_RE.fullmatch(
-                normalized
+                normalized,
             ):
+
                 continue
 
             unique_subdomains.add(
-                normalized
+                normalized,
             )
 
     return sorted(
@@ -361,40 +419,40 @@ def merge_results(
 # Run Passive Enumeration
 # ==========================================================
 
+
 def run(
+    context: ExecutionContext,
     domain: str,
-) -> dict[str, object]:
+) -> dict[str, Any]:
     """
-    Execute the complete passive enumeration workflow.
+    Execute the complete passive
+    enumeration workflow.
 
-    Workflow:
         Collect
-            ↓
+           ↓
         Merge
-            ↓
+           ↓
         Analyze
-            ↓
+           ↓
+        Store Context
+           ↓
         Export
-
-    Args:
-        domain: Target domain.
-
-    Returns:
-        Analysis dictionary.
+           ↓
+        Return
     """
 
     (
         results,
         timings,
         failed_sources,
-        total_scan_time,
     ) = collect_subdomains(
-        domain,
+        context=context,
+        domain=domain,
     )
 
     unique_subdomains = merge_results(
-        results,
-        domain,
+        results=results,
+        domain=domain,
     )
 
     analysis = analyze(
@@ -403,7 +461,11 @@ def run(
         unique_subdomains=unique_subdomains,
         timings=timings,
         failed_sources=failed_sources,
-        total_scan_time=total_scan_time,
+    )
+
+    context.set_analysis(
+        "passive",
+        analysis,
     )
 
     export_all(
@@ -412,6 +474,10 @@ def run(
 
     return analysis
 
+
+# ==========================================================
+# Public Exports
+# ==========================================================
 
 __all__ = [
     "run",

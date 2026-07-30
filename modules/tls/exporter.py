@@ -414,8 +414,6 @@ def export_summary(
 
         f"Forward Secrecy     : {statistics['forward_secrecy']}",
 
-        f"Elapsed Time        : {statistics['elapsed']} sec",
-
         "",
 
         "Risk Levels",
@@ -469,7 +467,6 @@ def show_summary(
     print(f"Weak Cipher         : {statistics['weak_cipher']}")
     print(f"Wildcard            : {statistics['wildcard']}")
     print(f"Forward Secrecy     : {statistics['forward_secrecy']}")
-    print(f"Elapsed Time        : {statistics['elapsed']} sec")
 
     print("-" * 80)
 

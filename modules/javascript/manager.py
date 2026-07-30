@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """
 JavaScript Manager
 
@@ -6,69 +8,40 @@ Coordinates JavaScript analysis workflow.
 
 from __future__ import annotations
 
-import time
+from concurrent.futures import as_completed
+from typing import Any
 
-from concurrent.futures import (
-    ThreadPoolExecutor,
-    as_completed,
-)
-
-from config.config import (
-    MAX_WORKERS,
-)
-
+from core.context import ExecutionContext
 from core.logger import (
     info,
+    progress_status,
     success,
     warning,
-    progress_status,
 )
 
-from modules.javascript.helpers import (
-    is_valid_url,
-)
-
-from modules.javascript.downloader import (
-    download_one,
-)
-
-from modules.javascript.parser import (
-    parse_file,
-)
-
-from modules.javascript.detectors import (
-    scan_content,
-)
-
-from modules.javascript.interesting import (
-    detect_interesting,
-)
-
-from modules.javascript.analyzer import (
-    analyze,
-)
-
+from modules.javascript.analyzer import analyze
+from modules.javascript.detectors import scan_content
+from modules.javascript.downloader import download_one
 from modules.javascript.exporter import (
     export_all,
     show_summary,
 )
+from modules.javascript.helpers import is_valid_url
+from modules.javascript.interesting import detect_interesting
+from modules.javascript.parser import parse_file
 
 
 # ==========================================================
 # Process One JavaScript
 # ==========================================================
 
+
 def process_javascript(
+    context: ExecutionContext,
     url: str,
-) -> tuple[str, dict | None]:
+) -> tuple[str, dict[str, Any] | None]:
     """
     Download and analyze one JavaScript file.
-
-    Returns:
-        tuple(
-            url,
-            metadata | None,
-        )
     """
 
     if not is_valid_url(url):
@@ -83,7 +56,8 @@ def process_javascript(
         )
 
     metadata = download_one(
-        url
+        context,
+        url,
     )
 
     if metadata is None:
@@ -94,7 +68,7 @@ def process_javascript(
         )
 
     filepath = metadata.get(
-        "path"
+        "path",
     )
 
     if not filepath:
@@ -119,7 +93,7 @@ def process_javascript(
     try:
 
         analysis = parse_file(
-            filepath
+            filepath,
         )
 
     except Exception as error:
@@ -143,7 +117,7 @@ def process_javascript(
                 analysis.get(
                     "urls",
                     [],
-                )
+                ),
             )
             if analysis
             else None
@@ -152,7 +126,10 @@ def process_javascript(
     except Exception as error:
 
         warning(
-            f"Interesting detection failed: {filepath} ({error})"
+            (
+                "Interesting detection failed: "
+                f"{filepath} ({error})"
+            )
         )
 
         metadata["interesting"] = None
@@ -184,7 +161,7 @@ def process_javascript(
 
         metadata["secrets"] = (
             scan_content(
-                content
+                content,
             )
             if content
             else None
@@ -193,7 +170,10 @@ def process_javascript(
     except Exception as error:
 
         warning(
-            f"Secret detection failed: {filepath} ({error})"
+            (
+                "Secret detection failed: "
+                f"{filepath} ({error})"
+            )
         )
 
         metadata["secrets"] = None
@@ -203,27 +183,22 @@ def process_javascript(
         metadata,
     )
 
+
 # ==========================================================
 # Collect Results
 # ==========================================================
 
+
 def collect_results(
+    context: ExecutionContext,
     javascript_urls: list[str],
 ) -> tuple[
-    dict,
+    dict[str, dict[str, Any]],
     list[str],
-    float,
 ]:
     """
     Download and analyze all
     JavaScript files.
-
-    Returns:
-        tuple(
-            results,
-            failed,
-            elapsed,
-        )
     """
 
     info(
@@ -234,7 +209,9 @@ def collect_results(
         {
             url
             for url in javascript_urls
-            if is_valid_url(url)
+            if is_valid_url(
+                url,
+            )
         }
     )
 
@@ -247,192 +224,161 @@ def collect_results(
         return (
             {},
             [],
-            0.0,
         )
 
-    results: dict = {}
+    executor = context.get_thread_pool()
+
+    if executor is None:
+
+        raise RuntimeError(
+            "Shared thread pool is not initialized."
+        )
+
+    results: dict[
+        str,
+        dict[str, Any],
+    ] = {}
 
     failed: list[str] = []
 
     total = len(
-        javascript_urls
+        javascript_urls,
     )
 
     completed = 0
 
-    start = time.perf_counter()
+    futures = {
 
-    with ThreadPoolExecutor(
-        max_workers=MAX_WORKERS,
-    ) as executor:
+        executor.submit(
+            process_javascript,
+            context,
+            url,
+        ): url
 
-        futures = {
+        for url in javascript_urls
 
-            executor.submit(
-                process_javascript,
-                url,
-            ): url
+    }
 
-            for url
-            in javascript_urls
+    for future in as_completed(
+        futures,
+    ):
 
-        }
+        url = futures[
+            future
+        ]
 
-        for future in as_completed(
-            futures
-        ):
+        completed += 1
 
-            url = futures[
-                future
-            ]
+        try:
 
-            completed += 1
+            (
+                js_url,
+                metadata,
+            ) = future.result()
 
-            try:
+        except Exception as error:
 
-                js_url, metadata = (
-                    future.result()
-                )
-
-            except Exception as error:
-
-                warning(
-                    f"{url}: {error}"
-                )
-
-                failed.append(
-                    url
-                )
-
-                progress_status(
-
-                    completed,
-
-                    total,
-
-                    f"✗ {url}",
-
-                )
-
-                continue
-
-            if metadata is None:
-
-                failed.append(
-                    js_url
-                )
-
-                progress_status(
-
-                    completed,
-
-                    total,
-
-                    f"✗ {js_url}",
-
-                )
-
-                continue
-
-            results[
-                js_url
-            ] = metadata
-
-            progress_status(
-
-                completed,
-
-                total,
-
-                f"✓ {js_url}",
-
+            warning(
+                f"{url}: {error}"
             )
 
-    elapsed = round(
+            failed.append(
+                url,
+            )
 
-        time.perf_counter()
+            progress_status(
+                completed,
+                total,
+                f"✗ {url}",
+            )
 
-        - start,
+            continue
 
-        2,
+        if metadata is None:
 
-    )
+            failed.append(
+                js_url,
+            )
+
+            progress_status(
+                completed,
+                total,
+                f"✗ {js_url}",
+            )
+
+            continue
+
+        results[
+            js_url
+        ] = metadata
+
+        progress_status(
+            completed,
+            total,
+            f"✓ {js_url}",
+        )
 
     return (
-
         results,
-
-        failed,
-
-        elapsed,
-
+        sorted(
+            failed,
+        ),
     )
+
 
 # ==========================================================
 # Run JavaScript Analysis
 # ==========================================================
 
+
 def run(
+    context: ExecutionContext,
     javascript_urls: list[str],
-) -> dict:
+) -> dict[str, Any]:
     """
-    Run JavaScript analysis pipeline.
-
-    Workflow
-
-        Download
-            ↓
-        Parse
-            ↓
-        Interesting Detection
-            ↓
-        Secret Detection
-            ↓
-        Analyze
-            ↓
-        Export
-            ↓
-        Summary
+    Run the JavaScript
+    analysis pipeline.
     """
 
-    results, failed, elapsed = (
-        collect_results(
-            javascript_urls
-        )
+    (
+        results,
+        failed,
+    ) = collect_results(
+        context,
+        javascript_urls,
     )
 
     analysis = analyze(
-
         results=results,
-
-        elapsed=elapsed,
-
     )
 
     analysis["failed"] = failed
 
+    context.set_analysis(
+        "javascript",
+        analysis,
+    )
+
     export_all(
-        analysis
+        analysis,
     )
 
     show_summary(
-        analysis
+        analysis,
     )
 
     success(
-        f"Processed "
+        "Processed "
         f"{analysis['statistics']['processed_files']} "
-        f"JavaScript file(s)."
+        "JavaScript file(s)."
     )
 
     if failed:
 
         warning(
-
-            f"Failed "
+            "Failed "
             f"{len(failed)} "
-            f"JavaScript file(s)."
-
+            "JavaScript file(s)."
         )
 
     return analysis
@@ -443,11 +389,7 @@ def run(
 # ==========================================================
 
 __all__ = [
-
     "process_javascript",
-
     "collect_results",
-
     "run",
-
 ]

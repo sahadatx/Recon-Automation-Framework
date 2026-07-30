@@ -9,19 +9,25 @@ from __future__ import annotations
 from typing import Any
 
 
+# ==========================================================
+# Analyze Results
+# ==========================================================
+
+
 def analyze(
     target: str,
     results: dict[str, list[str]],
     unique_subdomains: list[str],
     timings: dict[str, float],
     failed_sources: list[str],
-    total_scan_time: float,
 ) -> dict[str, Any]:
     """
     Analyze passive enumeration results.
     """
 
-    total_sources = len(results)
+    total_sources = len(
+        results,
+    )
 
     successful_sources = sum(
         1
@@ -35,9 +41,15 @@ def analyze(
         if not subdomains
     )
 
-    source_statistics: dict[str, dict[str, Any]] = {}
+    source_statistics: dict[
+        str,
+        dict[str, Any],
+    ] = {}
 
-    for source, subdomains in results.items():
+    for (
+        source,
+        subdomains,
+    ) in results.items():
 
         status = (
             "FAILED"
@@ -49,47 +61,42 @@ def analyze(
             )
         )
 
-        source_statistics[source] = {
-
-            "count": len(subdomains),
-
-            "time": timings.get(source, 0.0),
-
+        source_statistics[
+            source
+        ] = {
+            "count": len(
+                subdomains,
+            ),
+            "time": timings.get(
+                source,
+                0.0,
+            ),
             "status": status,
-
         }
 
     statistics = {
-
         "target": target,
-
         "total_sources": total_sources,
-
         "successful_sources": successful_sources,
-
-        "failed_sources": len(failed_sources),
-
+        "failed_sources": len(
+            failed_sources,
+        ),
         "empty_sources": empty_sources,
-
-        "total_subdomains": len(unique_subdomains),
-
-        "elapsed": total_scan_time,
-
+        "total_subdomains": len(
+            unique_subdomains,
+        ),
         "sources": source_statistics,
-
     }
 
     return {
-
         "results": unique_subdomains,
-
         "statistics": statistics,
-
         "sources": results,
-
-        "failed": failed_sources,
-
+        "failed": sorted(
+            failed_sources,
+        ),
     }
+
 
 # ==========================================================
 # Public Exports

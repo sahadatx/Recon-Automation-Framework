@@ -17,10 +17,10 @@ from .statistics import (
 # Analyze Results
 # ==========================================================
 
+
 def analyze(
     results: list[dict[str, Any]],
     interesting: list[dict[str, Any]],
-    elapsed: float,
 ) -> dict[str, Any]:
     """
     Analyze Virtual Host Discovery results.
@@ -32,10 +32,6 @@ def analyze(
             interesting=interesting,
         ),
         "interesting": interesting,
-        "elapsed": round(
-            elapsed,
-            2,
-        ),
     }
 
     return {

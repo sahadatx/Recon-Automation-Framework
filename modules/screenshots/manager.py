@@ -7,145 +7,113 @@ Production Async Screenshot Manager.
 from __future__ import annotations
 
 import asyncio
-import time
 
+from typing import Any
 
-from config.config import (
-    SCREENSHOT_WORKERS,
-)
+from config.config import SCREENSHOT_WORKERS
 
+from core.context import ExecutionContext
 
 from core.logger import (
     info,
+    progress_status,
     success,
     warning,
-    progress_status,
 )
 
-
-from modules.screenshots.helpers import (
-    start_playwright,
-    launch_browser,
-    create_context,
-    close_context,
-    cleanup,
-)
-
-
-from modules.screenshots.capture import (
-    capture_host,
-)
-
-
-from modules.screenshots.analyzer import (
-    analyze,
-)
-
-
+from modules.screenshots.analyzer import analyze
+from modules.screenshots.capture import capture_host
 from modules.screenshots.exporter import (
     export_all,
     show_summary,
 )
-
+from modules.screenshots.helpers import (
+    cleanup,
+    close_context,
+    create_context,
+    launch_browser,
+    start_playwright,
+)
 
 
 # ==========================================================
 # Capture One Host
 # ==========================================================
 
+
 async def capture_one(
     semaphore: asyncio.Semaphore,
-    browser,
+    browser: Any,
     host: str,
-    response: dict,
-) -> tuple[str, dict]:
+    response: dict[str, Any],
+) -> tuple[str, dict[str, Any]]:
     """
     Capture screenshot for one host.
 
-    Each target gets isolated
+    Each target receives an isolated
     BrowserContext.
     """
 
     async with semaphore:
 
-
-        context = await create_context(
-            browser
+        browser_context = await create_context(
+            browser,
         )
-
 
         try:
 
             metadata = await capture_host(
-
-                context,
-
+                browser_context,
                 response,
-
             )
-
 
             return (
-
                 host,
-
                 metadata,
-
             )
-
 
         finally:
 
             await close_context(
-                context
+                browser_context,
             )
-
 
 
 # ==========================================================
 # Capture Hosts
 # ==========================================================
 
+
 async def capture_hosts(
-    http_results: dict,
+    context: ExecutionContext,
+    http_results: dict[str, dict[str, Any]],
 ) -> tuple[
-    dict,
+    dict[str, dict[str, Any]],
     list[str],
-    float,
 ]:
     """
     Capture screenshots for
     HTTP probe results.
-
-    Returns:
-
-        results,
-        failed,
-        elapsed
-
     """
 
+    _ = context
 
     info(
         "Starting Screenshot Capture..."
     )
 
-
-    start = time.perf_counter()
-
-
-    results: dict = {}
+    results: dict[
+        str,
+        dict[str, Any],
+    ] = {}
 
     failed: list[str] = []
 
-
     total = len(
-        http_results
+        http_results,
     )
 
-
     completed = 0
-
 
     if total == 0:
 
@@ -154,240 +122,144 @@ async def capture_hosts(
         )
 
         return (
-
             {},
-
             [],
-
-            0.0,
-
         )
 
-
     semaphore = asyncio.Semaphore(
-
-        SCREENSHOT_WORKERS
-
+        SCREENSHOT_WORKERS,
     )
-
 
     playwright = await start_playwright()
 
-
     browser = await launch_browser(
-
-        playwright
-
+        playwright,
     )
-
 
     try:
 
-
         tasks = [
-
             capture_one(
-
                 semaphore,
-
                 browser,
-
                 host,
-
                 response,
-
             )
-
-            for host, response
-
-            in http_results.items()
-
+            for host, response in http_results.items()
         ]
 
-
         for task in asyncio.as_completed(
-
-            tasks
-
+            tasks,
         ):
-
 
             completed += 1
 
-
             try:
 
-
-                host, metadata = await task
-
-
+                (
+                    host,
+                    metadata,
+                ) = await task
 
                 if metadata.get(
-
                     "captured",
-
                     False,
-
                 ):
 
-
                     results[
-
                         host
-
                     ] = metadata
 
-
-
                     progress_status(
-
                         completed,
-
                         total,
-
                         f"✓ {host}",
-
                     )
-
 
                 else:
 
-
                     failed.append(
-
-                        host
-
+                        host,
                     )
-
 
                     progress_status(
-
                         completed,
-
                         total,
-
                         f"✗ {host}",
-
                     )
-
-
 
             except Exception as error:
 
-
                 warning(
-
-                    str(error)
-
+                    str(error),
                 )
-
-
 
     finally:
 
-
         await cleanup(
-
             playwright,
-
             browser,
-
         )
 
-
-
-    elapsed = round(
-
-        time.perf_counter()
-
-        - start,
-
-        2,
-
-    )
-
-
     success(
-
         f"Captured Screenshots : {len(results)}"
-
     )
-
 
     warning(
-
         f"Failed Screenshots : {len(failed)}"
-
     )
-
-
-    success(
-
-        f"Elapsed : {elapsed:.2f} sec"
-
-    )
-
 
     return (
-
         results,
-
-        failed,
-
-        elapsed,
-
+        sorted(
+            failed,
+        ),
     )
-
-
 
 
 # ==========================================================
 # Run Screenshot Pipeline (Async)
 # ==========================================================
 
+
 async def run_async(
-    http_results: dict,
-) -> dict:
+    context: ExecutionContext,
+    http_results: dict[str, dict[str, Any]],
+) -> dict[str, Any]:
     """
-    Execute the asynchronous screenshot pipeline.
-
-    Workflow:
-
-        HTTP Results
-              |
-              v
-        Screenshot Capture
-              |
-              v
-        Analyze
-              |
-              v
-        Export
-              |
-              v
-        Summary
-
+    Execute the asynchronous
+    screenshot pipeline.
     """
 
-    results, failed, elapsed = await capture_hosts(
-        http_results
+    (
+        results,
+        failed,
+    ) = await capture_hosts(
+        context,
+        http_results,
     )
 
     analysis = analyze(
         results=list(
-            results.values()
+            results.values(),
         ),
-        elapsed=elapsed,
     )
 
-    analysis["failed_hosts"] = failed
+    analysis[
+        "failed_hosts"
+    ] = failed
+
+    context.set_analysis(
+        "screenshots",
+        analysis,
+    )
 
     export_all(
-        analysis
+        analysis,
     )
 
     show_summary(
-        analysis
+        analysis,
     )
 
     return analysis
@@ -397,15 +269,19 @@ async def run_async(
 # Public Entry Point
 # ==========================================================
 
+
 def run(
-    http_results: dict,
-) -> dict:
+    context: ExecutionContext,
+    http_results: dict[str, dict[str, Any]],
+) -> dict[str, Any]:
     """
-    Public entry point for the Screenshot module.
+    Public entry point for
+    the Screenshot module.
     """
 
     return asyncio.run(
         run_async(
+            context,
             http_results,
         )
     )

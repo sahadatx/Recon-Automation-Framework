@@ -7,24 +7,21 @@ by the URL Discovery module.
 
 from __future__ import annotations
 
-from modules.javascript.helpers import (
+from typing import Any
 
-    download_file,
-
-    is_valid_url,
-
-    safe_filename,
-
-    save_javascript,
-
-)
+from core.context import ExecutionContext
 
 from core.logger import (
-
     debug,
-
+    info,
     warning,
+)
 
+from modules.javascript.helpers import (
+    download_file,
+    is_valid_url,
+    safe_filename,
+    save_javascript,
 )
 
 
@@ -32,19 +29,20 @@ from core.logger import (
 # Download One JavaScript File
 # ==========================================================
 
+
 def download_one(
+    context: ExecutionContext,
     url: str,
-) -> dict | None:
+) -> dict[str, Any] | None:
     """
-    Download a single
-    JavaScript file.
+    Download a single JavaScript file.
 
     Returns:
-        dict | None
+        Metadata dictionary or None.
     """
 
     if not is_valid_url(
-        url
+        url,
     ):
 
         warning(
@@ -60,7 +58,8 @@ def download_one(
     try:
 
         response = download_file(
-            url
+            context,
+            url,
         )
 
     except Exception as error:
@@ -82,15 +81,12 @@ def download_one(
     try:
 
         filename = safe_filename(
-            url
+            url,
         )
 
         filepath = save_javascript(
-
             filename,
-
             response.text,
-
         )
 
     except Exception as error:
@@ -108,21 +104,18 @@ def download_one(
         "filename": filename,
 
         "path": str(
-            filepath
+            filepath,
         ),
 
         "status": response.status_code,
 
         "size": len(
-            response.text
+            response.text,
         ),
 
         "content_type": response.headers.get(
-
             "Content-Type",
-
             "",
-
         ),
 
     }
@@ -132,18 +125,16 @@ def download_one(
 # Download Multiple JavaScript Files
 # ==========================================================
 
-def download_multiple(
-    urls: list[str],
-) -> tuple[list[dict], list[str]]:
-    """
-    Download multiple
-    JavaScript files.
 
-    Returns:
-        tuple[
-            list[dict],
-            list[str],
-        ]
+def download_multiple(
+    context: ExecutionContext,
+    urls: list[str],
+) -> tuple[
+    list[dict[str, Any]],
+    list[str],
+]:
+    """
+    Download multiple JavaScript files.
     """
 
     info(
@@ -151,71 +142,57 @@ def download_multiple(
     )
 
     urls = sorted(
-
         {
-
             url
-
             for url in urls
-
             if is_valid_url(
-                url
+                url,
             )
-
         }
-
     )
 
-    results: list[dict] = []
+    results: list[
+        dict[str, Any]
+    ] = []
 
-    failed: list[str] = []
+    failed: list[
+        str
+    ] = []
 
     for url in urls:
 
         metadata = download_one(
-            url
+            context,
+            url,
         )
 
         if metadata is None:
 
             failed.append(
-                url
+                url,
             )
 
             continue
 
         results.append(
-            metadata
+            metadata,
         )
 
     info(
-
-        f"Downloaded "
-
-        f"{len(results)} "
-
-        f"JavaScript file(s)."
-
+        f"Downloaded {len(results)} "
+        "JavaScript file(s)."
     )
 
     if failed:
 
         warning(
-
-            f"Failed "
-
-            f"{len(failed)} "
-
-            f"JavaScript file(s)."
-
+            f"Failed {len(failed)} "
+            "JavaScript file(s)."
         )
 
     return (
-
         results,
-
         failed,
-
     )
 
 
@@ -223,22 +200,21 @@ def download_multiple(
 # Entry Point
 # ==========================================================
 
-def download_javascript(
-    javascript_urls: list[str],
-) -> tuple[list[dict], list[str]]:
-    """
-    JavaScript downloader
-    entry point.
 
-    Returns:
-        tuple[
-            list[dict],
-            list[str],
-        ]
+def download_javascript(
+    context: ExecutionContext,
+    javascript_urls: list[str],
+) -> tuple[
+    list[dict[str, Any]],
+    list[str],
+]:
+    """
+    JavaScript downloader entry point.
     """
 
     return download_multiple(
-        javascript_urls
+        context,
+        javascript_urls,
     )
 
 
@@ -247,11 +223,7 @@ def download_javascript(
 # ==========================================================
 
 __all__ = [
-
     "download_one",
-
     "download_multiple",
-
     "download_javascript",
-
 ]

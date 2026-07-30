@@ -153,8 +153,6 @@ def export_txt(
 
         f"Target              : {statistics['target']}",
 
-        f"Elapsed Time        : {statistics['elapsed']} sec",
-
         f"Modules             : {statistics['modules']}",
 
         f"Completed Modules   : {statistics['completed_modules']}",
@@ -215,8 +213,6 @@ def export_summary(
 
         f"Findings           : {statistics['findings']}",
 
-        f"Elapsed Time       : {statistics['elapsed']} sec",
-
     ]
 
     return write_text(
@@ -266,10 +262,6 @@ def show_summary(
 
     print(
         f"Findings           : {statistics['findings']}"
-    )
-
-    print(
-        f"Elapsed Time       : {statistics['elapsed']} sec"
     )
 
     print("=" * 80)

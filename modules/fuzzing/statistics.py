@@ -87,14 +87,11 @@ def response_statistics(
         }
 
     sizes = [
-
         result.get(
             "length",
             0,
         )
-
         for result in results
-
     ]
 
     return {
@@ -104,8 +101,7 @@ def response_statistics(
         "maximum": max(sizes),
 
         "average": round(
-            sum(sizes)
-            / len(sizes),
+            sum(sizes) / len(sizes),
             2,
         ),
 
@@ -121,8 +117,7 @@ def generate_statistics(
     interesting: dict[str, Any],
 ) -> dict[str, Any]:
     """
-    Generate Directory
-    Fuzzing statistics.
+    Generate Directory Fuzzing statistics.
     """
 
     statistics = empty_statistics()

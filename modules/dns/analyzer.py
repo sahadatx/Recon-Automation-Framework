@@ -17,10 +17,10 @@ from modules.dns.statistics import (
 # Analyze DNS Results
 # ==========================================================
 
+
 def analyze(
     results: dict[str, dict[str, list[str]]],
     failed_hosts: list[str],
-    elapsed: float,
 ) -> dict[str, Any]:
     """
     Analyze DNS resolution results.
@@ -32,9 +32,6 @@ def analyze(
         failed_hosts:
             Hosts that failed to resolve.
 
-        elapsed:
-            Total scan time.
-
     Returns:
         DNS analysis.
     """
@@ -44,16 +41,14 @@ def analyze(
             results=results,
             failed_hosts=failed_hosts,
         ),
-        "elapsed": elapsed,
-        "unresolved": sorted(failed_hosts),
+        "unresolved": sorted(
+            failed_hosts,
+        ),
     }
 
     return {
-
         "results": results,
-
         "statistics": statistics,
-
     }
 
 

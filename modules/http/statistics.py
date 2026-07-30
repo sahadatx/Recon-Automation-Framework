@@ -19,15 +19,17 @@ def generate_statistics(
     Generate HTTP probe statistics.
 
     Args:
-        results: Successful HTTP probe results.
-        failed_hosts: Hosts that failed to respond.
+        results:
+            Successful HTTP probe results.
+
+        failed_hosts:
+            Hosts that failed to respond.
 
     Returns:
         HTTP statistics.
     """
 
     http_hosts = 0
-
     https_hosts = 0
 
     status_codes: dict[int, int] = {}
@@ -44,15 +46,11 @@ def generate_statistics(
 
             https_hosts += 1
 
-        status = data.get(
-            "status"
-        )
+        status = data.get("status")
 
         if status is not None:
 
-            status_codes[
-                status
-            ] = (
+            status_codes[status] = (
                 status_codes.get(
                     status,
                     0,
@@ -65,35 +63,37 @@ def generate_statistics(
             0.0,
         )
 
-    alive_hosts = len(
-        results
-    )
+    alive_hosts = len(results)
 
-    average_response_time = 0.0
-
-    if alive_hosts:
-
-        average_response_time = round(
-            total_response_time
-            / alive_hosts,
+    average_response_time = (
+        round(
+            total_response_time / alive_hosts,
             3,
         )
+        if alive_hosts
+        else 0.0
+    )
 
     return {
+
         "alive_hosts": alive_hosts,
+
         "dead_hosts": len(
-            failed_hosts
+            failed_hosts,
         ),
+
         "http_hosts": http_hosts,
+
         "https_hosts": https_hosts,
+
         "status_codes": dict(
             sorted(
-                status_codes.items()
+                status_codes.items(),
             )
         ),
-        "average_response_time": (
-            average_response_time
-        ),
+
+        "average_response_time": average_response_time,
+
     }
 
 

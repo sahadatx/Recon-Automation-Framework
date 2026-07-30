@@ -19,26 +19,23 @@ from .statistics import (
 # Analyze Results
 # ==========================================================
 
+
 def analyze(
     results: list[dict[str, Any]],
-    elapsed: float,
 ) -> dict[str, Any]:
     """
     Analyze takeover
     detection results.
 
     Returns:
-        dict[str, Any]
+        Analysis dictionary.
     """
-
-    statistics = {
-        **generate_statistics(results),
-        "elapsed": round(elapsed, 2),
-    }
 
     return {
         "results": results,
-        "statistics": statistics,
+        "statistics": generate_statistics(
+            results,
+        ),
     }
 
 

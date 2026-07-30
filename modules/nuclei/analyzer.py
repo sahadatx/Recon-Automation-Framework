@@ -6,17 +6,19 @@ from __future__ import annotations
 
 from typing import Any
 
-from .statistics import generate_statistics
+from .statistics import (
+    generate_statistics,
+)
 
 
 # ==========================================================
 # Analyze Results
 # ==========================================================
 
+
 def analyze(
     results: list[dict[str, Any]],
     failed: list[str],
-    elapsed: float,
 ) -> dict[str, Any]:
     """
     Analyze Nuclei scan results.
@@ -28,21 +30,15 @@ def analyze(
         failed:
             Failed targets.
 
-        elapsed:
-            Total execution time.
-
     Returns:
         Analysis dictionary.
     """
 
-    statistics = {
-        **generate_statistics(results),
-        "elapsed": round(elapsed, 2),
-    }
-
     return {
         "results": results,
-        "statistics": statistics,
+        "statistics": generate_statistics(
+            results,
+        ),
         "failed": failed,
     }
 

@@ -122,7 +122,7 @@ def generate_statistics(
 
     total = len(findings)
 
-    average = (
+    average_findings_per_target = (
         round(
             total / len(targets),
             2,
@@ -132,64 +132,87 @@ def generate_statistics(
     )
 
     return {
+
         "total_targets": len(targets),
+
         "total_findings": total,
+
         "critical": severity.get(
             CRITICAL,
             0,
         ),
+
         "high": severity.get(
             HIGH,
             0,
         ),
+
         "medium": severity.get(
             MEDIUM,
             0,
         ),
+
         "low": severity.get(
             LOW,
             0,
         ),
+
         "info": severity.get(
             INFO,
             0,
         ),
+
         "unknown": severity.get(
             UNKNOWN,
             0,
         ),
+
         "severity_statistics": dict(
-            severity
+            severity,
         ),
+
         "template_statistics": dict(
-            templates
+            templates,
         ),
+
         "target_statistics": dict(
-            targets
+            targets,
         ),
+
         "protocol_statistics": dict(
-            protocols
+            protocols,
         ),
+
         "tag_statistics": dict(
-            tags
+            tags,
         ),
+
         "unique_templates": len(
-            templates
+            templates,
         ),
+
         "unique_targets": len(
-            targets
+            targets,
         ),
+
         "top_templates": templates.most_common(
-            10
+            10,
         ),
+
         "top_targets": targets.most_common(
-            10
+            10,
         ),
+
         "top_tags": tags.most_common(
-            10
+            10,
         ),
+
         "cve_count": cves,
-        "average_findings_per_target": average,
+
+        "average_findings_per_target": (
+            average_findings_per_target
+        ),
+
     }
 
 

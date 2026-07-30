@@ -413,8 +413,6 @@ def export_summary(
 
         f"Interesting Directories  : {statistics['interesting_directories']}",
 
-        f"Elapsed Time             : {statistics['elapsed']} sec",
-
     ]
 
     return write_text(
@@ -455,7 +453,6 @@ def show_summary(
     print(f"Discovered Paths         : {statistics['total_results']}")
     print(f"Interesting Files        : {statistics['interesting_files']}")
     print(f"Interesting Directories  : {statistics['interesting_directories']}")
-    print(f"Elapsed Time             : {statistics['elapsed']} sec")
 
     if failed:
 

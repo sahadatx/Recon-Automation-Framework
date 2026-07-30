@@ -14,7 +14,8 @@ from typing import Any
 from urllib.parse import urlparse
 
 import dns.resolver
-import requests
+
+from core.context import ExecutionContext
 
 from config.config import HTTP_TIMEOUT
 
@@ -101,27 +102,31 @@ def resolve_ipv4(
 # ==========================================================
 
 def request_headers(
+    context: ExecutionContext,
     target: str,
 ):
     """
-    Send HTTP request.
+    Send HTTP request using the
+    shared HTTP session.
 
     Returns:
         requests.Response | None
     """
 
+    session = context.get_http_session()
+
+    if session is None:
+        raise RuntimeError(
+            "Shared HTTP session is not initialized."
+        )
+
     try:
 
-        response = requests.get(
-
+        response = session.get(
             target,
-
             headers=DEFAULT_HEADERS,
-
             timeout=HTTP_TIMEOUT,
-
             allow_redirects=True,
-
         )
 
         return response
@@ -129,7 +134,6 @@ def request_headers(
     except Exception:
 
         return None
-
 
 # ==========================================================
 # Response Headers

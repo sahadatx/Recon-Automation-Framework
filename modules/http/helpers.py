@@ -1,50 +1,22 @@
+#!/usr/bin/env python3
+
 """
 HTTP Helper Functions
 
-Shared helper functions used by the
-HTTP Probe module.
+Shared helper functions used by
+the HTTP Probe module.
 """
 
-import requests
+from __future__ import annotations
 
 from config.config import (
     HTTP_TIMEOUT,
-    HTTP_VERIFY_SSL,
-    HTTP_USER_AGENT,
     VERBOSE,
 )
 
 from core.logger import (
     debug,
 )
-
-# Disable SSL warnings
-requests.packages.urllib3.disable_warnings()
-
-
-# ==========================================================
-# Create Session
-# ==========================================================
-
-def create_session():
-    """
-    Create and configure an HTTP session.
-
-    Returns:
-        requests.Session
-    """
-
-    session = requests.Session()
-
-    session.verify = HTTP_VERIFY_SSL
-
-    session.headers.update(
-        {
-            "User-Agent": HTTP_USER_AGENT,
-        }
-    )
-
-    return session
 
 
 # ==========================================================
@@ -53,27 +25,41 @@ def create_session():
 
 def show_probe(
     url: str,
-):
+) -> None:
     """
     Display probe information.
 
-    Only shown when VERBOSE mode is enabled.
+    Probe messages are only shown
+    when verbose mode is enabled.
     """
 
-    if VERBOSE:
+    if not VERBOSE:
 
-        debug(
-            f"Probing {url}"
-        )
+        return
+
+    debug(
+        f"Probing {url}"
+    )
 
 
 # ==========================================================
 # Request Timeout
 # ==========================================================
 
-def request_timeout():
+def request_timeout() -> int | float:
     """
-    Return configured HTTP timeout.
+    Return the configured HTTP
+    request timeout.
     """
 
     return HTTP_TIMEOUT
+
+
+# ==========================================================
+# Public Exports
+# ==========================================================
+
+__all__ = [
+    "request_timeout",
+    "show_probe",
+]

@@ -17,9 +17,9 @@ from modules.javascript.statistics import (
 # Analyze JavaScript Results
 # ==========================================================
 
+
 def analyze(
     results: dict[str, dict[str, Any]],
-    elapsed: float,
 ) -> dict[str, Any]:
     """
     Analyze JavaScript results.
@@ -28,26 +28,15 @@ def analyze(
         results:
             JavaScript analysis results.
 
-        elapsed:
-            Total analysis time.
-
     Returns:
         JavaScript analysis.
     """
 
-    statistics = {
-        **generate_statistics(
+    return {
+        "results": results,
+        "statistics": generate_statistics(
             results=results,
         ),
-        "elapsed": elapsed,
-    }
-
-    return {
-
-        "results": results,
-
-        "statistics": statistics,
-
     }
 
 

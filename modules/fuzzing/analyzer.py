@@ -18,10 +18,10 @@ from .statistics import (
 # Analyze Results
 # ==========================================================
 
+
 def analyze(
     results: list[dict[str, Any]],
     interesting: dict[str, Any],
-    elapsed: float,
 ) -> dict[str, Any]:
     """
     Analyze Directory Fuzzing results.
@@ -33,28 +33,17 @@ def analyze(
         interesting:
             Interesting findings.
 
-        elapsed:
-            Execution time.
-
     Returns:
         Analysis results.
     """
 
-    statistics = {
-        **generate_statistics(
-            results,
-            interesting,
-        ),
-        "elapsed": round(
-            elapsed,
-            2,
-        ),
-    }
-
     return {
         "results": results,
         "interesting": interesting,
-        "statistics": statistics,
+        "statistics": generate_statistics(
+            results,
+            interesting,
+        ),
     }
 
 

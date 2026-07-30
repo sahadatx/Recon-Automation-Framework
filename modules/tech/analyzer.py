@@ -17,10 +17,10 @@ from modules.tech.statistics import (
 # Analyze Results
 # ==========================================================
 
+
 def analyze(
     results: dict[str, dict[str, Any]],
     failed_hosts: list[str],
-    elapsed: float,
 ) -> dict[str, Any]:
     """
     Analyze technology detection results.
@@ -31,9 +31,6 @@ def analyze(
 
         failed_hosts:
             Failed hosts.
-
-        elapsed:
-            Total execution time.
 
     Returns:
         Technology detection analysis.
@@ -48,7 +45,9 @@ def analyze(
             len(results)
             + len(failed_hosts)
         ),
-        "failed_hosts": len(failed_hosts),
+        "failed_hosts": len(
+            failed_hosts,
+        ),
         "technologies": sorted(
             {
                 technology
@@ -59,15 +58,11 @@ def analyze(
                 )
             }
         ),
-        "elapsed": elapsed,
     }
 
     return {
-
         "results": results,
-
         "statistics": statistics,
-
     }
 
 

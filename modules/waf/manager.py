@@ -7,8 +7,9 @@ WAF Detection pipeline.
 
 from __future__ import annotations
 
-from time import perf_counter
 from typing import Any
+
+from core.context import ExecutionContext
 
 from core.logger import (
     info,
@@ -25,7 +26,9 @@ from .scanner import scan_targets
 # Run WAF Detection
 # ==========================================================
 
+
 def run_waf_detection(
+    context: ExecutionContext,
     targets: list[str],
 ) -> dict[str, Any]:
     """
@@ -37,16 +40,20 @@ def run_waf_detection(
 
     if not targets:
 
-        return analyze(
+        analysis = analyze(
             results=[],
-            elapsed=0,
         )
+
+        context.set_analysis(
+            "waf",
+            analysis,
+        )
+
+        return analysis
 
     info(
         "Starting WAF Detection..."
     )
-
-    start = perf_counter()
 
     # ------------------------------------------------------
     # Scan Targets
@@ -57,7 +64,8 @@ def run_waf_detection(
     )
 
     scans = scan_targets(
-        targets
+        context,
+        targets,
     )
 
     # ------------------------------------------------------
@@ -69,7 +77,7 @@ def run_waf_detection(
     )
 
     results = detect_all(
-        scans
+        scans,
     )
 
     # ------------------------------------------------------
@@ -81,21 +89,20 @@ def run_waf_detection(
     )
 
     results = filter_results(
-        results
+        results,
     )
 
     # ------------------------------------------------------
     # Analyze
     # ------------------------------------------------------
 
-    elapsed = (
-        perf_counter()
-        - start
-    )
-
     analysis = analyze(
         results=results,
-        elapsed=elapsed,
+    )
+
+    context.set_analysis(
+        "waf",
+        analysis,
     )
 
     statistics = analysis[
@@ -126,10 +133,6 @@ def run_waf_detection(
         f"Highest Score    : {statistics['highest_score']}"
     )
 
-    success(
-        f"Elapsed          : {statistics['elapsed']:.2f} sec"
-    )
-
     return analysis
 
 
@@ -137,7 +140,9 @@ def run_waf_detection(
 # Public Entry Point
 # ==========================================================
 
+
 def run(
+    context: ExecutionContext,
     targets: list[str],
 ) -> dict[str, Any]:
     """
@@ -145,6 +150,7 @@ def run(
     """
 
     return run_waf_detection(
+        context,
         targets,
     )
 

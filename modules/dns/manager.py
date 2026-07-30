@@ -1,22 +1,16 @@
 """
 DNS Resolution Manager
 
-Coordinate DNS resolution, analysis, and exporting.
+Coordinate DNS resolution,
+analysis, and exporting.
 """
 
 from __future__ import annotations
 
-import time
+from concurrent.futures import as_completed
+from typing import Any
 
-from concurrent.futures import (
-    ThreadPoolExecutor,
-    as_completed,
-)
-
-from config.config import (
-    MAX_WORKERS,
-)
-
+from core.context import ExecutionContext
 from core.logger import (
     info,
     progress_status,
@@ -24,39 +18,49 @@ from core.logger import (
     warning,
 )
 
-from modules.dns.analyzer import (
-    analyze,
-)
-
-from modules.dns.exporter import (
-    export_all,
-)
-
-from modules.dns.records import (
-    resolve_all_records,
-)
+from modules.dns.analyzer import analyze
+from modules.dns.exporter import export_all
+from modules.dns.records import resolve_all_records
 
 
 # ==========================================================
 # Resolve One Subdomain
 # ==========================================================
 
+
 def resolve_subdomain(
+    context: ExecutionContext,
     subdomain: str,
-) -> tuple[
-    str,
-    dict[str, list[str]],
-]:
+) -> tuple[str, dict[str, list[str]]]:
     """
     Resolve every supported DNS record
-    for one subdomain.
+    for a single subdomain.
+
+    Cached results are reused whenever
+    available.
     """
+
+    if context.has_dns_cache(subdomain):
+
+        return (
+            subdomain,
+            context.get_dns_cache(
+                subdomain,
+            ),
+        )
+
+    records = resolve_all_records(
+        subdomain,
+    )
+
+    context.set_dns_cache(
+        subdomain,
+        records,
+    )
 
     return (
         subdomain,
-        resolve_all_records(
-            subdomain,
-        ),
+        records,
     )
 
 
@@ -64,15 +68,17 @@ def resolve_subdomain(
 # Resolve All Subdomains
 # ==========================================================
 
+
 def resolve_subdomains(
+    context: ExecutionContext,
     subdomains: list[str],
 ) -> tuple[
     dict[str, dict[str, list[str]]],
     list[str],
-    float,
 ]:
     """
-    Resolve DNS records for every subdomain.
+    Resolve DNS records for every
+    discovered subdomain.
     """
 
     info(
@@ -87,82 +93,77 @@ def resolve_subdomains(
     failed_hosts: list[str] = []
 
     total = len(
-        subdomains
+        subdomains,
     )
 
     completed = 0
 
-    start_time = (
-        time.perf_counter()
-    )
+    executor = context.get_thread_pool()
 
-    with ThreadPoolExecutor(
-        max_workers=MAX_WORKERS,
-    ) as executor:
+    if executor is None:
 
-        futures = {
-            executor.submit(
-                resolve_subdomain,
-                subdomain,
-            ): subdomain
-            for subdomain in subdomains
-        }
+        raise RuntimeError(
+            "Shared thread pool is not initialized."
+        )
 
-        for future in as_completed(
-            futures
-        ):
+    futures = {
 
-            subdomain = futures[
-                future
-            ]
+        executor.submit(
+            resolve_subdomain,
+            context,
+            subdomain,
+        ): subdomain
 
-            completed += 1
+        for subdomain in subdomains
 
-            try:
+    }
 
-                (
-                    hostname,
-                    records,
-                ) = future.result()
+    for future in as_completed(
+        futures,
+    ):
 
-                results[
-                    hostname
-                ] = records
+        subdomain = futures[
+            future
+        ]
 
-            except Exception as error:
+        completed += 1
 
-                warning(
-                    f"{subdomain}: "
-                    f"{error}"
-                )
+        try:
 
-                failed_hosts.append(
-                    subdomain
-                )
+            (
+                hostname,
+                records,
+            ) = future.result()
 
-            progress_status(
-                completed,
-                total,
-                f"✓ {subdomain} resolved",
+            results[
+                hostname
+            ] = records
+
+        except Exception as error:
+
+            warning(
+                f"{subdomain}: {error}"
             )
 
-    elapsed = round(
-        time.perf_counter()
-        - start_time,
-        2,
-    )
+            failed_hosts.append(
+                subdomain,
+            )
+
+        progress_status(
+            completed,
+            total,
+            f"✓ {subdomain} resolved",
+        )
 
     success(
-        f"Resolved "
-        f"{len(results)} hosts."
+        f"Resolved {len(results)} hosts."
     )
 
     return (
         results,
         sorted(
-            failed_hosts
+            failed_hosts,
         ),
-        elapsed,
     )
 
 
@@ -170,32 +171,42 @@ def resolve_subdomains(
 # Run DNS Resolution
 # ==========================================================
 
+
 def run(
+    context: ExecutionContext,
     subdomains: list[str],
-) -> dict:
+) -> dict[str, Any]:
     """
     Execute the complete DNS
     resolution workflow.
 
-    Workflow:
         Resolve
-        -> Analyze
-        -> Export
-        -> Return
+            ↓
+        Analyze
+            ↓
+        Store Context
+            ↓
+        Export
+            ↓
+        Return Analysis
     """
 
     (
         results,
         failed_hosts,
-        elapsed,
     ) = resolve_subdomains(
+        context,
         subdomains,
     )
 
     analysis = analyze(
         results=results,
         failed_hosts=failed_hosts,
-        elapsed=elapsed,
+    )
+
+    context.set_analysis(
+        "dns",
+        analysis,
     )
 
     export_all(

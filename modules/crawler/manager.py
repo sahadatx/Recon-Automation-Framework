@@ -1,66 +1,48 @@
+#!/usr/bin/env python3
+
 """
 Crawler Manager
 
-Coordinate URL crawling, analysis, and exporting.
+Coordinate URL crawling, analysis,
+and exporting.
 """
 
 from __future__ import annotations
 
-import time
-from concurrent.futures import (
-    ThreadPoolExecutor,
-    as_completed,
-)
+from concurrent.futures import as_completed
+from typing import Any
 
-from config.config import (
-    MAX_WORKERS,
-)
-
+from core.context import ExecutionContext
 from core.logger import (
     info,
-    warning,
-    success,
     progress_status,
+    success,
+    warning,
 )
 
-from modules.crawler.analyzer import (
-    analyze,
-)
-
-from modules.crawler.exporter import (
-    export_all,
-)
-
-from modules.crawler.crawler import (
-    crawl_host,
-)
+from modules.crawler.analyzer import analyze
+from modules.crawler.crawler import crawl_host
+from modules.crawler.exporter import export_all
 
 
 # ==========================================================
 # Crawl One Host
 # ==========================================================
 
+
 def crawl_one_host(
+    context: ExecutionContext,
     host: str,
-) -> tuple[
-    str,
-    dict | None,
-]:
+) -> tuple[str, dict[str, Any] | None]:
     """
     Crawl a single host.
-
-    Args:
-        host:
-            Target hostname.
-
-    Returns:
-        Hostname and crawl result.
     """
 
     return (
         host,
         crawl_host(
-            host,
+            context=context,
+            host=host,
         ),
     )
 
@@ -69,158 +51,140 @@ def crawl_one_host(
 # Crawl Hosts
 # ==========================================================
 
+
 def crawl_hosts(
+    context: ExecutionContext,
     hosts: list[str],
-) -> tuple[
-    dict[str, dict],
-    float,
-]:
+) -> dict[str, dict[str, Any]]:
     """
     Crawl multiple hosts in parallel.
-
-    Args:
-        hosts:
-            Target hosts.
-
-    Returns:
-        Crawl results and elapsed time.
     """
 
     info(
         "Starting URL Crawling..."
     )
 
+    executor = context.get_thread_pool()
+
+    if executor is None:
+
+        raise RuntimeError(
+            "Thread pool not initialized."
+        )
+
     results: dict[
         str,
-        dict,
+        dict[str, Any],
     ] = {}
 
     completed = 0
 
     total = len(
-        hosts
+        hosts,
     )
 
-    start_time = (
-        time.perf_counter()
-    )
+    futures = {
 
-    with ThreadPoolExecutor(
-        max_workers=MAX_WORKERS,
-    ) as executor:
+        executor.submit(
+            crawl_one_host,
+            context,
+            host,
+        ): host
 
-        futures = {
+        for host in hosts
 
-            executor.submit(
-                crawl_one_host,
-                host,
-            ): host
+    }
 
-            for host in hosts
-        }
+    for future in as_completed(
+        futures,
+    ):
 
-        for future in as_completed(
-            futures
-        ):
+        completed += 1
 
-            completed += 1
+        host = futures[
+            future
+        ]
 
-            host = futures[
-                future
-            ]
+        try:
 
-            try:
+            (
+                hostname,
+                result,
+            ) = future.result()
 
-                (
-                    hostname,
-                    result,
-                ) = future.result()
+            if result is not None:
 
-                if result is not None:
+                results[
+                    hostname
+                ] = result
 
-                    results[
-                        hostname
-                    ] = result
-
-                    pages = result[
-                        "statistics"
-                    ][
-                        "pages"
-                    ]
-
-                    progress_status(
-                        completed,
-                        total,
-                        (
-                            f"✓ {hostname} "
-                            f"({pages} pages)"
-                        ),
-                    )
-
-                else:
-
-                    progress_status(
-                        completed,
-                        total,
-                        f"✗ {hostname}",
-                    )
-
-            except Exception as error:
-
-                warning(
-                    f"{host}: {error}"
-                )
+                pages = result[
+                    "statistics"
+                ][
+                    "pages"
+                ]
 
                 progress_status(
                     completed,
                     total,
-                    f"✗ {host}",
+                    (
+                        f"✓ {hostname} "
+                        f"({pages} pages)"
+                    ),
                 )
 
-    elapsed = round(
-        time.perf_counter()
-        - start_time,
-        2,
-    )
+            else:
+
+                progress_status(
+                    completed,
+                    total,
+                    f"✗ {hostname}",
+                )
+
+        except Exception as exception:
+
+            warning(
+                f"{host}: {exception}",
+            )
+
+            progress_status(
+                completed,
+                total,
+                f"✗ {host}",
+            )
 
     success(
-        f"Hosts Crawled : {len(results)}"
+        f"Hosts Crawled : {len(results)}",
     )
 
-    return (
-        results,
-        elapsed,
-    )
+    return results
 
 
 # ==========================================================
 # Run Crawler
 # ==========================================================
 
+
 def run(
+    context: ExecutionContext,
     hosts: list[str],
-) -> dict:
+) -> dict[str, Any]:
     """
     Run the URL Discovery module.
-
-    Args:
-        hosts:
-            Target hosts.
-
-    Returns:
-        Crawl analysis.
     """
 
-    (
-        results,
-        elapsed,
-    ) = crawl_hosts(
-        hosts,
+    results = crawl_hosts(
+        context=context,
+        hosts=hosts,
     )
 
     analysis = analyze(
         results=results,
-        elapsed=elapsed,
+    )
+
+    context.set_analysis(
+        "crawler",
+        analysis,
     )
 
     export_all(

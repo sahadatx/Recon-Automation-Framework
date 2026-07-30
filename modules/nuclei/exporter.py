@@ -370,7 +370,6 @@ def export_summary(
         f"Medium          : {statistics.get('medium', 0)}",
         f"Low             : {statistics.get('low', 0)}",
         f"Info            : {statistics.get('info', 0)}",
-        f"Elapsed         : {statistics.get('elapsed', 0):.2f} sec",
     ]
 
     return write_text(
@@ -431,11 +430,6 @@ def show_summary(
     print(
         f"{'Info':<25}"
         f"{statistics.get('info', 0)}"
-    )
-
-    print(
-        f"{'Elapsed':<25}"
-        f"{statistics.get('elapsed', 0):.2f} sec"
     )
 
     print("=" * 60)

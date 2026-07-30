@@ -19,16 +19,17 @@ def generate_statistics(
     Generate statistics from port scan results.
 
     Args:
-        results: Successful scan results.
-        failed_hosts: Hosts without open ports.
+        results:
+            Successful scan results.
+
+        failed_hosts:
+            Hosts without open ports.
 
     Returns:
         Statistics dictionary.
     """
 
-    hosts_with_open_ports = len(
-        results
-    )
+    hosts_with_open_ports = len(results)
 
     hosts_without_open_ports = len(
         failed_hosts
@@ -41,16 +42,11 @@ def generate_statistics(
 
     total_open_ports = 0
 
-    service_counts: dict[
-        str,
-        int,
-    ] = {}
+    service_counts: dict[str, int] = {}
 
     for ports in results.values():
 
-        total_open_ports += len(
-            ports
-        )
+        total_open_ports += len(ports)
 
         for port in ports:
 
@@ -59,9 +55,7 @@ def generate_statistics(
                 "unknown",
             )
 
-            service_counts[
-                service
-            ] = (
+            service_counts[service] = (
                 service_counts.get(
                     service,
                     0,
@@ -80,24 +74,31 @@ def generate_statistics(
     )
 
     return {
+
         "hosts_scanned": hosts_scanned,
+
         "hosts_with_open_ports": (
             hosts_with_open_ports
         ),
+
         "hosts_without_open_ports": (
             hosts_without_open_ports
         ),
+
         "total_open_ports": (
             total_open_ports
         ),
+
         "average_open_ports": (
             average_open_ports
         ),
+
         "service_counts": dict(
             sorted(
-                service_counts.items()
+                service_counts.items(),
             )
         ),
+
     }
 
 

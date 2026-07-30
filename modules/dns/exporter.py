@@ -17,6 +17,7 @@ from modules.dns.constants import (
     UNRESOLVED_TXT,
 )
 
+
 # ==========================================================
 # Helpers
 # ==========================================================
@@ -152,10 +153,7 @@ def export_summary(
             f"{statistics['total_records']}\n"
         )
 
-        file.write(
-            f"Scan Time      : "
-            f"{statistics['elapsed']} sec\n\n"
-        )
+        file.write("\n")
 
         file.write(
             "Record Counts\n"

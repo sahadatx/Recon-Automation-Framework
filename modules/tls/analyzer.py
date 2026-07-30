@@ -17,6 +17,7 @@ from .statistics import (
 # Analyze One Host
 # ==========================================================
 
+
 def analyze_host(
     certificate: dict[str, Any],
     protocols: dict[str, Any],
@@ -143,9 +144,9 @@ def analyze_host(
 # Analyze Results
 # ==========================================================
 
+
 def analyze(
     results: list[dict[str, Any]],
-    elapsed: float,
 ) -> dict[str, Any]:
     """
     Analyze TLS Security results.
@@ -154,32 +155,15 @@ def analyze(
         results:
             TLS analysis results.
 
-        elapsed:
-            Total execution time.
-
     Returns:
         TLS Security analysis.
     """
 
-    statistics = {
-
-        **generate_statistics(
+    return {
+        "results": results,
+        "statistics": generate_statistics(
             results,
         ),
-
-        "elapsed": round(
-            elapsed,
-            2,
-        ),
-
-    }
-
-    return {
-
-        "results": results,
-
-        "statistics": statistics,
-
     }
 
 
@@ -188,9 +172,6 @@ def analyze(
 # ==========================================================
 
 __all__ = [
-
     "analyze_host",
-
     "analyze",
-
 ]

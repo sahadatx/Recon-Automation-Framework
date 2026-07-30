@@ -1,19 +1,22 @@
+#!/usr/bin/env python3
+
 """
 Port Scanner Manager
 
-Coordinate port scanning, analysis, and exporting.
+Coordinate port scanning,
+analysis, and exporting.
 """
 
 from __future__ import annotations
 
-import time
 from concurrent.futures import (
-    ThreadPoolExecutor,
     as_completed,
 )
 
-from config.config import (
-    PORT_HOST_WORKERS,
+from typing import Any
+
+from core.context import (
+    ExecutionContext,
 )
 
 from core.logger import (
@@ -40,25 +43,24 @@ from modules.ports.scanner import (
 # Scan One Host
 # ==========================================================
 
+
 def scan_one_host(
+    context: ExecutionContext,
     host: str,
 ) -> tuple[
     str,
-    list[dict],
+    list[dict[str, Any]],
 ]:
     """
     Scan common TCP ports for one host.
-
-    Args:
-        host: Target hostname.
-
-    Returns:
-        Hostname and open ports.
     """
 
     return (
         host,
-        scan_common_ports(host),
+        scan_common_ports(
+            context,
+            host,
+        ),
     )
 
 
@@ -66,23 +68,17 @@ def scan_one_host(
 # Scan Hosts
 # ==========================================================
 
+
 def scan_hosts(
+    context: ExecutionContext,
     hosts: list[str],
 ) -> tuple[
-    dict[str, list[dict]],
+    dict[str, list[dict[str, Any]]],
     list[str],
-    float,
 ]:
     """
-    Scan multiple hosts in parallel.
-
-    Args:
-        hosts: Target hosts.
-
-    Returns:
-        Scan results,
-        failed hosts,
-        elapsed time.
+    Scan multiple hosts using
+    the shared thread pool.
     """
 
     info(
@@ -91,115 +87,114 @@ def scan_hosts(
 
     results: dict[
         str,
-        list[dict],
+        list[dict[str, Any]],
     ] = {}
 
-    failed_hosts: list[
-        str
-    ] = []
+    failed_hosts: list[str] = []
+
+    total = len(
+        hosts,
+    )
 
     completed = 0
 
-    total = len(
-        hosts
-    )
+    executor = context.get_thread_pool()
 
-    start_time = (
-        time.perf_counter()
-    )
+    if executor is None:
 
-    with ThreadPoolExecutor(
-        max_workers=PORT_HOST_WORKERS,
-    ) as executor:
+        raise RuntimeError(
+            "Shared thread pool "
+            "is not initialized."
+        )
 
-        futures = {
+    futures = {
 
-            executor.submit(
-                scan_one_host,
-                host,
-            ): host
+        executor.submit(
+            scan_one_host,
+            context,
+            host,
+        ): host
 
-            for host in hosts
-        }
+        for host in hosts
 
-        for future in as_completed(
-            futures
-        ):
+    }
 
-            completed += 1
+    for future in as_completed(
+        futures,
+    ):
 
-            host = futures[
-                future
-            ]
+        host = futures[
+            future
+        ]
 
-            try:
+        completed += 1
 
-                (
-                    hostname,
-                    open_ports,
-                ) = future.result()
+        try:
 
-                if open_ports:
+            (
+                hostname,
+                open_ports,
+            ) = future.result()
 
-                    results[
-                        hostname
-                    ] = open_ports
+            if open_ports:
 
-                    progress_status(
-                        completed,
-                        total,
-                        (
-                            f"✓ {hostname} "
-                            f"[{len(open_ports)} open]"
-                        ),
-                    )
+                results[
+                    hostname
+                ] = open_ports
 
-                else:
-
-                    failed_hosts.append(
-                        hostname
-                    )
-
-                    progress_status(
-                        completed,
-                        total,
-                        f"✗ {hostname}",
-                    )
-
-            except Exception as error:
-
-                failed_hosts.append(
-                    host
+                progress_status(
+                    completed,
+                    total,
+                    (
+                        f"✓ {hostname} "
+                        f"[{len(open_ports)} open]"
+                    ),
                 )
 
-                warning(
-                    f"{host}: {error}"
+            else:
+
+                failed_hosts.append(
+                    hostname,
                 )
 
                 progress_status(
                     completed,
                     total,
-                    f"✗ {host}",
+                    f"✗ {hostname}",
                 )
 
-    elapsed = round(
-        time.perf_counter()
-        - start_time,
-        2,
-    )
+        except Exception as error:
+
+            failed_hosts.append(
+                host,
+            )
+
+            warning(
+                f"{host}: {error}",
+            )
+
+            progress_status(
+                completed,
+                total,
+                f"✗ {host}",
+            )
 
     success(
         f"Hosts With Open Ports : {len(results)}"
     )
 
     success(
-        f"Hosts Without Open Ports : {len(failed_hosts)}"
+        (
+            "Hosts Without Open Ports : "
+            f"{len(failed_hosts)}"
+        )
     )
 
     return (
         results,
-        failed_hosts,
-        elapsed,
+        sorted(
+            failed_hosts,
+        ),
     )
 
 
@@ -207,31 +202,43 @@ def scan_hosts(
 # Run Port Scanner
 # ==========================================================
 
+
 def run(
+    context: ExecutionContext,
     hosts: list[str],
-) -> dict:
+) -> dict[str, Any]:
     """
     Run the Port Scanner module.
 
-    Args:
-        hosts: Target hosts.
+    Workflow
 
-    Returns:
-        Port scan analysis.
+        Scan
+          ↓
+        Analyze
+          ↓
+        Store Context
+          ↓
+        Export
+          ↓
+        Return Analysis
     """
 
     (
         results,
         failed_hosts,
-        elapsed,
     ) = scan_hosts(
+        context,
         hosts,
     )
 
     analysis = analyze(
         results=results,
         failed_hosts=failed_hosts,
-        elapsed=elapsed,
+    )
+
+    context.set_analysis(
+        "ports",
+        analysis,
     )
 
     export_all(

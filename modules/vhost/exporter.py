@@ -306,8 +306,6 @@ def export_summary(
 
         "",
 
-        f"Scan Time               : {statistics['elapsed']:.2f} sec",
-
     ]
 
     return write_text(
@@ -428,13 +426,6 @@ def show_summary(
     print(
         f"{'HTTP 403':<30}"
         f"{statistics['status_403']}"
-    )
-
-    print("-" * 80)
-
-    print(
-        f"{'Scan Time':<30}"
-        f"{statistics['elapsed']:.2f} sec"
     )
 
     print("=" * 80)

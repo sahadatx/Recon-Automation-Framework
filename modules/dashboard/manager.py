@@ -8,6 +8,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from core.context import ExecutionContext
+
 from .analyzer import analyze
 from .exporter import export_all
 from .loader import load_report
@@ -17,7 +19,10 @@ from .loader import load_report
 # Run Dashboard
 # ==========================================================
 
-def run_dashboard() -> dict[str, Any]:
+
+def run_dashboard(
+    context: ExecutionContext,
+) -> dict[str, Any]:
     """
     Run the Dashboard module.
 
@@ -31,6 +36,11 @@ def run_dashboard() -> dict[str, Any]:
         report,
     )
 
+    context.set_analysis(
+        "dashboard",
+        analysis,
+    )
+
     export_all(
         analysis,
     )
@@ -42,12 +52,18 @@ def run_dashboard() -> dict[str, Any]:
 # Public Entry Point
 # ==========================================================
 
-def run() -> dict[str, Any]:
+
+def run(
+    context: ExecutionContext,
+) -> dict[str, Any]:
     """
-    Public entry point for the Dashboard module.
+    Public entry point for the
+    Dashboard module.
     """
 
-    return run_dashboard()
+    return run_dashboard(
+        context,
+    )
 
 
 # ==========================================================

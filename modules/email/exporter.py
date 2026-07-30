@@ -420,8 +420,6 @@ def export_summary(
 
         f"Highest Score      : {statistics['highest_score']}",
 
-        f"Elapsed Time       : {statistics['elapsed']} sec",
-
         "",
 
         "Risk Levels",
@@ -489,7 +487,6 @@ def show_summary(
     print(f"DMARC Enabled      : {statistics['dmarc_enabled']}")
     print(f"Average Score      : {statistics['average_score']}")
     print(f"Highest Score      : {statistics['highest_score']}")
-    print(f"Elapsed Time       : {statistics['elapsed']} sec")
 
     print("-" * 80)
 

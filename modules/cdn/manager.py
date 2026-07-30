@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """
 CDN Manager
 
@@ -7,59 +9,56 @@ CDN Detection pipeline.
 
 from __future__ import annotations
 
-from time import perf_counter
 from typing import Any
 
+from core.context import ExecutionContext
 from core.logger import (
     info,
     success,
 )
 
+from .analyzer import analyze
+from .filters import filter_results
 from .helpers import (
-    normalize_target,
-    request_headers,
     extract_headers,
     get_server_header,
+    normalize_target,
+    request_headers,
     resolve_cname,
     resolve_ipv4,
 )
-
-from .target_analyzer import (
-    analyze_target,
-)
-
-from .analyzer import (
-    analyze,
-)
-
-from .filters import (
-    filter_results,
-)
+from .target_analyzer import analyze_target
 
 
 # ==========================================================
 # Run CDN Detection
 # ==========================================================
 
+
 def run_cdn_detection(
+    context: ExecutionContext,
     targets: list[str],
 ) -> dict[str, Any]:
     """
-    Run complete CDN Detection.
+    Run the complete CDN detection workflow.
     """
 
     if not targets:
 
-        return analyze(
+        analysis = analyze(
             results=[],
-            elapsed=0,
         )
+
+        context.set_analysis(
+            "cdn",
+            analysis,
+        )
+
+        return analysis
 
     info(
         "Starting CDN Detection..."
     )
-
-    start = perf_counter()
 
     results: list[dict[str, Any]] = []
 
@@ -77,6 +76,7 @@ def run_cdn_detection(
             continue
 
         response = request_headers(
+            context,
             target,
         )
 
@@ -84,42 +84,33 @@ def run_cdn_detection(
             response,
         )
 
-        server = get_server_header(
-            headers,
-        )
-
-        cname = resolve_cname(
-            host,
-        )
-
-        ip = resolve_ipv4(
-            host,
-        )
-
         result = analyze_target(
             target=host,
             headers=headers,
-            server=server,
-            cname=cname,
-            ip=ip,
+            server=get_server_header(
+                headers,
+            ),
+            cname=resolve_cname(
+                host,
+            ),
+            ip=resolve_ipv4(
+                host,
+            ),
         )
 
         results.append(
             result,
         )
 
-    results = filter_results(
-        results,
-    )
-
-    elapsed = (
-        perf_counter()
-        - start
-    )
-
     analysis = analyze(
-        results=results,
-        elapsed=elapsed,
+        results=filter_results(
+            results,
+        ),
+    )
+
+    context.set_analysis(
+        "cdn",
+        analysis,
     )
 
     statistics = analysis[
@@ -139,15 +130,13 @@ def run_cdn_detection(
     )
 
     success(
-        f"Average Confidence  : {statistics['average_confidence']}"
+        f"Average Confidence  : "
+        f"{statistics['average_confidence']}"
     )
 
     success(
-        f"Highest Confidence  : {statistics['highest_confidence']}"
-    )
-
-    success(
-        f"Elapsed             : {statistics['elapsed']:.2f} sec"
+        f"Highest Confidence  : "
+        f"{statistics['highest_confidence']}"
     )
 
     return analysis
@@ -157,7 +146,9 @@ def run_cdn_detection(
 # Public Entry Point
 # ==========================================================
 
+
 def run(
+    context: ExecutionContext,
     targets: list[str],
 ) -> dict[str, Any]:
     """
@@ -165,6 +156,7 @@ def run(
     """
 
     return run_cdn_detection(
+        context,
         targets,
     )
 

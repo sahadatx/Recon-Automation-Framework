@@ -19,8 +19,11 @@ def generate_statistics(
     Generate DNS resolution statistics.
 
     Args:
-        results: DNS resolution results.
-        failed_hosts: Hosts that failed to resolve.
+        results:
+            DNS resolution results.
+
+        failed_hosts:
+            Hosts that failed to resolve.
 
     Returns:
         DNS statistics.
@@ -55,30 +58,28 @@ def generate_statistics(
                 [],
             )
 
-            record_counts[
-                record_type
-            ] += len(values)
+            record_counts[record_type] += len(values)
 
             if values:
 
-                enabled_hosts[
-                    record_type
-                ] += 1
+                enabled_hosts[record_type] += 1
 
     total_records = sum(
         record_counts.values()
     )
 
     return {
-        "resolved_hosts": len(
-            results
-        ),
-        "failed_hosts": len(
-            failed_hosts
-        ),
+
+        "resolved_hosts": len(results),
+
+        "failed_hosts": len(failed_hosts),
+
         "total_records": total_records,
+
         "record_counts": record_counts,
+
         "enabled_hosts": enabled_hosts,
+
     }
 
 

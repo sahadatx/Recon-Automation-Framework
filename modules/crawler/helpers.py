@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """
 Crawler Helper Functions
 
@@ -5,147 +7,53 @@ Shared helper functions used by the
 URL Discovery module.
 """
 
+from __future__ import annotations
+
+import time
 from urllib.parse import (
     urljoin,
     urlparse,
     urlunparse,
 )
 
+import requests
 import urllib3
 
-urllib3.disable_warnings(
-
-    urllib3.exceptions.InsecureRequestWarning
-
-)
-
-import requests
-
-import time
-
-from requests.adapters import HTTPAdapter
-
 from requests.exceptions import (
-
     ConnectionError,
-
     ConnectTimeout,
-
     HTTPError,
-
     ReadTimeout,
-
     Timeout,
-
 )
 
 from config.config import (
-
-    HTTP_TIMEOUT,
-
-    HTTP_USER_AGENT,
-
-    HTTP_VERIFY_SSL,
-
     CRAWLER_RETRIES,
-
+    HTTP_TIMEOUT,
 )
 
 from core.logger import (
-
     debug,
-
 )
 
+# ==========================================================
+# Disable SSL Warnings
+# ==========================================================
+
+urllib3.disable_warnings(
+    urllib3.exceptions.InsecureRequestWarning,
+)
 
 # ==========================================================
 # Retryable HTTP Status Codes
 # ==========================================================
 
-RETRY_STATUS_CODES = {
-
+RETRY_STATUS_CODES: set[int] = {
     500,
-
     502,
-
     503,
-
     504,
-
 }
-
-
-# ==========================================================
-# Create Session
-# ==========================================================
-
-def create_session() -> requests.Session:
-    """
-    Create reusable HTTP session.
-
-    Returns:
-        requests.Session
-    """
-
-    session = requests.Session()
-
-    session.headers.update(
-
-        {
-
-            "User-Agent": HTTP_USER_AGENT,
-
-            "Accept": (
-
-                "text/html,"
-
-                "application/xhtml+xml,"
-
-                "application/xml;q=0.9,*/*;q=0.8"
-
-            ),
-
-            "Accept-Encoding": "gzip, deflate",
-
-            "Connection": "keep-alive",
-
-        }
-
-    )
-
-    adapter = HTTPAdapter(
-
-        pool_connections=20,
-
-        pool_maxsize=20,
-
-    )
-
-    session.mount(
-
-        "http://",
-
-        adapter,
-
-    )
-
-    session.mount(
-
-        "https://",
-
-        adapter,
-
-    )
-
-    return session
-
-
-# ==========================================================
-# Global Session
-# ==========================================================
-
-SESSION = create_session()
-
 
 # ==========================================================
 # Normalize URL
@@ -154,27 +62,19 @@ SESSION = create_session()
 def normalize_url(
     base_url: str,
     link: str,
-):
+) -> str:
     """
-    Convert relative URL into
-    canonical absolute URL.
-
-    Returns:
-        str
+    Convert a relative URL into
+    a canonical absolute URL.
     """
 
     url = urljoin(
-
         base_url,
-
         link,
-
     )
 
     parsed = urlparse(
-
-        url
-
+        url,
     )
 
     path = parsed.path
@@ -188,17 +88,12 @@ def normalize_url(
         path = path.rstrip("/")
 
     parsed = parsed._replace(
-
         path=path,
-
         fragment="",
-
     )
 
     return urlunparse(
-
-        parsed
-
+        parsed,
     )
 
 
@@ -209,24 +104,16 @@ def normalize_url(
 def same_domain(
     root_url: str,
     url: str,
-):
+) -> bool:
     """
     Check whether two URLs
     belong to the same host.
     """
 
     return (
-
-        urlparse(
-            root_url
-        ).netloc
-
+        urlparse(root_url).netloc
         ==
-
-        urlparse(
-            url
-        ).netloc
-
+        urlparse(url).netloc
     )
 
 
@@ -235,11 +122,11 @@ def same_domain(
 # ==========================================================
 
 def is_html(
-    response,
-):
+    response: requests.Response | None,
+) -> bool:
     """
-    Check whether response
-    contains HTML.
+    Determine whether the response
+    contains HTML content.
     """
 
     if response is None:
@@ -247,29 +134,14 @@ def is_html(
         return False
 
     content_type = response.headers.get(
-
         "Content-Type",
-
         "",
-
     ).lower()
 
     return (
-
-        "text/html"
-
-        in
-
-        content_type
-
+        "text/html" in content_type
         or
-
-        "application/xhtml+xml"
-
-        in
-
-        content_type
-
+        "application/xhtml+xml" in content_type
     )
 
 
@@ -279,48 +151,33 @@ def is_html(
 
 def should_retry(
     error: Exception,
-):
+) -> bool:
     """
-    Decide whether a request
-    should be retried.
+    Determine whether the failed
+    request should be retried.
     """
 
     if isinstance(
-
         error,
-
         (
-
             Timeout,
-
             ConnectTimeout,
-
             ReadTimeout,
-
             ConnectionError,
-
         ),
-
     ):
 
         return True
 
     if isinstance(
-
         error,
-
         HTTPError,
-
     ):
 
         response = getattr(
-
             error,
-
             "response",
-
             None,
-
         )
 
         if response is None:
@@ -328,13 +185,9 @@ def should_retry(
             return False
 
         return (
-
             response.status_code
-
             in
-
             RETRY_STATUS_CODES
-
         )
 
     return False
@@ -345,49 +198,42 @@ def should_retry(
 # ==========================================================
 
 def download_page(
+    session: requests.Session,
     url: str,
-):
+) -> requests.Response | None:
     """
-    Download HTML page.
-
-    Returns:
-        requests.Response | None
+    Download an HTML page using the
+    shared HTTP session.
     """
 
-    for attempt in range(CRAWLER_RETRIES):
+    for attempt in range(
+        CRAWLER_RETRIES,
+    ):
 
         try:
 
             start = time.perf_counter()
 
-            response = SESSION.get(
-
+            response = session.get(
                 url,
-
                 timeout=HTTP_TIMEOUT,
-
                 allow_redirects=True,
-
-                verify=HTTP_VERIFY_SSL,
-
             )
 
             response.elapsed_time = round(
-
-                time.perf_counter() - start,
-
+                time.perf_counter()
+                - start,
                 3,
-
             )
 
             response.raise_for_status()
 
-            if not is_html(response):
+            if not is_html(
+                response,
+            ):
 
                 debug(
-
-                    f"Skipped non-HTML: {url}"
-
+                    f"Skipped non-HTML: {url}",
                 )
 
                 return None
@@ -397,59 +243,52 @@ def download_page(
         except requests.exceptions.SSLError as error:
 
             debug(
-
-                f"SSL Error: {url} ({error})"
-
+                f"SSL Error: {url} ({error})",
             )
 
             return None
 
         except requests.RequestException as error:
 
-            if not should_retry(error):
+            if not should_retry(
+                error,
+            ):
 
                 if (
-
-                    isinstance(error, HTTPError)
-
-                    and error.response is not None
-
+                    isinstance(
+                        error,
+                        HTTPError,
+                    )
+                    and
+                    error.response is not None
                 ):
 
                     debug(
-
-                        f"HTTP {error.response.status_code}: {url}"
-
+                        f"HTTP {error.response.status_code}: {url}",
                     )
 
                 else:
 
                     debug(
-
-                        f"Not retrying: {url} ({error})"
-
+                        f"Not retrying: {url} ({error})",
                     )
 
                 return None
 
             debug(
-
-                f"Retry ({attempt + 1}/{CRAWLER_RETRIES}): {url}"
-
+                f"Retry ({attempt + 1}/{CRAWLER_RETRIES}): {url}",
             )
 
-            if attempt < CRAWLER_RETRIES - 1:
+            if attempt < (
+                CRAWLER_RETRIES - 1
+            ):
 
                 time.sleep(
-
-                    2 ** attempt
-
+                    2 ** attempt,
                 )
 
     debug(
-
-        f"Failed after {CRAWLER_RETRIES} attempts: {url}"
-
+        f"Failed after {CRAWLER_RETRIES} attempts: {url}",
     )
 
     return None
@@ -461,16 +300,26 @@ def download_page(
 
 def get_domain(
     url: str,
-):
+) -> str:
     """
-    Return hostname.
-
-    Returns:
-        str
+    Return the hostname
+    from a URL.
     """
 
     return urlparse(
-
-        url
-
+        url,
     ).netloc
+
+
+# ==========================================================
+# Public Exports
+# ==========================================================
+
+__all__ = [
+    "download_page",
+    "get_domain",
+    "is_html",
+    "normalize_url",
+    "same_domain",
+    "should_retry",
+]

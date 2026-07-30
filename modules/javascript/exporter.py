@@ -702,8 +702,6 @@ def export_summary(
 
         f"Average URLs / File       : {statistics['average_urls_per_file']}",
 
-        f"Scan Time                 : {statistics['elapsed']:.2f} sec",
-
     ]
 
     return write_text(
@@ -1052,15 +1050,6 @@ def show_summary(
     print(
         f"{'Average URLs / File':<30}"
         f"{statistics['average_urls_per_file']}"
-    )
-
-    print(
-        "-" * 80
-    )
-
-    print(
-        f"{'Scan Time':<30}"
-        f"{statistics['elapsed']:.2f} sec"
     )
 
     print(

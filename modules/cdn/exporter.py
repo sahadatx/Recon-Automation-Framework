@@ -383,8 +383,6 @@ def export_summary(
 
         f"Highest Confidence  : {statistics['highest_confidence']}",
 
-        f"Elapsed Time        : {statistics['elapsed']} sec",
-
         "",
 
         "Confidence Levels",
@@ -447,7 +445,6 @@ def show_summary(
     print(f"CDN Not Detected    : {statistics['undetected']}")
     print(f"Average Confidence  : {statistics['average_confidence']}")
     print(f"Highest Confidence  : {statistics['highest_confidence']}")
-    print(f"Elapsed Time        : {statistics['elapsed']} sec")
 
     print("-" * 80)
 

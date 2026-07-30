@@ -165,10 +165,6 @@ def export_summary(
             f"Unique Subdomains   : {statistics['total_subdomains']}\n"
         )
 
-        file.write(
-            f"Scan Time           : {statistics['elapsed']} sec\n"
-        )
-
 
 # ==========================================================
 # Subdomains

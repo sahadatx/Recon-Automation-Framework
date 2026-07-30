@@ -8,6 +8,10 @@ from __future__ import annotations
 
 import time
 
+from typing import Any
+
+from core.context import ExecutionContext
+
 from modules.crawler.queue import (
     CrawlQueue,
 )
@@ -113,8 +117,9 @@ def create_result(
 # ==========================================================
 
 def crawl_url(
+    session: requests.Session,
     url: str,
-) -> dict | None:
+) -> dict[str, Any] | None:
     """
     Crawl a single URL.
 
@@ -133,7 +138,8 @@ def crawl_url(
     try:
 
         response = download_page(
-            url,
+            session=session,
+            url=url,
         )
 
         if response is None:
@@ -486,9 +492,10 @@ def finalize_statistics(
 # ==========================================================
 
 def crawl_host(
+    context: ExecutionContext,
     host: str,
     use_sitemap: bool = False,
-) -> dict:
+) -> dict[str, Any]:
     """
     Crawl one host using Breadth-First Search.
 
@@ -506,6 +513,14 @@ def crawl_host(
     info(
         f"Starting crawl: {host}"
     )
+
+    session = context.get_http_session()
+
+    if session is None:
+
+        raise RuntimeError(
+            "HTTP session not initialized."
+        )
 
     start_time = (
         time.perf_counter()
@@ -600,7 +615,8 @@ def crawl_host(
         )
 
         page = crawl_url(
-            url,
+            session=session,
+            url=url,
         )
 
         if page is None:

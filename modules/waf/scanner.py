@@ -8,221 +8,121 @@ WAF fingerprint detection.
 from __future__ import annotations
 
 from copy import deepcopy
+from typing import Any
 
-from requests import Session
-from requests.adapters import HTTPAdapter
 from requests.exceptions import (
     ConnectionError,
     RequestException,
     Timeout,
 )
-from urllib3.util.retry import Retry
 
 from config.config import (
     HTTP_TIMEOUT,
-    HTTP_USER_AGENT,
     HTTP_VERIFY_SSL,
 )
 
-# ==========================================================
-# HTTP Session
-# ==========================================================
+from core.context import ExecutionContext
 
-SESSION = Session()
-
-retry = Retry(
-
-    total=2,
-
-    connect=2,
-
-    read=2,
-
-    backoff_factor=0.5,
-
-    status_forcelist=(
-
-        500,
-        502,
-        503,
-        504,
-
-    ),
-
-    allowed_methods=(
-
-        "GET",
-
-        "HEAD",
-
-    ),
-
-)
-
-adapter = HTTPAdapter(
-
-    max_retries=retry,
-
-)
-
-SESSION.mount(
-
-    "http://",
-
-    adapter,
-
-)
-
-SESSION.mount(
-
-    "https://",
-
-    adapter,
-
-)
-
-SESSION.headers.update(
-
-    {
-
-        "User-Agent": HTTP_USER_AGENT,
-
-        "Accept": "*/*",
-
-        "Accept-Language": "en-US,en;q=0.9",
-
-    }
-
-)
 
 # ==========================================================
 # Empty Result
 # ==========================================================
 
 EMPTY_RESULT = {
-
     "url": "",
-
     "status": None,
-
     "headers": {},
-
     "cookies": {},
-
     "server": "",
-
     "body": "",
-
     "response_time": 0.0,
-
     "error": None,
-
 }
+
 
 # ==========================================================
 # Scan Target
 # ==========================================================
 
+
 def scan_target(
+    context: ExecutionContext,
     url: str,
-):
+) -> dict[str, Any]:
     """
     Collect HTTP response data.
 
     Returns:
-        dict
+        HTTP response information.
     """
 
+    session = context.get_http_session()
+
+    if session is None:
+        raise RuntimeError(
+            "Shared HTTP session is not initialized."
+        )
+
     result = deepcopy(
-
-        EMPTY_RESULT
-
+        EMPTY_RESULT,
     )
 
     result["url"] = url
 
     try:
 
-        response = SESSION.get(
-
+        response = session.get(
             url,
-
             timeout=HTTP_TIMEOUT,
-
             verify=HTTP_VERIFY_SSL,
-
             allow_redirects=True,
-
         )
 
         result["status"] = response.status_code
 
         result["headers"] = {
-
             key.lower(): value
-
-            for key, value
-
-            in response.headers.items()
-
+            for key, value in response.headers.items()
         }
 
         result["cookies"] = {
-
             key.lower(): value
-
-            for key, value
-
-            in response.cookies.items()
-
+            for key, value in response.cookies.items()
         }
 
         result["server"] = response.headers.get(
-
             "Server",
-
             "",
-
         ).lower()
 
-        result["body"] = response.text[:8192].lower()
+        result["body"] = response.text[
+            :8192
+        ].lower()
 
         result["response_time"] = round(
-
             response.elapsed.total_seconds(),
-
             3,
-
         )
 
     except (
-
         Timeout,
-
         ConnectionError,
-
-    ) as exc:
+    ) as error:
 
         result["error"] = str(
-
-            exc
-
+            error,
         )
 
-    except RequestException as exc:
+    except RequestException as error:
 
         result["error"] = str(
-
-            exc
-
+            error,
         )
 
-    except Exception as exc:
+    except Exception as error:
 
         result["error"] = str(
-
-            exc
-
+            error,
         )
 
     return result
@@ -232,46 +132,51 @@ def scan_target(
 # Scan Multiple Targets
 # ==========================================================
 
+
 def scan_targets(
-    targets,
-):
+    context: ExecutionContext,
+    targets: list[str],
+) -> list[dict[str, Any]]:
     """
     Scan multiple targets.
 
     Returns:
-        list
+        List of scan results.
     """
 
-    results = []
+    results: list[
+        dict[str, Any]
+    ] = []
 
     total = len(
-
-        targets
-
+        targets,
     )
 
     for index, target in enumerate(
-
         targets,
-
         start=1,
-
     ):
 
         print(
-
-            f"[{index}/{total}] Scanning {target}"
-
+            f"[{index}/{total}] "
+            f"Scanning {target}",
         )
 
         results.append(
-
             scan_target(
-
-                target
-
-            )
-
+                context,
+                target,
+            ),
         )
 
     return results
+
+
+# ==========================================================
+# Public Exports
+# ==========================================================
+
+__all__ = [
+    "scan_target",
+    "scan_targets",
+]

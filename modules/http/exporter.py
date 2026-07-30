@@ -148,10 +148,7 @@ def export_summary(
             f"{statistics['average_response_time']} sec\n"
         )
 
-        file.write(
-            f"Scan Time       : "
-            f"{statistics['elapsed']} sec\n\n"
-        )
+        file.write("\n")
 
         file.write(
             "Status Codes\n"

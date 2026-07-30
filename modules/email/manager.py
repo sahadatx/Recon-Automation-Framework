@@ -2,20 +2,21 @@
 Email Security Manager
 
 Coordinates the complete
-Email Security
-pipeline.
+Email Security pipeline.
 """
 
 from __future__ import annotations
 
-from time import perf_counter
 from typing import Any
 
+from core.context import ExecutionContext
 from core.logger import (
     info,
     success,
 )
 
+from .analyzer import analyze
+from .filters import filter_results
 from .helpers import (
     create_result,
     normalize_target,
@@ -28,44 +29,38 @@ from .helpers import (
     resolve_spf,
     resolve_tls_rpt,
 )
-
-from .target_analyzer import (
-    analyze_target,
-)
-
-from .analyzer import (
-    analyze,
-)
-
-from .filters import (
-    filter_results,
-)
+from .target_analyzer import analyze_target
 
 
 # ==========================================================
 # Run Email Security Analysis
 # ==========================================================
 
+
 def run_email_security(
+    context: ExecutionContext,
     targets: list[str],
 ) -> dict[str, Any]:
     """
-    Run complete
-    Email Security pipeline.
+    Run the complete Email Security pipeline.
     """
 
     if not targets:
 
-        return analyze(
+        analysis = analyze(
             results=[],
-            elapsed=0,
         )
+
+        context.set_analysis(
+            "email_security",
+            analysis,
+        )
+
+        return analysis
 
     info(
         "Starting Email Security Analysis..."
     )
-
-    start = perf_counter()
 
     results: list[dict[str, Any]] = []
 
@@ -81,10 +76,6 @@ def run_email_security(
 
         if not host:
             continue
-
-        # --------------------------------------------------
-        # DNS
-        # --------------------------------------------------
 
         mx = resolve_mx(
             host,
@@ -118,10 +109,6 @@ def run_email_security(
             host,
         )
 
-        # --------------------------------------------------
-        # Create Result
-        # --------------------------------------------------
-
         result = create_result(
             host,
             mx,
@@ -137,10 +124,6 @@ def run_email_security(
             dnssec,
         )
 
-        # --------------------------------------------------
-        # Analyze Target
-        # --------------------------------------------------
-
         result = analyze_target(
             result,
         )
@@ -149,26 +132,15 @@ def run_email_security(
             result,
         )
 
-    # ------------------------------------------------------
-    # Filter Results
-    # ------------------------------------------------------
-
-    results = filter_results(
-        results,
-    )
-
-    elapsed = (
-        perf_counter()
-        - start
-    )
-
-    # ------------------------------------------------------
-    # Module Analysis
-    # ------------------------------------------------------
-
     analysis = analyze(
-        results=results,
-        elapsed=elapsed,
+        results=filter_results(
+            results,
+        ),
+    )
+
+    context.set_analysis(
+        "email_security",
+        analysis,
     )
 
     statistics = analysis[
@@ -203,10 +175,6 @@ def run_email_security(
         f"Highest Score       : {statistics['highest_score']}"
     )
 
-    success(
-        f"Elapsed             : {statistics['elapsed']:.2f} sec"
-    )
-
     return analysis
 
 
@@ -214,14 +182,18 @@ def run_email_security(
 # Public Entry Point
 # ==========================================================
 
+
 def run(
+    context: ExecutionContext,
     targets: list[str],
 ) -> dict[str, Any]:
     """
-    Public entry point for the Email Security module.
+    Public entry point for the
+    Email Security module.
     """
 
     return run_email_security(
+        context,
         targets,
     )
 

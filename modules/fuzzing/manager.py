@@ -8,42 +8,23 @@ and reporting.
 
 from __future__ import annotations
 
-import time
-
-from concurrent.futures import (
-    ThreadPoolExecutor,
-    as_completed,
-)
-
+from concurrent.futures import as_completed
 from typing import Any
 
-from config.config import (
-    MAX_WORKERS,
-)
-
+from core.context import ExecutionContext
 from core.logger import (
     info,
+    progress_status,
     success,
     warning,
-    progress_status,
 )
 
-from modules.fuzzing.analyzer import (
-    analyze,
-)
-
-from modules.fuzzing.filters import (
-    apply_filters,
-)
-
+from modules.fuzzing.analyzer import analyze
+from modules.fuzzing.filters import apply_filters
 from modules.fuzzing.interesting import (
     scan as detect_interesting,
 )
-
-from modules.fuzzing.parser import (
-    parse_ffuf,
-)
-
+from modules.fuzzing.parser import parse_ffuf
 from modules.fuzzing.scanner import (
     cleanup,
     scan_target,
@@ -54,6 +35,7 @@ from modules.fuzzing.scanner import (
 # Process Target
 # ==========================================================
 
+
 def process_target(
     target: str,
 ) -> tuple[
@@ -61,18 +43,7 @@ def process_target(
     dict[str, Any] | None,
 ]:
     """
-    Scan and analyze
-    one target.
-
-    Args:
-        target:
-            Target URL.
-
-    Returns:
-        (
-            target,
-            analysis,
-        )
+    Scan and analyze one target.
     """
 
     scan = scan_target(
@@ -102,12 +73,10 @@ def process_target(
             )
 
         results = apply_filters(
-
             parsed.get(
                 "results",
                 [],
-            )
-
+            ),
         )
 
         interesting = detect_interesting(
@@ -117,7 +86,6 @@ def process_target(
         analysis = analyze(
             results=results,
             interesting=interesting,
-            elapsed=0,
         )
 
         return (
@@ -136,19 +104,13 @@ def process_target(
 # Run Directory Fuzzing
 # ==========================================================
 
+
 def run_fuzzing(
+    context: ExecutionContext,
     targets: list[str],
 ) -> dict[str, Any]:
     """
-    Run directory
-    fuzzing.
-
-    Args:
-        targets:
-            Target URLs.
-
-    Returns:
-        Analysis dictionary.
+    Run directory fuzzing.
     """
 
     info(
@@ -156,8 +118,44 @@ def run_fuzzing(
     )
 
     targets = sorted(
-        set(targets),
+        set(
+            targets,
+        ),
     )
+
+    if not targets:
+
+        warning(
+            "No targets supplied."
+        )
+
+        analysis = {
+            "results": {},
+            "statistics": {
+                "targets": 0,
+                "successful": 0,
+                "failed": 0,
+                "total_results": 0,
+                "interesting_files": 0,
+                "interesting_directories": 0,
+            },
+            "failed": [],
+        }
+
+        context.set_analysis(
+            "fuzzing",
+            analysis,
+        )
+
+        return analysis
+
+    executor = context.get_thread_pool()
+
+    if executor is None:
+
+        raise RuntimeError(
+            "Shared thread pool is not initialized."
+        )
 
     results: dict[
         str,
@@ -172,107 +170,85 @@ def run_fuzzing(
         targets,
     )
 
-    start_time = time.perf_counter()
+    futures = {
 
-    with ThreadPoolExecutor(
-        max_workers=MAX_WORKERS,
-    ) as executor:
+        executor.submit(
+            process_target,
+            target,
+        ): target
 
-        futures = {
+        for target in targets
 
-            executor.submit(
-                process_target,
-                target,
-            ): target
+    }
 
-            for target in targets
+    for future in as_completed(
+        futures,
+    ):
 
-        }
+        target = futures[
+            future
+        ]
 
-        for future in as_completed(
-            futures,
-        ):
+        completed += 1
 
-            target = futures[
-                future
-            ]
+        try:
 
-            completed += 1
+            (
+                hostname,
+                analysis,
+            ) = future.result()
 
-            try:
+            if analysis is not None:
 
-                hostname, analysis = (
-                    future.result()
+                results[
+                    hostname
+                ] = analysis
+
+                progress_status(
+                    completed,
+                    total,
+                    f"✓ {hostname}",
                 )
 
-                if analysis:
-
-                    results[
-                        hostname
-                    ] = analysis
-
-                    progress_status(
-                        completed,
-                        total,
-                        f"✓ {hostname}",
-                    )
-
-                else:
-
-                    failed.append(
-                        hostname,
-                    )
-
-                    progress_status(
-                        completed,
-                        total,
-                        f"✗ {hostname}",
-                    )
-
-            except Exception as error:
-
-                warning(
-                    f"{target}: {error}"
-                )
+            else:
 
                 failed.append(
-                    target,
+                    hostname,
                 )
 
                 progress_status(
                     completed,
                     total,
-                    f"✗ {target}",
+                    f"✗ {hostname}",
                 )
 
-    elapsed = round(
-        time.perf_counter()
-        - start_time,
-        2,
-    )
+        except Exception as error:
 
-    # ======================================================
-    # Overall Statistics
-    # ======================================================
+            warning(
+                f"{target}: {error}",
+            )
+
+            failed.append(
+                target,
+            )
+
+            progress_status(
+                completed,
+                total,
+                f"✗ {target}",
+            )
 
     overall: dict[str, Any] = {
-
         "targets": total,
-
         "successful": len(
             results,
         ),
-
         "failed": len(
             failed,
         ),
-
         "total_results": 0,
-
         "interesting_files": 0,
-
         "interesting_directories": 0,
-
     }
 
     for analysis in results.values():
@@ -296,10 +272,6 @@ def run_fuzzing(
             "interesting_directories",
             0,
         )
-
-    # ======================================================
-    # Summary
-    # ======================================================
 
     success(
         f"Targets                  : {overall['targets']}"
@@ -325,29 +297,18 @@ def run_fuzzing(
         f"Interesting Directories  : {overall['interesting_directories']}"
     )
 
-    success(
-        f"Elapsed                  : {elapsed:.2f} sec"
-    )
-
-    # ======================================================
-    # Analysis
-    # ======================================================
-
     analysis = {
-
         "results": results,
-
-        "statistics": {
-
-            **overall,
-
-            "elapsed": elapsed,
-
-        },
-
-        "failed": failed,
-
+        "statistics": overall,
+        "failed": sorted(
+            failed,
+        ),
     }
+
+    context.set_analysis(
+        "fuzzing",
+        analysis,
+    )
 
     return analysis
 
@@ -356,14 +317,18 @@ def run_fuzzing(
 # Public Entry Point
 # ==========================================================
 
+
 def run(
+    context: ExecutionContext,
     targets: list[str],
 ) -> dict[str, Any]:
     """
-    Public entry point for the Directory Fuzzing module.
+    Public entry point for the
+    Directory Fuzzing module.
     """
 
     return run_fuzzing(
+        context,
         targets,
     )
 

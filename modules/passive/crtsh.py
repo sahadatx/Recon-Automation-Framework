@@ -5,13 +5,15 @@ Passive subdomain enumeration using
 Certificate Transparency Logs.
 """
 
-import requests
+from __future__ import annotations
+
+from core.context import ExecutionContext
 
 from core.logger import (
+    error,
     info,
     success,
     warning,
-    error,
 )
 
 from modules.passive.helpers import (
@@ -21,12 +23,19 @@ from modules.passive.helpers import (
 
 
 @retry_request(max_attempts=3, delay=2)
-def run_crtsh(domain: str) -> list[str]:
+def run_crtsh(
+    context: ExecutionContext,
+    domain: str,
+) -> list[str]:
     """
     Query crt.sh for subdomains.
 
     Args:
-        domain: Target domain.
+        context:
+            Shared execution context.
+
+        domain:
+            Target domain.
 
     Returns:
         List of discovered subdomains.
@@ -34,17 +43,24 @@ def run_crtsh(domain: str) -> list[str]:
 
     info("Querying crt.sh...")
 
+    session = context.get_http_session()
+
+    if session is None:
+        raise RuntimeError(
+            "HTTP session not initialized."
+        )
+
     url = (
         f"https://crt.sh/?q=%.{domain}&output=json"
     )
 
     headers = {
-        "User-Agent": "ReconAutomationFramework/2.0"
+        "User-Agent": "ReconAutomationFramework/2.0",
     }
 
     try:
 
-        response = requests.get(
+        response = session.get(
             url,
             headers=headers,
             timeout=30,
@@ -54,31 +70,33 @@ def run_crtsh(domain: str) -> list[str]:
 
         data = response.json()
 
-    except requests.exceptions.Timeout:
+    except Exception as exc:
 
-        error("crt.sh request timed out.")
+        if exc.__class__.__name__ == "Timeout":
+
+            error("crt.sh request timed out.")
+
+        elif exc.__class__.__name__ == "JSONDecodeError":
+
+            error(
+                "Invalid JSON response from crt.sh."
+            )
+
+        else:
+
+            error(
+                f"crt.sh request failed: {exc}"
+            )
 
         return []
 
-    except requests.exceptions.RequestException as e:
-
-        error(f"crt.sh request failed: {e}")
-
-        return []
-
-    except ValueError:
-
-        error("Invalid JSON response from crt.sh.")
-
-        return []
-
-    subdomains = []
+    subdomains: list[str] = []
 
     for item in data:
 
         names = item.get(
             "name_value",
-            ""
+            "",
         )
 
         subdomains.extend(
@@ -86,8 +104,8 @@ def run_crtsh(domain: str) -> list[str]:
         )
 
     subdomains = normalize_subdomains(
-        subdomains,
-        domain,
+        subdomains=subdomains,
+        domain=domain,
     )
 
     if subdomains:
@@ -103,3 +121,8 @@ def run_crtsh(domain: str) -> list[str]:
         )
 
     return subdomains
+
+
+__all__ = [
+    "run_crtsh",
+]

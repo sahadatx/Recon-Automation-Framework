@@ -6,14 +6,14 @@ Coordinates technology detection.
 
 from __future__ import annotations
 
-import time
 from concurrent.futures import (
-    ThreadPoolExecutor,
     as_completed,
 )
 
-from config.config import (
-    MAX_WORKERS,
+from typing import Any
+
+from core.context import (
+    ExecutionContext,
 )
 
 from core.logger import (
@@ -26,9 +26,11 @@ from core.logger import (
 from modules.tech.analyzer import (
     analyze,
 )
+
 from modules.tech.detector import (
     detect_technologies,
 )
+
 from modules.tech.exporter import (
     export_all,
 )
@@ -38,10 +40,14 @@ from modules.tech.exporter import (
 # Detect One Host
 # ==========================================================
 
+
 def detect_one_host(
     host: str,
-    response: dict,
-) -> tuple[str, dict]:
+    response: dict[str, Any],
+) -> tuple[
+    str,
+    dict[str, Any],
+]:
     """
     Detect technologies for one host.
     """
@@ -58,127 +64,117 @@ def detect_one_host(
 # Detect Hosts
 # ==========================================================
 
+
 def detect_hosts(
-    http_results: dict,
+    context: ExecutionContext,
+    http_results: dict[str, dict[str, Any]],
 ) -> tuple[
-    dict,
+    dict[str, dict[str, Any]],
     list[str],
-    float,
 ]:
     """
     Detect technologies for all hosts.
-
-    Returns:
-        (
-            results,
-            failed_hosts,
-            elapsed,
-        )
     """
 
     info(
         "Starting Technology Detection..."
     )
 
-    results: dict = {}
+    results: dict[
+        str,
+        dict[str, Any],
+    ] = {}
 
     failed_hosts: list[str] = []
 
+    total = len(
+        http_results,
+    )
+
     completed = 0
 
-    total = len(
-        http_results
-    )
+    executor = context.get_thread_pool()
 
-    start_time = (
-        time.perf_counter()
-    )
+    if executor is None:
 
-    with ThreadPoolExecutor(
-        max_workers=MAX_WORKERS,
-    ) as executor:
+        raise RuntimeError(
+            "Shared thread pool is not initialized."
+        )
 
-        futures = {
+    futures = {
 
-            executor.submit(
-                detect_one_host,
-                host,
-                response,
-            ): host
+        executor.submit(
+            detect_one_host,
+            host,
+            response,
+        ): host
 
-            for host, response
-            in http_results.items()
+        for (
+            host,
+            response,
+        ) in http_results.items()
 
-        }
+    }
 
-        for future in as_completed(
-            futures,
-        ):
+    for future in as_completed(
+        futures,
+    ):
 
-            host = futures[
-                future
-            ]
+        host = futures[
+            future
+        ]
 
-            completed += 1
+        completed += 1
 
-            try:
+        try:
 
+            (
+                hostname,
+                technologies,
+            ) = future.result()
+
+            results[
+                hostname
+            ] = technologies
+
+            progress_status(
+                completed,
+                total,
                 (
-                    hostname,
-                    technologies,
-                ) = future.result()
+                    f"✓ {hostname} "
+                    f"[{len(technologies.get('technologies', []))} tech]"
+                ),
+            )
 
-                results[
-                    hostname
-                ] = technologies
+        except Exception as error:
 
-                progress_status(
-                    completed,
-                    total,
-                    (
-                        f"✓ {hostname} "
-                        f"["
-                        f"{len(technologies.get('technologies', []))}"
-                        f" tech]"
-                    ),
-                )
+            failed_hosts.append(
+                host,
+            )
 
-            except Exception as error:
+            warning(
+                f"{host}: {error}"
+            )
 
-                failed_hosts.append(
-                    host,
-                )
+            progress_status(
+                completed,
+                total,
+                f"✗ {host}",
+            )
 
-                warning(
-                    f"{host}: {error}"
-                )
-
-                progress_status(
-                    completed,
-                    total,
-                    f"✗ {host}",
-                )
-
-    elapsed = round(
-        time.perf_counter()
-        - start_time,
-        2,
+    success(
+        f"Technology Detection Completed: {len(results)}"
     )
 
     success(
-        f"Technology Detection Completed: "
-        f"{len(results)}"
-    )
-
-    success(
-        f"Failed Hosts: "
-        f"{len(failed_hosts)}"
+        f"Failed Hosts: {len(failed_hosts)}"
     )
 
     return (
         results,
-        failed_hosts,
-        elapsed,
+        sorted(
+            failed_hosts,
+        ),
     )
 
 
@@ -186,28 +182,44 @@ def detect_hosts(
 # Run
 # ==========================================================
 
-def run(
-    http_results: dict,
-) -> dict:
-    """
-    Run technology detection workflow.
 
-    Returns:
-        Analysis dictionary.
+def run(
+    context: ExecutionContext,
+    http_results: dict[str, dict[str, Any]],
+) -> dict[str, Any]:
+    """
+    Run the complete technology
+    detection workflow.
+
+    Workflow
+
+        Detect
+          ↓
+        Analyze
+          ↓
+        Store Context
+          ↓
+        Export
+          ↓
+        Return Analysis
     """
 
     (
         results,
         failed_hosts,
-        elapsed,
     ) = detect_hosts(
+        context,
         http_results,
     )
 
     analysis = analyze(
         results=results,
         failed_hosts=failed_hosts,
-        elapsed=elapsed,
+    )
+
+    context.set_analysis(
+        "technology",
+        analysis,
     )
 
     export_all(

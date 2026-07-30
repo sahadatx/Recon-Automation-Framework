@@ -241,11 +241,6 @@ def export_summary(
         )
 
         file.write(
-            f"Scan Time             : "
-            f"{statistics['elapsed']} sec\n\n"
-        )
-
-        file.write(
             "Technology Breakdown\n"
         )
 

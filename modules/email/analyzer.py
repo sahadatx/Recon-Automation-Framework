@@ -19,9 +19,9 @@ from .statistics import (
 # Analyze Results
 # ==========================================================
 
+
 def analyze(
     results: list[dict[str, Any]],
-    elapsed: float,
 ) -> dict[str, Any]:
     """
     Analyze email security
@@ -31,14 +31,11 @@ def analyze(
         dict[str, Any]
     """
 
-    statistics = {
-        **generate_statistics(results),
-        "elapsed": round(elapsed, 2),
-    }
-
     return {
         "results": results,
-        "statistics": statistics,
+        "statistics": generate_statistics(
+            results,
+        ),
     }
 
 

@@ -17,10 +17,10 @@ from modules.ports.statistics import (
 # Analyze Results
 # ==========================================================
 
+
 def analyze(
-    results: dict[str, dict[str, Any]],
+    results: dict[str, list[dict[str, Any]]],
     failed_hosts: list[str],
-    elapsed: float,
 ) -> dict[str, Any]:
     """
     Analyze port scan results.
@@ -32,9 +32,6 @@ def analyze(
         failed_hosts:
             Hosts without open ports.
 
-        elapsed:
-            Total scan time.
-
     Returns:
         Port scan analysis.
     """
@@ -44,18 +41,19 @@ def analyze(
             results=results,
             failed_hosts=failed_hosts,
         ),
-        "open_hosts": sorted(results),
-        "closed_hosts": sorted(failed_hosts),
-        "elapsed": elapsed,
+        "open_hosts": sorted(
+            results,
+        ),
+        "closed_hosts": sorted(
+            failed_hosts,
+        ),
     }
 
     return {
-
         "results": results,
-
         "statistics": statistics,
-
     }
+
 
 # ==========================================================
 # Public Exports

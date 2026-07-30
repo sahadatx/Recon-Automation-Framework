@@ -24,7 +24,6 @@ def empty_statistics() -> dict[str, Any]:
         "completed_modules": 0,
         "failed_modules": 0,
         "findings": 0,
-        "elapsed": 0.0,
     }
 
 
@@ -93,8 +92,6 @@ def generate_statistics(
 
     findings = 0
 
-    elapsed = 0.0
-
     for module in modules.values():
 
         if not isinstance(
@@ -126,14 +123,6 @@ def generate_statistics(
 
             findings += 1
 
-        elapsed += module.get(
-            "statistics",
-            {},
-        ).get(
-            "elapsed",
-            0.0,
-        )
-
     return {
 
         "target": target,
@@ -147,11 +136,6 @@ def generate_statistics(
         "failed_modules": failed_modules,
 
         "findings": findings,
-
-        "elapsed": round(
-            elapsed,
-            2,
-        ),
 
     }
 

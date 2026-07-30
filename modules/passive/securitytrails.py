@@ -5,34 +5,41 @@ Passive subdomain enumeration using
 SecurityTrails API.
 """
 
-import requests
+from __future__ import annotations
+
+from core.context import ExecutionContext
 
 from config.config import (
     SECURITYTRAILS_API_KEY,
 )
 
 from core.logger import (
+    error,
     info,
     success,
     warning,
-    error,
 )
 
 from modules.passive.helpers import (
-    retry_request,
     normalize_subdomains,
+    retry_request,
 )
 
 
 @retry_request(max_attempts=3, delay=2)
 def run_securitytrails(
+    context: ExecutionContext,
     domain: str,
 ) -> list[str]:
     """
     Query SecurityTrails API.
 
     Args:
-        domain: Target domain.
+        context:
+            Shared execution context.
+
+        domain:
+            Target domain.
 
     Returns:
         List of discovered subdomains.
@@ -48,6 +55,14 @@ def run_securitytrails(
 
         return []
 
+    session = context.get_http_session()
+
+    if session is None:
+
+        raise RuntimeError(
+            "HTTP session not initialized."
+        )
+
     url = (
         f"https://api.securitytrails.com/v1/"
         f"domain/{domain}/subdomains"
@@ -59,7 +74,7 @@ def run_securitytrails(
 
     try:
 
-        response = requests.get(
+        response = session.get(
             url,
             headers=headers,
             timeout=30,
@@ -69,25 +84,42 @@ def run_securitytrails(
 
         data = response.json()
 
-    except requests.exceptions.RequestException as e:
+    except Exception as exc:
 
-        error(
-            f"SecurityTrails request failed: {e}"
-        )
+        if exc.__class__.__name__ == "Timeout":
+
+            error(
+                "SecurityTrails request timed out."
+            )
+
+        elif exc.__class__.__name__ == "JSONDecodeError":
+
+            error(
+                "Invalid JSON response from SecurityTrails."
+            )
+
+        else:
+
+            error(
+                f"SecurityTrails request failed: {exc}"
+            )
 
         return []
 
-    subdomains = []
+    subdomains: list[str] = []
 
-    for sub in data.get("subdomains", []):
+    for sub in data.get(
+        "subdomains",
+        [],
+    ):
 
         subdomains.append(
             f"{sub}.{domain}"
         )
 
     subdomains = normalize_subdomains(
-        subdomains,
-        domain,
+        subdomains=subdomains,
+        domain=domain,
     )
 
     if subdomains:
@@ -103,3 +135,8 @@ def run_securitytrails(
         )
 
     return subdomains
+
+
+__all__ = [
+    "run_securitytrails",
+]

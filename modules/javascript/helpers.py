@@ -11,11 +11,21 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 import requests
+from requests.exceptions import (
+    ConnectionError,
+    ConnectTimeout,
+    HTTPError,
+    ReadTimeout,
+    Timeout,
+)
 
 from config.config import (
-    HTTP_USER_AGENT,
-    HTTP_VERIFY_SSL,
+    HTTP_RETRIES,
+    HTTP_TIMEOUT,
 )
+
+from core.context import ExecutionContext
+from core.logger import debug
 
 from modules.javascript.constants import (
     FILES_DIR,
@@ -27,57 +37,17 @@ from modules.javascript.constants import (
 # ==========================================================
 
 RETRY_STATUS_CODES = {
-
     500,
-
     502,
-
     503,
-
     504,
-
 }
-
-
-# ==========================================================
-# Create Session
-# ==========================================================
-
-def create_session() -> requests.Session:
-    """
-    Create reusable HTTP session.
-
-    Returns:
-        requests.Session
-    """
-
-    session = requests.Session()
-
-    session.headers.update(
-
-        {
-
-            "User-Agent": HTTP_USER_AGENT,
-
-        }
-
-    )
-
-    session.verify = HTTP_VERIFY_SSL
-
-    return session
-
-
-# ==========================================================
-# Global Session
-# ==========================================================
-
-SESSION = create_session()
 
 
 # ==========================================================
 # Create Output Directory
 # ==========================================================
+
 
 def create_output_directory() -> Path:
     """
@@ -88,11 +58,8 @@ def create_output_directory() -> Path:
     """
 
     FILES_DIR.mkdir(
-
         parents=True,
-
         exist_ok=True,
-
     )
 
     return FILES_DIR
@@ -102,46 +69,33 @@ def create_output_directory() -> Path:
 # URL Validation
 # ==========================================================
 
+
 def is_valid_url(
     url: str,
 ) -> bool:
     """
     Validate JavaScript URL.
-
-    Returns:
-        bool
     """
 
     if not url:
-
         return False
 
     try:
-
         parsed = urlparse(
-            url
+            url,
         )
 
     except ValueError:
-
         return False
 
     return (
-
         parsed.scheme in {
-
             "http",
-
             "https",
-
         }
-
-        and
-
-        bool(
-            parsed.netloc
+        and bool(
+            parsed.netloc,
         )
-
     )
 
 
@@ -149,63 +103,42 @@ def is_valid_url(
 # Safe Filename
 # ==========================================================
 
+
 def safe_filename(
     url: str,
 ) -> str:
     """
     Convert JavaScript URL into
     a filesystem-safe filename.
-
-    Returns:
-        str
     """
 
     filename = (
-
-        url
-
-        .replace(
+        url.replace(
             "https://",
             "",
         )
-
         .replace(
             "http://",
             "",
         )
-
     )
 
     for character in (
-
         "/",
-
         "\\",
-
         "?",
-
         "&",
-
         "=",
-
         ":",
-
     ):
-
         filename = filename.replace(
-
             character,
-
             "_",
-
         )
 
     if not filename.endswith(
-
-        ".js"
-
+        ".js",
     ):
-
         filename += ".js"
 
     return filename
@@ -215,69 +148,33 @@ def safe_filename(
 # Save JavaScript
 # ==========================================================
 
+
 def save_javascript(
     filename: str,
     content: str,
 ) -> Path:
     """
     Save JavaScript file.
-
-    Returns:
-        Path
     """
 
     filepath = (
-
         create_output_directory()
-
         / filename
-
     )
 
     filepath.write_text(
-
         content,
-
         encoding="utf-8",
-
         errors="ignore",
-
     )
 
     return filepath
-
-from requests.exceptions import (
-
-    ConnectionError,
-
-    ConnectTimeout,
-
-    HTTPError,
-
-    ReadTimeout,
-
-    Timeout,
-
-)
-
-from config.config import (
-
-    HTTP_RETRIES,
-
-    HTTP_TIMEOUT,
-
-)
-
-from core.logger import (
-
-    debug,
-
-)
 
 
 # ==========================================================
 # Retry Policy
 # ==========================================================
+
 
 def should_retry(
     error: Exception,
@@ -285,61 +182,33 @@ def should_retry(
     """
     Decide whether a request
     should be retried.
-
-    Returns:
-        bool
     """
 
     if isinstance(
-
         error,
-
         (
-
             Timeout,
-
             ConnectTimeout,
-
             ReadTimeout,
-
             ConnectionError,
-
         ),
-
     ):
-
         return True
 
     if isinstance(
-
         error,
-
         HTTPError,
-
     ):
-
         response = getattr(
-
             error,
-
             "response",
-
             None,
-
         )
 
         return (
-
             response is not None
-
-            and
-
-            response.status_code
-
-            in
-
-            RETRY_STATUS_CODES
-
+            and response.status_code
+            in RETRY_STATUS_CODES
         )
 
     return False
@@ -349,24 +218,26 @@ def should_retry(
 # Make Request
 # ==========================================================
 
+
 def make_request(
+    context: ExecutionContext,
     url: str,
 ) -> requests.Response:
     """
     Send HTTP GET request.
-
-    Returns:
-        requests.Response
     """
 
-    response = SESSION.get(
+    session = context.get_http_session()
 
+    if session is None:
+        raise RuntimeError(
+            "Shared HTTP session is not initialized."
+        )
+
+    response = session.get(
         url,
-
         timeout=HTTP_TIMEOUT,
-
         allow_redirects=True,
-
     )
 
     response.raise_for_status()
@@ -378,17 +249,18 @@ def make_request(
 # Download File
 # ==========================================================
 
+
 def download_file(
+    context: ExecutionContext,
     url: str,
 ) -> requests.Response | None:
     """
     Download a JavaScript file.
-
-    Returns:
-        requests.Response | None
     """
 
-    if not is_valid_url(url):
+    if not is_valid_url(
+        url,
+    ):
 
         debug(
             f"Invalid URL skipped: {url}"
@@ -398,12 +270,15 @@ def download_file(
 
     attempts = HTTP_RETRIES + 1
 
-    for attempt in range(attempts):
+    for attempt in range(
+        attempts,
+    ):
 
         try:
 
             return make_request(
-                url
+                context,
+                url,
             )
 
         except requests.exceptions.SSLError as error:
@@ -424,96 +299,52 @@ def download_file(
 
         except requests.RequestException as error:
 
-            if not should_retry(error):
+            if not should_retry(
+                error,
+            ):
 
                 if (
-
                     isinstance(
-
                         error,
-
                         HTTPError,
-
                     )
-
-                    and
-
-                    error.response is not None
-
+                    and error.response is not None
                 ):
 
                     debug(
-
-                        f"HTTP "
-
-                        f"{error.response.status_code}: "
-
-                        f"{url}"
-
+                        f"HTTP {error.response.status_code}: {url}"
                     )
 
                 else:
 
                     debug(
-
-                        f"Not retrying: "
-
-                        f"{url} ({error})"
-
+                        f"Not retrying: {url} ({error})"
                     )
 
                 return None
 
             if (
-
                 isinstance(
-
                     error,
-
                     HTTPError,
-
                 )
-
-                and
-
-                error.response is not None
-
+                and error.response is not None
             ):
 
                 debug(
-
-                    f"Retry "
-
-                    f"({attempt + 1}/{attempts}) "
-
-                    f"HTTP "
-
-                    f"{error.response.status_code}: "
-
-                    f"{url}"
-
+                    f"Retry ({attempt + 1}/{attempts}) "
+                    f"HTTP {error.response.status_code}: {url}"
                 )
 
             else:
 
                 debug(
-
-                    f"Retry "
-
-                    f"({attempt + 1}/{attempts}): "
-
+                    f"Retry ({attempt + 1}/{attempts}): "
                     f"{url} ({error})"
-
                 )
 
     debug(
-
-        f"Failed after "
-
-        f"{attempts} attempts: "
-
-        f"{url}"
-
+        f"Failed after {attempts} attempts: {url}"
     )
 
     return None
@@ -524,25 +355,12 @@ def download_file(
 # ==========================================================
 
 __all__ = [
-
-    "SESSION",
-
     "RETRY_STATUS_CODES",
-
-    "create_session",
-
     "create_output_directory",
-
     "is_valid_url",
-
     "safe_filename",
-
     "save_javascript",
-
     "should_retry",
-
     "make_request",
-
     "download_file",
-
 ]

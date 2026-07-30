@@ -25,32 +25,19 @@ def generate_statistics(
         Aggregated JavaScript statistics.
     """
 
-    processed_files = len(
-        results
-    )
+    processed_files = len(results)
 
     total_urls = 0
-
     total_comments = 0
-
     total_strings = 0
-
     total_source_maps = 0
-
     total_endpoints = 0
-
     total_interesting_files = 0
-
     total_interesting_directories = 0
-
     total_secret_types = 0
-
     total_secrets = 0
 
-    urls_per_file: dict[
-        str,
-        int,
-    ] = {}
+    urls_per_file: dict[str, int] = {}
 
     for (
         javascript,
@@ -157,18 +144,14 @@ def generate_statistics(
             )
         )
 
-    average_urls_per_file = 0.0
-
-    if processed_files:
-
-        average_urls_per_file = round(
-
-            total_urls
-            / processed_files,
-
+    average_urls_per_file = (
+        round(
+            total_urls / processed_files,
             2,
-
         )
+        if processed_files
+        else 0.0
+    )
 
     return {
 
@@ -176,9 +159,7 @@ def generate_statistics(
 
         "urls": total_urls,
 
-        "average_urls_per_file": (
-            average_urls_per_file
-        ),
+        "average_urls_per_file": average_urls_per_file,
 
         "comments": total_comments,
 
@@ -188,25 +169,17 @@ def generate_statistics(
 
         "endpoints": total_endpoints,
 
-        "interesting_files": (
-            total_interesting_files
-        ),
+        "interesting_files": total_interesting_files,
 
         "interesting_directories": (
             total_interesting_directories
         ),
 
-        "secret_types": (
-            total_secret_types
-        ),
+        "secret_types": total_secret_types,
 
-        "total_secrets": (
-            total_secrets
-        ),
+        "total_secrets": total_secrets,
 
-        "urls_per_file": (
-            urls_per_file
-        ),
+        "urls_per_file": urls_per_file,
 
     }
 

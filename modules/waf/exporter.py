@@ -417,8 +417,6 @@ def export_summary(
 
         f"Highest Score          : {statistics['highest_score']}",
 
-        f"Scan Time              : {statistics['elapsed']:.2f} sec",
-
         "",
 
         "Detected Vendors",
@@ -587,13 +585,6 @@ def show_summary(
         print(
             "None"
         )
-
-    print("-" * 80)
-
-    print(
-        f"{'Scan Time':<30}"
-        f"{statistics['elapsed']:.2f} sec"
-    )
 
     print("=" * 80)
 

@@ -1,7 +1,8 @@
 """
 HTTP Probe Analyzer
 
-Analyze HTTP probe results and generate a summary.
+Analyze HTTP probe results
+and generate a summary.
 """
 
 from __future__ import annotations
@@ -17,10 +18,10 @@ from modules.http.statistics import (
 # Analyze HTTP Results
 # ==========================================================
 
+
 def analyze(
     results: dict[str, dict[str, Any]],
     failed_hosts: list[str],
-    elapsed: float,
 ) -> dict[str, Any]:
     """
     Analyze HTTP probe results.
@@ -32,9 +33,6 @@ def analyze(
         failed_hosts:
             Hosts that failed to respond.
 
-        elapsed:
-            Total probe time.
-
     Returns:
         HTTP analysis.
     """
@@ -44,9 +42,12 @@ def analyze(
             results=results,
             failed_hosts=failed_hosts,
         ),
-        "elapsed": elapsed,
-        "alive": sorted(results),
-        "dead": sorted(failed_hosts),
+        "alive": sorted(
+            results,
+        ),
+        "dead": sorted(
+            failed_hosts,
+        ),
     }
 
     return {

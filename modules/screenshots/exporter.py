@@ -364,8 +364,6 @@ def export_summary(
 
         f"Average Size        : {statistics.get('average_size',0)} bytes",
 
-        f"Scan Time           : {statistics.get('elapsed',0)} sec",
-
         "",
 
     ]
@@ -490,15 +488,6 @@ def show_summary(
         f"{'Success Rate':<30}"
 
         f"{statistics.get('success_rate',0)}%"
-
-    )
-
-
-    print(
-
-        f"{'Scan Time':<30}"
-
-        f"{statistics.get('elapsed',0)} sec"
 
     )
 

@@ -17,9 +17,9 @@ from modules.crawler.statistics import (
 # Analyze Crawler Results
 # ==========================================================
 
+
 def analyze(
     results: dict[str, dict[str, Any]],
-    elapsed: float,
 ) -> dict[str, Any]:
     """
     Analyze crawler results.
@@ -28,25 +28,15 @@ def analyze(
         results:
             Crawled results grouped by host.
 
-        elapsed:
-            Total crawl time.
-
     Returns:
         Crawler analysis.
     """
 
-    statistics = generate_statistics(
-        results=results,
-    )
-
-    statistics["elapsed"] = elapsed
-
     return {
-
         "results": results,
-
-        "statistics": statistics,
-
+        "statistics": generate_statistics(
+            results=results,
+        ),
     }
 
 

@@ -6,6 +6,8 @@ Module Executor
 
 from __future__ import annotations
 
+import inspect
+
 from typing import Any
 
 from core.analysis import empty_analysis
@@ -18,16 +20,24 @@ from core.resolvers import resolve_inputs
 Analysis = dict[str, Any]
 
 
+# ==========================================================
+# Resolve Arguments
+# ==========================================================
+
 def _resolve_args(
     context: ExecutionContext,
     module: str,
     args: tuple[Any, ...],
 ) -> tuple[Any, ...]:
     """
-    Resolve module arguments.
+    Resolve module input arguments.
+
+    Explicit arguments always take precedence over
+    automatically resolved dependencies.
     """
 
-    if len(args) != 0:
+    if args:
+
         return args
 
     return resolve_inputs(
@@ -36,21 +46,27 @@ def _resolve_args(
     )
 
 
+# ==========================================================
+# Validate Analysis
+# ==========================================================
+
 def _validate_analysis(
     module: str,
     analysis: Any,
 ) -> Analysis:
     """
-    Validate module analysis.
+    Ensure every module returns a valid analysis.
     """
 
     if analysis is None:
+
         return empty_analysis()
 
     if not isinstance(
         analysis,
         dict,
     ):
+
         warning(
             f"{module} returned invalid analysis."
         )
@@ -60,6 +76,71 @@ def _validate_analysis(
     return analysis
 
 
+# ==========================================================
+# Execute Runner
+# ==========================================================
+
+def _execute_runner(
+    context: ExecutionContext,
+    runner: Any,
+    args: tuple[Any, ...],
+    kwargs: dict[str, Any],
+) -> Any:
+    """
+    Execute a module runner.
+
+    If the runner accepts an ExecutionContext,
+    inject the shared context automatically.
+
+    Supports both:
+
+        run(context, ...)
+        run(...)
+
+    and keyword-only:
+
+        run(*, context=...)
+    """
+
+    signature = inspect.signature(
+        runner,
+    )
+
+    parameters = signature.parameters
+
+    context_parameter = parameters.get(
+        "context",
+    )
+
+    if context_parameter is None:
+
+        return runner(
+            *args,
+            **kwargs,
+        )
+
+    if (
+        context_parameter.kind
+        is inspect.Parameter.KEYWORD_ONLY
+    ):
+
+        return runner(
+            *args,
+            context=context,
+            **kwargs,
+        )
+
+    return runner(
+        context,
+        *args,
+        **kwargs,
+    )
+
+
+# ==========================================================
+# Execute Module
+# ==========================================================
+
 def execute_module(
     context: ExecutionContext,
     module: str,
@@ -67,7 +148,19 @@ def execute_module(
     **kwargs: Any,
 ) -> Analysis:
     """
-    Execute a module and store its analysis.
+    Execute a framework module.
+
+    Workflow
+
+        Resolve Inputs
+            ↓
+        Execute Runner
+            ↓
+        Validate Analysis
+            ↓
+        Store Analysis
+            ↓
+        Return Analysis
     """
 
     runner = get_runner(
@@ -82,15 +175,17 @@ def execute_module(
 
     try:
 
-        analysis = runner(
-            *resolved_args,
-            **kwargs,
+        analysis = _execute_runner(
+            context=context,
+            runner=runner,
+            args=resolved_args,
+            kwargs=kwargs,
         )
 
-    except Exception as error:
+    except Exception as exception:
 
         warning(
-            f"{module} failed: {error}"
+            f"{module} failed: {exception}"
         )
 
         analysis = empty_analysis()
@@ -106,3 +201,12 @@ def execute_module(
     )
 
     return analysis
+
+
+# ==========================================================
+# Public Exports
+# ==========================================================
+
+__all__ = [
+    "execute_module",
+]

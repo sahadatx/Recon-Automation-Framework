@@ -18,9 +18,9 @@ from modules.screenshots.statistics import (
 # Analyze Screenshot Results
 # ==========================================================
 
+
 def analyze(
     results: list[dict[str, Any]],
-    elapsed: float,
 ) -> dict[str, Any]:
     """
     Analyze screenshot results.
@@ -29,32 +29,22 @@ def analyze(
         results:
             Screenshot capture results.
 
-        elapsed:
-            Total screenshot scan time.
-
     Returns:
         Screenshot analysis.
     """
 
-    statistics = {
-        **generate_statistics(
+    return {
+        "results": results,
+        "statistics": generate_statistics(
             results,
         ),
-        "elapsed": elapsed,
-    }
-
-    return {
-
-        "results": results,
-
-        "statistics": statistics,
-
     }
 
 
 # ==========================================================
 # Filter Successful Screenshots
 # ==========================================================
+
 
 def get_successful_screenshots(
     analysis: dict[str, Any],
@@ -91,6 +81,7 @@ def get_successful_screenshots(
 # Filter Failed Screenshots
 # ==========================================================
 
+
 def get_failed_screenshots(
     analysis: dict[str, Any],
 ) -> list[dict[str, Any]]:
@@ -125,6 +116,7 @@ def get_failed_screenshots(
 # ==========================================================
 # Build Dashboard Data
 # ==========================================================
+
 
 def dashboard_data(
     analysis: dict[str, Any],
@@ -173,11 +165,6 @@ def dashboard_data(
 
         "performance": {
 
-            "scan_time": statistics.get(
-                "elapsed",
-                0,
-            ),
-
             "average_time": statistics.get(
                 "average_time",
                 0,
@@ -203,13 +190,8 @@ def dashboard_data(
 # ==========================================================
 
 __all__ = [
-
     "analyze",
-
     "get_successful_screenshots",
-
     "get_failed_screenshots",
-
     "dashboard_data",
-
 ]

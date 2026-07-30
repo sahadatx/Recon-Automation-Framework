@@ -4,19 +4,37 @@ Assetfinder Module
 Passive subdomain enumeration using Assetfinder.
 """
 
-from modules.passive.helpers import execute_source
+from __future__ import annotations
+
+from core.context import (
+    ExecutionContext,
+)
+
+from modules.passive.helpers import (
+    execute_source,
+)
 
 
-def run_assetfinder(domain: str) -> list[str]:
+def run_assetfinder(
+    context: ExecutionContext,
+    domain: str,
+) -> list[str]:
     """
     Run Assetfinder.
 
     Args:
-        domain: Target domain.
+        context:
+            Shared execution context.
+
+        domain:
+            Target domain.
 
     Returns:
         List of discovered subdomains.
     """
+
+    # Reserved for future use.
+    _ = context
 
     command = [
         "assetfinder",
@@ -29,3 +47,8 @@ def run_assetfinder(domain: str) -> list[str]:
         command=command,
         domain=domain,
     )
+
+
+__all__ = [
+    "run_assetfinder",
+]

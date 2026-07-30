@@ -8,6 +8,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from core.context import ExecutionContext
+
 from .exporter import (
     export_all,
     show_summary,
@@ -28,10 +30,25 @@ from .statistics import (
 
 
 def execute(
+    context: ExecutionContext,
     analyses: dict[str, Any],
 ) -> dict[str, Any]:
     """
     Generate and export the final report.
+
+    Workflow
+
+        Generate Report
+              ↓
+        Generate Statistics
+              ↓
+        Export
+              ↓
+        Show Summary
+              ↓
+        Store Analysis
+              ↓
+        Return Report
     """
 
     # ------------------------------------------------------
@@ -69,6 +86,15 @@ def execute(
         statistics,
     )
 
+    # ------------------------------------------------------
+    # Store Analysis
+    # ------------------------------------------------------
+
+    context.set_analysis(
+        "report",
+        report,
+    )
+
     return report
 
 
@@ -76,7 +102,9 @@ def execute(
 # Public Entry Point
 # ==========================================================
 
+
 def run(
+    context: ExecutionContext,
     analyses: dict[str, Any],
 ) -> dict[str, Any]:
     """
@@ -84,6 +112,7 @@ def run(
     """
 
     return execute(
+        context,
         analyses,
     )
 

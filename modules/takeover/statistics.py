@@ -145,7 +145,6 @@ def confidence_statistics(
 
 def generate_statistics(
     results,
-    elapsed=0.0,
 ) -> dict:
     """
     Generate takeover
@@ -270,14 +269,6 @@ def generate_statistics(
 
         ),
 
-        "elapsed": round(
-
-            elapsed,
-
-            2,
-
-        ),
-
     }
 
 
@@ -340,14 +331,6 @@ def print_summary(
         f"Highest Confidence    : "
 
         f"{statistics['highest_confidence']}"
-
-    )
-
-    print(
-
-        f"Elapsed Time          : "
-
-        f"{statistics['elapsed']} sec"
 
     )
 

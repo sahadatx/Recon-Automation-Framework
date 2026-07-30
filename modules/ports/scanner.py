@@ -4,105 +4,95 @@ Port Scanner
 Core scanning functions.
 """
 
-from concurrent.futures import (
-    ThreadPoolExecutor,
-    as_completed,
-)
+from __future__ import annotations
 
-from config.config import (
-    PORT_SCAN_WORKERS,
-)
+from concurrent.futures import as_completed
+from typing import Any
+
+from core.context import ExecutionContext
 
 from modules.ports.common_ports import (
     COMMON_PORTS,
 )
-
 from modules.ports.helpers import (
     scan_port,
     show_scan,
 )
 
 # Future
-# from modules.ports.banner import (
-#     grab_banner,
-# )
+# from modules.ports.banner import grab_banner
 
 
 # ==========================================================
-# Scan One Host
+# Scan Host
 # ==========================================================
+
 
 def scan_host(
+    context: ExecutionContext,
     host: str,
     ports: list[int],
-):
+) -> list[dict[str, Any]]:
     """
     Scan selected TCP ports for one host.
 
-    Args:
-        host: Target hostname.
-        ports: List of TCP ports.
-
     Returns:
-        list[dict]
+        List of open ports.
     """
 
-    open_ports = []
+    executor = context.get_thread_pool()
 
-    with ThreadPoolExecutor(
-        max_workers=min(
-            PORT_SCAN_WORKERS,
-            len(ports),
+    if executor is None:
+        raise RuntimeError(
+            "Shared thread pool is not initialized."
         )
-    ) as executor:
 
-        futures = {
+    open_ports: list[dict[str, Any]] = []
 
-            executor.submit(
-                scan_port,
-                host,
-                port,
-            ): port
+    futures = {
+        executor.submit(
+            scan_port,
+            host,
+            port,
+        ): port
+        for port in ports
+    }
 
-            for port in ports
+    for future in as_completed(
+        futures,
+    ):
 
-        }
+        port = futures[
+            future
+        ]
 
-        for future in as_completed(
-            futures
-        ):
+        show_scan(
+            host,
+            port,
+        )
 
-            port = futures[
-                future
-            ]
+        try:
 
-            try:
+            result = future.result()
 
-                show_scan(
-                    host,
-                    port,
-                )
+        except Exception:
+            continue
 
-                result = future.result()
+        if result is None:
+            continue
 
-                if not result:
-                    continue
+        # ==================================================
+        # Future Banner Grabbing
+        # ==================================================
 
-                # ==========================================
-                # Future Banner Grabbing
-                # ==========================================
+        # result["banner"] = grab_banner(
+        #     host,
+        #     port,
+        # )
 
-                # result["banner"] = grab_banner(
-                #     host,
-                #     port,
-                # )
-
-                open_ports.append(
-                    result
-                )
-
-            except Exception:
-                continue
+        open_ports.append(
+            result,
+        )
 
     return sorted(
         open_ports,
@@ -114,17 +104,17 @@ def scan_host(
 # Scan Common Ports
 # ==========================================================
 
+
 def scan_common_ports(
+    context: ExecutionContext,
     host: str,
-):
+) -> list[dict[str, Any]]:
     """
     Scan predefined common TCP ports.
-
-    Returns:
-        list[dict]
     """
 
     return scan_host(
+        context,
         host,
         COMMON_PORTS,
     )
@@ -134,22 +124,33 @@ def scan_common_ports(
 # Scan Custom Ports
 # ==========================================================
 
+
 def scan_custom_ports(
+    context: ExecutionContext,
     host: str,
     ports: list[int],
-):
+) -> list[dict[str, Any]]:
     """
     Scan custom TCP ports.
-
-    Returns:
-        list[dict]
     """
 
-    ports = sorted(
-        set(ports)
+    return scan_host(
+        context,
+        host,
+        sorted(
+            set(
+                ports,
+            ),
+        ),
     )
 
-    return scan_host(
-        host,
-        ports,
-    )
+
+# ==========================================================
+# Public Exports
+# ==========================================================
+
+__all__ = [
+    "scan_host",
+    "scan_common_ports",
+    "scan_custom_ports",
+]

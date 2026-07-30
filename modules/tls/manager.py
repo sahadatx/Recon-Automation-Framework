@@ -7,53 +7,61 @@ TLS Analysis pipeline.
 
 from __future__ import annotations
 
-from time import perf_counter
 from typing import Any
+
+from core.context import ExecutionContext
 
 from core.logger import (
     info,
     success,
 )
 
-from .certificate import collect_certificate
-from .protocols import collect_protocols
-from .ciphers import collect_cipher
-
 from .analyzer import (
     analyze,
     analyze_host,
 )
-
-from .filters import (
-    filter_results,
-)
+from .certificate import collect_certificate
+from .ciphers import collect_cipher
+from .filters import filter_results
+from .protocols import collect_protocols
 
 
 # ==========================================================
 # Run TLS Analysis
 # ==========================================================
 
+
 def run_tls_analysis(
+    context: ExecutionContext,
     targets: list[str],
 ) -> dict[str, Any]:
     """
-    Run complete TLS Analysis.
+    Run the complete TLS Analysis pipeline.
+
+    Returns:
+        TLS analysis.
     """
 
     if not targets:
 
-        return analyze(
+        analysis = analyze(
             results=[],
-            elapsed=0,
         )
+
+        context.set_analysis(
+            "tls",
+            analysis,
+        )
+
+        return analysis
 
     info(
         "Starting TLS Analysis..."
     )
 
-    start = perf_counter()
-
-    results: list[dict[str, Any]] = []
+    results: list[
+        dict[str, Any]
+    ] = []
 
     for target in targets:
 
@@ -87,14 +95,13 @@ def run_tls_analysis(
         results,
     )
 
-    elapsed = (
-        perf_counter()
-        - start
-    )
-
     analysis = analyze(
         results=results,
-        elapsed=elapsed,
+    )
+
+    context.set_analysis(
+        "tls",
+        analysis,
     )
 
     statistics = analysis[
@@ -141,10 +148,6 @@ def run_tls_analysis(
         f"Forward Secrecy     : {statistics['forward_secrecy']}"
     )
 
-    success(
-        f"Elapsed             : {statistics['elapsed']:.2f} sec"
-    )
-
     return analysis
 
 
@@ -152,7 +155,9 @@ def run_tls_analysis(
 # Public Entry Point
 # ==========================================================
 
+
 def run(
+    context: ExecutionContext,
     targets: list[str],
 ) -> dict[str, Any]:
     """
@@ -160,6 +165,7 @@ def run(
     """
 
     return run_tls_analysis(
+        context,
         targets,
     )
 

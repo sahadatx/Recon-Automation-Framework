@@ -8,26 +8,21 @@ Detection pipeline.
 
 from __future__ import annotations
 
-from time import perf_counter
+from concurrent.futures import (
+    as_completed,
+)
+
 from typing import Any
+
+from core.context import (
+    ExecutionContext,
+)
 
 from core.logger import (
     info,
+    progress_status,
     success,
-)
-
-from .helpers import (
-    normalize_target,
-    request_page,
-    extract_status_code,
-    extract_body,
-    extract_title,
-    resolve_cname,
-    resolve_ipv4,
-)
-
-from .target_analyzer import (
-    analyze_target,
+    warning,
 )
 
 from .analyzer import (
@@ -38,113 +33,213 @@ from .filters import (
     filter_results,
 )
 
+from .helpers import (
+    extract_body,
+    extract_status_code,
+    extract_title,
+    normalize_target,
+    request_page,
+    resolve_cname,
+    resolve_ipv4,
+)
+
+from .target_analyzer import (
+    analyze_target,
+)
+
+
+# ==========================================================
+# Process Target
+# ==========================================================
+
+
+def process_target(
+    target: str,
+) -> tuple[
+    str,
+    dict[str, Any] | None,
+]:
+    """
+    Analyze one target.
+    """
+
+    host = normalize_target(
+        target,
+    )
+
+    if not host:
+
+        return (
+            target,
+            None,
+        )
+
+    response = request_page(
+        target,
+    )
+
+    status_code = extract_status_code(
+        response,
+    )
+
+    body = extract_body(
+        response,
+    )
+
+    http_title = extract_title(
+        response,
+    )
+
+    cname = resolve_cname(
+        host,
+    )
+
+    ip = resolve_ipv4(
+        host,
+    )
+
+    result = analyze_target(
+        target=host,
+        body=body,
+        status_code=status_code,
+        cname=cname,
+        ip=ip,
+        http_title=http_title,
+    )
+
+    return (
+        host,
+        result,
+    )
+
 
 # ==========================================================
 # Run Takeover Detection
 # ==========================================================
 
+
 def run_takeover_detection(
+    context: ExecutionContext,
     targets: list[str],
 ) -> dict[str, Any]:
     """
-    Run complete
+    Run the complete
     Subdomain Takeover
     Detection pipeline.
     """
 
     if not targets:
 
-        return analyze(
+        analysis = analyze(
             results=[],
-            elapsed=0,
         )
+
+        context.set_analysis(
+            "takeover",
+            analysis,
+        )
+
+        return analysis
 
     info(
         "Starting Subdomain Takeover Detection..."
     )
 
-    start = perf_counter()
+    executor = context.get_thread_pool()
 
-    results: list[dict[str, Any]] = []
+    if executor is None:
 
-    for target in targets:
-
-        info(
-            f"Analyzing {target}..."
+        raise RuntimeError(
+            "Shared thread pool is not initialized."
         )
 
-        host = normalize_target(
+    targets = sorted(
+        set(
+            targets,
+        )
+    )
+
+    completed = 0
+
+    total = len(
+        targets,
+    )
+
+    results: list[
+        dict[str, Any]
+    ] = []
+
+    futures = {
+
+        executor.submit(
+            process_target,
             target,
-        )
+        ): target
 
-        if not host:
-            continue
+        for target in targets
 
-        # --------------------------------------------------
-        # HTTP
-        # --------------------------------------------------
+    }
 
-        response = request_page(
-            target,
-        )
+    for future in as_completed(
+        futures,
+    ):
 
-        status_code = extract_status_code(
-            response,
-        )
+        target = futures[
+            future
+        ]
 
-        body = extract_body(
-            response,
-        )
+        completed += 1
 
-        http_title = extract_title(
-            response,
-        )
+        try:
 
-        # --------------------------------------------------
-        # DNS
-        # --------------------------------------------------
+            (
+                _,
+                result,
+            ) = future.result()
 
-        cname = resolve_cname(
-            host,
-        )
+            if result is None:
 
-        ip = resolve_ipv4(
-            host,
-        )
+                progress_status(
+                    completed,
+                    total,
+                    f"✗ {target}",
+                )
 
-        # --------------------------------------------------
-        # Analyze Target
-        # --------------------------------------------------
+                continue
 
-        result = analyze_target(
-            target=host,
-            body=body,
-            status_code=status_code,
-            cname=cname,
-            ip=ip,
-            http_title=http_title,
-        )
+            results.append(
+                result,
+            )
 
-        results.append(
-            result,
-        )
+            progress_status(
+                completed,
+                total,
+                f"✓ {target}",
+            )
 
-    # ------------------------------------------------------
-    # Filter Results
-    # ------------------------------------------------------
+        except Exception as error:
+
+            warning(
+                f"{target}: {error}"
+            )
+
+            progress_status(
+                completed,
+                total,
+                f"✗ {target}",
+            )
 
     results = filter_results(
         results,
     )
 
-    elapsed = (
-        perf_counter()
-        - start
-    )
-
     analysis = analyze(
         results=results,
-        elapsed=elapsed,
+    )
+
+    context.set_analysis(
+        "takeover",
+        analysis,
     )
 
     statistics = analysis[
@@ -171,26 +266,25 @@ def run_takeover_detection(
         f"Highest Confidence  : {statistics['highest_confidence']}"
     )
 
-    success(
-        f"Elapsed             : {statistics['elapsed']:.2f} sec"
-    )
-
     return analysis
-
 
 
 # ==========================================================
 # Public Entry Point
 # ==========================================================
 
+
 def run(
+    context: ExecutionContext,
     targets: list[str],
 ) -> dict[str, Any]:
     """
-    Public entry point for the Takeover module.
+    Public entry point for the
+    Takeover module.
     """
 
     return run_takeover_detection(
+        context,
         targets,
     )
 
