@@ -7,6 +7,8 @@ SecurityTrails API.
 
 from __future__ import annotations
 
+import requests
+
 from core.context import ExecutionContext
 
 from config.config import (
@@ -42,10 +44,13 @@ def run_securitytrails(
             Target domain.
 
     Returns:
-        List of discovered subdomains.
+        Normalized list of discovered
+        subdomains.
     """
 
-    info("Running SecurityTrails...")
+    info(
+        "Running SecurityTrails..."
+    )
 
     if not SECURITYTRAILS_API_KEY:
 
@@ -80,58 +85,122 @@ def run_securitytrails(
             timeout=30,
         )
 
-        response.raise_for_status()
+    except (
+        requests.Timeout,
+        requests.ConnectionError,
+    ):
 
-        data = response.json()
+        warning(
+            "SecurityTrails connection failed. "
+            "Retrying..."
+        )
 
-    except Exception as exc:
+        raise
 
-        if exc.__class__.__name__ == "Timeout":
+    except requests.RequestException as exc:
 
-            error(
-                "SecurityTrails request timed out."
-            )
+        error(
+            f"SecurityTrails request failed: {exc}"
+        )
 
-        elif exc.__class__.__name__ == "JSONDecodeError":
+        return []
 
-            error(
-                "Invalid JSON response from SecurityTrails."
+    if response.status_code == 401:
+
+        error(
+            "Invalid SecurityTrails API key."
+        )
+
+        return []
+
+    if response.status_code == 403:
+
+        error(
+            "SecurityTrails access denied."
+        )
+
+        return []
+
+    if response.status_code == 404:
+
+        warning(
+            f"No SecurityTrails data for "
+            f"{domain}."
+        )
+
+        return []
+
+    if response.status_code == 429:
+
+        retry_after = response.headers.get(
+            "Retry-After"
+        )
+
+        if retry_after:
+
+            warning(
+                "SecurityTrails rate limit "
+                f"exceeded. Retry after "
+                f"{retry_after} seconds."
             )
 
         else:
 
-            error(
-                f"SecurityTrails request failed: {exc}"
+            warning(
+                "SecurityTrails rate limit "
+                "exceeded."
             )
 
         return []
 
-    subdomains: list[str] = []
+    if response.status_code >= 500:
 
-    for sub in data.get(
-        "subdomains",
-        [],
-    ):
-
-        subdomains.append(
-            f"{sub}.{domain}"
+        warning(
+            f"SecurityTrails server error "
+            f"({response.status_code}). "
+            "Retrying..."
         )
 
+        raise requests.HTTPError(
+            f"HTTP {response.status_code}"
+        )
+
+    try:
+
+        data = response.json()
+
+    except ValueError:
+
+        error(
+            "Invalid JSON response from "
+            "SecurityTrails."
+        )
+
+        return []
+
     subdomains = normalize_subdomains(
-        subdomains=subdomains,
-        domain=domain,
+        [
+            f"{sub}.{domain}"
+            for sub in data.get(
+                "subdomains",
+                [],
+            )
+        ],
+        domain,
     )
 
     if subdomains:
 
         success(
-            f"SecurityTrails found {len(subdomains)} subdomains."
+            f"SecurityTrails found "
+            f"{len(subdomains)} subdomains."
         )
 
     else:
 
         warning(
-            "SecurityTrails returned no results."
+            "SecurityTrails returned "
+            "no results."
         )
 
     return subdomains
