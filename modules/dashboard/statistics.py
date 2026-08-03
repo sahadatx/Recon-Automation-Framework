@@ -48,8 +48,26 @@ def generate_statistics(
     if not report:
         return empty_statistics()
 
-    modules = report.get(
+    # ======================================================
+    # Report Structure
+    #
+    # report
+    #   └── modules
+    #         ├── analysis
+    #         ├── statistics
+    #         └── performance
+    #
+    # Dashboard statistics are generated from the
+    # analysis section only.
+    # ======================================================
+
+    report_modules = report.get(
         "modules",
+        {},
+    )
+
+    modules = report_modules.get(
+        "analysis",
         {},
     )
 
@@ -73,7 +91,7 @@ def generate_statistics(
             module,
             dict,
         )
-        and module
+        and bool(module)
     )
 
     failed_modules = sum(
@@ -86,6 +104,7 @@ def generate_statistics(
             )
             and module.get(
                 "failed",
+                False,
             )
         )
     )
@@ -102,16 +121,23 @@ def generate_statistics(
 
         results = module.get(
             "results",
-            [],
         )
 
         if isinstance(
+            results,
+            dict,
+        ):
+
+            findings += len(
+                results,
+            )
+
+        elif isinstance(
             results,
             (
                 list,
                 tuple,
                 set,
-                dict,
             ),
         ):
 
@@ -119,7 +145,7 @@ def generate_statistics(
                 results,
             )
 
-        elif results:
+        elif results is not None:
 
             findings += 1
 

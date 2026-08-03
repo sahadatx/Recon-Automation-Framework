@@ -39,8 +39,25 @@ def analyze(
             "statistics": empty_statistics(),
         }
 
-    modules = report.get(
+    # ======================================================
+    # Report Structure
+    #
+    # report
+    #   └── modules
+    #         ├── analysis
+    #         ├── statistics
+    #         └── performance
+    #
+    # Dashboard only uses analysis modules.
+    # ======================================================
+
+    report_modules = report.get(
         "modules",
+        {},
+    )
+
+    modules = report_modules.get(
+        "analysis",
         {},
     )
 
