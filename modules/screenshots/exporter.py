@@ -180,19 +180,19 @@ def export_results(
 
         lines.append("=" * 80)
 
-        lines.append(f"URL        : {result.get('url','-')}")
+        lines.append(f"URL        : {result.get('url', '-')}")
 
-        lines.append(f"Title      : {result.get('title','-')}")
+        lines.append(f"Title      : {result.get('title', '-')}")
 
-        lines.append(f"Captured   : {result.get('captured',False)}")
+        lines.append(f"Captured   : {result.get('captured', False)}")
 
-        lines.append(f"Status     : {result.get('status','-')}")
+        lines.append(f"Status     : {result.get('status', '-')}")
 
-        lines.append(f"Screenshot : {result.get('path','-')}")
+        lines.append(f"Screenshot : {result.get('path', '-')}")
 
-        lines.append(f"Size       : {result.get('filesize',0)} bytes")
+        lines.append(f"Size       : {result.get('filesize', 0)} bytes")
 
-        lines.append(f"Time       : {result.get('elapsed',0)} sec")
+        lines.append(f"Time       : {result.get('elapsed', 0)} sec")
 
         lines.append("")
 
@@ -242,12 +242,12 @@ def export_summary(
         "Screenshot Analysis Summary",
         "=" * 70,
         "",
-        f"Total Targets       : {statistics.get('total_targets',0)}",
-        f"Captured            : {statistics.get('captured',0)}",
-        f"Failed              : {statistics.get('failed',0)}",
-        f"Success Rate        : {statistics.get('success_rate',0)}%",
-        f"Average Time        : {statistics.get('average_time',0)} sec",
-        f"Average Size        : {statistics.get('average_size',0)} bytes",
+        f"Total Targets       : {statistics.get('total_targets', 0)}",
+        f"Captured            : {statistics.get('captured', 0)}",
+        f"Failed              : {statistics.get('failed', 0)}",
+        f"Success Rate        : {statistics.get('success_rate', 0)}%",
+        f"Average Time        : {statistics.get('average_time', 0)} sec",
+        f"Average Size        : {statistics.get('average_size', 0)} bytes",
         "",
     ]
 
@@ -313,13 +313,13 @@ def show_summary(
 
     print("=" * 80)
 
-    print(f"{'Total Targets':<30}" f"{statistics.get('total_targets',0)}")
+    print(f"{'Total Targets':<30}" f"{statistics.get('total_targets', 0)}")
 
-    print(f"{'Captured':<30}" f"{statistics.get('captured',0)}")
+    print(f"{'Captured':<30}" f"{statistics.get('captured', 0)}")
 
-    print(f"{'Failed':<30}" f"{statistics.get('failed',0)}")
+    print(f"{'Failed':<30}" f"{statistics.get('failed', 0)}")
 
-    print(f"{'Success Rate':<30}" f"{statistics.get('success_rate',0)}%")
+    print(f"{'Success Rate':<30}" f"{statistics.get('success_rate', 0)}%")
 
     print("=" * 80)
 

@@ -184,11 +184,11 @@ def export_txt(
     for result in results:
 
         lines.append(
-            f"{result.get('host','-')}"
+            f"{result.get('host', '-')}"
             f"\t"
-            f"{result.get('status','-')}"
+            f"{result.get('status', '-')}"
             f"\t"
-            f"{result.get('url','-')}"
+            f"{result.get('url', '-')}"
         )
 
     return write_text(
@@ -228,11 +228,11 @@ def export_interesting(
     for result in interesting:
 
         lines.append(
-            f"{result.get('host','-')}"
+            f"{result.get('host', '-')}"
             f"\t"
-            f"{result.get('status','-')}"
+            f"{result.get('status', '-')}"
             f"\t"
-            f"{result.get('url','-')}"
+            f"{result.get('url', '-')}"
         )
 
     return write_text(

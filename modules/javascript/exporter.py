@@ -366,9 +366,9 @@ def export_results(
 
         lines.append(f"JavaScript : {javascript}")
 
-        lines.append(f"Saved File : {metadata.get('path','-')}")
+        lines.append(f"Saved File : {metadata.get('path', '-')}")
 
-        lines.append(f"Status     : {metadata.get('status','-')}")
+        lines.append(f"Status     : {metadata.get('status', '-')}")
 
         lines.append("")
 
