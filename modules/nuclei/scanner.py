@@ -7,18 +7,10 @@ multiple targets.
 
 import subprocess
 import tempfile
-
 from pathlib import Path
 
-from config.config import (
-    NUCLEI_THREADS,
-    NUCLEI_TIMEOUT,
-    NUCLEI_RATE_LIMIT,
-)
-
-from modules.nuclei.templates import (
-    get_templates,
-)
+from config.config import NUCLEI_RATE_LIMIT, NUCLEI_THREADS, NUCLEI_TIMEOUT
+from modules.nuclei.templates import get_templates
 
 # ==========================================================
 # Default Configuration

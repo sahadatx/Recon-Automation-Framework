@@ -12,13 +12,8 @@ from typing import Any
 
 from core.context import ExecutionContext
 
-from .generator import (
-    generate_report,
-)
-
-from .statistics import (
-    generate_statistics,
-)
+from .generator import generate_report
+from .statistics import generate_statistics
 
 # ==========================================================
 # Report Manager

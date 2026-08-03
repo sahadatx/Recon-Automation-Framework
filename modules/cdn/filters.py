@@ -10,11 +10,11 @@ from __future__ import annotations
 from copy import deepcopy
 
 from .constants import (
-    HIGH_CONFIDENCE,
-    MEDIUM_CONFIDENCE,
-    LOW_CONFIDENCE,
-    UNKNOWN_CONFIDENCE,
     CDN_PROVIDERS,
+    HIGH_CONFIDENCE,
+    LOW_CONFIDENCE,
+    MEDIUM_CONFIDENCE,
+    UNKNOWN_CONFIDENCE,
 )
 
 # ==========================================================

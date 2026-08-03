@@ -10,19 +10,12 @@ using the shared HTTP session.
 from __future__ import annotations
 
 import time
-
 from typing import Any
 
 import requests
 
-from core.logger import (
-    warning,
-)
-
-from modules.http.helpers import (
-    request_timeout,
-    show_probe,
-)
+from core.logger import warning
+from modules.http.helpers import request_timeout, show_probe
 
 # ==========================================================
 # Probe URL

@@ -9,30 +9,13 @@ and analysis.
 
 from __future__ import annotations
 
-from concurrent.futures import (
-    as_completed,
-)
-
+from concurrent.futures import as_completed
 from typing import Any
 
-from core.context import (
-    ExecutionContext,
-)
-
-from core.logger import (
-    info,
-    progress_status,
-    success,
-    warning,
-)
-
-from modules.ports.analyzer import (
-    analyze,
-)
-
-from modules.ports.scanner import (
-    scan_common_ports,
-)
+from core.context import ExecutionContext
+from core.logger import info, progress_status, success, warning
+from modules.ports.analyzer import analyze
+from modules.ports.scanner import scan_common_ports
 
 # ==========================================================
 # Scan One Host

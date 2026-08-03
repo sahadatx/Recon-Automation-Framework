@@ -8,9 +8,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from config.config import (
-    HTTP_TIMEOUT,
-)
+from config.config import HTTP_TIMEOUT
 
 # ==========================================================
 # Output Directory

@@ -8,10 +8,7 @@ import re
 
 from bs4 import BeautifulSoup
 
-from modules.crawler.helpers import (
-    normalize_url,
-    same_domain,
-)
+from modules.crawler.helpers import normalize_url, same_domain
 
 # ==========================================================
 # Extract Links

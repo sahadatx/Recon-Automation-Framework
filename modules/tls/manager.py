@@ -11,15 +11,9 @@ from __future__ import annotations
 from typing import Any
 
 from core.context import ExecutionContext
-from core.logger import (
-    info,
-    success,
-)
+from core.logger import info, success
 
-from .analyzer import (
-    analyze,
-    analyze_host,
-)
+from .analyzer import analyze, analyze_host
 from .certificate import collect_certificate
 from .ciphers import collect_cipher
 from .filters import filter_results

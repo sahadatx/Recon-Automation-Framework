@@ -7,11 +7,7 @@ Displays the framework banner.
 from rich.console import Console
 from rich.panel import Panel
 
-from config.config import (
-    APP_NAME,
-    VERSION,
-    AUTHOR,
-)
+from config.config import APP_NAME, AUTHOR, VERSION
 
 console = Console()
 

@@ -10,24 +10,18 @@ from __future__ import annotations
 from typing import Any
 
 from .constants import (
-    TAKEOVER_FINGERPRINTS,
     CNAME_FINGERPRINTS,
-    STATUS_CODES,
     HIGH_CONFIDENCE,
-    MEDIUM_CONFIDENCE,
     LOW_CONFIDENCE,
-    METHOD_HTTP,
-    METHOD_STATUS,
+    MEDIUM_CONFIDENCE,
     METHOD_CNAME,
     METHOD_DNS,
+    METHOD_HTTP,
+    METHOD_STATUS,
+    STATUS_CODES,
+    TAKEOVER_FINGERPRINTS,
 )
-
-from .helpers import (
-    contains_fingerprint,
-    create_result,
-    merge_methods,
-    safe_lower,
-)
+from .helpers import contains_fingerprint, create_result, merge_methods, safe_lower
 
 # ==========================================================
 # HTTP Body Detection

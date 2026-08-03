@@ -8,29 +8,24 @@ from __future__ import annotations
 
 import csv
 import json
-
 from pathlib import Path
 from typing import Any
 
-from core.logger import (
-    success,
-    warning,
-)
-
+from core.logger import success, warning
 from modules.javascript.constants import (
-    JAVASCRIPT_OUTPUT_DIR,
-    RESULTS_TXT,
-    RESULTS_JSON,
-    RESULTS_CSV,
-    SUMMARY_TXT,
-    JAVASCRIPT_TXT,
-    URLS_TXT,
     ENDPOINTS_TXT,
-    SOURCE_MAPS_TXT,
-    INTERESTING_FILES_TXT,
-    INTERESTING_DIRECTORIES_TXT,
-    SECRETS_TXT,
     FILES_DIR,
+    INTERESTING_DIRECTORIES_TXT,
+    INTERESTING_FILES_TXT,
+    JAVASCRIPT_OUTPUT_DIR,
+    JAVASCRIPT_TXT,
+    RESULTS_CSV,
+    RESULTS_JSON,
+    RESULTS_TXT,
+    SECRETS_TXT,
+    SOURCE_MAPS_TXT,
+    SUMMARY_TXT,
+    URLS_TXT,
 )
 
 # ==========================================================

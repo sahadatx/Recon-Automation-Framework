@@ -12,18 +12,15 @@ import json
 from pathlib import Path
 from typing import Any
 
-from core.logger import (
-    success,
-    warning,
-)
+from core.logger import success, warning
 
 from .constants import (
-    OUTPUT_DIR,
-    TXT_FILE,
-    JSON_FILE,
     CSV_FILE,
-    SUMMARY_FILE,
     HIGH_RISK_FILE,
+    JSON_FILE,
+    OUTPUT_DIR,
+    SUMMARY_FILE,
+    TXT_FILE,
 )
 
 # ==========================================================

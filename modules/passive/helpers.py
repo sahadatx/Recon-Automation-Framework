@@ -9,24 +9,11 @@ from __future__ import annotations
 import re
 import subprocess
 import time
-
-from collections.abc import (
-    Callable,
-    Mapping,
-)
+from collections.abc import Callable, Mapping
 from functools import wraps
-from typing import (
-    Any,
-    TypeVar,
-)
+from typing import Any, TypeVar
 
-
-from core.logger import (
-    error,
-    info,
-    success,
-    warning,
-)
+from core.logger import error, info, success, warning
 
 # ==========================================================
 # Constants

@@ -9,9 +9,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from modules.screenshots.statistics import (
-    generate_statistics,
-)
+from modules.screenshots.statistics import generate_statistics
 
 # ==========================================================
 # Analyze Screenshot Results

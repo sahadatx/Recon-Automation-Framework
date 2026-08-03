@@ -9,12 +9,7 @@ from __future__ import annotations
 
 from collections import Counter
 
-from .constants import (
-    CRITICAL_RISK,
-    HIGH_RISK,
-    LOW_RISK,
-    MEDIUM_RISK,
-)
+from .constants import CRITICAL_RISK, HIGH_RISK, LOW_RISK, MEDIUM_RISK
 
 # ==========================================================
 # Provider Statistics

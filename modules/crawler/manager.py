@@ -12,13 +12,7 @@ from concurrent.futures import as_completed
 from typing import Any
 
 from core.context import ExecutionContext
-from core.logger import (
-    info,
-    progress_status,
-    success,
-    warning,
-)
-
+from core.logger import info, progress_status, success, warning
 from modules.crawler.analyzer import analyze
 from modules.crawler.crawler import crawl_host
 

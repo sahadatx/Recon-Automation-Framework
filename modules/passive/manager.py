@@ -10,52 +10,18 @@ from __future__ import annotations
 
 import re
 import time
+from concurrent.futures import as_completed
+from typing import Any, Callable
 
-from concurrent.futures import (
-    as_completed,
-)
-
-from typing import (
-    Any,
-    Callable,
-)
-
-from core.context import (
-    ExecutionContext,
-)
-
-from core.logger import (
-    info,
-    warning,
-)
-
-from modules.passive.analyzer import (
-    analyze,
-)
-
-from modules.passive.assetfinder import (
-    run_assetfinder,
-)
-
-from modules.passive.chaos import (
-    run_chaos,
-)
-
-from modules.passive.crtsh import (
-    run_crtsh,
-)
-
-from modules.passive.findomain import (
-    run_findomain,
-)
-
-from modules.passive.securitytrails import (
-    run_securitytrails,
-)
-
-from modules.passive.subfinder import (
-    run_subfinder,
-)
+from core.context import ExecutionContext
+from core.logger import info, warning
+from modules.passive.analyzer import analyze
+from modules.passive.assetfinder import run_assetfinder
+from modules.passive.chaos import run_chaos
+from modules.passive.crtsh import run_crtsh
+from modules.passive.findomain import run_findomain
+from modules.passive.securitytrails import run_securitytrails
+from modules.passive.subfinder import run_subfinder
 
 # ==========================================================
 # Type Definitions

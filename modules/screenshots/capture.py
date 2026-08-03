@@ -9,20 +9,14 @@ from __future__ import annotations
 from pathlib import Path
 from time import perf_counter
 
-from playwright.async_api import (
-    BrowserContext,
-    TimeoutError as PlaywrightTimeoutError,
-)
+from playwright.async_api import BrowserContext
+from playwright.async_api import TimeoutError as PlaywrightTimeoutError
 
+from core.logger import debug, warning
 from modules.screenshots.constants import (
     IMAGES_DIR,
-    SCREENSHOT_TIMEOUT,
     SCREENSHOT_FULL_PAGE,
-)
-
-from core.logger import (
-    debug,
-    warning,
+    SCREENSHOT_TIMEOUT,
 )
 
 # ==========================================================

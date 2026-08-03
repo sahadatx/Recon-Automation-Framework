@@ -9,21 +9,14 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from core.logger import (
-    debug,
-    warning,
-)
-
+from core.logger import debug, warning
+from modules.javascript.endpoints import extract_endpoints
 from modules.javascript.extractors import (
     extract_comments,
     extract_source_maps,
     extract_strings,
     extract_urls,
     generate_statistics,
-)
-
-from modules.javascript.endpoints import (
-    extract_endpoints,
 )
 
 # ==========================================================

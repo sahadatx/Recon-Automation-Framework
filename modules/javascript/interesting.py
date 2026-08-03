@@ -10,9 +10,7 @@ from __future__ import annotations
 from pathlib import PurePosixPath
 from urllib.parse import urlparse
 
-from core.logger import (
-    debug,
-)
+from core.logger import debug
 
 # ==========================================================
 # Interesting Files

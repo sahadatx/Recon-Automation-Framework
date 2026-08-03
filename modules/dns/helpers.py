@@ -10,17 +10,8 @@ from __future__ import annotations
 import dns.exception
 import dns.resolver
 
-from config.config import (
-    DNS_LIFETIME,
-    DNS_RETRIES,
-    DNS_SERVERS,
-    DNS_TIMEOUT,
-)
-
-from core.logger import (
-    info,
-    warning,
-)
+from config.config import DNS_LIFETIME, DNS_RETRIES, DNS_SERVERS, DNS_TIMEOUT
+from core.logger import info, warning
 
 # ==========================================================
 # Create Resolver

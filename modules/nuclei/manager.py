@@ -13,20 +13,12 @@ from concurrent.futures import as_completed
 from typing import Any
 
 from core.context import ExecutionContext
-from core.logger import (
-    info,
-    progress_status,
-    success,
-    warning,
-)
+from core.logger import info, progress_status, success, warning
 
 from .analyzer import analyze
 from .filters import apply_filters
 from .parser import parse_nuclei
-from .scanner import (
-    cleanup,
-    scan_target,
-)
+from .scanner import cleanup, scan_target
 
 # ==========================================================
 # Process Target

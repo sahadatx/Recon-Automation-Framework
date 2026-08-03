@@ -9,42 +9,17 @@ discovery and analysis.
 
 from __future__ import annotations
 
-from concurrent.futures import (
-    as_completed,
-)
-
+from concurrent.futures import as_completed
 from typing import Any
 
-from core.context import (
-    ExecutionContext,
-)
+from core.context import ExecutionContext
+from core.logger import info, progress_status, success, warning
 
-from core.logger import (
-    info,
-    progress_status,
-    success,
-    warning,
-)
-
-from .analyzer import (
-    analyze,
-)
-
-from .filters import (
-    apply_filters,
-)
-
-from .interesting import (
-    scan as detect_interesting,
-)
-
-from .parser import (
-    parse_ffuf,
-)
-
-from .scanner import (
-    scan_target,
-)
+from .analyzer import analyze
+from .filters import apply_filters
+from .interesting import scan as detect_interesting
+from .parser import parse_ffuf
+from .scanner import scan_target
 
 # ==========================================================
 # Process Target

@@ -4,10 +4,7 @@ DNS Resolver
 Resolve A (IPv4) and AAAA (IPv6) records.
 """
 
-from modules.dns.helpers import (
-    resolve_record,
-    show_lookup,
-)
+from modules.dns.helpers import resolve_record, show_lookup
 
 # ==========================================================
 # Resolve IPv4 (A)

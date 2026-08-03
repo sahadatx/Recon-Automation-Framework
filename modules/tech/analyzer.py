@@ -8,9 +8,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from modules.tech.statistics import (
-    generate_statistics,
-)
+from modules.tech.statistics import generate_statistics
 
 # ==========================================================
 # Analyze Results

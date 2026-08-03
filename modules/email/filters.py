@@ -10,13 +10,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 
-from .constants import (
-    CRITICAL_RISK,
-    HIGH_RISK,
-    LOW_RISK,
-    MAIL_PROVIDERS,
-    MEDIUM_RISK,
-)
+from .constants import CRITICAL_RISK, HIGH_RISK, LOW_RISK, MAIL_PROVIDERS, MEDIUM_RISK
 
 # ==========================================================
 # Constants

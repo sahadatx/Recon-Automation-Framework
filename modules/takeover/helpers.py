@@ -8,22 +8,17 @@ Subdomain Takeover Detection.
 from __future__ import annotations
 
 import socket
-
 from copy import deepcopy
 from typing import Any
 from urllib.parse import urlparse
 
 import dns.resolver
 import requests
-
 from bs4 import BeautifulSoup
 
 from config.config import HTTP_TIMEOUT
 
-from .constants import (
-    DEFAULT_ANALYSIS,
-    DEFAULT_HEADERS,
-)
+from .constants import DEFAULT_ANALYSIS, DEFAULT_HEADERS
 
 # ==========================================================
 # Default Result

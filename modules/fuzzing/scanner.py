@@ -7,24 +7,19 @@ commands against target URLs.
 
 import subprocess
 import tempfile
-
 from pathlib import Path
 
 from config.config import (
+    FUZZ_AUTO_CALIBRATION,
+    FUZZ_DEFAULT_WORDLIST,
+    FUZZ_FILTER_CODES,
+    FUZZ_MATCH_CODES,
+    FUZZ_RATE_LIMIT,
     FUZZ_THREADS,
     FUZZ_TIMEOUT,
-    FUZZ_RATE_LIMIT,
-    FUZZ_MATCH_CODES,
-    FUZZ_FILTER_CODES,
-    FUZZ_DEFAULT_WORDLIST,
     HTTP_USER_AGENT,
-    FUZZ_AUTO_CALIBRATION,
 )
-
-from core.logger import (
-    info,
-    warning,
-)
+from core.logger import info, warning
 
 # ==========================================================
 # Validate Target

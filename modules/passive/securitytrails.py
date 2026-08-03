@@ -9,23 +9,10 @@ from __future__ import annotations
 
 import requests
 
+from config.config import SECURITYTRAILS_API_KEY
 from core.context import ExecutionContext
-
-from config.config import (
-    SECURITYTRAILS_API_KEY,
-)
-
-from core.logger import (
-    error,
-    info,
-    success,
-    warning,
-)
-
-from modules.passive.helpers import (
-    normalize_subdomains,
-    retry_request,
-)
+from core.logger import error, info, success, warning
+from modules.passive.helpers import normalize_subdomains, retry_request
 
 
 @retry_request(max_attempts=3, delay=2)

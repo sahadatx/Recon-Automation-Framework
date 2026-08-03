@@ -9,30 +9,13 @@ detection and analysis.
 
 from __future__ import annotations
 
-from concurrent.futures import (
-    as_completed,
-)
-
+from concurrent.futures import as_completed
 from typing import Any
 
-from core.context import (
-    ExecutionContext,
-)
-
-from core.logger import (
-    info,
-    progress_status,
-    success,
-    warning,
-)
-
-from modules.tech.analyzer import (
-    analyze,
-)
-
-from modules.tech.detector import (
-    detect_technologies,
-)
+from core.context import ExecutionContext
+from core.logger import info, progress_status, success, warning
+from modules.tech.analyzer import analyze
+from modules.tech.detector import detect_technologies
 
 # ==========================================================
 # Detect One Host

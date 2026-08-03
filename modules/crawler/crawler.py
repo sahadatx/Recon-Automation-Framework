@@ -7,45 +7,17 @@ Core crawler for discovering URLs.
 from __future__ import annotations
 
 import time
-
 from typing import Any
 
+from config.config import CRAWLER_DEPTH, CRAWLER_MAX_URLS
 from core.context import ExecutionContext
-
-from modules.crawler.queue import (
-    CrawlQueue,
-)
-
-from modules.crawler.helpers import (
-    download_page,
-)
-
-from modules.crawler.parser import (
-    parse_html,
-)
-
-from modules.crawler.filters import (
-    should_enqueue,
-)
-
-from modules.crawler.robots import (
-    fetch_robots,
-)
-
-from modules.crawler.sitemap import (
-    fetch_sitemap,
-)
-
-from core.logger import (
-    debug,
-    info,
-    warning,
-)
-
-from config.config import (
-    CRAWLER_DEPTH,
-    CRAWLER_MAX_URLS,
-)
+from core.logger import debug, info, warning
+from modules.crawler.filters import should_enqueue
+from modules.crawler.helpers import download_page
+from modules.crawler.parser import parse_html
+from modules.crawler.queue import CrawlQueue
+from modules.crawler.robots import fetch_robots
+from modules.crawler.sitemap import fetch_sitemap
 
 # ==========================================================
 # Create Statistics

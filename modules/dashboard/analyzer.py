@@ -8,10 +8,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from .statistics import (
-    empty_statistics,
-    generate_statistics,
-)
+from .statistics import empty_statistics, generate_statistics
 
 # ==========================================================
 # Analyze Dashboard

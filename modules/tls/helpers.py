@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import socket
 import ssl
-
 from copy import deepcopy
 from datetime import datetime
 from typing import Any

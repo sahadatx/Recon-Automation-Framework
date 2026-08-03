@@ -11,10 +11,7 @@ from typing import Any
 from core.context import ExecutionContext
 from core.plugins.base import BasePlugin
 
-from .exporter import (
-    export_all,
-    show_summary,
-)
+from .exporter import export_all, show_summary
 from .manager import run
 
 # ==========================================================

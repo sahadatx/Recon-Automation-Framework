@@ -12,10 +12,10 @@ from copy import deepcopy
 
 from .constants import (
     HIGH_CONFIDENCE,
-    MEDIUM_CONFIDENCE,
     LOW_CONFIDENCE,
-    UNKNOWN_CONFIDENCE,
+    MEDIUM_CONFIDENCE,
     TAKEOVER_PROVIDERS,
+    UNKNOWN_CONFIDENCE,
 )
 
 # ==========================================================

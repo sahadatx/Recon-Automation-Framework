@@ -9,14 +9,7 @@ from __future__ import annotations
 
 from collections import Counter
 
-from .constants import (
-    CRITICAL,
-    HIGH,
-    MEDIUM,
-    LOW,
-    INFO,
-    UNKNOWN,
-)
+from .constants import CRITICAL, HIGH, INFO, LOW, MEDIUM, UNKNOWN
 
 # ==========================================================
 # Empty Statistics

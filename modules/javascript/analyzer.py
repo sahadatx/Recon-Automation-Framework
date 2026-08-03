@@ -8,9 +8,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from modules.javascript.statistics import (
-    generate_statistics,
-)
+from modules.javascript.statistics import generate_statistics
 
 # ==========================================================
 # Analyze JavaScript Results

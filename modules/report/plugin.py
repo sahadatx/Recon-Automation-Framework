@@ -11,12 +11,9 @@ from typing import Any
 from core.context import ExecutionContext
 from core.plugins.base import BasePlugin
 
-from .exporter import (
-    export_all,
-    show_summary,
-)
-from .statistics import generate_statistics
+from .exporter import export_all, show_summary
 from .manager import run
+from .statistics import generate_statistics
 
 # ==========================================================
 # Report Generator Plugin

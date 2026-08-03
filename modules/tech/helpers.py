@@ -5,9 +5,7 @@ Shared helper functions used by the
 Technology Detection module.
 """
 
-from modules.tech.fingerprints import (
-    HTML_KEYWORDS,
-)
+from modules.tech.fingerprints import HTML_KEYWORDS
 
 # ==========================================================
 # Normalize Technologies

@@ -9,17 +9,12 @@ from __future__ import annotations
 
 from typing import Any
 
-from modules.waf.fingerprints import (
-    WAF_FINGERPRINTS,
-    CONFIDENCE,
-    CONFIDENCE_LEVELS,
-)
-
+from modules.waf.fingerprints import CONFIDENCE, CONFIDENCE_LEVELS, WAF_FINGERPRINTS
 from modules.waf.helpers import (
     match_keys,
     match_substrings,
-    normalize_headers,
     normalize_cookies,
+    normalize_headers,
     safe_lower,
     unique_evidence,
 )

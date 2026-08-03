@@ -6,12 +6,9 @@ into a normalized format.
 """
 
 import json
-
 from pathlib import Path
 
-from core.logger import (
-    warning,
-)
+from core.logger import warning
 
 # ==========================================================
 # Load JSON

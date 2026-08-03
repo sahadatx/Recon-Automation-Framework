@@ -11,8 +11,8 @@ from typing import Any
 from core.context import ExecutionContext
 from core.plugins.base import BasePlugin
 
-from .manager import run
 from .exporter import export_all
+from .manager import run
 
 # ==========================================================
 # DNS Plugin

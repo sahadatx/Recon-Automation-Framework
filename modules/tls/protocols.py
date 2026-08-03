@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import socket
 import ssl
-
 from copy import deepcopy
 
 from config.config import HTTP_TIMEOUT

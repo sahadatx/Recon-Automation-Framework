@@ -10,17 +10,9 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import Any
 
-from requests.exceptions import (
-    ConnectionError,
-    RequestException,
-    Timeout,
-)
+from requests.exceptions import ConnectionError, RequestException, Timeout
 
-from config.config import (
-    HTTP_TIMEOUT,
-    HTTP_VERIFY_SSL,
-)
-
+from config.config import HTTP_TIMEOUT, HTTP_VERIFY_SSL
 from core.context import ExecutionContext
 
 # ==========================================================

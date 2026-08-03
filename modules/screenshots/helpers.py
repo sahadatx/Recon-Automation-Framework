@@ -7,23 +7,15 @@ Production Async Playwright Browser Engine.
 from __future__ import annotations
 
 from playwright.async_api import (
-    async_playwright,
-    Playwright,
     Browser,
     BrowserContext,
     Page,
+    Playwright,
+    async_playwright,
 )
 
-from modules.screenshots.constants import (
-    SCREENSHOT_WIDTH,
-    SCREENSHOT_HEIGHT,
-    HEADLESS,
-)
-
-from core.logger import (
-    debug,
-    warning,
-)
+from core.logger import debug, warning
+from modules.screenshots.constants import HEADLESS, SCREENSHOT_HEIGHT, SCREENSHOT_WIDTH
 
 # ==========================================================
 # Start Playwright

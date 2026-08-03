@@ -6,15 +6,14 @@ from __future__ import annotations
 
 import csv
 import json
-
 from pathlib import Path
 from typing import Any
 
 from core.logger import success
 
 from .constants import (
-    CSV_FILE,
     CRITICAL_FILE,
+    CSV_FILE,
     HIGH_FILE,
     JSON_FILE,
     OUTPUT_DIR,

@@ -7,21 +7,13 @@ results into multiple formats.
 
 from __future__ import annotations
 
-from typing import Any
-
 import csv
 import json
-
 from pathlib import Path
+from typing import Any
 
-from config.config import (
-    WAF_OUTPUT_DIR,
-)
-
-from core.logger import (
-    success,
-    warning,
-)
+from config.config import WAF_OUTPUT_DIR
+from core.logger import success, warning
 
 # ==========================================================
 # Create Output Directory

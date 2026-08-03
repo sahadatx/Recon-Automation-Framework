@@ -19,17 +19,10 @@ from requests.exceptions import (
     Timeout,
 )
 
-from config.config import (
-    HTTP_RETRIES,
-    HTTP_TIMEOUT,
-)
-
+from config.config import HTTP_RETRIES, HTTP_TIMEOUT
 from core.context import ExecutionContext
 from core.logger import debug
-
-from modules.javascript.constants import (
-    FILES_DIR,
-)
+from modules.javascript.constants import FILES_DIR
 
 # ==========================================================
 # Retryable HTTP Status Codes

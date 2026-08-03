@@ -6,7 +6,6 @@ normalized Python objects.
 """
 
 import json
-
 from pathlib import Path
 
 # ==========================================================

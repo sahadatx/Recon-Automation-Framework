@@ -10,13 +10,7 @@ from __future__ import annotations
 from typing import Any
 
 from core.context import ExecutionContext
-
-from core.logger import (
-    debug,
-    info,
-    warning,
-)
-
+from core.logger import debug, info, warning
 from modules.javascript.helpers import (
     download_file,
     is_valid_url,

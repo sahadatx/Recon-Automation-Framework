@@ -7,14 +7,8 @@ Port Scanner module.
 
 import socket
 
-from config.config import (
-    PORT_SCAN_TIMEOUT,
-    DEBUG,
-)
-
-from core.logger import (
-    debug,
-)
+from config.config import DEBUG, PORT_SCAN_TIMEOUT
+from core.logger import debug
 
 # ==========================================================
 # Common Services

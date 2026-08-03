@@ -7,20 +7,12 @@ results into multiple formats.
 
 from __future__ import annotations
 
+import json
+from pathlib import Path
 from typing import Any
 
-import json
-
-from pathlib import Path
-
-from config.config import (
-    VHOST_OUTPUT_DIR,
-)
-
-from core.logger import (
-    success,
-    warning,
-)
+from config.config import VHOST_OUTPUT_DIR
+from core.logger import success, warning
 
 # ==========================================================
 # Create Output Directory

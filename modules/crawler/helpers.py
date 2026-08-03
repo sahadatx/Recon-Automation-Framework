@@ -10,15 +10,10 @@ URL Discovery module.
 from __future__ import annotations
 
 import time
-from urllib.parse import (
-    urljoin,
-    urlparse,
-    urlunparse,
-)
+from urllib.parse import urljoin, urlparse, urlunparse
 
 import requests
 import urllib3
-
 from requests.exceptions import (
     ConnectionError,
     ConnectTimeout,
@@ -27,14 +22,8 @@ from requests.exceptions import (
     Timeout,
 )
 
-from config.config import (
-    CRAWLER_RETRIES,
-    HTTP_TIMEOUT,
-)
-
-from core.logger import (
-    debug,
-)
+from config.config import CRAWLER_RETRIES, HTTP_TIMEOUT
+from core.logger import debug
 
 # ==========================================================
 # Disable SSL Warnings

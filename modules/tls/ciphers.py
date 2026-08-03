@@ -7,12 +7,9 @@ Cipher suite detection and analysis.
 from __future__ import annotations
 
 import ssl
-
 from copy import deepcopy
 
-from .helpers import (
-    connect_tls,
-)
+from .helpers import connect_tls
 
 # ==========================================================
 # Default Result

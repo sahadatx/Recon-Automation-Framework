@@ -5,17 +5,11 @@ Downloads and parses sitemap.xml files.
 """
 
 import gzip
-
-from xml.etree import ElementTree
 from urllib.parse import urljoin
+from xml.etree import ElementTree
 
-from modules.crawler.helpers import (
-    download_page,
-)
-
-from core.logger import (
-    debug,
-)
+from core.logger import debug
+from modules.crawler.helpers import download_page
 
 # ==========================================================
 # XML Namespace

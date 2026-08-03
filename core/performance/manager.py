@@ -16,11 +16,7 @@ from .bottleneck import detect_bottlenecks
 from .memory_analyzer import analyze_memory
 from .memory_benchmark import MemoryBenchmark
 from .memory_profiler import MemoryProfiler
-from .performance_report import (
-    generate_markdown,
-    generate_report,
-    generate_text,
-)
+from .performance_report import generate_markdown, generate_report, generate_text
 from .profiler import PerformanceProfiler
 
 

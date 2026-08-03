@@ -13,23 +13,12 @@ from concurrent.futures import as_completed
 from typing import Any
 
 from core.context import ExecutionContext
-from core.logger import (
-    info,
-    progress_status,
-    success,
-    warning,
-)
-
+from core.logger import info, progress_status, success, warning
 from modules.fuzzing.analyzer import analyze
 from modules.fuzzing.filters import apply_filters
-from modules.fuzzing.interesting import (
-    scan as detect_interesting,
-)
+from modules.fuzzing.interesting import scan as detect_interesting
 from modules.fuzzing.parser import parse_ffuf
-from modules.fuzzing.scanner import (
-    cleanup,
-    scan_target,
-)
+from modules.fuzzing.scanner import cleanup, scan_target
 
 # ==========================================================
 # Process Target

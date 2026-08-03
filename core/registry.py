@@ -6,8 +6,7 @@ Module Registry
 
 from __future__ import annotations
 
-from typing import Any
-from typing import Callable
+from typing import Any, Callable
 
 from modules.cdn.manager import run as run_cdn
 from modules.crawler.manager import run as run_crawler

@@ -9,31 +9,14 @@ detection and analysis.
 
 from __future__ import annotations
 
-from concurrent.futures import (
-    as_completed,
-)
-
+from concurrent.futures import as_completed
 from typing import Any
 
-from core.context import (
-    ExecutionContext,
-)
+from core.context import ExecutionContext
+from core.logger import info, progress_status, success, warning
 
-from core.logger import (
-    info,
-    progress_status,
-    success,
-    warning,
-)
-
-from .analyzer import (
-    analyze,
-)
-
-from .filters import (
-    filter_results,
-)
-
+from .analyzer import analyze
+from .filters import filter_results
 from .helpers import (
     extract_body,
     extract_status_code,
@@ -43,10 +26,7 @@ from .helpers import (
     resolve_cname,
     resolve_ipv4,
 )
-
-from .target_analyzer import (
-    analyze_target,
-)
+from .target_analyzer import analyze_target
 
 # ==========================================================
 # Process Target

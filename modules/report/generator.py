@@ -8,14 +8,8 @@ from __future__ import annotations
 
 from typing import Any
 
-from .constants import (
-    AUTHOR,
-    REPORT_TITLE,
-    REPORT_VERSION,
-)
-from .helpers import (
-    current_timestamp,
-)
+from .constants import AUTHOR, REPORT_TITLE, REPORT_VERSION
+from .helpers import current_timestamp
 
 # ==========================================================
 # Report Generator

@@ -9,9 +9,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from modules.http.statistics import (
-    generate_statistics,
-)
+from modules.http.statistics import generate_statistics
 
 # ==========================================================
 # Analyze HTTP Results

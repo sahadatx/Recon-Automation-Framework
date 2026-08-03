@@ -8,14 +8,9 @@ JavaScript Analysis module.
 from __future__ import annotations
 
 import re
+from urllib.parse import urlparse
 
-from urllib.parse import (
-    urlparse,
-)
-
-from modules.javascript.string_filters import (
-    filter_strings,
-)
+from modules.javascript.string_filters import filter_strings
 
 # ==========================================================
 # Regex Patterns

@@ -10,19 +10,11 @@ screenshot capture and analysis.
 from __future__ import annotations
 
 import asyncio
-
 from typing import Any
 
 from config.config import SCREENSHOT_WORKERS
-
 from core.context import ExecutionContext
-from core.logger import (
-    info,
-    progress_status,
-    success,
-    warning,
-)
-
+from core.logger import info, progress_status, success, warning
 from modules.screenshots.analyzer import analyze
 from modules.screenshots.capture import capture_host
 from modules.screenshots.helpers import (

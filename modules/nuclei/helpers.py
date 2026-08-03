@@ -6,9 +6,7 @@ the Nuclei module.
 """
 
 import shutil
-
 from pathlib import Path
-
 from urllib.parse import urlparse
 
 # ==========================================================

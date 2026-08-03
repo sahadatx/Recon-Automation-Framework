@@ -12,10 +12,7 @@ from __future__ import annotations
 from typing import Any
 
 from core.context import ExecutionContext
-from core.logger import (
-    info,
-    success,
-)
+from core.logger import info, success
 
 from .analyzer import analyze
 from .filters import filter_results

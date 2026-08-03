@@ -6,13 +6,8 @@ Passive subdomain enumeration using Assetfinder.
 
 from __future__ import annotations
 
-from core.context import (
-    ExecutionContext,
-)
-
-from modules.passive.helpers import (
-    execute_source,
-)
+from core.context import ExecutionContext
+from modules.passive.helpers import execute_source
 
 
 def run_assetfinder(

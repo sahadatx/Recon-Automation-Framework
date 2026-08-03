@@ -11,13 +11,9 @@ Recon Automation Framework.
 from __future__ import annotations
 
 import requests
-
 from requests.adapters import HTTPAdapter
 
-from config.config import (
-    HTTP_USER_AGENT,
-    HTTP_VERIFY_SSL,
-)
+from config.config import HTTP_USER_AGENT, HTTP_VERIFY_SSL
 
 # ==========================================================
 # Create HTTP Session

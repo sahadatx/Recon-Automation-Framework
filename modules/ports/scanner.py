@@ -10,14 +10,8 @@ from concurrent.futures import as_completed
 from typing import Any
 
 from core.context import ExecutionContext
-
-from modules.ports.common_ports import (
-    COMMON_PORTS,
-)
-from modules.ports.helpers import (
-    scan_port,
-    show_scan,
-)
+from modules.ports.common_ports import COMMON_PORTS
+from modules.ports.helpers import scan_port, show_scan
 
 # Future
 # from modules.ports.banner import grab_banner

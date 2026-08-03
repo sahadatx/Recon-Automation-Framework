@@ -5,10 +5,7 @@ Filtering and normalization utilities used by the
 URL Discovery module.
 """
 
-from urllib.parse import (
-    urlparse,
-    urlunparse,
-)
+from urllib.parse import urlparse, urlunparse
 
 # ==========================================================
 # Remove Fragment

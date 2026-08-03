@@ -6,14 +6,9 @@ Virtual Host Discovery module.
 """
 
 from pathlib import Path
+from urllib.parse import urlparse
 
-from urllib.parse import (
-    urlparse,
-)
-
-from config.config import (
-    VHOST_OUTPUT_DIR,
-)
+from config.config import VHOST_OUTPUT_DIR
 
 # ==========================================================
 # Output Directory

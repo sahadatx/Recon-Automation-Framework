@@ -6,28 +6,17 @@ Performance monitoring and benchmarking.
 
 from __future__ import annotations
 
-from .manager import PerformanceManager
-
 from .benchmark import Benchmark
-from .bottleneck import (
-    detect_bottlenecks,
-    summary as bottleneck_summary,
-)
-from .memory_analyzer import (
-    analyze_memory,
-    summary as memory_summary,
-)
+from .bottleneck import detect_bottlenecks
+from .bottleneck import summary as bottleneck_summary
+from .manager import PerformanceManager
+from .memory_analyzer import analyze_memory
+from .memory_analyzer import summary as memory_summary
 from .memory_benchmark import MemoryBenchmark
 from .memory_profiler import MemoryProfiler
-from .memory_report import (
-    generate_markdown as generate_memory_markdown,
-    generate_report as generate_memory_report,
-)
-from .performance_report import (
-    generate_markdown,
-    generate_report,
-    generate_text,
-)
+from .memory_report import generate_markdown as generate_memory_markdown
+from .memory_report import generate_report as generate_memory_report
+from .performance_report import generate_markdown, generate_report, generate_text
 from .profiler import PerformanceProfiler
 
 __all__ = [

@@ -7,17 +7,9 @@ using the configured regex database.
 
 from __future__ import annotations
 
-from core.logger import (
-    warning,
-)
-
-from modules.javascript.filters import (
-    filter_findings,
-)
-
-from modules.javascript.secrets import (
-    SECRET_PATTERNS,
-)
+from core.logger import warning
+from modules.javascript.filters import filter_findings
+from modules.javascript.secrets import SECRET_PATTERNS
 
 # ==========================================================
 # Empty Result

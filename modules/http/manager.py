@@ -9,30 +9,13 @@ and analysis.
 
 from __future__ import annotations
 
-from concurrent.futures import (
-    as_completed,
-)
-
+from concurrent.futures import as_completed
 from typing import Any
 
-from core.context import (
-    ExecutionContext,
-)
-
-from core.logger import (
-    info,
-    progress_status,
-    success,
-    warning,
-)
-
-from modules.http.analyzer import (
-    analyze,
-)
-
-from modules.http.probe import (
-    probe_host,
-)
+from core.context import ExecutionContext
+from core.logger import info, progress_status, success, warning
+from modules.http.analyzer import analyze
+from modules.http.probe import probe_host
 
 # ==========================================================
 # Probe One Host

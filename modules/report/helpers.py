@@ -11,11 +11,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from .constants import (
-    DEFAULT_ENCODING,
-    REPORT_DIR,
-    TIMESTAMP_FORMAT,
-)
+from .constants import DEFAULT_ENCODING, REPORT_DIR, TIMESTAMP_FORMAT
 
 # ==========================================================
 # Directory

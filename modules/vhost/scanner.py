@@ -7,25 +7,20 @@ commands against target URLs.
 
 import subprocess
 import tempfile
-
 from pathlib import Path
 from urllib.parse import urlparse
 
 from config.config import (
+    HTTP_USER_AGENT,
+    VHOST_AUTO_CALIBRATION,
+    VHOST_DEFAULT_WORDLIST,
+    VHOST_FILTER_CODES,
+    VHOST_MATCH_CODES,
+    VHOST_RATE_LIMIT,
     VHOST_THREADS,
     VHOST_TIMEOUT,
-    VHOST_RATE_LIMIT,
-    VHOST_MATCH_CODES,
-    VHOST_FILTER_CODES,
-    VHOST_DEFAULT_WORDLIST,
-    VHOST_AUTO_CALIBRATION,
-    HTTP_USER_AGENT,
 )
-
-from core.logger import (
-    info,
-    warning,
-)
+from core.logger import info, warning
 
 # ==========================================================
 # Validate Target

@@ -7,9 +7,7 @@ normalizes ffuf results.
 
 from collections import Counter
 
-from config.config import (
-    VHOST_FILTER_DEFAULT_RESPONSES,
-)
+from config.config import VHOST_FILTER_DEFAULT_RESPONSES
 
 # ==========================================================
 # Default Status Codes

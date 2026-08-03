@@ -9,14 +9,8 @@ the HTTP Probe module.
 
 from __future__ import annotations
 
-from config.config import (
-    HTTP_TIMEOUT,
-    VERBOSE,
-)
-
-from core.logger import (
-    debug,
-)
+from config.config import HTTP_TIMEOUT, VERBOSE
+from core.logger import debug
 
 # ==========================================================
 # Show Probe

@@ -6,12 +6,9 @@ updates and version checking.
 """
 
 import subprocess
-
 from pathlib import Path
 
-from modules.nuclei.helpers import (
-    ensure_directory,
-)
+from modules.nuclei.helpers import ensure_directory
 
 # ==========================================================
 # Default Template Directory

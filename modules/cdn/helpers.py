@@ -8,21 +8,16 @@ CDN Detection.
 from __future__ import annotations
 
 import socket
-
 from copy import deepcopy
 from typing import Any
 from urllib.parse import urlparse
 
 import dns.resolver
 
+from config.config import HTTP_TIMEOUT
 from core.context import ExecutionContext
 
-from config.config import HTTP_TIMEOUT
-
-from .constants import (
-    DEFAULT_ANALYSIS,
-    DEFAULT_HEADERS,
-)
+from .constants import DEFAULT_ANALYSIS, DEFAULT_HEADERS
 
 # ==========================================================
 # Default Result

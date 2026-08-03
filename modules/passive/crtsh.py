@@ -8,18 +8,8 @@ Certificate Transparency Logs.
 from __future__ import annotations
 
 from core.context import ExecutionContext
-
-from core.logger import (
-    error,
-    info,
-    success,
-    warning,
-)
-
-from modules.passive.helpers import (
-    normalize_subdomains,
-    retry_request,
-)
+from core.logger import error, info, success, warning
+from modules.passive.helpers import normalize_subdomains, retry_request
 
 
 @retry_request(max_attempts=3, delay=2)

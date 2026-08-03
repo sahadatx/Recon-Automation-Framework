@@ -10,27 +10,12 @@ and analysis.
 from __future__ import annotations
 
 from core.context import ExecutionContext
+from core.logger import info, success
 
-from core.logger import (
-    info,
-    success,
-)
-
-from .analyzer import (
-    analyze,
-)
-
-from .detector import (
-    detect_all,
-)
-
-from .filters import (
-    filter_results,
-)
-
-from .scanner import (
-    scan_targets,
-)
+from .analyzer import analyze
+from .detector import detect_all
+from .filters import filter_results
+from .scanner import scan_targets
 
 # ==========================================================
 # Run WAF Detection

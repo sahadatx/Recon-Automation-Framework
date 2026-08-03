@@ -5,19 +5,18 @@ Core technology detection logic.
 """
 
 from modules.tech.fingerprints import (
-    SERVER_FINGERPRINTS,
-    FRAMEWORK_FINGERPRINTS,
     CDN_FINGERPRINTS,
     CMS_FINGERPRINTS,
+    FRAMEWORK_FINGERPRINTS,
     HOSTING_FINGERPRINTS,
+    SERVER_FINGERPRINTS,
 )
-
 from modules.tech.helpers import (
-    normalize_technologies,
+    detect_html_technologies,
+    detect_security_headers,
     extract_headers,
     extract_html,
-    detect_security_headers,
-    detect_html_technologies,
+    normalize_technologies,
 )
 
 # ==========================================================

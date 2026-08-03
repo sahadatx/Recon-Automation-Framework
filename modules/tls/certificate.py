@@ -7,28 +7,22 @@ analysis functions.
 
 from __future__ import annotations
 
+import ssl
 from copy import deepcopy
 from datetime import datetime, timezone
-import ssl
 
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.asymmetric import (
-    dsa,
-    ec,
-    ed25519,
-    ed448,
-    rsa,
-)
+from cryptography.hazmat.primitives.asymmetric import dsa, ec, ed448, ed25519, rsa
 
 from modules.tls.helpers import (
     get_certificate,
-    get_subject,
     get_issuer,
+    get_not_after,
+    get_not_before,
     get_san,
     get_serial_number,
-    get_not_before,
-    get_not_after,
+    get_subject,
 )
 
 # ==========================================================

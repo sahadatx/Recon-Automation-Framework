@@ -11,20 +11,9 @@ from typing import Any
 
 from core.logger import success
 
-from .constants import (
-    REPORT_JSON,
-    REPORT_MD,
-    REPORT_TXT,
-    SUMMARY_TXT,
-)
-
-from .helpers import (
-    ensure_output_directory,
-)
-
-from .statistics import (
-    generate_summary,
-)
+from .constants import REPORT_JSON, REPORT_MD, REPORT_TXT, SUMMARY_TXT
+from .helpers import ensure_output_directory
+from .statistics import generate_summary
 
 # ==========================================================
 # JSON

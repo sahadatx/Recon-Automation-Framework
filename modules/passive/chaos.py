@@ -9,21 +9,10 @@ from __future__ import annotations
 
 import os
 
-from core.context import (
-    ExecutionContext,
-)
-
-from config.config import (
-    PDCP_API_KEY,
-)
-
-from core.logger import (
-    error,
-)
-
-from modules.passive.helpers import (
-    execute_source,
-)
+from config.config import PDCP_API_KEY
+from core.context import ExecutionContext
+from core.logger import error
+from modules.passive.helpers import execute_source
 
 
 def run_chaos(

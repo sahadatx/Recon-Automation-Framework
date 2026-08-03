@@ -19,10 +19,7 @@ from .constants import (
     MEDIUM_RISK,
     MEDIUM_SCORE,
 )
-
-from .helpers import (
-    safe_lower,
-)
+from .helpers import safe_lower
 
 # ==========================================================
 # Mail Provider

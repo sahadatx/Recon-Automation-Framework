@@ -6,23 +6,17 @@ Exports screenshot analysis results.
 
 from __future__ import annotations
 
+import csv
+import json
+from pathlib import Path
 from typing import Any
 
-import json
-import csv
-
-from pathlib import Path
-
+from core.logger import success, warning
 from modules.screenshots.constants import (
-    SCREENSHOT_OUTPUT_DIR,
-    RESULTS_TXT,
     RESULTS_JSON,
+    RESULTS_TXT,
+    SCREENSHOT_OUTPUT_DIR,
     SUMMARY_TXT,
-)
-
-from core.logger import (
-    success,
-    warning,
 )
 
 # ==========================================================

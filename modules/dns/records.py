@@ -7,15 +7,8 @@ Author : Sahadat Hossain
 Project : Recon Automation Framework
 """
 
-from modules.dns.helpers import (
-    resolve_record,
-    show_lookup,
-)
-
-from modules.dns.resolver import (
-    resolve_a,
-    resolve_aaaa,
-)
+from modules.dns.helpers import resolve_record, show_lookup
+from modules.dns.resolver import resolve_a, resolve_aaaa
 
 # ==========================================================
 # Resolve MX

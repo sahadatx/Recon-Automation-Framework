@@ -10,24 +10,19 @@ from __future__ import annotations
 from typing import Any
 
 from .constants import (
-    HEADER_FINGERPRINTS,
-    SERVER_FINGERPRINTS,
     CNAME_FINGERPRINTS,
-    IP_PROVIDER_HINTS,
+    HEADER_FINGERPRINTS,
     HIGH_CONFIDENCE,
-    MEDIUM_CONFIDENCE,
+    IP_PROVIDER_HINTS,
     LOW_CONFIDENCE,
-    METHOD_HEADER,
-    METHOD_SERVER,
+    MEDIUM_CONFIDENCE,
     METHOD_CNAME,
+    METHOD_HEADER,
     METHOD_IP,
+    METHOD_SERVER,
+    SERVER_FINGERPRINTS,
 )
-
-from .helpers import (
-    create_result,
-    merge_methods,
-    safe_lower,
-)
+from .helpers import create_result, merge_methods, safe_lower
 
 # ==========================================================
 # Header Detection
