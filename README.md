@@ -21,6 +21,7 @@ Automated Reconnaissance • Plugin Architecture • Multi-threading • Profess
     width="100%">
 </p>
 
+
 <!-- ========================================================= -->
 <!-- GitHub Badges -->
 <!-- ========================================================= -->
@@ -29,7 +30,6 @@ Automated Reconnaissance • Plugin Architecture • Multi-threading • Profess
 
 <img src="https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" />
 <img src="https://img.shields.io/badge/Platform-Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black" alt="Platform" />
-<img src="https://img.shields.io/badge/Version-v1.0.0-blue?style=for-the-badge" alt="Version" />
 <img src="https://img.shields.io/badge/License-MIT-success?style=for-the-badge" alt="License" />
 <img src="https://img.shields.io/badge/Status-Active-brightgreen?style=for-the-badge" alt="Status" />
 
@@ -37,7 +37,8 @@ Automated Reconnaissance • Plugin Architecture • Multi-threading • Profess
 
 <p align="center">
 
-<img src="https://github.com/sahadatx/Recon-Automation-Framework/actions/workflows/python.yml/badge.svg" alt="Build Status" />
+<img src="https://img.shields.io/github/actions/workflow/status/sahadatx/Recon-Automation-Framework/python.yml?branch=main&style=for-the-badge&label=Build" alt="Build Status" />
+<img src="https://img.shields.io/github/v/release/sahadatx/Recon-Automation-Framework?style=for-the-badge&label=Latest%20Release" alt="Latest Release" />
 <img src="https://img.shields.io/github/last-commit/sahadatx/Recon-Automation-Framework?style=for-the-badge" alt="Last Commit" />
 <img src="https://img.shields.io/github/stars/sahadatx/Recon-Automation-Framework?style=for-the-badge" alt="Stars" />
 <img src="https://img.shields.io/github/forks/sahadatx/Recon-Automation-Framework?style=for-the-badge" alt="Forks" />
