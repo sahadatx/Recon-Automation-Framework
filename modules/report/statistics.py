@@ -8,7 +8,6 @@ from __future__ import annotations
 
 from typing import Any
 
-
 # ==========================================================
 # Helpers
 # ==========================================================
@@ -65,14 +64,12 @@ def _stat(
     Return one statistic from a module.
     """
 
-    return (
-        module.get(
-            "statistics",
-            {},
-        ).get(
-            key,
-            default,
-        )
+    return module.get(
+        "statistics",
+        {},
+    ).get(
+        key,
+        default,
     )
 
 
@@ -89,16 +86,12 @@ def generate_statistics(
     all module analyses.
     """
 
-    analyses = (
-        report
-        .get(
-            "modules",
-            {},
-        )
-        .get(
-            "analysis",
-            {},
-        )
+    analyses = report.get(
+        "modules",
+        {},
+    ).get(
+        "analysis",
+        {},
     )
 
     passive = _module(
@@ -177,11 +170,9 @@ def generate_statistics(
     )
 
     statistics = {
-
         # --------------------------------------------------
         # Enumeration
         # --------------------------------------------------
-
         "total_subdomains": _stat(
             passive,
             "total_subdomains",
@@ -192,85 +183,68 @@ def generate_statistics(
                 )
             ),
         ),
-
         "resolved_hosts": _stat(
             dns,
             "resolved_hosts",
         ),
-
         "alive_hosts": _stat(
             http,
             "alive_hosts",
         ),
-
         "open_ports": _stat(
             ports,
             "total_open_ports",
         ),
-
         # --------------------------------------------------
         # Discovery
         # --------------------------------------------------
-
         "technologies": _stat(
             tech,
             "technology_count",
         ),
-
         "urls": _stat(
             crawler,
             "total_urls",
         ),
-
         "javascript_files": _stat(
             javascript,
             "processed_files",
         ),
-
         "directories": _stat(
             fuzzing,
             "total_results",
         ),
-
         "virtual_hosts": _stat(
             vhost,
             "total_results",
         ),
-
         "screenshots": _stat(
             screenshots,
             "captured",
         ),
-
         # --------------------------------------------------
         # Security
         # --------------------------------------------------
-
         "tls_hosts": _stat(
             tls,
             "targets",
         ),
-
         "waf_hosts": _stat(
             waf,
             "detected",
         ),
-
         "cdn_hosts": _stat(
             cdn,
             "detected",
         ),
-
         "takeover_candidates": _stat(
             takeover,
             "vulnerable",
         ),
-
         "email_records": _stat(
             email,
             "targets",
         ),
-
     }
 
     return statistics
@@ -289,15 +263,12 @@ def generate_summary(
     """
 
     lines = [
-
         "=" * 80,
         "Recon Automation Framework Report Summary",
         "=" * 80,
-
     ]
 
     labels = {
-
         "total_subdomains": "Total Subdomains",
         "resolved_hosts": "Resolved Hosts",
         "alive_hosts": "Alive Hosts",
@@ -313,19 +284,13 @@ def generate_summary(
         "cdn_hosts": "CDN Hosts",
         "takeover_candidates": "Takeover Candidates",
         "email_records": "Email Records",
-
     }
 
     for key, label in labels.items():
 
-        lines.append(
-            f"{label:<30} "
-            f"{statistics.get(key, 0)}"
-        )
+        lines.append(f"{label:<30} " f"{statistics.get(key, 0)}")
 
-    lines.append(
-        "=" * 80
-    )
+    lines.append("=" * 80)
 
     return "\n".join(
         lines,

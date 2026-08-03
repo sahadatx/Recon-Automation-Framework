@@ -13,7 +13,6 @@ from .base import BasePlugin
 from .discovery import discovery
 from .registry import registry
 
-
 # ==========================================================
 # Plugin Loader
 # ==========================================================

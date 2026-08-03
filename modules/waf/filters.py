@@ -16,17 +16,16 @@ from copy import deepcopy
 MAX_SCORE = 100
 
 VALID_CONFIDENCE = {
-
     "High",
     "Medium",
     "Low",
     "Unknown",
-
 }
 
 # ==========================================================
 # Reset Detection
 # ==========================================================
+
 
 def reset_detection(
     result: dict,
@@ -51,6 +50,7 @@ def reset_detection(
 # Normalize Score
 # ==========================================================
 
+
 def normalize_score(
     score: int,
 ):
@@ -62,23 +62,18 @@ def normalize_score(
     """
 
     return max(
-
         0,
-
         min(
-
             score,
-
             MAX_SCORE,
-
         ),
-
     )
 
 
 # ==========================================================
 # Normalize Evidence
 # ==========================================================
+
 
 def normalize_evidence(
     evidence,
@@ -90,26 +85,13 @@ def normalize_evidence(
         list
     """
 
-    return sorted(
-
-        {
-
-            item.strip()
-
-            for item
-
-            in evidence
-
-            if item
-
-        }
-
-    )
+    return sorted({item.strip() for item in evidence if item})
 
 
 # ==========================================================
 # Validate Confidence
 # ==========================================================
+
 
 def validate_confidence(
     confidence,
@@ -132,6 +114,7 @@ def validate_confidence(
 # Has Evidence Type
 # ==========================================================
 
+
 def has_evidence(
     evidence,
     prefix,
@@ -143,24 +126,13 @@ def has_evidence(
         bool
     """
 
-    return any(
-
-        item.startswith(
-
-            prefix
-
-        )
-
-        for item
-
-        in evidence
-
-    )
+    return any(item.startswith(prefix) for item in evidence)
 
 
 # ==========================================================
 # Validate Result
 # ==========================================================
+
 
 def validate_result(
     result,
@@ -172,40 +144,19 @@ def validate_result(
         dict
     """
 
-    if not result.get(
+    if not result.get("vendor"):
 
-        "vendor"
+        return reset_detection(result)
 
-    ):
+    if not result.get("evidence"):
 
-        return reset_detection(
-
-            result
-
-        )
-
-    if not result.get(
-
-        "evidence"
-
-    ):
-
-        return reset_detection(
-
-            result
-
-        )
+        return reset_detection(result)
 
     result["confidence"] = validate_confidence(
-
         result.get(
-
             "confidence",
-
             "Unknown",
-
         )
-
     )
 
     return result
@@ -214,6 +165,7 @@ def validate_result(
 # ==========================================================
 # False Positive Filter
 # ==========================================================
+
 
 def remove_false_positive(
     result,
@@ -226,76 +178,40 @@ def remove_false_positive(
     """
 
     evidence = result.get(
-
         "evidence",
-
         [],
-
     )
 
     header = has_evidence(
-
         evidence,
-
         "Header:",
-
     )
 
     cookie = has_evidence(
-
         evidence,
-
         "Cookie:",
-
     )
 
     server = has_evidence(
-
         evidence,
-
         "Server:",
-
     )
 
     body = has_evidence(
-
         evidence,
-
         "Body:",
-
     )
 
     status = has_evidence(
-
         evidence,
-
         "Status:",
-
     )
 
     # Only body or only status
 
-    if (
+    if (body or status) and not (header or cookie or server):
 
-        body
-
-        or status
-
-    ) and not (
-
-        header
-
-        or cookie
-
-        or server
-
-    ):
-
-        return reset_detection(
-
-            result
-
-        )
+        return reset_detection(result)
 
     return result
 
@@ -303,6 +219,7 @@ def remove_false_positive(
 # ==========================================================
 # Filter Single Result
 # ==========================================================
+
 
 def filter_result(
     result,
@@ -314,47 +231,25 @@ def filter_result(
         dict
     """
 
-    filtered = deepcopy(
-
-        result
-
-    )
+    filtered = deepcopy(result)
 
     filtered["score"] = normalize_score(
-
         filtered.get(
-
             "score",
-
             0,
-
         )
-
     )
 
     filtered["evidence"] = normalize_evidence(
-
         filtered.get(
-
             "evidence",
-
             [],
-
         )
-
     )
 
-    filtered = validate_result(
+    filtered = validate_result(filtered)
 
-        filtered
-
-    )
-
-    filtered = remove_false_positive(
-
-        filtered
-
-    )
+    filtered = remove_false_positive(filtered)
 
     return filtered
 
@@ -362,6 +257,7 @@ def filter_result(
 # ==========================================================
 # Filter Results
 # ==========================================================
+
 
 def filter_results(
     results,
@@ -373,50 +269,24 @@ def filter_results(
         list
     """
 
-    filtered = [
-
-        filter_result(
-
-            result
-
-        )
-
-        for result
-
-        in results
-
-    ]
+    filtered = [filter_result(result) for result in results]
 
     filtered.sort(
-
         key=lambda item: (
-
             item.get(
-
                 "detected",
-
                 False,
-
             ),
-
             item.get(
-
                 "score",
-
                 0,
-
             ),
-
             item.get(
-
                 "vendor",
-
-            ) or "",
-
+            )
+            or "",
         ),
-
         reverse=True,
-
     )
 
     return filtered
@@ -425,6 +295,7 @@ def filter_results(
 # ==========================================================
 # Detected Only
 # ==========================================================
+
 
 def detected_only(
     results,
@@ -437,27 +308,19 @@ def detected_only(
     """
 
     return [
-
         result
-
-        for result
-
-        in results
-
+        for result in results
         if result.get(
-
             "detected",
-
             False,
-
         )
-
     ]
 
 
 # ==========================================================
 # Remove Unknown
 # ==========================================================
+
 
 def remove_unknown(
     results,
@@ -469,18 +332,4 @@ def remove_unknown(
         list
     """
 
-    return [
-
-        result
-
-        for result
-
-        in results
-
-        if result.get(
-
-            "vendor"
-
-        )
-
-    ]
+    return [result for result in results if result.get("vendor")]

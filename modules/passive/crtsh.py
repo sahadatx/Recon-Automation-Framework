@@ -46,13 +46,9 @@ def run_crtsh(
     session = context.get_http_session()
 
     if session is None:
-        raise RuntimeError(
-            "HTTP session not initialized."
-        )
+        raise RuntimeError("HTTP session not initialized.")
 
-    url = (
-        f"https://crt.sh/?q=%.{domain}&output=json"
-    )
+    url = f"https://crt.sh/?q=%.{domain}&output=json"
 
     headers = {
         "User-Agent": "ReconAutomationFramework/2.0",
@@ -78,15 +74,11 @@ def run_crtsh(
 
         elif exc.__class__.__name__ == "JSONDecodeError":
 
-            error(
-                "Invalid JSON response from crt.sh."
-            )
+            error("Invalid JSON response from crt.sh.")
 
         else:
 
-            error(
-                f"crt.sh request failed: {exc}"
-            )
+            error(f"crt.sh request failed: {exc}")
 
         return []
 
@@ -99,9 +91,7 @@ def run_crtsh(
             "",
         )
 
-        subdomains.extend(
-            names.split("\n")
-        )
+        subdomains.extend(names.split("\n"))
 
     subdomains = normalize_subdomains(
         subdomains=subdomains,
@@ -110,15 +100,11 @@ def run_crtsh(
 
     if subdomains:
 
-        success(
-            f"crt.sh found {len(subdomains)} subdomains."
-        )
+        success(f"crt.sh found {len(subdomains)} subdomains.")
 
     else:
 
-        warning(
-            "crt.sh returned no results."
-        )
+        warning("crt.sh returned no results.")
 
     return subdomains
 

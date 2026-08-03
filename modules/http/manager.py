@@ -34,7 +34,6 @@ from modules.http.probe import (
     probe_host,
 )
 
-
 # ==========================================================
 # Probe One Host
 # ==========================================================
@@ -58,10 +57,7 @@ def probe_one_host(
 
     if session is None:
 
-        raise RuntimeError(
-            "Shared HTTP session "
-            "is not initialized."
-        )
+        raise RuntimeError("Shared HTTP session " "is not initialized.")
 
     return (
         host,
@@ -88,9 +84,7 @@ def probe_hosts(
     Probe all hosts in parallel.
     """
 
-    info(
-        "Starting HTTP Probe..."
-    )
+    info("Starting HTTP Probe...")
 
     results: dict[
         str,
@@ -105,36 +99,26 @@ def probe_hosts(
         hosts,
     )
 
-    executor = (
-        context.get_thread_pool()
-    )
+    executor = context.get_thread_pool()
 
     if executor is None:
 
-        raise RuntimeError(
-            "Shared thread pool "
-            "is not initialized."
-        )
+        raise RuntimeError("Shared thread pool " "is not initialized.")
 
     futures = {
-
         executor.submit(
             probe_one_host,
             context,
             host,
         ): host
-
         for host in hosts
-
     }
 
     for future in as_completed(
         futures,
     ):
 
-        host = futures[
-            future
-        ]
+        host = futures[future]
 
         completed += 1
 
@@ -147,9 +131,7 @@ def probe_hosts(
 
             if response:
 
-                results[
-                    hostname
-                ] = response
+                results[hostname] = response
 
                 progress_status(
                     completed,
@@ -189,13 +171,9 @@ def probe_hosts(
                 f"✗ {host}",
             )
 
-    success(
-        f"Alive Hosts : {len(results)}"
-    )
+    success(f"Alive Hosts : {len(results)}")
 
-    success(
-        f"Dead Hosts  : {len(failed_hosts)}"
-    )
+    success(f"Dead Hosts  : {len(failed_hosts)}")
 
     return (
         results,

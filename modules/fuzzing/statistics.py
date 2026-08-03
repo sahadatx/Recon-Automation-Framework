@@ -9,10 +9,10 @@ from __future__ import annotations
 
 from typing import Any
 
-
 # ==========================================================
 # Empty Statistics
 # ==========================================================
+
 
 def empty_statistics() -> dict[str, Any]:
     """
@@ -37,6 +37,7 @@ def empty_statistics() -> dict[str, Any]:
 # Status Code Statistics
 # ==========================================================
 
+
 def status_statistics(
     results: list[dict[str, Any]],
 ) -> dict[str, int]:
@@ -55,10 +56,7 @@ def status_statistics(
             )
         )
 
-        statistics[status] = (
-            statistics.get(status, 0)
-            + 1
-        )
+        statistics[status] = statistics.get(status, 0) + 1
 
     return dict(
         sorted(
@@ -70,6 +68,7 @@ def status_statistics(
 # ==========================================================
 # Response Statistics
 # ==========================================================
+
 
 def response_statistics(
     results: list[dict[str, Any]],
@@ -95,22 +94,19 @@ def response_statistics(
     ]
 
     return {
-
         "minimum": min(sizes),
-
         "maximum": max(sizes),
-
         "average": round(
             sum(sizes) / len(sizes),
             2,
         ),
-
     }
 
 
 # ==========================================================
 # Generate Statistics
 # ==========================================================
+
 
 def generate_statistics(
     results: list[dict[str, Any]],

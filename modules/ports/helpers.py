@@ -16,13 +16,11 @@ from core.logger import (
     debug,
 )
 
-
 # ==========================================================
 # Common Services
 # ==========================================================
 
 SERVICE_MAP = {
-
     # Web
     80: "http",
     443: "https",
@@ -32,13 +30,11 @@ SERVICE_MAP = {
     8000: "http-alt",
     8008: "http-alt",
     8088: "http-alt",
-
     # Remote Access
     22: "ssh",
     23: "telnet",
     3389: "rdp",
     5900: "vnc",
-
     # Mail
     25: "smtp",
     110: "pop3",
@@ -47,13 +43,10 @@ SERVICE_MAP = {
     587: "submission",
     993: "imaps",
     995: "pop3s",
-
     # DNS
     53: "dns",
-
     # SMB
     445: "smb",
-
     # Databases
     1433: "mssql",
     1521: "oracle",
@@ -63,24 +56,22 @@ SERVICE_MAP = {
     27017: "mongodb",
     9200: "elasticsearch",
     9300: "elasticsearch",
-
     # Containers
     2375: "docker",
     2376: "docker-tls",
     6443: "kubernetes",
-
     # Misc
     8888: "jupyter",
     9090: "prometheus",
     9000: "sonarqube",
     10000: "webmin",
-
 }
 
 
 # ==========================================================
 # Create Socket
 # ==========================================================
+
 
 def create_socket():
     """
@@ -92,9 +83,7 @@ def create_socket():
         socket.SOCK_STREAM,
     )
 
-    sock.settimeout(
-        PORT_SCAN_TIMEOUT
-    )
+    sock.settimeout(PORT_SCAN_TIMEOUT)
 
     return sock
 
@@ -102,6 +91,7 @@ def create_socket():
 # ==========================================================
 # Get Service Name
 # ==========================================================
+
 
 def get_service_name(
     port: int,
@@ -119,6 +109,7 @@ def get_service_name(
 # ==========================================================
 # Scan Port
 # ==========================================================
+
 
 def scan_port(
     host: str,
@@ -146,18 +137,13 @@ def scan_port(
             return None
 
         return {
-
             "port": port,
-
             "service": get_service_name(
                 port,
             ),
-
             "state": "open",
-
             # Future:
             "banner": None,
-
         }
 
     except (
@@ -178,6 +164,7 @@ def scan_port(
 # Show Scan
 # ==========================================================
 
+
 def show_scan(
     host: str,
     port: int,
@@ -188,14 +175,13 @@ def show_scan(
 
     if DEBUG:
 
-        debug(
-            f"Scanning {host}:{port}"
-        )
+        debug(f"Scanning {host}:{port}")
 
 
 # ==========================================================
 # Get Timeout
 # ==========================================================
+
 
 def get_timeout():
     """

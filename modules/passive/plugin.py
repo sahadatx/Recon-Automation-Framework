@@ -14,7 +14,6 @@ from core.plugins.base import BasePlugin
 from .exporter import export_all
 from .manager import run
 
-
 # ==========================================================
 # Passive Enumeration Plugin
 # ==========================================================

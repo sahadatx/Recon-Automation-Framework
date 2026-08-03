@@ -29,6 +29,7 @@ from .constants import (
 # Output Directory
 # ==========================================================
 
+
 def create_output_directory() -> None:
     """
     Create output directory.
@@ -43,6 +44,7 @@ def create_output_directory() -> None:
 # ==========================================================
 # Write Text
 # ==========================================================
+
 
 def write_text(
     output_file: Path,
@@ -69,15 +71,11 @@ def write_text(
             encoding="utf-8",
         )
 
-        success(
-            f"Saved {output_file}"
-        )
+        success(f"Saved {output_file}")
 
     except OSError as error:
 
-        warning(
-            f"{output_file}: {error}"
-        )
+        warning(f"{output_file}: {error}")
 
     return output_file
 
@@ -85,6 +83,7 @@ def write_text(
 # ==========================================================
 # Write JSON
 # ==========================================================
+
 
 def write_json(
     output_file: Path,
@@ -120,15 +119,11 @@ def write_json(
                 default=str,
             )
 
-        success(
-            f"Saved {output_file}"
-        )
+        success(f"Saved {output_file}")
 
     except OSError as error:
 
-        warning(
-            f"{output_file}: {error}"
-        )
+        warning(f"{output_file}: {error}")
 
     return output_file
 
@@ -136,6 +131,7 @@ def write_json(
 # ==========================================================
 # Write CSV
 # ==========================================================
+
 
 def write_csv(
     output_file: Path,
@@ -196,15 +192,11 @@ def write_csv(
                     ]
                 )
 
-        success(
-            f"Saved {output_file}"
-        )
+        success(f"Saved {output_file}")
 
     except OSError as error:
 
-        warning(
-            f"{output_file}: {error}"
-        )
+        warning(f"{output_file}: {error}")
 
     return output_file
 
@@ -212,6 +204,7 @@ def write_csv(
 # ==========================================================
 # Export JSON
 # ==========================================================
+
 
 def export_json(
     analysis: dict[str, Any],
@@ -230,6 +223,7 @@ def export_json(
 # Export TXT
 # ==========================================================
 
+
 def export_txt(
     analysis: dict[str, Any],
 ) -> Path:
@@ -245,34 +239,19 @@ def export_txt(
 
         lines.append("=" * 80)
 
-        lines.append(
-            f"Target              : {result.get('target', '-')}"
-        )
+        lines.append(f"Target              : {result.get('target', '-')}")
 
-        lines.append(
-            f"CDN Detected        : {result.get('cdn', False)}"
-        )
+        lines.append(f"CDN Detected        : {result.get('cdn', False)}")
 
-        lines.append(
-            f"Provider            : {result.get('provider', '-')}"
-        )
+        lines.append(f"Provider            : {result.get('provider', '-')}")
 
-        lines.append(
-            f"Confidence          : {result.get('confidence', '-')}"
-        )
+        lines.append(f"Confidence          : {result.get('confidence', '-')}")
 
-        lines.append(
-            "Methods             : "
-            + ", ".join(result.get("method", []))
-        )
+        lines.append("Methods             : " + ", ".join(result.get("method", [])))
 
-        lines.append(
-            f"CNAME               : {result.get('cname', '-')}"
-        )
+        lines.append(f"CNAME               : {result.get('cname', '-')}")
 
-        lines.append(
-            f"IP Address          : {result.get('ip', '-')}"
-        )
+        lines.append(f"IP Address          : {result.get('ip', '-')}")
 
         lines.append("Recommendations")
 
@@ -285,15 +264,11 @@ def export_txt(
 
             for recommendation in recommendations:
 
-                lines.append(
-                    f"  - {recommendation}"
-                )
+                lines.append(f"  - {recommendation}")
 
         else:
 
-            lines.append(
-                "  None"
-            )
+            lines.append("  None")
 
         lines.append("")
 
@@ -306,6 +281,7 @@ def export_txt(
 # ==========================================================
 # Export CSV
 # ==========================================================
+
 
 def export_csv(
     analysis: dict[str, Any],
@@ -323,6 +299,7 @@ def export_csv(
 # ==========================================================
 # Export Detected
 # ==========================================================
+
 
 def export_detected(
     analysis: dict[str, Any],
@@ -344,12 +321,10 @@ def export_detected(
             continue
 
         lines.append(
-
             f"{result.get('target', '-')}"
             f" -> "
             f"{result.get('provider', '-')}"
             f" (Confidence: {result.get('confidence', '-')})"
-
         )
 
     return write_text(
@@ -362,6 +337,7 @@ def export_detected(
 # Export Summary
 # ==========================================================
 
+
 def export_summary(
     analysis: dict[str, Any],
 ) -> Path:
@@ -372,34 +348,21 @@ def export_summary(
     statistics = analysis["statistics"]
 
     lines = [
-
         "CDN Detection Summary",
-
         "=" * 40,
-
         f"Targets             : {statistics['targets']}",
-
         f"CDN Detected        : {statistics['detected']}",
-
         f"CDN Not Detected    : {statistics['undetected']}",
-
         f"Average Confidence  : {statistics['average_confidence']}",
-
         f"Highest Confidence  : {statistics['highest_confidence']}",
-
         "",
-
         "Confidence Levels",
-
         "-" * 40,
-
     ]
 
     for level, count in statistics["confidence_statistics"].items():
 
-        lines.append(
-            f"{level:<20}{count}"
-        )
+        lines.append(f"{level:<20}{count}")
 
     lines.extend(
         [
@@ -411,9 +374,7 @@ def export_summary(
 
     for provider, count in statistics["provider_statistics"].items():
 
-        lines.append(
-            f"{provider:<20}{count}"
-        )
+        lines.append(f"{provider:<20}{count}")
 
     return write_text(
         SUMMARY_FILE,
@@ -424,6 +385,7 @@ def export_summary(
 # ==========================================================
 # Show Summary
 # ==========================================================
+
 
 def show_summary(
     analysis: dict[str, Any],
@@ -438,9 +400,7 @@ def show_summary(
 
     print("=" * 80)
 
-    print(
-        "CDN Detection Summary".center(80)
-    )
+    print("CDN Detection Summary".center(80))
 
     print("=" * 80)
 
@@ -458,9 +418,7 @@ def show_summary(
 
     for level, count in statistics["confidence_statistics"].items():
 
-        print(
-            f"{level:<30}{count}"
-        )
+        print(f"{level:<30}{count}")
 
     print("-" * 80)
 
@@ -470,9 +428,7 @@ def show_summary(
 
     for provider, count in statistics["provider_statistics"].items():
 
-        print(
-            f"{provider:<30}{count}"
-        )
+        print(f"{provider:<30}{count}")
 
     print("=" * 80)
 
@@ -480,6 +436,7 @@ def show_summary(
 # ==========================================================
 # Export All
 # ==========================================================
+
 
 def export_all(
     analysis: dict[str, Any],

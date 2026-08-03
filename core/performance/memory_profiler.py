@@ -90,11 +90,7 @@ class MemoryProfiler:
                 os.getpid(),
             )
 
-            return (
-                process.memory_info().rss
-                / 1024
-                / 1024
-            )
+            return process.memory_info().rss / 1024 / 1024
 
         if HAS_RESOURCE:
 
@@ -111,19 +107,11 @@ class MemoryProfiler:
 
                 return memory / 1024
 
-            return (
-                memory
-                / 1024
-                / 1024
-            )
+            return memory / 1024 / 1024
 
         current, _ = tracemalloc.get_traced_memory()
 
-        return (
-            current
-            / 1024
-            / 1024
-        )
+        return current / 1024 / 1024
 
     # ------------------------------------------------------
     # Peak Memory
@@ -139,11 +127,7 @@ class MemoryProfiler:
 
             _, peak = tracemalloc.get_traced_memory()
 
-            return (
-                peak
-                / 1024
-                / 1024
-            )
+            return peak / 1024 / 1024
 
         return MemoryProfiler.current_memory()
 
@@ -166,8 +150,7 @@ class MemoryProfiler:
                 2,
             ),
             "difference_mb": round(
-                self.peak_memory()
-                - self.current_memory(),
+                self.peak_memory() - self.current_memory(),
                 2,
             ),
         }

@@ -33,7 +33,6 @@ from core.plugins.manager import (
     plugin_manager,
 )
 
-
 # ==========================================================
 # Context
 # ==========================================================
@@ -98,10 +97,7 @@ def execute_pipeline_module(
 
     if not config["quiet"]:
 
-        info(
-            f"[{index}/{total}] "
-            f"Running {module}..."
-        )
+        info(f"[{index}/{total}] " f"Running {module}...")
 
     arguments: tuple[Any, ...] = ()
 
@@ -112,9 +108,7 @@ def execute_pipeline_module(
 
     if module == "passive":
 
-        arguments = (
-            config["target"],
-        )
+        arguments = (config["target"],)
 
     execute_module(
         context,
@@ -124,9 +118,7 @@ def execute_pipeline_module(
 
     if not config["quiet"]:
 
-        success(
-            f"Completed {module}"
-        )
+        success(f"Completed {module}")
 
 
 # ==========================================================
@@ -185,9 +177,7 @@ def print_performance_summary(
 
         return
 
-    report = (
-        context.performance.markdown()
-    )
+    report = context.performance.markdown()
 
     if not report:
 
@@ -229,6 +219,7 @@ def cleanup(
     session.close()
 
     context.clear()
+
 
 # ==========================================================
 # Main
@@ -300,9 +291,7 @@ def main() -> None:
         # Stop framework timer
         #
 
-        framework_elapsed = (
-            context.performance.stop()
-        )
+        framework_elapsed = context.performance.stop()
 
         #
         # Store statistics
@@ -351,10 +340,7 @@ def main() -> None:
 
         if not config["quiet"]:
 
-            success(
-                "Framework completed in "
-                f"{framework_elapsed:.2f} sec."
-            )
+            success("Framework completed in " f"{framework_elapsed:.2f} sec.")
 
     finally:
 

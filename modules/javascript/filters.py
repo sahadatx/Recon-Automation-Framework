@@ -9,44 +9,28 @@ from __future__ import annotations
 
 import re
 
-
 # ==========================================================
 # Placeholder Values
 # ==========================================================
 
 PLACEHOLDERS = {
-
     "",
-
     "api_key",
     "apikey",
-
     "secret",
-
     "password",
-
     "token",
-
     "bearer",
-
     "your_api_key",
     "your_token",
     "your_secret",
-
     "change_me",
-
     "example",
-
     "sample",
-
     "dummy",
-
     "test",
-
     "null",
-
     "none",
-
 }
 
 
@@ -60,6 +44,7 @@ MIN_SECRET_LENGTH = 20
 # ==========================================================
 # Empty Value
 # ==========================================================
+
 
 def is_empty(
     value: str,
@@ -78,6 +63,7 @@ def is_empty(
 # Placeholder Value
 # ==========================================================
 
+
 def is_placeholder(
     value: str,
 ) -> bool:
@@ -89,24 +75,13 @@ def is_placeholder(
         bool
     """
 
-    return (
-
-        value
-
-        .strip()
-
-        .lower()
-
-        in
-
-        PLACEHOLDERS
-
-    )
+    return value.strip().lower() in PLACEHOLDERS
 
 
 # ==========================================================
 # Too Short
 # ==========================================================
+
 
 def is_short(
     value: str,
@@ -120,24 +95,13 @@ def is_short(
         bool
     """
 
-    return (
-
-        len(
-
-            value.strip()
-
-        )
-
-        <
-
-        MIN_SECRET_LENGTH
-
-    )
+    return len(value.strip()) < MIN_SECRET_LENGTH
 
 
 # ==========================================================
 # Base64 Noise
 # ==========================================================
+
 
 def is_base64_noise(
     value: str,
@@ -150,23 +114,18 @@ def is_base64_noise(
     """
 
     return (
-
         re.fullmatch(
-
             r"[A-Za-z0-9+/=]+",
-
             value,
-
         )
-
         is not None
-
     )
 
 
 # ==========================================================
 # Repeated Characters
 # ==========================================================
+
 
 def is_repeated(
     value: str,
@@ -182,26 +141,13 @@ def is_repeated(
         bool
     """
 
-    return (
-
-        len(
-
-            set(
-
-                value
-
-            )
-
-        )
-
-        <= 2
-
-    )
+    return len(set(value)) <= 2
 
 
 # ==========================================================
 # Generic API Key Validation
 # ==========================================================
+
 
 def is_generic_noise(
     value: str,
@@ -213,40 +159,17 @@ def is_generic_noise(
         bool
     """
 
-    has_letter = any(
+    has_letter = any(char.isalpha() for char in value)
 
-        char.isalpha()
+    has_digit = any(char.isdigit() for char in value)
 
-        for char
-
-        in value
-
-    )
-
-    has_digit = any(
-
-        char.isdigit()
-
-        for char
-
-        in value
-
-    )
-
-    return not (
-
-        has_letter
-
-        and
-
-        has_digit
-
-    )
+    return not (has_letter and has_digit)
 
 
 # ==========================================================
 # JWT Validation
 # ==========================================================
+
 
 def is_valid_jwt(
     value: str,
@@ -259,18 +182,13 @@ def is_valid_jwt(
         bool
     """
 
-    return (
-
-        value.count(".")
-
-        == 2
-
-    )
+    return value.count(".") == 2
 
 
 # ==========================================================
 # Keep Secret
 # ==========================================================
+
 
 def keep_secret(
     secret_type: str,
@@ -284,69 +202,31 @@ def keep_secret(
         bool
     """
 
-    if is_empty(
-        value
-    ):
+    if is_empty(value):
 
         return False
 
-    if is_placeholder(
-        value
-    ):
+    if is_placeholder(value):
 
         return False
 
-    if is_short(
-        value
-    ):
+    if is_short(value):
 
         return False
 
-    if is_repeated(
-        value
-    ):
+    if is_repeated(value):
 
         return False
 
-    if (
-
-        secret_type == "jwt"
-
-        and
-
-        not is_valid_jwt(
-            value
-        )
-
-    ):
+    if secret_type == "jwt" and not is_valid_jwt(value):
 
         return False
 
-    if (
-
-        secret_type == "generic_api_key"
-
-        and
-
-        is_generic_noise(
-            value
-        )
-
-    ):
+    if secret_type == "generic_api_key" and is_generic_noise(value):
 
         return False
 
-    if (
-
-        secret_type == "generic_api_key"
-
-        and
-
-        is_base64_noise(
-            value
-        )
-
-    ):
+    if secret_type == "generic_api_key" and is_base64_noise(value):
 
         return False
 
@@ -356,6 +236,7 @@ def keep_secret(
 # ==========================================================
 # Filter Findings
 # ==========================================================
+
 
 def filter_findings(
     findings: dict[str, list[str]],
@@ -373,30 +254,19 @@ def filter_findings(
     for secret_type, values in findings.items():
 
         kept = sorted(
-
             {
-
                 value
-
                 for value in values
-
                 if keep_secret(
-
                     secret_type,
-
                     value,
-
                 )
-
             }
-
         )
 
         if kept:
 
-            filtered[
-                secret_type
-            ] = kept
+            filtered[secret_type] = kept
 
     return filtered
 
@@ -406,27 +276,15 @@ def filter_findings(
 # ==========================================================
 
 __all__ = [
-
     "MIN_SECRET_LENGTH",
-
     "PLACEHOLDERS",
-
     "is_empty",
-
     "is_placeholder",
-
     "is_short",
-
     "is_base64_noise",
-
     "is_repeated",
-
     "is_generic_noise",
-
     "is_valid_jwt",
-
     "keep_secret",
-
     "filter_findings",
-
 ]

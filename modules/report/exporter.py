@@ -26,7 +26,6 @@ from .statistics import (
     generate_summary,
 )
 
-
 # ==========================================================
 # JSON
 # ==========================================================
@@ -51,9 +50,7 @@ def export_json(
             ensure_ascii=False,
         )
 
-    success(
-        f"Saved {REPORT_JSON}"
-    )
+    success(f"Saved {REPORT_JSON}")
 
 
 # ==========================================================
@@ -81,9 +78,7 @@ def export_text(
             )
         )
 
-    success(
-        f"Saved {REPORT_TXT}"
-    )
+    success(f"Saved {REPORT_TXT}")
 
 
 # ==========================================================
@@ -99,56 +94,36 @@ def export_markdown(
     """
 
     lines = [
-
         "# Recon Automation Framework Report",
-
         "",
-
     ]
 
     for section, data in report.items():
 
-        lines.append(
-            f"## {section.title()}"
-        )
+        lines.append(f"## {section.title()}")
 
         lines.append("")
 
-        lines.append(
-            "```json"
-        )
+        lines.append("```json")
 
         lines.append(
-
             json.dumps(
-
                 data,
-
                 indent=4,
-
                 ensure_ascii=False,
-
             )
-
         )
 
-        lines.append(
-            "```"
-        )
+        lines.append("```")
 
         lines.append("")
 
     REPORT_MD.write_text(
-
         "\n".join(lines),
-
         encoding="utf-8",
-
     )
 
-    success(
-        f"Saved {REPORT_MD}"
-    )
+    success(f"Saved {REPORT_MD}")
 
 
 # ==========================================================
@@ -164,18 +139,11 @@ def export_summary(
     """
 
     SUMMARY_TXT.write_text(
-
-        generate_summary(
-            statistics
-        ),
-
+        generate_summary(statistics),
         encoding="utf-8",
-
     )
 
-    success(
-        f"Saved {SUMMARY_TXT}"
-    )
+    success(f"Saved {SUMMARY_TXT}")
 
 
 # ==========================================================
@@ -224,27 +192,17 @@ def show_summary(
 
     print()
 
-    print(
-        "=" * 80
-    )
+    print("=" * 80)
 
-    print(
-        "Report Summary"
-    )
+    print("Report Summary")
 
-    print(
-        "=" * 80
-    )
+    print("=" * 80)
 
     for key, value in statistics.items():
 
-        print(
-            f"{key.replace('_', ' ').title():<30} {value}"
-        )
+        print(f"{key.replace('_', ' ').title():<30} {value}")
 
-    print(
-        "=" * 80
-    )
+    print("=" * 80)
 
 
 # ==========================================================
@@ -252,17 +210,10 @@ def show_summary(
 # ==========================================================
 
 __all__ = [
-
     "export_json",
-
     "export_text",
-
     "export_markdown",
-
     "export_summary",
-
     "export_all",
-
     "show_summary",
-
 ]

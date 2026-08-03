@@ -22,7 +22,6 @@ from core.logger import (
 from modules.dns.analyzer import analyze
 from modules.dns.records import resolve_all_records
 
-
 # ==========================================================
 # Resolve One Subdomain
 # ==========================================================
@@ -81,9 +80,7 @@ def resolve_subdomains(
     discovered subdomain.
     """
 
-    info(
-        "Starting DNS Resolution..."
-    )
+    info("Starting DNS Resolution...")
 
     results: dict[
         str,
@@ -102,29 +99,22 @@ def resolve_subdomains(
 
     if executor is None:
 
-        raise RuntimeError(
-            "Shared thread pool is not initialized."
-        )
+        raise RuntimeError("Shared thread pool is not initialized.")
 
     futures = {
-
         executor.submit(
             resolve_subdomain,
             context,
             subdomain,
         ): subdomain
-
         for subdomain in subdomains
-
     }
 
     for future in as_completed(
         futures,
     ):
 
-        subdomain = futures[
-            future
-        ]
+        subdomain = futures[future]
 
         completed += 1
 
@@ -135,15 +125,11 @@ def resolve_subdomains(
                 records,
             ) = future.result()
 
-            results[
-                hostname
-            ] = records
+            results[hostname] = records
 
         except Exception as error:
 
-            warning(
-                f"{subdomain}: {error}"
-            )
+            warning(f"{subdomain}: {error}")
 
             failed_hosts.append(
                 subdomain,
@@ -155,9 +141,7 @@ def resolve_subdomains(
             f"✓ {subdomain} resolved",
         )
 
-    success(
-        f"Resolved {len(results)} hosts."
-    )
+    success(f"Resolved {len(results)} hosts.")
 
     return (
         results,

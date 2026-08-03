@@ -32,7 +32,6 @@ from .scanner import (
     scan_targets,
 )
 
-
 # ==========================================================
 # Run WAF Detection
 # ==========================================================
@@ -114,9 +113,7 @@ def run_waf_detection(
         analysis,
     )
 
-    statistics = analysis[
-        "statistics"
-    ]
+    statistics = analysis["statistics"]
 
     success(
         f"Targets          : {statistics['targets']}",

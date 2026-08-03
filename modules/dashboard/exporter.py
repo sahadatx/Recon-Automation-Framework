@@ -27,10 +27,10 @@ from .constants import (
     DASHBOARD_SUMMARY,
 )
 
-
 # ==========================================================
 # Output Directory
 # ==========================================================
+
 
 def create_output_directory() -> None:
     """
@@ -46,6 +46,7 @@ def create_output_directory() -> None:
 # ==========================================================
 # Write Text
 # ==========================================================
+
 
 def write_text(
     output_file: Path,
@@ -68,22 +69,15 @@ def write_text(
     try:
 
         output_file.write_text(
-
             "\n".join(lines),
-
             encoding="utf-8",
-
         )
 
-        success(
-            f"Saved {output_file}"
-        )
+        success(f"Saved {output_file}")
 
     except OSError as error:
 
-        warning(
-            f"{output_file}: {error}"
-        )
+        warning(f"{output_file}: {error}")
 
     return output_file
 
@@ -91,6 +85,7 @@ def write_text(
 # ==========================================================
 # Write JSON
 # ==========================================================
+
 
 def write_json(
     output_file: Path,
@@ -113,38 +108,24 @@ def write_json(
     try:
 
         with output_file.open(
-
             "w",
-
             encoding="utf-8",
-
         ) as file:
 
             json.dump(
-
                 data,
-
                 file,
-
                 indent=4,
-
                 ensure_ascii=False,
-
                 sort_keys=True,
-
                 default=str,
-
             )
 
-        success(
-            f"Saved {output_file}"
-        )
+        success(f"Saved {output_file}")
 
     except OSError as error:
 
-        warning(
-            f"{output_file}: {error}"
-        )
+        warning(f"{output_file}: {error}")
 
     return output_file
 
@@ -152,6 +133,7 @@ def write_json(
 # ==========================================================
 # Write HTML
 # ==========================================================
+
 
 def write_html(
     output_file: Path,
@@ -174,22 +156,15 @@ def write_html(
     try:
 
         output_file.write_text(
-
             html,
-
             encoding="utf-8",
-
         )
 
-        success(
-            f"Saved {output_file}"
-        )
+        success(f"Saved {output_file}")
 
     except OSError as error:
 
-        warning(
-            f"{output_file}: {error}"
-        )
+        warning(f"{output_file}: {error}")
 
     return output_file
 
@@ -197,6 +172,7 @@ def write_html(
 # ==========================================================
 # Export JSON
 # ==========================================================
+
 
 def export_json(
     analysis: dict[str, Any],
@@ -206,17 +182,15 @@ def export_json(
     """
 
     return write_json(
-
         DASHBOARD_JSON,
-
         analysis,
-
     )
 
 
 # ==========================================================
 # Export TXT
 # ==========================================================
+
 
 def export_txt(
     analysis: dict[str, Any],
@@ -230,57 +204,36 @@ def export_txt(
     results = analysis["results"]
 
     lines = [
-
         "Dashboard",
-
         "=" * 80,
-
         "",
-
         f"Target             : {statistics['target']}",
-
         f"Modules            : {statistics['modules']}",
-
         f"Completed Modules  : {statistics['completed_modules']}",
-
         f"Failed Modules     : {statistics['failed_modules']}",
-
         f"Findings           : {statistics['findings']}",
-
         "",
-
         "Executed Modules",
-
         "-" * 80,
-
     ]
 
     for module in results.get(
-
         "module_names",
-
         [],
-
     ):
 
-        lines.append(
-
-            f"• {module}"
-
-        )
+        lines.append(f"• {module}")
 
     return write_text(
-
         DASHBOARD_TXT,
-
         lines,
-
     )
 
 
 # ==========================================================
 # Export Summary
 # ==========================================================
+
 
 def export_summary(
     analysis: dict[str, Any],
@@ -292,34 +245,25 @@ def export_summary(
     statistics = analysis["statistics"]
 
     lines = [
-
         "Dashboard Summary",
-
         "=" * 40,
-
         f"Target             : {statistics['target']}",
-
         f"Modules            : {statistics['modules']}",
-
         f"Completed Modules  : {statistics['completed_modules']}",
-
         f"Failed Modules     : {statistics['failed_modules']}",
-
         f"Findings           : {statistics['findings']}",
-
     ]
 
     return write_text(
-
         DASHBOARD_SUMMARY,
-
         lines,
-
     )
+
 
 # ==========================================================
 # Build CSS
 # ==========================================================
+
 
 def _build_css() -> str:
     """
@@ -591,9 +535,11 @@ footer{
 </style>
 """
 
+
 # ==========================================================
 # Build Header
 # ==========================================================
+
 
 def _build_header(
     statistics: dict,
@@ -708,9 +654,11 @@ v1.0.0
 
 """
 
+
 # ==========================================================
 # Build Summary Cards
 # ==========================================================
+
 
 def _build_summary_cards(
     statistics: dict,
@@ -816,9 +764,11 @@ def _build_summary_cards(
 </div>
 """
 
+
 # ==========================================================
 # Build Execution Summary
 # ==========================================================
+
 
 def _build_execution_summary(
     statistics: dict,
@@ -835,33 +785,27 @@ def _build_execution_summary(
     """
 
     success_rate = round(
-
         (
             statistics["completed_modules"]
-            /
-            max(
+            / max(
                 statistics["modules"],
                 1,
             )
-        ) * 100,
-
+        )
+        * 100,
         1,
-
     )
 
     failure_rate = round(
-
         (
             statistics["failed_modules"]
-            /
-            max(
+            / max(
                 statistics["modules"],
                 1,
             )
-        ) * 100,
-
+        )
+        * 100,
         1,
-
     )
 
     return f"""
@@ -1018,9 +962,11 @@ style="width:{failure_rate}%;">
 </div>
 """
 
+
 # ==========================================================
 # Build Module Status
 # ==========================================================
+
 
 def _build_module_status(
     modules: list[str],
@@ -1040,9 +986,7 @@ def _build_module_status(
 
     for module in sorted(modules):
 
-        rows.append(
-
-            f"""
+        rows.append(f"""
 <tr>
 
 <td>
@@ -1058,9 +1002,7 @@ def _build_module_status(
 </td>
 
 </tr>
-"""
-
-        )
+""")
 
     return f"""
 <div class="section">
@@ -1104,9 +1046,11 @@ Status
 </div>
 """
 
+
 # ==========================================================
 # Build Findings Breakdown
 # ==========================================================
+
 
 def _build_findings_breakdown(
     analysis: dict,
@@ -1127,65 +1071,55 @@ def _build_findings_breakdown(
     results = analysis["results"]
 
     findings = {
-
         "Subdomains": len(
             results.get(
                 "subdomains",
                 [],
             )
         ),
-
         "Alive Hosts": len(
             results.get(
                 "alive_hosts",
                 [],
             )
         ),
-
         "Open Ports": len(
             results.get(
                 "ports",
                 [],
             )
         ),
-
         "URLs": len(
             results.get(
                 "urls",
                 [],
             )
         ),
-
         "JavaScript Files": len(
             results.get(
                 "javascript",
                 [],
             )
         ),
-
         "Technologies": len(
             results.get(
                 "technologies",
                 [],
             )
         ),
-
         "Screenshots": len(
             results.get(
                 "screenshots",
                 [],
             )
         ),
-
     }
 
     rows = []
 
     for category, count in findings.items():
 
-        rows.append(
-
-            f"""
+        rows.append(f"""
 <tr>
 
 <td>
@@ -1201,13 +1135,9 @@ def _build_findings_breakdown(
 </td>
 
 </tr>
-"""
+""")
 
-        )
-
-    rows.append(
-
-        f"""
+    rows.append(f"""
 <tr>
 
 <td>
@@ -1227,9 +1157,7 @@ def _build_findings_breakdown(
 </td>
 
 </tr>
-"""
-
-    )
+""")
 
     return f"""
 <div class="section">
@@ -1273,9 +1201,11 @@ Count
 </div>
 """
 
+
 # ==========================================================
 # Build Results Overview
 # ==========================================================
+
 
 def _build_results_overview(
     statistics: dict,
@@ -1296,13 +1226,9 @@ def _build_results_overview(
         1,
     )
 
-    completed = statistics[
-        "completed_modules"
-    ]
+    completed = statistics["completed_modules"]
 
-    failed = statistics[
-        "failed_modules"
-    ]
+    failed = statistics["failed_modules"]
 
     success_rate = round(
         (completed / total_modules) * 100,
@@ -1318,37 +1244,25 @@ def _build_results_overview(
 
         framework_status = "Healthy"
 
-        framework_class = (
-            "status-success"
-        )
+        framework_class = "status-success"
 
-        framework_message = (
-            "All modules completed successfully."
-        )
+        framework_message = "All modules completed successfully."
 
     elif failed <= 2:
 
         framework_status = "Warning"
 
-        framework_class = (
-            "status-warning"
-        )
+        framework_class = "status-warning"
 
-        framework_message = (
-            "Some modules reported errors."
-        )
+        framework_message = "Some modules reported errors."
 
     else:
 
         framework_status = "Failed"
 
-        framework_class = (
-            "status-failed"
-        )
+        framework_class = "status-failed"
 
-        framework_message = (
-            "Multiple modules failed during execution."
-        )
+        framework_message = "Multiple modules failed during execution."
 
     return f"""
 <div class="section">
@@ -1451,9 +1365,11 @@ color:#94a3b8;
 </div>
 """
 
+
 # ==========================================================
 # Build Framework Information
 # ==========================================================
+
 
 def _build_framework_information(
     analysis: dict,
@@ -1472,47 +1388,22 @@ def _build_framework_information(
     statistics = analysis["statistics"]
 
     framework = {
-
-        "Framework":
-            "Recon Automation Framework",
-
-        "Version":
-            "v1.0.0",
-
-        "Generated":
-            datetime.now().strftime(
-                "%Y-%m-%d %H:%M:%S"
-            ),
-
-        "Target":
-            statistics["target"],
-
-        "Modules":
-            statistics["modules"],
-
-        "Completed":
-            statistics["completed_modules"],
-
-        "Failed":
-            statistics["failed_modules"],
-
-        "Findings":
-            statistics["findings"],
-
-        "Output":
-            str(
-                DASHBOARD_DIR
-            ),
-
+        "Framework": "Recon Automation Framework",
+        "Version": "v1.0.0",
+        "Generated": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "Target": statistics["target"],
+        "Modules": statistics["modules"],
+        "Completed": statistics["completed_modules"],
+        "Failed": statistics["failed_modules"],
+        "Findings": statistics["findings"],
+        "Output": str(DASHBOARD_DIR),
     }
 
     rows = []
 
     for key, value in framework.items():
 
-        rows.append(
-
-            f"""
+        rows.append(f"""
 <tr>
 
 <td>
@@ -1532,9 +1423,7 @@ def _build_framework_information(
 </td>
 
 </tr>
-"""
-
-        )
+""")
 
     return f"""
 <div class="section">
@@ -1578,9 +1467,11 @@ Value
 </div>
 """
 
+
 # ==========================================================
 # Build Footer
 # ==========================================================
+
 
 def _build_footer() -> str:
     """
@@ -1692,6 +1583,7 @@ Recon Automation Framework
 # Export HTML Dashboard
 # ==========================================================
 
+
 def export_html(
     analysis: dict,
 ) -> Path:
@@ -1727,44 +1619,24 @@ def export_html(
         statistics,
     )
 
-    execution_summary = (
-
-        _build_execution_summary(
-            statistics,
-        )
-
+    execution_summary = _build_execution_summary(
+        statistics,
     )
 
-    module_status = (
-
-        _build_module_status(
-            modules,
-        )
-
+    module_status = _build_module_status(
+        modules,
     )
 
-    findings_breakdown = (
-
-        _build_findings_breakdown(
-            analysis,
-        )
-
+    findings_breakdown = _build_findings_breakdown(
+        analysis,
     )
 
-    results_overview = (
-
-        _build_results_overview(
-            statistics,
-        )
-
+    results_overview = _build_results_overview(
+        statistics,
     )
 
-    framework_information = (
-
-        _build_framework_information(
-            analysis,
-        )
-
+    framework_information = _build_framework_information(
+        analysis,
     )
 
     footer = _build_footer()
@@ -1817,17 +1689,15 @@ Recon Automation Framework Dashboard
 """
 
     return write_html(
-
         DASHBOARD_HTML,
-
         html,
-
     )
 
 
 # ==========================================================
 # Show Summary
 # ==========================================================
+
 
 def show_summary(
     analysis: dict,
@@ -1842,36 +1712,19 @@ def show_summary(
 
     print("=" * 80)
 
-    print(
-        "Dashboard Summary"
-    )
+    print("Dashboard Summary")
 
     print("=" * 80)
 
-    print(
-        f"{'Target':<25}"
-        f"{statistics['target']}"
-    )
+    print(f"{'Target':<25}" f"{statistics['target']}")
 
-    print(
-        f"{'Modules':<25}"
-        f"{statistics['modules']}"
-    )
+    print(f"{'Modules':<25}" f"{statistics['modules']}")
 
-    print(
-        f"{'Completed':<25}"
-        f"{statistics['completed_modules']}"
-    )
+    print(f"{'Completed':<25}" f"{statistics['completed_modules']}")
 
-    print(
-        f"{'Failed':<25}"
-        f"{statistics['failed_modules']}"
-    )
+    print(f"{'Failed':<25}" f"{statistics['failed_modules']}")
 
-    print(
-        f"{'Findings':<25}"
-        f"{statistics['findings']}"
-    )
+    print(f"{'Findings':<25}" f"{statistics['findings']}")
 
     print("=" * 80)
 
@@ -1879,6 +1732,7 @@ def show_summary(
 # ==========================================================
 # Export All
 # ==========================================================
+
 
 def export_all(
     analysis: dict,
@@ -1893,36 +1747,13 @@ def export_all(
     create_output_directory()
 
     exported = {
-
-        "txt":
-
-            export_txt(
-                analysis
-            ),
-
-        "json":
-
-            export_json(
-                analysis
-            ),
-
-        "summary":
-
-            export_summary(
-                analysis
-            ),
-
-        "html":
-
-            export_html(
-                analysis
-            ),
-
+        "txt": export_txt(analysis),
+        "json": export_json(analysis),
+        "summary": export_summary(analysis),
+        "html": export_html(analysis),
     }
 
-    success(
-        "Dashboard reports exported successfully."
-    )
+    success("Dashboard reports exported successfully.")
 
     return exported
 
@@ -1932,17 +1763,10 @@ def export_all(
 # ==========================================================
 
 __all__ = [
-
     "export_json",
-
     "export_txt",
-
     "export_summary",
-
     "export_html",
-
     "export_all",
-
     "show_summary",
-
 ]

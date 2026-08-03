@@ -18,7 +18,6 @@ from .base import BasePlugin
 from .loader import loader
 from .registry import registry
 
-
 # ==========================================================
 # Plugin Manager
 # ==========================================================
@@ -179,11 +178,7 @@ class PluginManager:
         self,
     ) -> Iterator[BasePlugin]:
 
-        return (
-            plugin
-            for plugin in registry
-            if plugin.enabled
-        )
+        return (plugin for plugin in registry if plugin.enabled)
 
     def __len__(
         self,

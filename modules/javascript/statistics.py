@@ -6,10 +6,10 @@ Generate statistics for JavaScript analysis results.
 
 from __future__ import annotations
 
-
 # ==========================================================
 # Generate Statistics
 # ==========================================================
+
 
 def generate_statistics(
     results: dict[str, dict],
@@ -42,9 +42,7 @@ def generate_statistics(
     for (
         javascript,
         metadata,
-    ) in sorted(
-        results.items()
-    ):
+    ) in sorted(results.items()):
 
         analysis = metadata.get(
             "analysis",
@@ -61,11 +59,9 @@ def generate_statistics(
             {},
         )
 
-        interesting_statistics = (
-            interesting.get(
-                "statistics",
-                {},
-            )
+        interesting_statistics = interesting.get(
+            "statistics",
+            {},
         )
 
         secrets = metadata.get(
@@ -73,11 +69,9 @@ def generate_statistics(
             {},
         )
 
-        secret_statistics = (
-            secrets.get(
-                "statistics",
-                {},
-            )
+        secret_statistics = secrets.get(
+            "statistics",
+            {},
         )
 
         count = len(
@@ -87,9 +81,7 @@ def generate_statistics(
             )
         )
 
-        urls_per_file[
-            javascript
-        ] = count
+        urls_per_file[javascript] = count
 
         total_urls += statistics.get(
             "urls",
@@ -116,32 +108,24 @@ def generate_statistics(
             0,
         )
 
-        total_interesting_files += (
-            interesting_statistics.get(
-                "interesting_files",
-                0,
-            )
+        total_interesting_files += interesting_statistics.get(
+            "interesting_files",
+            0,
         )
 
-        total_interesting_directories += (
-            interesting_statistics.get(
-                "interesting_directories",
-                0,
-            )
+        total_interesting_directories += interesting_statistics.get(
+            "interesting_directories",
+            0,
         )
 
-        total_secret_types += (
-            secret_statistics.get(
-                "secret_types",
-                0,
-            )
+        total_secret_types += secret_statistics.get(
+            "secret_types",
+            0,
         )
 
-        total_secrets += (
-            secret_statistics.get(
-                "total_secrets",
-                0,
-            )
+        total_secrets += secret_statistics.get(
+            "total_secrets",
+            0,
         )
 
     average_urls_per_file = (
@@ -154,33 +138,18 @@ def generate_statistics(
     )
 
     return {
-
         "processed_files": processed_files,
-
         "urls": total_urls,
-
         "average_urls_per_file": average_urls_per_file,
-
         "comments": total_comments,
-
         "strings": total_strings,
-
         "source_maps": total_source_maps,
-
         "endpoints": total_endpoints,
-
         "interesting_files": total_interesting_files,
-
-        "interesting_directories": (
-            total_interesting_directories
-        ),
-
+        "interesting_directories": (total_interesting_directories),
         "secret_types": total_secret_types,
-
         "total_secrets": total_secrets,
-
         "urls_per_file": urls_per_file,
-
     }
 
 

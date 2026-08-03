@@ -20,6 +20,7 @@ console = Console()
 # Show Banner
 # ==========================================================
 
+
 def show_banner():
     """
     Display the application banner.
@@ -47,16 +48,10 @@ def show_banner():
         )
     )
 
-    console.print(
-        f"[bold]Application :[/bold] {APP_NAME}"
-    )
+    console.print(f"[bold]Application :[/bold] {APP_NAME}")
 
-    console.print(
-        f"[bold]Version     :[/bold] {VERSION}"
-    )
+    console.print(f"[bold]Version     :[/bold] {VERSION}")
 
-    console.print(
-        f"[bold]Author      :[/bold] {AUTHOR}"
-    )
+    console.print(f"[bold]Author      :[/bold] {AUTHOR}")
 
     console.rule(style="bright_blue")

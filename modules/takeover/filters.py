@@ -18,33 +18,26 @@ from .constants import (
     TAKEOVER_PROVIDERS,
 )
 
-
 # ==========================================================
 # Constants
 # ==========================================================
 
 VALID_PROVIDERS = set(
-
     TAKEOVER_PROVIDERS,
-
 )
 
 VALID_CONFIDENCE = {
-
     HIGH_CONFIDENCE,
-
     MEDIUM_CONFIDENCE,
-
     LOW_CONFIDENCE,
-
     UNKNOWN_CONFIDENCE,
-
 }
 
 
 # ==========================================================
 # Reset Analysis
 # ==========================================================
+
 
 def reset_analysis(
     result: dict,
@@ -60,11 +53,7 @@ def reset_analysis(
 
     result["provider"] = ""
 
-    result["confidence"] = (
-
-        UNKNOWN_CONFIDENCE
-
-    )
+    result["confidence"] = UNKNOWN_CONFIDENCE
 
     result["methods"] = []
 
@@ -79,6 +68,7 @@ def reset_analysis(
 # Normalize Confidence
 # ==========================================================
 
+
 def normalize_confidence(
     confidence,
 ) -> int:
@@ -92,31 +82,19 @@ def normalize_confidence(
     try:
 
         confidence = int(
-
             confidence,
-
         )
 
     except Exception:
 
-        confidence = (
-
-            UNKNOWN_CONFIDENCE
-
-        )
+        confidence = UNKNOWN_CONFIDENCE
 
     confidence = max(
-
         0,
-
         min(
-
             confidence,
-
             100,
-
         ),
-
     )
 
     return confidence
@@ -125,6 +103,7 @@ def normalize_confidence(
 # ==========================================================
 # Normalize Provider
 # ==========================================================
+
 
 def normalize_provider(
     provider,
@@ -141,9 +120,7 @@ def normalize_provider(
         return ""
 
     provider = str(
-
         provider,
-
     ).strip()
 
     if provider in VALID_PROVIDERS:
@@ -156,6 +133,7 @@ def normalize_provider(
 # ==========================================================
 # Normalize Methods
 # ==========================================================
+
 
 def normalize_methods(
     methods,
@@ -180,38 +158,29 @@ def normalize_methods(
 
             continue
 
-        method = str(
+        method = (
+            str(
+                method,
+            )
+            .strip()
+            .lower()
+        )
 
-            method,
-
-        ).strip().lower()
-
-        if (
-
-            method
-
-            and
-
-            method not in normalized
-
-        ):
+        if method and method not in normalized:
 
             normalized.append(
-
                 method,
-
             )
 
     return sorted(
-
         normalized,
-
     )
 
 
 # ==========================================================
 # Normalize Recommendations
 # ==========================================================
+
 
 def normalize_recommendations(
     recommendations,
@@ -228,34 +197,13 @@ def normalize_recommendations(
 
         return []
 
-    return sorted(
-
-        {
-
-            item.strip()
-
-            for item
-
-            in recommendations
-
-            if (
-
-                item
-
-                and
-
-                item.strip()
-
-            )
-
-        }
-
-    )
+    return sorted({item.strip() for item in recommendations if (item and item.strip())})
 
 
 # ==========================================================
 # Validate Analysis
 # ==========================================================
+
 
 def validate_analysis(
     result,
@@ -267,78 +215,38 @@ def validate_analysis(
         dict
     """
 
-    result["confidence"] = (
-
-        normalize_confidence(
-
-            result.get(
-
-                "confidence",
-
-                UNKNOWN_CONFIDENCE,
-
-            )
-
+    result["confidence"] = normalize_confidence(
+        result.get(
+            "confidence",
+            UNKNOWN_CONFIDENCE,
         )
-
     )
 
-    result["provider"] = (
-
-        normalize_provider(
-
-            result.get(
-
-                "provider",
-
-                "",
-
-            )
-
+    result["provider"] = normalize_provider(
+        result.get(
+            "provider",
+            "",
         )
-
     )
 
-    result["methods"] = (
-
-        normalize_methods(
-
-            result.get(
-
-                "methods",
-
-                [],
-
-            )
-
+    result["methods"] = normalize_methods(
+        result.get(
+            "methods",
+            [],
         )
-
     )
 
-    result["recommendations"] = (
-
-        normalize_recommendations(
-
-            result.get(
-
-                "recommendations",
-
-                [],
-
-            )
-
+    result["recommendations"] = normalize_recommendations(
+        result.get(
+            "recommendations",
+            [],
         )
-
     )
 
     result["vulnerable"] = bool(
-
         result.get(
-
             "provider",
-
         )
-
     )
 
     return result
@@ -347,6 +255,7 @@ def validate_analysis(
 # ==========================================================
 # Filter Single Result
 # ==========================================================
+
 
 def filter_result(
     result,
@@ -360,21 +269,18 @@ def filter_result(
     """
 
     filtered = deepcopy(
-
         result,
-
     )
 
     return validate_analysis(
-
         filtered,
-
     )
 
 
 # ==========================================================
 # Filter Results
 # ==========================================================
+
 
 def filter_results(
     results,
@@ -388,43 +294,24 @@ def filter_results(
     """
 
     filtered = [
-
         filter_result(
-
             result,
-
         )
-
-        for result
-
-        in results
-
+        for result in results
     ]
 
     filtered.sort(
-
         key=lambda item: (
-
             item.get(
-
                 "confidence",
-
                 UNKNOWN_CONFIDENCE,
-
             ),
-
             item.get(
-
                 "provider",
-
                 "",
-
             ),
-
         ),
-
         reverse=True,
-
     )
 
     return filtered
@@ -433,6 +320,7 @@ def filter_results(
 # ==========================================================
 # Vulnerable Only
 # ==========================================================
+
 
 def vulnerable_only(
     results,
@@ -446,25 +334,18 @@ def vulnerable_only(
     """
 
     return [
-
         result
-
-        for result
-
-        in results
-
+        for result in results
         if result.get(
-
             "vulnerable",
-
         )
-
     ]
 
 
 # ==========================================================
 # Safe Only
 # ==========================================================
+
 
 def safe_only(
     results,
@@ -478,25 +359,18 @@ def safe_only(
     """
 
     return [
-
         result
-
-        for result
-
-        in results
-
+        for result in results
         if not result.get(
-
             "vulnerable",
-
         )
-
     ]
 
 
 # ==========================================================
 # Failed Only
 # ==========================================================
+
 
 def failed_only(
     results,
@@ -509,25 +383,18 @@ def failed_only(
     """
 
     return [
-
         result
-
-        for result
-
-        in results
-
+        for result in results
         if result.get(
-
             "error",
-
         )
-
     ]
 
 
 # ==========================================================
 # Remove Failed
 # ==========================================================
+
 
 def remove_failed(
     results,
@@ -540,19 +407,11 @@ def remove_failed(
     """
 
     return [
-
         result
-
-        for result
-
-        in results
-
+        for result in results
         if not result.get(
-
             "error",
-
         )
-
     ]
 
 
@@ -561,35 +420,18 @@ def remove_failed(
 # ==========================================================
 
 __all__ = [
-
     "VALID_PROVIDERS",
-
     "VALID_CONFIDENCE",
-
     "reset_analysis",
-
     "normalize_confidence",
-
     "normalize_provider",
-
     "normalize_methods",
-
     "normalize_recommendations",
-
     "validate_analysis",
-
     "filter_result",
-
     "filter_results",
-
     "vulnerable_only",
-
     "safe_only",
-
     "failed_only",
-
     "remove_failed",
-
 ]
-
-

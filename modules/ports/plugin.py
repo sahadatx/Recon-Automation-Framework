@@ -14,7 +14,6 @@ from core.plugins.base import BasePlugin
 from .exporter import export_all
 from .manager import run
 
-
 # ==========================================================
 # Port Scanner Plugin
 # ==========================================================
@@ -37,9 +36,7 @@ class PortScannerPlugin(BasePlugin):
         "network services."
     )
 
-    depends_on = (
-        "http",
-    )
+    depends_on = ("http",)
 
     config = {
         "threads": True,

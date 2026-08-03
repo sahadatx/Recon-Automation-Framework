@@ -14,7 +14,6 @@ from core.plugins.base import BasePlugin
 from .manager import run
 from .exporter import export_all
 
-
 # ==========================================================
 # DNS Plugin
 # ==========================================================
@@ -32,14 +31,10 @@ class DNSPlugin(BasePlugin):
     author = "Sahadat Hossain"
 
     description = (
-        "Perform DNS enumeration and "
-        "collect DNS records for "
-        "target domains."
+        "Perform DNS enumeration and " "collect DNS records for " "target domains."
     )
 
-    depends_on = (
-        "passive",
-    )
+    depends_on = ("passive",)
 
     config = {
         "output": True,

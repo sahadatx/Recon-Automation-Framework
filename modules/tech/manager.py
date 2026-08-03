@@ -34,7 +34,6 @@ from modules.tech.detector import (
     detect_technologies,
 )
 
-
 # ==========================================================
 # Detect One Host
 # ==========================================================
@@ -77,9 +76,7 @@ def detect_hosts(
     for all hosts.
     """
 
-    info(
-        "Starting Technology Detection..."
-    )
+    info("Starting Technology Detection...")
 
     results: dict[
         str,
@@ -98,32 +95,25 @@ def detect_hosts(
 
     if executor is None:
 
-        raise RuntimeError(
-            "Shared thread pool is not initialized."
-        )
+        raise RuntimeError("Shared thread pool is not initialized.")
 
     futures = {
-
         executor.submit(
             detect_one_host,
             host,
             response,
         ): host
-
         for (
             host,
             response,
         ) in http_results.items()
-
     }
 
     for future in as_completed(
         futures,
     ):
 
-        host = futures[
-            future
-        ]
+        host = futures[future]
 
         completed += 1
 
@@ -134,9 +124,7 @@ def detect_hosts(
                 technologies,
             ) = future.result()
 
-            results[
-                hostname
-            ] = technologies
+            results[hostname] = technologies
 
             progress_status(
                 completed,
@@ -153,9 +141,7 @@ def detect_hosts(
                 host,
             )
 
-            warning(
-                f"{host}: {error}"
-            )
+            warning(f"{host}: {error}")
 
             progress_status(
                 completed,
@@ -163,13 +149,9 @@ def detect_hosts(
                 f"✗ {host}",
             )
 
-    success(
-        f"Technology Detection Completed: {len(results)}"
-    )
+    success(f"Technology Detection Completed: {len(results)}")
 
-    success(
-        f"Failed Hosts: {len(failed_hosts)}"
-    )
+    success(f"Failed Hosts: {len(failed_hosts)}")
 
     return (
         results,

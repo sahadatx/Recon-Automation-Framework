@@ -6,10 +6,10 @@ ASCII charts for the Dashboard module.
 
 from __future__ import annotations
 
-
 # ==========================================================
 # ASCII Bar
 # ==========================================================
+
 
 def ascii_bar(
     value: int,
@@ -36,9 +36,7 @@ def ascii_bar(
     if maximum <= 0:
         return ""
 
-    filled = int(
-        value / maximum * width
-    )
+    filled = int(value / maximum * width)
 
     return "█" * filled
 
@@ -46,6 +44,7 @@ def ascii_bar(
 # ==========================================================
 # Build Chart
 # ==========================================================
+
 
 def build_chart(
     values: dict[str, int],
@@ -83,9 +82,7 @@ def build_chart(
             width,
         )
 
-        lines.append(
-            f"{label:<20} {bar} {value}"
-        )
+        lines.append(f"{label:<20} {bar} {value}")
 
     return lines
 

@@ -30,14 +30,13 @@ from .constants import (
 # ==========================================================
 
 EMPTY_EMAIL_RESULT = deepcopy(
-
     DEFAULT_ANALYSIS,
-
 )
 
 # ==========================================================
 # Normalize Target
 # ==========================================================
+
 
 def normalize_target(
     target: str,
@@ -52,27 +51,18 @@ def normalize_target(
     target = target.strip().lower()
 
     target = target.replace(
-
         "https://",
-
         "",
-
     )
 
     target = target.replace(
-
         "http://",
-
         "",
-
     )
 
     target = target.split(
-
         "/",
-
         1,
-
     )[0]
 
     return target
@@ -81,6 +71,7 @@ def normalize_target(
 # ==========================================================
 # DNS Lookup
 # ==========================================================
+
 
 def resolve_record(
     target: str,
@@ -96,27 +87,16 @@ def resolve_record(
     try:
 
         answers = dns.resolver.resolve(
-
             target,
-
             record_type,
-
             lifetime=DEFAULT_TIMEOUT,
-
         )
 
         return [
-
             str(
-
                 answer,
-
             ).rstrip(".")
-
-            for answer
-            in
-            answers
-
+            for answer in answers
         ]
 
     except Exception:
@@ -127,6 +107,7 @@ def resolve_record(
 # ==========================================================
 # MX Records
 # ==========================================================
+
 
 def resolve_mx(
     target: str,
@@ -139,17 +120,15 @@ def resolve_mx(
     """
 
     return resolve_record(
-
         target,
-
         MX_RECORD,
-
     )
 
 
 # ==========================================================
 # TXT Records
 # ==========================================================
+
 
 def resolve_txt(
     target: str,
@@ -162,17 +141,15 @@ def resolve_txt(
     """
 
     return resolve_record(
-
         target,
-
         TXT_RECORD,
-
     )
 
 
 # ==========================================================
 # DNSKEY Records
 # ==========================================================
+
 
 def resolve_dnskey(
     target: str,
@@ -185,21 +162,17 @@ def resolve_dnskey(
     """
 
     return bool(
-
         resolve_record(
-
             target,
-
             DNSKEY_RECORD,
-
         )
-
     )
 
 
 # ==========================================================
 # Safe Lower
 # ==========================================================
+
 
 def safe_lower(
     value: Any,
@@ -217,16 +190,14 @@ def safe_lower(
         return ""
 
     return str(
-
         value,
-
     ).lower()
-
 
 
 # ==========================================================
 # SPF Record
 # ==========================================================
+
 
 def resolve_spf(
     target: str,
@@ -245,41 +216,30 @@ def resolve_spf(
     """
 
     for record in resolve_txt(
-
         target,
-
     ):
 
         if safe_lower(
-
             record,
-
         ).startswith(
-
             "v=spf1",
-
         ):
 
             return (
-
                 True,
-
                 record,
-
             )
 
     return (
-
         False,
-
         "",
-
     )
 
 
 # ==========================================================
 # DMARC Record
 # ==========================================================
+
 
 def resolve_dmarc(
     target: str,
@@ -298,33 +258,26 @@ def resolve_dmarc(
     """
 
     records = resolve_txt(
-
         f"{DMARC_PREFIX}.{target}",
-
     )
 
     if records:
 
         return (
-
             True,
-
             records[0],
-
         )
 
     return (
-
         False,
-
         "",
-
     )
 
 
 # ==========================================================
 # DKIM Record
 # ==========================================================
+
 
 def resolve_dkim(
     target: str,
@@ -345,33 +298,26 @@ def resolve_dkim(
     for selector in DKIM_SELECTORS:
 
         records = resolve_txt(
-
             f"{selector}._domainkey.{target}",
-
         )
 
         if records:
 
             return (
-
                 True,
-
                 selector,
-
             )
 
     return (
-
         False,
-
         "",
-
     )
 
 
 # ==========================================================
 # MTA-STS Record
 # ==========================================================
+
 
 def resolve_mta_sts(
     target: str,
@@ -384,19 +330,16 @@ def resolve_mta_sts(
     """
 
     return bool(
-
         resolve_txt(
-
             f"{MTA_STS_PREFIX}.{target}",
-
         )
-
     )
 
 
 # ==========================================================
 # TLS-RPT Record
 # ==========================================================
+
 
 def resolve_tls_rpt(
     target: str,
@@ -409,19 +352,16 @@ def resolve_tls_rpt(
     """
 
     return bool(
-
         resolve_txt(
-
             f"{TLS_RPT_PREFIX}.{target}",
-
         )
-
     )
 
 
 # ==========================================================
 # BIMI Record
 # ==========================================================
+
 
 def resolve_bimi(
     target: str,
@@ -434,19 +374,16 @@ def resolve_bimi(
     """
 
     return bool(
-
         resolve_txt(
-
             f"{BIMI_PREFIX}.{target}",
-
         )
-
     )
 
 
 # ==========================================================
 # Create Result
 # ==========================================================
+
 
 def create_result(
     target: str,
@@ -472,9 +409,7 @@ def create_result(
     """
 
     result = deepcopy(
-
         EMPTY_EMAIL_RESULT,
-
     )
 
     result["target"] = target
@@ -498,33 +433,18 @@ def create_result(
 # ==========================================================
 
 __all__ = [
-
     "EMPTY_EMAIL_RESULT",
-
     "normalize_target",
-
     "resolve_record",
-
     "resolve_mx",
-
     "resolve_txt",
-
     "resolve_dnskey",
-
     "safe_lower",
-
     "resolve_spf",
-
     "resolve_dmarc",
-
     "resolve_dkim",
-
     "resolve_mta_sts",
-
     "resolve_tls_rpt",
-
     "resolve_bimi",
-
     "create_result",
-
 ]

@@ -29,10 +29,10 @@ from .helpers import (
     safe_lower,
 )
 
-
 # ==========================================================
 # Header Detection
 # ==========================================================
+
 
 def detect_header_provider(
     headers: dict[str, Any],
@@ -42,8 +42,7 @@ def detect_header_provider(
         return None, []
 
     normalized_headers = {
-        key.lower(): safe_lower(value)
-        for key, value in headers.items()
+        key.lower(): safe_lower(value) for key, value in headers.items()
     }
 
     for provider, fingerprints in HEADER_FINGERPRINTS.items():
@@ -63,6 +62,7 @@ def detect_header_provider(
 # ==========================================================
 # Server Detection
 # ==========================================================
+
 
 def detect_server_provider(
     server: str,
@@ -89,6 +89,7 @@ def detect_server_provider(
 # CNAME Detection
 # ==========================================================
 
+
 def detect_cname_provider(
     cname: str | None,
 ) -> tuple[str | None, list[str]]:
@@ -114,6 +115,7 @@ def detect_cname_provider(
 # IP Detection
 # ==========================================================
 
+
 def detect_ip_provider(
     ip: str | None,
 ) -> tuple[str | None, list[str]]:
@@ -127,9 +129,7 @@ def detect_ip_provider(
 
         for prefix in prefixes:
 
-            if ip.startswith(
-                safe_lower(prefix)
-            ):
+            if ip.startswith(safe_lower(prefix)):
 
                 return (
                     provider,
@@ -142,6 +142,7 @@ def detect_ip_provider(
 # ==========================================================
 # Confidence
 # ==========================================================
+
 
 def calculate_confidence(
     methods: list[str],
@@ -165,6 +166,7 @@ def calculate_confidence(
 # Recommendations
 # ==========================================================
 
+
 def build_recommendations(
     provider: str | None,
 ) -> list[str]:
@@ -186,6 +188,7 @@ def build_recommendations(
 # ==========================================================
 # Analyze Target
 # ==========================================================
+
 
 def analyze_target(
     target: str,

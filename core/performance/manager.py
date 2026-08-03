@@ -71,9 +71,7 @@ class PerformanceManager:
             Any,
         ] = {}
 
-        self._bottlenecks: list[
-            dict[str, Any]
-        ] = []
+        self._bottlenecks: list[dict[str, Any]] = []
 
         self._report: dict[
             str,
@@ -126,19 +124,13 @@ class PerformanceManager:
         if not self._running:
             return 0.0
 
-        execution_time = (
-            self._framework_profiler.stop()
-        )
+        execution_time = self._framework_profiler.stop()
 
-        self._memory_snapshot = (
-            self._memory_profiler.snapshot()
-        )
+        self._memory_snapshot = self._memory_profiler.snapshot()
 
         self._memory_profiler.stop()
 
-        self._benchmark.set_execution_time(
-            execution_time
-        )
+        self._benchmark.set_execution_time(execution_time)
 
         self._benchmark.set_memory_peak(
             self._memory_snapshot.get(
@@ -150,7 +142,6 @@ class PerformanceManager:
         self._running = False
 
         return execution_time
-
 
     # ==========================================================
     # Module Profiling
@@ -189,16 +180,11 @@ class PerformanceManager:
         )
 
         if profiler is None:
-            raise RuntimeError(
-                f"Module '{module}' "
-                "has not been started."
-            )
+            raise RuntimeError(f"Module '{module}' " "has not been started.")
 
         elapsed = profiler.stop()
 
-        snapshot = (
-            self._memory_profiler.snapshot()
-        )
+        snapshot = self._memory_profiler.snapshot()
 
         self._benchmark.add_module(
             name=module,
@@ -270,10 +256,7 @@ class PerformanceManager:
         Return framework execution time.
         """
 
-        return (
-            self._framework_profiler.elapsed
-        )
-
+        return self._framework_profiler.elapsed
 
     # ==========================================================
     # Memory
@@ -305,9 +288,7 @@ class PerformanceManager:
         """
 
         if not self._memory_snapshot:
-            self._memory_snapshot = (
-                self._memory_profiler.snapshot()
-            )
+            self._memory_snapshot = self._memory_profiler.snapshot()
 
         self._memory_analysis = analyze_memory(
             self._memory_snapshot,
@@ -327,24 +308,19 @@ class PerformanceManager:
         """
 
         metrics = {
-            "execution_time": (
-                self.execution_time
-            ),
+            "execution_time": (self.execution_time),
             "memory_peak_mb": (
                 self._memory_snapshot.get(
                     "peak_mb",
                     0.0,
                 )
             ),
-
             # CPU profiling will be added
             # in a future lesson.
             "cpu_percent": 0.0,
         }
 
-        self._bottlenecks = (
-            detect_bottlenecks(metrics)
-        )
+        self._bottlenecks = detect_bottlenecks(metrics)
 
         return list(self._bottlenecks)
 
@@ -376,9 +352,7 @@ class PerformanceManager:
         if not self._bottlenecks:
             self.detect_bottlenecks()
 
-        self._benchmark_summary = (
-            self._memory_benchmark.summary()
-        )
+        self._benchmark_summary = self._memory_benchmark.summary()
 
         self._report = generate_report(
             execution_time=self.execution_time,
@@ -401,7 +375,6 @@ class PerformanceManager:
             return self.generate_report()
 
         return dict(self._report)
-
 
     # ==========================================================
     # Output
@@ -442,12 +415,8 @@ class PerformanceManager:
             "execution_time": self.execution_time,
             "memory": self.memory_snapshot,
             "benchmark": self._benchmark.summary(),
-            "memory_benchmark": (
-                self._memory_benchmark.summary()
-            ),
-            "bottlenecks": list(
-                self._bottlenecks
-            ),
+            "memory_benchmark": (self._memory_benchmark.summary()),
+            "bottlenecks": list(self._bottlenecks),
         }
 
     # ==========================================================

@@ -16,10 +16,10 @@ from .constants import (
     MEDIUM_RISK,
 )
 
-
 # ==========================================================
 # Provider Statistics
 # ==========================================================
+
 
 def provider_statistics(
     results,
@@ -32,15 +32,12 @@ def provider_statistics(
     """
 
     counter = Counter(
-
         result.get(
             "provider",
             "Unknown",
         )
         or "Unknown"
-
         for result in results
-
     )
 
     return dict(
@@ -54,6 +51,7 @@ def provider_statistics(
 # Risk Statistics
 # ==========================================================
 
+
 def risk_statistics(
     results,
 ) -> dict:
@@ -65,33 +63,17 @@ def risk_statistics(
     """
 
     return {
-
-        "low": sum(
-            result.get("risk") == LOW_RISK
-            for result in results
-        ),
-
-        "medium": sum(
-            result.get("risk") == MEDIUM_RISK
-            for result in results
-        ),
-
-        "high": sum(
-            result.get("risk") == HIGH_RISK
-            for result in results
-        ),
-
-        "critical": sum(
-            result.get("risk") == CRITICAL_RISK
-            for result in results
-        ),
-
+        "low": sum(result.get("risk") == LOW_RISK for result in results),
+        "medium": sum(result.get("risk") == MEDIUM_RISK for result in results),
+        "high": sum(result.get("risk") == HIGH_RISK for result in results),
+        "critical": sum(result.get("risk") == CRITICAL_RISK for result in results),
     }
 
 
 # ==========================================================
 # Generate Statistics
 # ==========================================================
+
 
 def generate_statistics(
     results,
@@ -156,39 +138,27 @@ def generate_statistics(
     )
 
     return {
-
         "targets": total,
-
         "low": statistics["low"],
-
         "medium": statistics["medium"],
-
         "high": statistics["high"],
-
         "critical": statistics["critical"],
-
         "provider_statistics": provider_statistics(
             results,
         ),
-
         "risk_statistics": statistics,
-
         "spf_enabled": spf_enabled,
-
         "dkim_enabled": dkim_enabled,
-
         "dmarc_enabled": dmarc_enabled,
-
         "average_score": average_score,
-
         "highest_score": highest_score,
-
     }
 
 
 # ==========================================================
 # Print Summary
 # ==========================================================
+
 
 def print_summary(
     statistics,
@@ -226,13 +196,9 @@ def print_summary(
 
     print("-" * 80)
 
-    for level, count in statistics[
-        "risk_statistics"
-    ].items():
+    for level, count in statistics["risk_statistics"].items():
 
-        print(
-            f"{level.title():<30}{count}"
-        )
+        print(f"{level.title():<30}{count}")
 
     print("-" * 80)
 
@@ -249,9 +215,7 @@ def print_summary(
 
         for provider, count in providers.items():
 
-            print(
-                f"{provider:<30}{count}"
-            )
+            print(f"{provider:<30}{count}")
 
     else:
 
@@ -265,13 +229,8 @@ def print_summary(
 # ==========================================================
 
 __all__ = [
-
     "provider_statistics",
-
     "risk_statistics",
-
     "generate_statistics",
-
     "print_summary",
-
 ]

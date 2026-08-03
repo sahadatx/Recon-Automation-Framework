@@ -25,10 +25,10 @@ from core.logger import (
     warning,
 )
 
-
 # ==========================================================
 # Start Playwright
 # ==========================================================
+
 
 async def start_playwright() -> Playwright:
     """
@@ -38,24 +38,17 @@ async def start_playwright() -> Playwright:
         Playwright instance
     """
 
-    debug(
-        "Starting Playwright engine..."
-    )
+    debug("Starting Playwright engine...")
 
     try:
 
-        playwright = await (
-            async_playwright()
-            .start()
-        )
+        playwright = await async_playwright().start()
 
         return playwright
 
     except Exception as error:
 
-        warning(
-            f"Playwright start failed: {error}"
-        )
+        warning(f"Playwright start failed: {error}")
 
         raise
 
@@ -63,6 +56,7 @@ async def start_playwright() -> Playwright:
 # ==========================================================
 # Launch Browser
 # ==========================================================
+
 
 async def launch_browser(
     playwright: Playwright,
@@ -78,37 +72,25 @@ async def launch_browser(
         Browser instance
     """
 
-    debug(
-        "Launching Chromium browser..."
-    )
+    debug("Launching Chromium browser...")
 
     try:
 
         browser = await playwright.chromium.launch(
-
             headless=HEADLESS,
-
             args=[
-
                 "--disable-dev-shm-usage",
-
                 "--disable-gpu",
-
                 "--no-sandbox",
-
                 "--disable-setuid-sandbox",
-
             ],
-
         )
 
         return browser
 
     except Exception as error:
 
-        warning(
-            f"Browser launch failed: {error}"
-        )
+        warning(f"Browser launch failed: {error}")
 
         raise
 
@@ -116,6 +98,7 @@ async def launch_browser(
 # ==========================================================
 # Create Context
 # ==========================================================
+
 
 async def create_context(
     browser: Browser,
@@ -127,24 +110,15 @@ async def create_context(
         BrowserContext
     """
 
-    debug(
-        "Creating browser context..."
-    )
+    debug("Creating browser context...")
 
     context = await browser.new_context(
-
         viewport={
-
             "width": SCREENSHOT_WIDTH,
-
             "height": SCREENSHOT_HEIGHT,
-
         },
-
         ignore_https_errors=True,
-
         java_script_enabled=True,
-
     )
 
     return context
@@ -153,6 +127,7 @@ async def create_context(
 # ==========================================================
 # Create Page
 # ==========================================================
+
 
 async def create_page(
     context: BrowserContext,
@@ -173,6 +148,7 @@ async def create_page(
 # Close Page
 # ==========================================================
 
+
 async def close_page(
     page: Page | None,
 ) -> None:
@@ -190,14 +166,13 @@ async def close_page(
 
     except Exception as error:
 
-        debug(
-            f"Page close failed: {error}"
-        )
+        debug(f"Page close failed: {error}")
 
 
 # ==========================================================
 # Close Context
 # ==========================================================
+
 
 async def close_context(
     context: BrowserContext | None,
@@ -216,14 +191,13 @@ async def close_context(
 
     except Exception as error:
 
-        debug(
-            f"Context close failed: {error}"
-        )
+        debug(f"Context close failed: {error}")
 
 
 # ==========================================================
 # Close Browser
 # ==========================================================
+
 
 async def close_browser(
     browser: Browser | None,
@@ -242,14 +216,13 @@ async def close_browser(
 
     except Exception as error:
 
-        debug(
-            f"Browser close failed: {error}"
-        )
+        debug(f"Browser close failed: {error}")
 
 
 # ==========================================================
 # Stop Playwright
 # ==========================================================
+
 
 async def stop_playwright(
     playwright: Playwright | None,
@@ -268,14 +241,13 @@ async def stop_playwright(
 
     except Exception as error:
 
-        debug(
-            f"Playwright stop failed: {error}"
-        )
+        debug(f"Playwright stop failed: {error}")
 
 
 # ==========================================================
 # Cleanup
 # ==========================================================
+
 
 async def cleanup(
     playwright: Playwright | None,
@@ -288,13 +260,9 @@ async def cleanup(
     happen inside capture workflow.
     """
 
-    await close_browser(
-        browser
-    )
+    await close_browser(browser)
 
-    await stop_playwright(
-        playwright
-    )
+    await stop_playwright(playwright)
 
 
 # ==========================================================
@@ -302,23 +270,13 @@ async def cleanup(
 # ==========================================================
 
 __all__ = [
-
     "start_playwright",
-
     "launch_browser",
-
     "create_context",
-
     "create_page",
-
     "close_page",
-
     "close_context",
-
     "close_browser",
-
     "stop_playwright",
-
     "cleanup",
-
 ]

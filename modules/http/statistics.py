@@ -6,10 +6,10 @@ Generate statistics for HTTP probe results.
 
 from __future__ import annotations
 
-
 # ==========================================================
 # Generate Statistics
 # ==========================================================
+
 
 def generate_statistics(
     results: dict[str, dict],
@@ -75,25 +75,18 @@ def generate_statistics(
     )
 
     return {
-
         "alive_hosts": alive_hosts,
-
         "dead_hosts": len(
             failed_hosts,
         ),
-
         "http_hosts": http_hosts,
-
         "https_hosts": https_hosts,
-
         "status_codes": dict(
             sorted(
                 status_codes.items(),
             )
         ),
-
         "average_response_time": average_response_time,
-
     }
 
 

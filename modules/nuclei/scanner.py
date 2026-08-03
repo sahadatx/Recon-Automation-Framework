@@ -20,16 +20,11 @@ from modules.nuclei.templates import (
     get_templates,
 )
 
-
 # ==========================================================
 # Default Configuration
 # ==========================================================
 
-DEFAULT_SEVERITY = (
-
-    "critical,high,medium,low,info"
-
-)
+DEFAULT_SEVERITY = "critical,high,medium,low,info"
 
 DEFAULT_RETRIES = 2
 
@@ -39,6 +34,7 @@ DEFAULT_JSONL = True
 # ==========================================================
 # Validate Target
 # ==========================================================
+
 
 def validate_target(
     target: str,
@@ -50,33 +46,21 @@ def validate_target(
         bool
     """
 
-    return (
-
-        isinstance(
-            target,
-            str,
+    return isinstance(
+        target,
+        str,
+    ) and target.startswith(
+        (
+            "http://",
+            "https://",
         )
-
-        and
-
-        target.startswith(
-
-            (
-
-                "http://",
-
-                "https://",
-
-            )
-
-        )
-
     )
 
 
 # ==========================================================
 # Build Command
 # ==========================================================
+
 
 def build_command(
     output_file: Path,
@@ -92,57 +76,30 @@ def build_command(
     """
 
     command = [
-
         "nuclei",
-
         "-jsonl",
-
         "-o",
-
-        str(
-            output_file
-        ),
-
+        str(output_file),
         "-severity",
-
         severity,
-
         "-rate-limit",
-
-        str(
-            NUCLEI_RATE_LIMIT
-        ),
-
+        str(NUCLEI_RATE_LIMIT),
         "-c",
-
-        str(
-            NUCLEI_THREADS
-        ),
-
+        str(NUCLEI_THREADS),
     ]
 
     templates = get_templates(
-
         profile=profile,
-
         custom=custom_template,
-
     )
 
     for template in templates:
 
         command.extend(
-
             [
-
                 "-t",
-
-                str(
-                    template
-                ),
-
+                str(template),
             ]
-
         )
 
     return command
@@ -151,6 +108,7 @@ def build_command(
 # ==========================================================
 # Create Output File
 # ==========================================================
+
 
 def create_output_file():
     """
@@ -161,19 +119,16 @@ def create_output_file():
     """
 
     return Path(
-
         tempfile.mkstemp(
-
             suffix=".jsonl",
-
         )[1]
-
     )
 
 
 # ==========================================================
 # Build Single Target
 # ==========================================================
+
 
 def build_single_target(
     target: str,
@@ -187,27 +142,17 @@ def build_single_target(
     """
 
     command = build_command(
-
         output_file,
-
         profile,
-
         custom_template,
-
         severity,
-
     )
 
     command.extend(
-
         [
-
             "-target",
-
             target,
-
         ]
-
     )
 
     return command
@@ -216,6 +161,7 @@ def build_single_target(
 # ==========================================================
 # Build Multiple Targets
 # ==========================================================
+
 
 def build_multiple_targets(
     target_file: Path,
@@ -230,29 +176,17 @@ def build_multiple_targets(
     """
 
     command = build_command(
-
         output_file,
-
         profile,
-
         custom_template,
-
         severity,
-
     )
 
     command.extend(
-
         [
-
             "-list",
-
-            str(
-                target_file
-            ),
-
+            str(target_file),
         ]
-
     )
 
     return command
@@ -261,6 +195,7 @@ def build_multiple_targets(
 # ==========================================================
 # Run Single Target
 # ==========================================================
+
 
 def run_single_target(
     target: str,
@@ -273,106 +208,67 @@ def run_single_target(
     Run Nuclei against one target.
     """
 
-    if not validate_target(
-        target
-    ):
+    if not validate_target(target):
 
         return (
-
             None,
-
             "Invalid target",
-
         )
 
     output_file = create_output_file()
 
     command = build_single_target(
-
         target,
-
         output_file,
-
         profile,
-
         custom_template,
-
         severity,
-
     )
 
     last_error = None
 
-    for _ in range(
-
-        retries + 1
-
-    ):
+    for _ in range(retries + 1):
 
         try:
 
             subprocess.run(
-
                 command,
-
                 stdout=subprocess.DEVNULL,
-
                 stderr=subprocess.PIPE,
-
                 text=True,
-
                 timeout=NUCLEI_TIMEOUT,
-
                 check=True,
-
             )
 
             return (
-
                 output_file,
-
                 None,
-
             )
 
         except subprocess.TimeoutExpired:
 
-            last_error = (
-
-                f"Timeout ({NUCLEI_TIMEOUT}s)"
-
-            )
+            last_error = f"Timeout ({NUCLEI_TIMEOUT}s)"
 
         except subprocess.CalledProcessError as error:
 
-            last_error = (
-
-                error.stderr.strip()
-
-            )
+            last_error = error.stderr.strip()
 
         except Exception as error:
 
-            last_error = str(
-                error
-            )
+            last_error = str(error)
 
-    cleanup(
-        output_file
-    )
+    cleanup(output_file)
 
     return (
-
         None,
-
         last_error,
-
     )
 
 
 # ==========================================================
 # Run Multiple Targets
 # ==========================================================
+
 
 def run_multiple_targets(
     targets: list[str],
@@ -389,133 +285,81 @@ def run_multiple_targets(
     if not targets:
 
         return (
-
             None,
-
             "No targets",
-
         )
 
     output_file = create_output_file()
 
     with tempfile.NamedTemporaryFile(
-
         mode="w",
-
         suffix=".txt",
-
         delete=False,
-
         encoding="utf-8",
-
     ) as file:
 
         for target in targets:
 
-            file.write(
+            file.write(target + "\n")
 
-                target + "\n"
-
-            )
-
-        target_file = Path(
-            file.name
-        )
+        target_file = Path(file.name)
 
     command = build_multiple_targets(
-
         target_file,
-
         output_file,
-
         profile,
-
         custom_template,
-
         severity,
-
     )
 
     last_error = None
 
-    for _ in range(
-
-        retries + 1
-
-    ):
+    for _ in range(retries + 1):
 
         try:
 
             subprocess.run(
-
                 command,
-
                 stdout=subprocess.DEVNULL,
-
                 stderr=subprocess.PIPE,
-
                 text=True,
-
                 timeout=NUCLEI_TIMEOUT,
-
                 check=True,
-
             )
 
-            cleanup(
-                target_file
-            )
+            cleanup(target_file)
 
             return (
-
                 output_file,
-
                 None,
-
             )
 
         except subprocess.TimeoutExpired:
 
-            last_error = (
-
-                f"Timeout ({NUCLEI_TIMEOUT}s)"
-
-            )
+            last_error = f"Timeout ({NUCLEI_TIMEOUT}s)"
 
         except subprocess.CalledProcessError as error:
 
-            last_error = (
-
-                error.stderr.strip()
-
-            )
+            last_error = error.stderr.strip()
 
         except Exception as error:
 
-            last_error = str(
-                error
-            )
+            last_error = str(error)
 
-    cleanup(
-        target_file
-    )
+    cleanup(target_file)
 
-    cleanup(
-        output_file
-    )
+    cleanup(output_file)
 
     return (
-
         None,
-
         last_error,
-
     )
 
 
 # ==========================================================
 # Cleanup
 # ==========================================================
+
 
 def cleanup(
     filepath,
@@ -530,12 +374,8 @@ def cleanup(
 
     try:
 
-        Path(
-            filepath
-        ).unlink(
-
+        Path(filepath).unlink(
             missing_ok=True,
-
         )
 
     except Exception:
@@ -547,6 +387,7 @@ def cleanup(
 # Installation Helpers
 # ==========================================================
 
+
 def is_nuclei_installed():
     """
     Check installation.
@@ -555,21 +396,13 @@ def is_nuclei_installed():
     try:
 
         subprocess.run(
-
             [
-
                 "nuclei",
-
                 "-version",
-
             ],
-
             stdout=subprocess.DEVNULL,
-
             stderr=subprocess.DEVNULL,
-
             check=True,
-
         )
 
         return True
@@ -587,21 +420,13 @@ def get_nuclei_version():
     try:
 
         result = subprocess.run(
-
             [
-
                 "nuclei",
-
                 "-version",
-
             ],
-
             capture_output=True,
-
             text=True,
-
             check=True,
-
         )
 
         return result.stdout.strip()
@@ -615,6 +440,7 @@ def get_nuclei_version():
 # Public Wrappers
 # ==========================================================
 
+
 def scan_target(
     target: str,
     profile: str = "default",
@@ -626,31 +452,16 @@ def scan_target(
     """
 
     output, error = run_single_target(
-
         target,
-
         profile,
-
         custom_template,
-
         severity,
-
     )
 
     return {
-
-        "success":
-
-            error is None,
-
-        "output":
-
-            output,
-
-        "error":
-
-            error,
-
+        "success": error is None,
+        "output": output,
+        "error": error,
     }
 
 
@@ -665,37 +476,23 @@ def scan_targets(
     """
 
     output, error = run_multiple_targets(
-
         targets,
-
         profile,
-
         custom_template,
-
         severity,
-
     )
 
     return {
-
-        "success":
-
-            error is None,
-
-        "output":
-
-            output,
-
-        "error":
-
-            error,
-
+        "success": error is None,
+        "output": output,
+        "error": error,
     }
 
 
 # ==========================================================
 # Capabilities
 # ==========================================================
+
 
 def supports_multiple_targets():
 
@@ -714,17 +511,11 @@ def supports_jsonl():
 if __name__ == "__main__":
 
     print(
-
         "Installed :",
-
         is_nuclei_installed(),
-
     )
 
     print(
-
         "Version   :",
-
         get_nuclei_version(),
-
     )

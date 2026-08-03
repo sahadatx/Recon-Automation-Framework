@@ -16,7 +16,6 @@ from core.logger import (
     warning,
 )
 
-
 # ==========================================================
 # Output Directory
 # ==========================================================
@@ -38,6 +37,7 @@ def create_output_directory() -> None:
 # ==========================================================
 # Write Text
 # ==========================================================
+
 
 def write_text(
     output_file: Path,
@@ -64,15 +64,11 @@ def write_text(
             encoding="utf-8",
         )
 
-        success(
-            f"Saved {output_file}"
-        )
+        success(f"Saved {output_file}")
 
     except OSError as error:
 
-        warning(
-            f"{output_file}: {error}"
-        )
+        warning(f"{output_file}: {error}")
 
     return output_file
 
@@ -80,6 +76,7 @@ def write_text(
 # ==========================================================
 # Write JSON
 # ==========================================================
+
 
 def write_json(
     output_file: Path,
@@ -115,15 +112,11 @@ def write_json(
                 default=str,
             )
 
-        success(
-            f"Saved {output_file}"
-        )
+        success(f"Saved {output_file}")
 
     except OSError as error:
 
-        warning(
-            f"{output_file}: {error}"
-        )
+        warning(f"{output_file}: {error}")
 
     return output_file
 
@@ -131,6 +124,7 @@ def write_json(
 # ==========================================================
 # Write CSV
 # ==========================================================
+
 
 def write_csv(
     output_file: Path,
@@ -194,15 +188,11 @@ def write_csv(
                     ]
                 )
 
-        success(
-            f"Saved {output_file}"
-        )
+        success(f"Saved {output_file}")
 
     except OSError as error:
 
-        warning(
-            f"{output_file}: {error}"
-        )
+        warning(f"{output_file}: {error}")
 
     return output_file
 
@@ -210,6 +200,7 @@ def write_csv(
 # ==========================================================
 # Export JSON
 # ==========================================================
+
 
 def export_json(
     analysis: dict[str, Any],
@@ -228,6 +219,7 @@ def export_json(
 # Export TXT
 # ==========================================================
 
+
 def export_txt(
     analysis: dict[str, Any],
 ) -> Path:
@@ -243,49 +235,27 @@ def export_txt(
 
         lines.append("=" * 80)
 
-        lines.append(
-            f"Target              : {result.get('host', '-')}"
-        )
+        lines.append(f"Target              : {result.get('host', '-')}")
 
-        lines.append(
-            f"Risk Level          : {result.get('risk_level', '-')}"
-        )
+        lines.append(f"Risk Level          : {result.get('risk_level', '-')}")
 
-        lines.append(
-            f"Risk Score          : {result.get('risk_score', 0)}"
-        )
+        lines.append(f"Risk Score          : {result.get('risk_score', 0)}")
 
-        lines.append(
-            f"Days Remaining      : {result.get('days_remaining', 0)}"
-        )
+        lines.append(f"Days Remaining      : {result.get('days_remaining', 0)}")
 
-        lines.append(
-            f"Expired             : {result.get('expired', False)}"
-        )
+        lines.append(f"Expired             : {result.get('expired', False)}")
 
-        lines.append(
-            f"Self Signed         : {result.get('self_signed', False)}"
-        )
+        lines.append(f"Self Signed         : {result.get('self_signed', False)}")
 
-        lines.append(
-            f"Hostname Match      : {result.get('hostname_match', False)}"
-        )
+        lines.append(f"Hostname Match      : {result.get('hostname_match', False)}")
 
-        lines.append(
-            f"Weak Protocol       : {result.get('weak_protocol', False)}"
-        )
+        lines.append(f"Weak Protocol       : {result.get('weak_protocol', False)}")
 
-        lines.append(
-            f"Weak Cipher         : {result.get('weak_cipher', False)}"
-        )
+        lines.append(f"Weak Cipher         : {result.get('weak_cipher', False)}")
 
-        lines.append(
-            f"Forward Secrecy     : {result.get('forward_secrecy', False)}"
-        )
+        lines.append(f"Forward Secrecy     : {result.get('forward_secrecy', False)}")
 
-        lines.append(
-            f"Wildcard            : {result.get('wildcard', False)}"
-        )
+        lines.append(f"Wildcard            : {result.get('wildcard', False)}")
 
         lines.append("Recommendations")
 
@@ -298,15 +268,11 @@ def export_txt(
 
             for recommendation in recommendations:
 
-                lines.append(
-                    f"  - {recommendation}"
-                )
+                lines.append(f"  - {recommendation}")
 
         else:
 
-            lines.append(
-                "  None"
-            )
+            lines.append("  None")
 
         lines.append("")
 
@@ -319,6 +285,7 @@ def export_txt(
 # ==========================================================
 # Export CSV
 # ==========================================================
+
 
 def export_csv(
     analysis: dict[str, Any],
@@ -336,6 +303,7 @@ def export_csv(
 # ==========================================================
 # Export High Risk
 # ==========================================================
+
 
 def export_high_risk(
     analysis: dict[str, Any],
@@ -360,13 +328,11 @@ def export_high_risk(
             continue
 
         lines.append(
-
             f"{result.get('host', '-')}"
             f" -> "
             f"{result.get('risk_level', '-')}"
             f" "
             f"(Score: {result.get('risk_score', 0)})"
-
         )
 
     return write_text(
@@ -379,6 +345,7 @@ def export_high_risk(
 # Export Summary
 # ==========================================================
 
+
 def export_summary(
     analysis: dict[str, Any],
 ) -> Path:
@@ -389,44 +356,26 @@ def export_summary(
     statistics = analysis["statistics"]
 
     lines = [
-
         "TLS Analysis Summary",
-
         "=" * 40,
-
         f"Targets             : {statistics['targets']}",
-
         f"Average Risk        : {statistics['average_risk']}",
-
         f"Highest Risk        : {statistics['highest_risk']}",
-
         f"Expired             : {statistics['expired']}",
-
         f"Self Signed         : {statistics['self_signed']}",
-
         f"Hostname Mismatch   : {statistics['hostname_mismatch']}",
-
         f"Weak Protocol       : {statistics['weak_protocol']}",
-
         f"Weak Cipher         : {statistics['weak_cipher']}",
-
         f"Wildcard            : {statistics['wildcard']}",
-
         f"Forward Secrecy     : {statistics['forward_secrecy']}",
-
         "",
-
         "Risk Levels",
-
         "-" * 40,
-
     ]
 
     for level, count in statistics["risk_levels"].items():
 
-        lines.append(
-            f"{level:<20}{count}"
-        )
+        lines.append(f"{level:<20}{count}")
 
     return write_text(
         OUTPUT_DIR / "summary.txt",
@@ -437,6 +386,7 @@ def export_summary(
 # ==========================================================
 # Show Summary
 # ==========================================================
+
 
 def show_summary(
     analysis: dict[str, Any],
@@ -451,9 +401,7 @@ def show_summary(
 
     print("=" * 80)
 
-    print(
-        "TLS Analysis Summary".center(80)
-    )
+    print("TLS Analysis Summary".center(80))
 
     print("=" * 80)
 
@@ -476,9 +424,7 @@ def show_summary(
 
     for level, count in statistics["risk_levels"].items():
 
-        print(
-            f"{level:<30}{count}"
-        )
+        print(f"{level:<30}{count}")
 
     print("=" * 80)
 
@@ -486,6 +432,7 @@ def show_summary(
 # ==========================================================
 # Export All
 # ==========================================================
+
 
 def export_all(
     analysis: dict[str, Any],
@@ -514,7 +461,5 @@ def export_all(
 # ==========================================================
 
 __all__ = [
-
     "export_all",
-
 ]

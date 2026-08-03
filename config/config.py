@@ -11,7 +11,6 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-
 # ==========================================================
 # Load Environment
 # ==========================================================
@@ -23,23 +22,11 @@ load_dotenv()
 # Application
 # ==========================================================
 
-APP_NAME = (
+APP_NAME = "Recon Automation Framework"
 
-    "Recon Automation Framework"
+VERSION = "1.0.0"
 
-)
-
-VERSION = (
-
-    "1.0.0"
-
-)
-
-AUTHOR = (
-
-    "Sahadat Hossain"
-
-)
+AUTHOR = "Sahadat Hossain"
 
 
 # ==========================================================
@@ -50,306 +37,104 @@ DEFAULT_TIMEOUT = 60
 
 MAX_WORKERS = 7
 
-USER_AGENT = (
+USER_AGENT = "ReconAutomationFramework/1.0.0"
 
-    "ReconAutomationFramework/1.0.0"
+DEFAULT_ENCODING = "utf-8"
 
-)
-
-DEFAULT_ENCODING = (
-
-    "utf-8"
-
-)
-
-DEFAULT_SCHEME = (
-
-    "https"
-
-)
+DEFAULT_SCHEME = "https"
 
 
 # ==========================================================
 # Project Paths
 # ==========================================================
 
-PROJECT_ROOT = (
+PROJECT_ROOT = Path.cwd()
 
-    Path.cwd()
+OUTPUT_DIR = PROJECT_ROOT / "output"
 
-)
+LOG_DIR = PROJECT_ROOT / "logs"
 
-OUTPUT_DIR = (
-
-    PROJECT_ROOT
-
-    / "output"
-
-)
-
-LOG_DIR = (
-
-    PROJECT_ROOT
-
-    / "logs"
-
-)
-
-TEMP_DIR = (
-
-    PROJECT_ROOT
-
-    / "temp"
-
-)
+TEMP_DIR = PROJECT_ROOT / "temp"
 
 
-PASSIVE_OUTPUT_DIR = (
+PASSIVE_OUTPUT_DIR = OUTPUT_DIR / "passive"
 
-    OUTPUT_DIR
+DNS_OUTPUT_DIR = OUTPUT_DIR / "dns"
 
-    / "passive"
+HTTP_OUTPUT_DIR = OUTPUT_DIR / "http"
 
-)
+PORT_OUTPUT_DIR = OUTPUT_DIR / "ports"
 
-DNS_OUTPUT_DIR = (
+TECHNOLOGY_OUTPUT_DIR = OUTPUT_DIR / "technology"
 
-    OUTPUT_DIR
+CRAWLER_OUTPUT_DIR = OUTPUT_DIR / "crawler"
 
-    / "dns"
+JAVASCRIPT_OUTPUT_DIR = OUTPUT_DIR / "javascript" / "raw"
 
-)
+FUZZ_OUTPUT_DIR = OUTPUT_DIR / "fuzzing"
 
-HTTP_OUTPUT_DIR = (
+SCREENSHOT_OUTPUT_DIR = OUTPUT_DIR / "screenshots"
 
-    OUTPUT_DIR
+NUCLEI_OUTPUT_DIR = OUTPUT_DIR / "nuclei"
 
-    / "http"
-
-)
-
-PORT_OUTPUT_DIR = (
-
-    OUTPUT_DIR
-
-    / "ports"
-
-)
-
-TECHNOLOGY_OUTPUT_DIR = (
-
-    OUTPUT_DIR
-
-    / "technology"
-
-)
-
-CRAWLER_OUTPUT_DIR = (
-
-    OUTPUT_DIR
-
-    / "crawler"
-
-)
-
-JAVASCRIPT_OUTPUT_DIR = (
-
-    OUTPUT_DIR
-
-    / "javascript"
-
-    / "raw"
-
-)
-
-FUZZ_OUTPUT_DIR = (
-
-    OUTPUT_DIR
-
-    / "fuzzing"
-
-)
-
-SCREENSHOT_OUTPUT_DIR = (
-
-    OUTPUT_DIR
-
-    / "screenshots"
-
-)
-
-NUCLEI_OUTPUT_DIR = (
-
-    OUTPUT_DIR
-
-    / "nuclei"
-
-)
-
-VHOST_OUTPUT_DIR = (
-
-    OUTPUT_DIR
-
-    / "vhost"
-
-)
+VHOST_OUTPUT_DIR = OUTPUT_DIR / "vhost"
 
 
 # ==========================================================
 # Shared Wordlists
 # ==========================================================
 
-WORDLISTS_DIR = (
+WORDLISTS_DIR = PROJECT_ROOT / "wordlists"
 
-    PROJECT_ROOT
+DIRECTORY_WORDLIST_DIR = WORDLISTS_DIR / "directories"
 
-    / "wordlists"
+VHOST_WORDLIST_DIR = WORDLISTS_DIR / "vhosts"
 
-)
+SUBDOMAIN_WORDLIST_DIR = WORDLISTS_DIR / "subdomains"
 
-DIRECTORY_WORDLIST_DIR = (
+PARAMETER_WORDLIST_DIR = WORDLISTS_DIR / "parameters"
 
-    WORDLISTS_DIR
+FILES_WORDLIST_DIR = WORDLISTS_DIR / "files"
 
-    / "directories"
+CUSTOM_WORDLIST_DIR = WORDLISTS_DIR / "custom"
 
-)
-
-VHOST_WORDLIST_DIR = (
-
-    WORDLISTS_DIR
-
-    / "vhosts"
-
-)
-
-SUBDOMAIN_WORDLIST_DIR = (
-
-    WORDLISTS_DIR
-
-    / "subdomains"
-
-)
-
-PARAMETER_WORDLIST_DIR = (
-
-    WORDLISTS_DIR
-
-    / "parameters"
-
-)
-
-FILES_WORDLIST_DIR = (
-
-    WORDLISTS_DIR
-
-    / "files"
-
-)
-
-CUSTOM_WORDLIST_DIR = (
-
-    WORDLISTS_DIR
-
-    / "custom"
-
-)
-
-WAF_OUTPUT_DIR = (
-
-    OUTPUT_DIR
-
-    / "waf"
-
-)
+WAF_OUTPUT_DIR = OUTPUT_DIR / "waf"
 
 # ==========================================================
 # Default Wordlists
 # ==========================================================
 
-DEFAULT_DIRECTORY_WORDLIST = (
+DEFAULT_DIRECTORY_WORDLIST = DIRECTORY_WORDLIST_DIR / "common.txt"
 
-    DIRECTORY_WORDLIST_DIR
+DEFAULT_VHOST_WORDLIST = VHOST_WORDLIST_DIR / "common.txt"
 
-    / "common.txt"
+DEFAULT_SUBDOMAIN_WORDLIST = SUBDOMAIN_WORDLIST_DIR / "common.txt"
 
-)
-
-DEFAULT_VHOST_WORDLIST = (
-
-    VHOST_WORDLIST_DIR
-
-    / "common.txt"
-
-)
-
-DEFAULT_SUBDOMAIN_WORDLIST = (
-
-    SUBDOMAIN_WORDLIST_DIR
-
-    / "common.txt"
-
-)
-
-DEFAULT_PARAMETER_WORDLIST = (
-
-    PARAMETER_WORDLIST_DIR
-
-    / "common.txt"
-
-)
+DEFAULT_PARAMETER_WORDLIST = PARAMETER_WORDLIST_DIR / "common.txt"
 
 
 # ==========================================================
 # API Keys
 # ==========================================================
 
-PDCP_API_KEY = (
-
-    os.getenv(
-
-        "PDCP_API_KEY",
-
-        "",
-
-    )
-
+PDCP_API_KEY = os.getenv(
+    "PDCP_API_KEY",
+    "",
 )
 
-SECURITYTRAILS_API_KEY = (
-
-    os.getenv(
-
-        "SECURITYTRAILS_API_KEY",
-
-        "",
-
-    )
-
+SECURITYTRAILS_API_KEY = os.getenv(
+    "SECURITYTRAILS_API_KEY",
+    "",
 )
 
-CHAOS_API_KEY = (
-
-    os.getenv(
-
-        "CHAOS_API_KEY",
-
-        "",
-
-    )
-
+CHAOS_API_KEY = os.getenv(
+    "CHAOS_API_KEY",
+    "",
 )
 
-SHODAN_API_KEY = (
-
-    os.getenv(
-
-        "SHODAN_API_KEY",
-
-        "",
-
-    )
-
+SHODAN_API_KEY = os.getenv(
+    "SHODAN_API_KEY",
+    "",
 )
 
 
@@ -364,15 +149,10 @@ DNS_LIFETIME = 8
 DNS_RETRIES = 2
 
 DNS_SERVERS = [
-
     "1.1.1.1",
-
     "1.0.0.1",
-
     "8.8.8.8",
-
     "8.8.4.4",
-
 ]
 
 
@@ -392,11 +172,7 @@ HTTP_VERIFY_SSL = True
 
 HTTP_FOLLOW_REDIRECTS = True
 
-HTTP_USER_AGENT = (
-
-    USER_AGENT
-
-)
+HTTP_USER_AGENT = USER_AGENT
 
 
 # ==========================================================
@@ -413,11 +189,7 @@ PORT_SCAN_WORKERS = 100
 
 ENABLE_BANNER_GRAB = False
 
-DEFAULT_PORTS = (
-
-    "common"
-
-)
+DEFAULT_PORTS = "common"
 
 
 # ==========================================================
@@ -457,14 +229,9 @@ SCREENSHOT_HEADLESS = True
 
 SCREENSHOT_DARK_MODE = False
 
-SCREENSHOT_FORMAT = (
-
-    "png"
-
-)
+SCREENSHOT_FORMAT = "png"
 
 SCREENSHOT_QUALITY = 100
-
 
 
 # ==========================================================
@@ -485,23 +252,11 @@ FUZZ_FOLLOW_REDIRECTS = False
 
 FUZZ_AUTO_CALIBRATION = True
 
-FUZZ_DEFAULT_WORDLIST = (
+FUZZ_DEFAULT_WORDLIST = DEFAULT_DIRECTORY_WORDLIST
 
-    DEFAULT_DIRECTORY_WORDLIST
+FUZZ_MATCH_CODES = "200,204,301,302,307,401,403,405"
 
-)
-
-FUZZ_MATCH_CODES = (
-
-    "200,204,301,302,307,401,403,405"
-
-)
-
-FUZZ_FILTER_CODES = (
-
-    "400,404"
-
-)
+FUZZ_FILTER_CODES = "400,404"
 
 FUZZ_MATCH_SIZE = ""
 
@@ -520,17 +275,9 @@ NUCLEI_RATE_LIMIT = 150
 
 NUCLEI_RETRIES = 2
 
-NUCLEI_PROFILE = (
+NUCLEI_PROFILE = "default"
 
-    "default"
-
-)
-
-NUCLEI_SEVERITY = (
-
-    "critical,high,medium,low,info"
-
-)
+NUCLEI_SEVERITY = "critical,high,medium,low,info"
 
 NUCLEI_FOLLOW_REDIRECTS = False
 
@@ -551,33 +298,17 @@ VHOST_FILTER_DEFAULT_RESPONSES = True
 
 VHOST_RETRIES = 1
 
-VHOST_HEADER = (
+VHOST_HEADER = "Host"
 
-    "Host"
-
-)
-
-VHOST_DEFAULT_WORDLIST = (
-
-    DEFAULT_VHOST_WORDLIST
-
-)
+VHOST_DEFAULT_WORDLIST = DEFAULT_VHOST_WORDLIST
 
 VHOST_RECURSION = False
 
 VHOST_FOLLOW_REDIRECTS = False
 
-VHOST_MATCH_CODES = (
+VHOST_MATCH_CODES = "200,204,301,302,307,401,403"
 
-    "200,204,301,302,307,401,403"
-
-)
-
-VHOST_FILTER_CODES = (
-
-    "400,404"
-
-)
+VHOST_FILTER_CODES = "400,404"
 
 VHOST_MATCH_SIZE = ""
 
@@ -590,21 +321,11 @@ VHOST_FILTER_SIZE = "0"
 
 VERBOSE = False
 
-LOG_LEVEL = (
-
-    "INFO"
-
-)
+LOG_LEVEL = "INFO"
 
 LOG_TO_FILE = True
 
-LOG_FILE = (
-
-    LOG_DIR
-
-    / "framework.log"
-
-)
+LOG_FILE = LOG_DIR / "framework.log"
 
 
 NETWORK_TIMEOUT = 10
@@ -647,13 +368,8 @@ SHOW_TOOL_COMMANDS = False
 # ==========================================================
 
 DEFAULT_OUTPUT_FORMATS = (
-
     "txt",
-
     "json",
-
     "csv",
-
     "markdown",
-
 )

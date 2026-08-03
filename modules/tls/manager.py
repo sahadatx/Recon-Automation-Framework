@@ -25,7 +25,6 @@ from .ciphers import collect_cipher
 from .filters import filter_results
 from .protocols import collect_protocols
 
-
 # ==========================================================
 # Run TLS Analysis
 # ==========================================================
@@ -63,19 +62,13 @@ def run_tls_analysis(
 
         return analysis
 
-    info(
-        "Starting TLS Analysis..."
-    )
+    info("Starting TLS Analysis...")
 
-    results: list[
-        dict[str, Any]
-    ] = []
+    results: list[dict[str, Any]] = []
 
     for target in targets:
 
-        info(
-            f"Analyzing {target}..."
-        )
+        info(f"Analyzing {target}...")
 
         certificate = collect_certificate(
             target,
@@ -112,49 +105,27 @@ def run_tls_analysis(
         analysis,
     )
 
-    statistics = analysis[
-        "statistics"
-    ]
+    statistics = analysis["statistics"]
 
-    success(
-        f"Targets             : {statistics['targets']}"
-    )
+    success(f"Targets             : {statistics['targets']}")
 
-    success(
-        f"Average Risk        : {statistics['average_risk']}"
-    )
+    success(f"Average Risk        : {statistics['average_risk']}")
 
-    success(
-        f"Highest Risk        : {statistics['highest_risk']}"
-    )
+    success(f"Highest Risk        : {statistics['highest_risk']}")
 
-    success(
-        f"Expired             : {statistics['expired']}"
-    )
+    success(f"Expired             : {statistics['expired']}")
 
-    success(
-        f"Self Signed         : {statistics['self_signed']}"
-    )
+    success(f"Self Signed         : {statistics['self_signed']}")
 
-    success(
-        f"Hostname Mismatch   : {statistics['hostname_mismatch']}"
-    )
+    success(f"Hostname Mismatch   : {statistics['hostname_mismatch']}")
 
-    success(
-        f"Weak Protocol       : {statistics['weak_protocol']}"
-    )
+    success(f"Weak Protocol       : {statistics['weak_protocol']}")
 
-    success(
-        f"Weak Cipher         : {statistics['weak_cipher']}"
-    )
+    success(f"Weak Cipher         : {statistics['weak_cipher']}")
 
-    success(
-        f"Wildcard            : {statistics['wildcard']}"
-    )
+    success(f"Wildcard            : {statistics['wildcard']}")
 
-    success(
-        f"Forward Secrecy     : {statistics['forward_secrecy']}"
-    )
+    success(f"Forward Secrecy     : {statistics['forward_secrecy']}")
 
     return analysis
 

@@ -12,7 +12,6 @@ from modules.crawler.statistics import (
     generate_statistics,
 )
 
-
 # ==========================================================
 # Analyze Crawler Results
 # ==========================================================

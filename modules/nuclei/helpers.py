@@ -11,10 +11,10 @@ from pathlib import Path
 
 from urllib.parse import urlparse
 
-
 # ==========================================================
 # Check Installation
 # ==========================================================
+
 
 def is_nuclei_installed():
     """
@@ -25,20 +25,13 @@ def is_nuclei_installed():
         bool
     """
 
-    return (
-
-        shutil.which(
-            "nuclei"
-        )
-
-        is not None
-
-    )
+    return shutil.which("nuclei") is not None
 
 
 # ==========================================================
 # Get Version
 # ==========================================================
+
 
 def get_nuclei_version():
     """
@@ -54,21 +47,13 @@ def get_nuclei_version():
     try:
 
         result = subprocess.run(
-
             [
-
                 "nuclei",
-
                 "-version",
-
             ],
-
             capture_output=True,
-
             text=True,
-
             timeout=5,
-
         )
 
         return result.stdout.strip()
@@ -82,6 +67,7 @@ def get_nuclei_version():
 # Ensure Directory
 # ==========================================================
 
+
 def ensure_directory(
     directory: str | Path,
 ):
@@ -93,16 +79,11 @@ def ensure_directory(
         Path
     """
 
-    path = Path(
-        directory
-    )
+    path = Path(directory)
 
     path.mkdir(
-
         parents=True,
-
         exist_ok=True,
-
     )
 
     return path
@@ -111,6 +92,7 @@ def ensure_directory(
 # ==========================================================
 # Cleanup File
 # ==========================================================
+
 
 def cleanup_file(
     filepath: str | Path,
@@ -122,9 +104,7 @@ def cleanup_file(
         bool
     """
 
-    path = Path(
-        filepath
-    )
+    path = Path(filepath)
 
     if not path.exists():
 
@@ -145,6 +125,7 @@ def cleanup_file(
 # Remove Duplicates
 # ==========================================================
 
+
 def remove_duplicates(
     values: list,
 ):
@@ -156,18 +137,13 @@ def remove_duplicates(
         list
     """
 
-    return list(
-
-        dict.fromkeys(
-            values
-        )
-
-    )
+    return list(dict.fromkeys(values))
 
 
 # ==========================================================
 # Normalize Target
 # ==========================================================
+
 
 def normalize_target(
     target: str,
@@ -186,43 +162,27 @@ def normalize_target(
         return ""
 
     if not target.startswith(
-
         (
-
             "http://",
-
             "https://",
-
         )
-
     ):
 
-        target = (
+        target = "https://" + target
 
-            "https://"
-
-            + target
-
-        )
-
-    parsed = urlparse(
-        target
-    )
+    parsed = urlparse(target)
 
     scheme = parsed.scheme
 
     host = parsed.netloc.lower()
 
-    return (
-
-        f"{scheme}://{host}"
-
-    )
+    return f"{scheme}://{host}"
 
 
 # ==========================================================
 # Normalize Targets
 # ==========================================================
+
 
 def normalize_targets(
     targets: list[str],
@@ -234,26 +194,15 @@ def normalize_targets(
         list
     """
 
-    normalized = [
+    normalized = [normalize_target(target) for target in targets if target.strip()]
 
-        normalize_target(
-            target
-        )
-
-        for target in targets
-
-        if target.strip()
-
-    ]
-
-    return remove_duplicates(
-        normalized
-    )
+    return remove_duplicates(normalized)
 
 
 # ==========================================================
 # Validate Target
 # ==========================================================
+
 
 def validate_target(
     target: str,
@@ -265,30 +214,21 @@ def validate_target(
         bool
     """
 
-    target = normalize_target(
-        target
-    )
+    target = normalize_target(target)
 
     if not target:
 
         return False
 
-    parsed = urlparse(
-        target
-    )
+    parsed = urlparse(target)
 
-    return bool(
-
-        parsed.scheme
-
-        and parsed.netloc
-
-    )
+    return bool(parsed.scheme and parsed.netloc)
 
 
 # ==========================================================
 # Validate Targets
 # ==========================================================
+
 
 def validate_targets(
     targets: list[str],
@@ -300,24 +240,13 @@ def validate_targets(
         list
     """
 
-    return [
-
-        target
-
-        for target in normalize_targets(
-            targets
-        )
-
-        if validate_target(
-            target
-        )
-
-    ]
+    return [target for target in normalize_targets(targets) if validate_target(target)]
 
 
 # ==========================================================
 # Read Lines
 # ==========================================================
+
 
 def read_lines(
     filepath: str | Path,
@@ -329,9 +258,7 @@ def read_lines(
         list
     """
 
-    path = Path(
-        filepath
-    )
+    path = Path(filepath)
 
     if not path.exists():
 
@@ -340,22 +267,11 @@ def read_lines(
     try:
 
         with path.open(
-
             "r",
-
             encoding="utf-8",
-
         ) as file:
 
-            return [
-
-                line.strip()
-
-                for line in file
-
-                if line.strip()
-
-            ]
+            return [line.strip() for line in file if line.strip()]
 
     except Exception:
 
@@ -365,6 +281,7 @@ def read_lines(
 # ==========================================================
 # Write Lines
 # ==========================================================
+
 
 def write_lines(
     filepath: str | Path,
@@ -377,27 +294,18 @@ def write_lines(
         Path
     """
 
-    path = Path(
-        filepath
-    )
+    path = Path(filepath)
 
-    ensure_directory(
-        path.parent
-    )
+    ensure_directory(path.parent)
 
     with path.open(
-
         "w",
-
         encoding="utf-8",
-
     ) as file:
 
         for line in lines:
 
-            file.write(
-                line + "\n"
-            )
+            file.write(line + "\n")
 
     return path
 
@@ -405,6 +313,7 @@ def write_lines(
 # ==========================================================
 # Load Targets
 # ==========================================================
+
 
 def load_targets(
     filepath: str | Path,
@@ -416,18 +325,15 @@ def load_targets(
         list
     """
 
-    targets = read_lines(
-        filepath
-    )
+    targets = read_lines(filepath)
 
-    return validate_targets(
-        targets
-    )
+    return validate_targets(targets)
 
 
 # ==========================================================
 # Save Targets
 # ==========================================================
+
 
 def save_targets(
     filepath: str | Path,
@@ -440,16 +346,11 @@ def save_targets(
         Path
     """
 
-    targets = validate_targets(
-        targets
-    )
+    targets = validate_targets(targets)
 
     return write_lines(
-
         filepath,
-
         targets,
-
     )
 
 
@@ -470,20 +371,13 @@ if __name__ == "__main__":
     )
 
     sample = [
-
         "example.com",
-
         "https://example.com",
-
         "http://testphp.vulnweb.com",
-
         "example.com",
-
     ]
 
-    normalized = normalize_targets(
-        sample
-    )
+    normalized = normalize_targets(sample)
 
     print(
         "Normalized:",
@@ -492,7 +386,5 @@ if __name__ == "__main__":
 
     print(
         "Valid:",
-        validate_targets(
-            sample
-        ),
+        validate_targets(sample),
     )

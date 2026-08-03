@@ -34,7 +34,6 @@ from modules.ports.scanner import (
     scan_common_ports,
 )
 
-
 # ==========================================================
 # Scan One Host
 # ==========================================================
@@ -78,9 +77,7 @@ def scan_hosts(
     the shared thread pool.
     """
 
-    info(
-        "Starting Port Scan..."
-    )
+    info("Starting Port Scan...")
 
     results: dict[
         str,
@@ -99,30 +96,22 @@ def scan_hosts(
 
     if executor is None:
 
-        raise RuntimeError(
-            "Shared thread pool "
-            "is not initialized."
-        )
+        raise RuntimeError("Shared thread pool " "is not initialized.")
 
     futures = {
-
         executor.submit(
             scan_one_host,
             context,
             host,
         ): host
-
         for host in hosts
-
     }
 
     for future in as_completed(
         futures,
     ):
 
-        host = futures[
-            future
-        ]
+        host = futures[future]
 
         completed += 1
 
@@ -135,17 +124,12 @@ def scan_hosts(
 
             if open_ports:
 
-                results[
-                    hostname
-                ] = open_ports
+                results[hostname] = open_ports
 
                 progress_status(
                     completed,
                     total,
-                    (
-                        f"✓ {hostname} "
-                        f"[{len(open_ports)} open]"
-                    ),
+                    (f"✓ {hostname} " f"[{len(open_ports)} open]"),
                 )
 
             else:
@@ -176,16 +160,9 @@ def scan_hosts(
                 f"✗ {host}",
             )
 
-    success(
-        f"Hosts With Open Ports : {len(results)}"
-    )
+    success(f"Hosts With Open Ports : {len(results)}")
 
-    success(
-        (
-            "Hosts Without Open Ports : "
-            f"{len(failed_hosts)}"
-        )
-    )
+    success(("Hosts Without Open Ports : " f"{len(failed_hosts)}"))
 
     return (
         results,

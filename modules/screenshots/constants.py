@@ -9,46 +9,31 @@ from __future__ import annotations
 
 from pathlib import Path
 
-
 # ==========================================================
 # Output Directory
 # ==========================================================
 
-SCREENSHOT_OUTPUT_DIR = Path(
-    "output/screenshots"
-)
+SCREENSHOT_OUTPUT_DIR = Path("output/screenshots")
 
 
 # ==========================================================
 # Images Directory
 # ==========================================================
 
-IMAGES_DIR = (
-    SCREENSHOT_OUTPUT_DIR
-    / "images"
-)
+IMAGES_DIR = SCREENSHOT_OUTPUT_DIR / "images"
 
 
 # ==========================================================
 # Output Files
 # ==========================================================
 
-RESULTS_TXT = (
-    SCREENSHOT_OUTPUT_DIR
-    / "results.txt"
-)
+RESULTS_TXT = SCREENSHOT_OUTPUT_DIR / "results.txt"
 
 
-RESULTS_JSON = (
-    SCREENSHOT_OUTPUT_DIR
-    / "results.json"
-)
+RESULTS_JSON = SCREENSHOT_OUTPUT_DIR / "results.json"
 
 
-SUMMARY_TXT = (
-    SCREENSHOT_OUTPUT_DIR
-    / "summary.txt"
-)
+SUMMARY_TXT = SCREENSHOT_OUTPUT_DIR / "summary.txt"
 
 
 # ==========================================================
@@ -81,27 +66,15 @@ HEADLESS = True
 # ==========================================================
 
 __all__ = [
-
     "SCREENSHOT_OUTPUT_DIR",
-
     "IMAGES_DIR",
-
     "RESULTS_TXT",
-
     "RESULTS_JSON",
-
     "SUMMARY_TXT",
-
     "SCREENSHOT_WIDTH",
-
     "SCREENSHOT_HEIGHT",
-
     "SCREENSHOT_FULL_PAGE",
-
     "SCREENSHOT_TIMEOUT",
-
     "BROWSER_NAME",
-
     "HEADLESS",
-
 ]

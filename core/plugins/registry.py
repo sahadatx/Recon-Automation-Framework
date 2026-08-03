@@ -13,7 +13,6 @@ from collections.abc import Iterator
 
 from .base import BasePlugin
 
-
 # ==========================================================
 # Plugin Registry
 # ==========================================================
@@ -49,15 +48,11 @@ class PluginRegistry:
 
         if not name:
 
-            raise ValueError(
-                "Plugin name cannot be empty."
-            )
+            raise ValueError("Plugin name cannot be empty.")
 
         if name in self._plugins:
 
-            raise ValueError(
-                f"Plugin '{name}' is already registered."
-            )
+            raise ValueError(f"Plugin '{name}' is already registered.")
 
         self._plugins[name] = plugin
 
@@ -92,9 +87,7 @@ class PluginRegistry:
 
         if plugin is None:
 
-            raise KeyError(
-                f"Plugin '{name}' is not registered."
-            )
+            raise KeyError(f"Plugin '{name}' is not registered.")
 
         return plugin
 
@@ -106,10 +99,7 @@ class PluginRegistry:
         Check whether a plugin exists.
         """
 
-        return (
-            name.strip().lower()
-            in self._plugins
-        )
+        return name.strip().lower() in self._plugins
 
     # ======================================================
     # Collection

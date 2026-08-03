@@ -10,10 +10,10 @@ from __future__ import annotations
 
 from collections import Counter
 
-
 # ==========================================================
 # Provider Statistics
 # ==========================================================
+
 
 def provider_statistics(
     results,
@@ -27,37 +27,25 @@ def provider_statistics(
     """
 
     counter = Counter(
-
         result.get(
-
             "provider",
-
             "Unknown",
-
         )
-
         or "Unknown"
-
-        for result
-
-        in results
-
+        for result in results
     )
 
     return dict(
-
         sorted(
-
             counter.items(),
-
         )
-
     )
 
 
 # ==========================================================
 # Confidence Statistics
 # ==========================================================
+
 
 def confidence_statistics(
     results,
@@ -71,77 +59,47 @@ def confidence_statistics(
     """
 
     return {
-
         "high": sum(
-
             result.get(
-
                 "confidence",
-
                 0,
-
-            ) >= 90
-
-            for result
-
-            in results
-
+            )
+            >= 90
+            for result in results
         ),
-
         "medium": sum(
-
-            70 <= result.get(
-
+            70
+            <= result.get(
                 "confidence",
-
                 0,
-
-            ) < 90
-
-            for result
-
-            in results
-
+            )
+            < 90
+            for result in results
         ),
-
         "low": sum(
-
-            0 < result.get(
-
+            0
+            < result.get(
                 "confidence",
-
                 0,
-
-            ) < 70
-
-            for result
-
-            in results
-
+            )
+            < 70
+            for result in results
         ),
-
         "unknown": sum(
-
             result.get(
-
                 "confidence",
-
                 0,
-
-            ) == 0
-
-            for result
-
-            in results
-
+            )
+            == 0
+            for result in results
         ),
-
     }
 
 
 # ==========================================================
 # Generate Statistics
 # ==========================================================
+
 
 def generate_statistics(
     results,
@@ -155,126 +113,67 @@ def generate_statistics(
     """
 
     total = len(
-
         results,
-
     )
 
     vulnerable = sum(
-
         result.get(
-
             "vulnerable",
-
             False,
-
         )
-
-        for result
-
-        in results
-
+        for result in results
     )
 
-    safe = (
-
-        total
-
-        - vulnerable
-
-    )
+    safe = total - vulnerable
 
     confidence = [
-
         result.get(
-
             "confidence",
-
             0,
-
         )
-
-        for result
-
-        in results
-
+        for result in results
     ]
 
-    average_confidence = round(
-
-        sum(
-
-            confidence,
-
+    average_confidence = (
+        round(
+            sum(
+                confidence,
+            )
+            / total,
+            2,
         )
-
-        / total,
-
-        2,
-
-    ) if total else 0.0
+        if total
+        else 0.0
+    )
 
     highest_confidence = max(
-
         confidence,
-
         default=0,
-
     )
 
-    statistics = (
-
-        confidence_statistics(
-
-            results,
-
-        )
-
+    statistics = confidence_statistics(
+        results,
     )
-
 
     return {
-
         "targets": total,
-
         "vulnerable": vulnerable,
-
         "safe": safe,
-
         "provider_statistics": (
-
             provider_statistics(
-
                 results,
-
             )
-
         ),
-
-        "confidence_statistics": (
-
-            statistics
-
-        ),
-
-        "average_confidence": (
-
-            average_confidence
-
-        ),
-
-        "highest_confidence": (
-
-            highest_confidence
-
-        ),
-
+        "confidence_statistics": (statistics),
+        "average_confidence": (average_confidence),
+        "highest_confidence": (highest_confidence),
     }
 
 
 # ==========================================================
 # Print Summary
 # ==========================================================
+
 
 def print_summary(
     statistics,
@@ -289,106 +188,53 @@ def print_summary(
     print("=" * 80)
 
     print(
-
         "Subdomain Takeover Summary".center(
-
             80,
-
         )
-
     )
 
     print("=" * 80)
 
-    print(
+    print(f"Targets               : {statistics['targets']}")
 
-        f"Targets               : {statistics['targets']}"
+    print(f"Vulnerable            : {statistics['vulnerable']}")
 
-    )
+    print(f"Safe                  : {statistics['safe']}")
 
-    print(
+    print(f"Average Confidence    : " f"{statistics['average_confidence']}")
 
-        f"Vulnerable            : {statistics['vulnerable']}"
-
-    )
-
-    print(
-
-        f"Safe                  : {statistics['safe']}"
-
-    )
-
-    print(
-
-        f"Average Confidence    : "
-
-        f"{statistics['average_confidence']}"
-
-    )
-
-    print(
-
-        f"Highest Confidence    : "
-
-        f"{statistics['highest_confidence']}"
-
-    )
+    print(f"Highest Confidence    : " f"{statistics['highest_confidence']}")
 
     print("-" * 80)
 
-    print(
-
-        "Confidence Levels"
-
-    )
+    print("Confidence Levels")
 
     print("-" * 80)
 
-    for level, count in statistics[
-        "confidence_statistics"
-    ].items():
+    for level, count in statistics["confidence_statistics"].items():
 
-        print(
-
-            f"{level.title():<30}{count}"
-
-        )
+        print(f"{level.title():<30}{count}")
 
     print("-" * 80)
 
-    print(
-
-        "Takeover Providers"
-
-    )
+    print("Takeover Providers")
 
     print("-" * 80)
 
     providers = statistics.get(
-
         "provider_statistics",
-
         {},
-
     )
 
     if providers:
 
         for provider, count in providers.items():
 
-            print(
-
-                f"{provider:<30}{count}"
-
-            )
+            print(f"{provider:<30}{count}")
 
     else:
 
-        print(
-
-            "None"
-
-        )
+        print("None")
 
     print("=" * 80)
 
@@ -398,13 +244,8 @@ def print_summary(
 # ==========================================================
 
 __all__ = [
-
     "provider_statistics",
-
     "confidence_statistics",
-
     "generate_statistics",
-
     "print_summary",
-
 ]

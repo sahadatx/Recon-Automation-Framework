@@ -24,21 +24,17 @@ from .constants import (
     DEFAULT_HEADERS,
 )
 
-
 # ==========================================================
 # Default Result
 # ==========================================================
 
-EMPTY_CDN_RESULT = deepcopy(
-
-    DEFAULT_ANALYSIS
-
-)
+EMPTY_CDN_RESULT = deepcopy(DEFAULT_ANALYSIS)
 
 
 # ==========================================================
 # Normalize Target
 # ==========================================================
+
 
 def normalize_target(
     target: str,
@@ -62,9 +58,7 @@ def normalize_target(
         target = f"https://{target}"
 
     parsed = urlparse(
-
         target,
-
     )
 
     return parsed.hostname or ""
@@ -73,6 +67,7 @@ def normalize_target(
 # ==========================================================
 # Resolve IPv4
 # ==========================================================
+
 
 def resolve_ipv4(
     host: str,
@@ -87,9 +82,7 @@ def resolve_ipv4(
     try:
 
         return socket.gethostbyname(
-
             host,
-
         )
 
     except Exception:
@@ -100,6 +93,7 @@ def resolve_ipv4(
 # ==========================================================
 # HTTP Request
 # ==========================================================
+
 
 def request_headers(
     context: ExecutionContext,
@@ -116,9 +110,7 @@ def request_headers(
     session = context.get_http_session()
 
     if session is None:
-        raise RuntimeError(
-            "Shared HTTP session is not initialized."
-        )
+        raise RuntimeError("Shared HTTP session is not initialized.")
 
     try:
 
@@ -135,9 +127,11 @@ def request_headers(
 
         return None
 
+
 # ==========================================================
 # Response Headers
 # ==========================================================
+
 
 def extract_headers(
     response,
@@ -153,16 +147,13 @@ def extract_headers(
 
         return {}
 
-    return dict(
-
-        response.headers
-
-    )
+    return dict(response.headers)
 
 
 # ==========================================================
 # DNS CNAME
 # ==========================================================
+
 
 def resolve_cname(
     host: str,
@@ -177,18 +168,11 @@ def resolve_cname(
     try:
 
         answers = dns.resolver.resolve(
-
             host,
-
             "CNAME",
-
         )
 
-        return str(
-
-            answers[0].target
-
-        ).rstrip(".")
+        return str(answers[0].target).rstrip(".")
 
     except Exception:
 
@@ -198,6 +182,7 @@ def resolve_cname(
 # ==========================================================
 # Header Exists
 # ==========================================================
+
 
 def header_exists(
     headers: dict[str, Any],
@@ -211,26 +196,13 @@ def header_exists(
         bool
     """
 
-    return (
-
-        header.lower()
-
-        in
-
-        {
-
-            key.lower()
-
-            for key in headers
-
-        }
-
-    )
+    return header.lower() in {key.lower() for key in headers}
 
 
 # ==========================================================
 # Server Header
 # ==========================================================
+
 
 def get_server_header(
     headers: dict[str, Any],
@@ -247,9 +219,7 @@ def get_server_header(
         if key.lower() == "server":
 
             return str(
-
                 value,
-
             )
 
     return ""
@@ -258,6 +228,7 @@ def get_server_header(
 # ==========================================================
 # Cache Headers
 # ==========================================================
+
 
 def get_cache_headers(
     headers: dict[str, Any],
@@ -276,19 +247,7 @@ def get_cache_headers(
 
         key_lower = key.lower()
 
-        if (
-
-            "cache" in key_lower
-
-            or
-
-            key_lower == "age"
-
-            or
-
-            key_lower == "via"
-
-        ):
+        if "cache" in key_lower or key_lower == "age" or key_lower == "via":
 
             cache_headers[key] = value
 
@@ -298,6 +257,7 @@ def get_cache_headers(
 # ==========================================================
 # Safe Lower
 # ==========================================================
+
 
 def safe_lower(
     value: Any,
@@ -315,15 +275,14 @@ def safe_lower(
         return ""
 
     return str(
-
         value,
-
     ).lower()
 
 
 # ==========================================================
 # Merge Detection Methods
 # ==========================================================
+
 
 def merge_methods(
     *methods,
@@ -349,9 +308,7 @@ def merge_methods(
             if method not in merged:
 
                 merged.append(
-
                     method,
-
                 )
 
     return merged
@@ -361,6 +318,7 @@ def merge_methods(
 # Deep Copy Result
 # ==========================================================
 
+
 def create_result():
     """
     Create empty CDN result.
@@ -369,11 +327,7 @@ def create_result():
         dict
     """
 
-    return deepcopy(
-
-        EMPTY_CDN_RESULT
-
-    )
+    return deepcopy(EMPTY_CDN_RESULT)
 
 
 # ==========================================================
@@ -381,29 +335,16 @@ def create_result():
 # ==========================================================
 
 __all__ = [
-
     "EMPTY_CDN_RESULT",
-
     "normalize_target",
-
     "resolve_ipv4",
-
     "request_headers",
-
     "extract_headers",
-
     "resolve_cname",
-
     "header_exists",
-
     "get_server_header",
-
     "get_cache_headers",
-
     "safe_lower",
-
     "merge_methods",
-
     "create_result",
-
 ]

@@ -10,21 +10,17 @@ from __future__ import annotations
 import ipaddress
 import re
 
-
 # ==========================================================
 # Constants
 # ==========================================================
 
-DOMAIN_PATTERN = re.compile(
-    r"^(?!-)"
-    r"(?:[A-Za-z0-9-]{1,63}\.)+"
-    r"[A-Za-z]{2,63}$"
-)
+DOMAIN_PATTERN = re.compile(r"^(?!-)" r"(?:[A-Za-z0-9-]{1,63}\.)+" r"[A-Za-z]{2,63}$")
 
 
 # ==========================================================
 # Internal Helpers
 # ==========================================================
+
 
 def _validate_positive(
     value: int,
@@ -36,9 +32,7 @@ def _validate_positive(
 
     if value < 1:
 
-        raise ValueError(
-            f"{name} must be greater than 0."
-        )
+        raise ValueError(f"{name} must be greater than 0.")
 
     return value
 
@@ -46,6 +40,7 @@ def _validate_positive(
 # ==========================================================
 # Validate Target
 # ==========================================================
+
 
 def validate_target(
     target: str,
@@ -65,9 +60,7 @@ def validate_target(
 
     if not target:
 
-        raise ValueError(
-            "Target cannot be empty."
-        )
+        raise ValueError("Target cannot be empty.")
 
     # ------------------------------------------------------
     # IP Address
@@ -95,14 +88,13 @@ def validate_target(
 
         return target
 
-    raise ValueError(
-        f"Invalid target: {target}"
-    )
+    raise ValueError(f"Invalid target: {target}")
 
 
 # ==========================================================
 # Validate Threads
 # ==========================================================
+
 
 def validate_threads(
     threads: int,
@@ -121,6 +113,7 @@ def validate_threads(
 # Validate Timeout
 # ==========================================================
 
+
 def validate_timeout(
     timeout: int,
 ) -> int:
@@ -138,6 +131,7 @@ def validate_timeout(
 # Validate Retries
 # ==========================================================
 
+
 def validate_retries(
     retries: int,
 ) -> int:
@@ -147,9 +141,7 @@ def validate_retries(
 
     if retries < 0:
 
-        raise ValueError(
-            "Retries cannot be negative."
-        )
+        raise ValueError("Retries cannot be negative.")
 
     return retries
 
@@ -159,13 +151,8 @@ def validate_retries(
 # ==========================================================
 
 __all__ = [
-
     "validate_target",
-
     "validate_threads",
-
     "validate_timeout",
-
     "validate_retries",
-
 ]

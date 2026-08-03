@@ -22,10 +22,10 @@ from .constants import (
     TXT_FILE,
 )
 
-
 # ==========================================================
 # Output Directory
 # ==========================================================
+
 
 def create_output_directory() -> Path:
     """
@@ -43,6 +43,7 @@ def create_output_directory() -> Path:
 # ==========================================================
 # Write Helpers
 # ==========================================================
+
 
 def write_text(
     path: Path,
@@ -121,6 +122,7 @@ def write_csv(
 # Export TXT
 # ==========================================================
 
+
 def export_txt(
     analysis: dict[str, Any],
 ) -> Path:
@@ -142,29 +144,17 @@ def export_txt(
     lines.append("Summary")
     lines.append("-" * 80)
 
-    lines.append(
-        f"Total Findings : {statistics['total_findings']}"
-    )
+    lines.append(f"Total Findings : {statistics['total_findings']}")
 
-    lines.append(
-        f"Critical       : {statistics['critical']}"
-    )
+    lines.append(f"Critical       : {statistics['critical']}")
 
-    lines.append(
-        f"High           : {statistics['high']}"
-    )
+    lines.append(f"High           : {statistics['high']}")
 
-    lines.append(
-        f"Medium         : {statistics['medium']}"
-    )
+    lines.append(f"Medium         : {statistics['medium']}")
 
-    lines.append(
-        f"Low            : {statistics['low']}"
-    )
+    lines.append(f"Low            : {statistics['low']}")
 
-    lines.append(
-        f"Info           : {statistics['info']}"
-    )
+    lines.append(f"Info           : {statistics['info']}")
 
     lines.append("")
 
@@ -174,45 +164,27 @@ def export_txt(
 
     for finding in results:
 
-        lines.append(
-            f"[{finding['severity'].upper()}]"
-        )
+        lines.append(f"[{finding['severity'].upper()}]")
 
-        lines.append(
-            f"Target       : {finding.get('target', '')}"
-        )
+        lines.append(f"Target       : {finding.get('target', '')}")
 
-        lines.append(
-            f"URL          : {finding.get('url', '')}"
-        )
+        lines.append(f"URL          : {finding.get('url', '')}")
 
-        lines.append(
-            f"Template     : {finding.get('template_name', '')}"
-        )
+        lines.append(f"Template     : {finding.get('template_name', '')}")
 
-        lines.append(
-            f"Template ID  : {finding.get('template_id', '')}"
-        )
+        lines.append(f"Template ID  : {finding.get('template_id', '')}")
 
-        lines.append(
-            f"Protocol     : {finding.get('protocol', '')}"
-        )
+        lines.append(f"Protocol     : {finding.get('protocol', '')}")
 
-        lines.append(
-            f"Matcher      : {finding.get('matcher', '')}"
-        )
+        lines.append(f"Matcher      : {finding.get('matcher', '')}")
 
         if finding.get("description"):
 
-            lines.append(
-                f"Description  : {finding['description']}"
-            )
+            lines.append(f"Description  : {finding['description']}")
 
         if finding.get("tags"):
 
-            lines.append(
-                f"Tags         : {', '.join(finding['tags'])}"
-            )
+            lines.append(f"Tags         : {', '.join(finding['tags'])}")
 
         lines.append("-" * 80)
 
@@ -225,6 +197,7 @@ def export_txt(
 # ==========================================================
 # Export JSON
 # ==========================================================
+
 
 def export_json(
     analysis: dict[str, Any],
@@ -243,6 +216,7 @@ def export_json(
 # Export CSV
 # ==========================================================
 
+
 def export_csv(
     analysis: dict[str, Any],
 ) -> Path:
@@ -252,34 +226,38 @@ def export_csv(
 
     results = analysis["results"]
 
-    rows: list[list[Any]] = [[
-        "Severity",
-        "Target",
-        "URL",
-        "Template ID",
-        "Template Name",
-        "Protocol",
-        "Matcher",
-        "Tags",
-    ]]
+    rows: list[list[Any]] = [
+        [
+            "Severity",
+            "Target",
+            "URL",
+            "Template ID",
+            "Template Name",
+            "Protocol",
+            "Matcher",
+            "Tags",
+        ]
+    ]
 
     for finding in results:
 
-        rows.append([
-            finding.get("severity", ""),
-            finding.get("target", ""),
-            finding.get("url", ""),
-            finding.get("template_id", ""),
-            finding.get("template_name", ""),
-            finding.get("protocol", ""),
-            finding.get("matcher", ""),
-            ", ".join(
-                finding.get(
-                    "tags",
-                    [],
-                )
-            ),
-        ])
+        rows.append(
+            [
+                finding.get("severity", ""),
+                finding.get("target", ""),
+                finding.get("url", ""),
+                finding.get("template_id", ""),
+                finding.get("template_name", ""),
+                finding.get("protocol", ""),
+                finding.get("matcher", ""),
+                ", ".join(
+                    finding.get(
+                        "tags",
+                        [],
+                    )
+                ),
+            ]
+        )
 
     return write_csv(
         CSV_FILE,
@@ -290,6 +268,7 @@ def export_csv(
 # ==========================================================
 # Export High
 # ==========================================================
+
 
 def export_high(
     analysis: dict[str, Any],
@@ -307,9 +286,7 @@ def export_high(
         if finding.get("severity") != "high":
             continue
 
-        lines.append(
-            finding.get("url", "")
-        )
+        lines.append(finding.get("url", ""))
 
     return write_text(
         HIGH_FILE,
@@ -320,6 +297,7 @@ def export_high(
 # ==========================================================
 # Export Critical
 # ==========================================================
+
 
 def export_critical(
     analysis: dict[str, Any],
@@ -337,9 +315,7 @@ def export_critical(
         if finding.get("severity") != "critical":
             continue
 
-        lines.append(
-            finding.get("url", "")
-        )
+        lines.append(finding.get("url", ""))
 
     return write_text(
         CRITICAL_FILE,
@@ -350,6 +326,7 @@ def export_critical(
 # ==========================================================
 # Export Summary
 # ==========================================================
+
 
 def export_summary(
     analysis: dict[str, Any],
@@ -382,6 +359,7 @@ def export_summary(
 # Show Summary
 # ==========================================================
 
+
 def show_summary(
     analysis: dict[str, Any],
 ) -> None:
@@ -397,40 +375,19 @@ def show_summary(
     print("Nuclei Scan Summary")
     print("=" * 60)
 
-    print(
-        f"{'Targets':<25}"
-        f"{statistics.get('total_targets', 0)}"
-    )
+    print(f"{'Targets':<25}" f"{statistics.get('total_targets', 0)}")
 
-    print(
-        f"{'Findings':<25}"
-        f"{statistics.get('total_findings', 0)}"
-    )
+    print(f"{'Findings':<25}" f"{statistics.get('total_findings', 0)}")
 
-    print(
-        f"{'Critical':<25}"
-        f"{statistics.get('critical', 0)}"
-    )
+    print(f"{'Critical':<25}" f"{statistics.get('critical', 0)}")
 
-    print(
-        f"{'High':<25}"
-        f"{statistics.get('high', 0)}"
-    )
+    print(f"{'High':<25}" f"{statistics.get('high', 0)}")
 
-    print(
-        f"{'Medium':<25}"
-        f"{statistics.get('medium', 0)}"
-    )
+    print(f"{'Medium':<25}" f"{statistics.get('medium', 0)}")
 
-    print(
-        f"{'Low':<25}"
-        f"{statistics.get('low', 0)}"
-    )
+    print(f"{'Low':<25}" f"{statistics.get('low', 0)}")
 
-    print(
-        f"{'Info':<25}"
-        f"{statistics.get('info', 0)}"
-    )
+    print(f"{'Info':<25}" f"{statistics.get('info', 0)}")
 
     print("=" * 60)
 
@@ -438,6 +395,7 @@ def show_summary(
 # ==========================================================
 # Export All
 # ==========================================================
+
 
 def export_all(
     analysis: dict[str, Any],

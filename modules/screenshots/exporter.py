@@ -25,10 +25,10 @@ from core.logger import (
     warning,
 )
 
-
 # ==========================================================
 # Ensure Output Directory
 # ==========================================================
+
 
 def ensure_output_directory() -> Path:
     """
@@ -39,20 +39,17 @@ def ensure_output_directory() -> Path:
     """
 
     SCREENSHOT_OUTPUT_DIR.mkdir(
-
         parents=True,
-
         exist_ok=True,
-
     )
 
     return SCREENSHOT_OUTPUT_DIR
 
 
-
 # ==========================================================
 # Write Text
 # ==========================================================
+
 
 def write_text(
     path: Path,
@@ -63,39 +60,26 @@ def write_text(
     """
 
     path.parent.mkdir(
-
         parents=True,
-
         exist_ok=True,
-
     )
 
     with path.open(
-
         "w",
-
         encoding="utf-8",
-
     ) as file:
 
-        file.write(
+        file.write("\n".join(lines))
 
-            "\n".join(lines)
-
-        )
-
-
-    success(
-        f"Saved {path}"
-    )
+    success(f"Saved {path}")
 
     return path
-
 
 
 # ==========================================================
 # Write JSON
 # ==========================================================
+
 
 def write_json(
     path: Path,
@@ -106,45 +90,31 @@ def write_json(
     """
 
     path.parent.mkdir(
-
         parents=True,
-
         exist_ok=True,
-
     )
 
     with path.open(
-
         "w",
-
         encoding="utf-8",
-
     ) as file:
 
         json.dump(
-
             data,
-
             file,
-
             indent=4,
-
             sort_keys=True,
-
         )
 
-
-    success(
-        f"Saved {path}"
-    )
+    success(f"Saved {path}")
 
     return path
-
 
 
 # ==========================================================
 # Write CSV
 # ==========================================================
+
 
 def write_csv(
     path: Path,
@@ -155,95 +125,53 @@ def write_csv(
     """
 
     path.parent.mkdir(
-
         parents=True,
-
         exist_ok=True,
-
     )
 
-
     with path.open(
-
         "w",
-
         newline="",
-
         encoding="utf-8",
-
     ) as file:
 
+        writer = csv.writer(file)
 
-        writer = csv.writer(
-            file
+        writer.writerow(
+            [
+                "URL",
+                "Title",
+                "Status",
+                "Captured",
+                "Screenshot",
+                "Filesize",
+                "Elapsed",
+            ]
         )
-
-
-        writer.writerow([
-
-            "URL",
-
-            "Title",
-
-            "Status",
-
-            "Captured",
-
-            "Screenshot",
-
-            "Filesize",
-
-            "Elapsed",
-
-        ])
-
 
         for item in results:
 
-            writer.writerow([
+            writer.writerow(
+                [
+                    item.get("url"),
+                    item.get("title"),
+                    item.get("status"),
+                    item.get("captured"),
+                    item.get("path"),
+                    item.get("filesize"),
+                    item.get("elapsed"),
+                ]
+            )
 
-                item.get(
-                    "url"
-                ),
-
-                item.get(
-                    "title"
-                ),
-
-                item.get(
-                    "status"
-                ),
-
-                item.get(
-                    "captured"
-                ),
-
-                item.get(
-                    "path"
-                ),
-
-                item.get(
-                    "filesize"
-                ),
-
-                item.get(
-                    "elapsed"
-                ),
-
-            ])
-
-
-    success(
-        f"Saved {path}"
-    )
+    success(f"Saved {path}")
 
     return path
-
 
 
 # ==========================================================
 # Export Results TXT
 # ==========================================================
+
 
 def export_results(
     analysis: dict[str, Any],
@@ -254,59 +182,36 @@ def export_results(
 
     lines = []
 
-    for result in analysis.get(
-        "results",
-        []
-    ):
+    for result in analysis.get("results", []):
 
-        lines.append(
-            "=" * 80
-        )
+        lines.append("=" * 80)
 
-        lines.append(
-            f"URL        : {result.get('url','-')}"
-        )
+        lines.append(f"URL        : {result.get('url','-')}")
 
-        lines.append(
-            f"Title      : {result.get('title','-')}"
-        )
+        lines.append(f"Title      : {result.get('title','-')}")
 
-        lines.append(
-            f"Captured   : {result.get('captured',False)}"
-        )
+        lines.append(f"Captured   : {result.get('captured',False)}")
 
-        lines.append(
-            f"Status     : {result.get('status','-')}"
-        )
+        lines.append(f"Status     : {result.get('status','-')}")
 
-        lines.append(
-            f"Screenshot : {result.get('path','-')}"
-        )
+        lines.append(f"Screenshot : {result.get('path','-')}")
 
-        lines.append(
-            f"Size       : {result.get('filesize',0)} bytes"
-        )
+        lines.append(f"Size       : {result.get('filesize',0)} bytes")
 
-        lines.append(
-            f"Time       : {result.get('elapsed',0)} sec"
-        )
+        lines.append(f"Time       : {result.get('elapsed',0)} sec")
 
         lines.append("")
 
-
     return write_text(
-
         RESULTS_TXT,
-
         lines,
-
     )
-
 
 
 # ==========================================================
 # Export JSON
 # ==========================================================
+
 
 def export_json(
     analysis: dict[str, Any],
@@ -316,18 +221,15 @@ def export_json(
     """
 
     return write_json(
-
         RESULTS_JSON,
-
         analysis,
-
     )
-
 
 
 # ==========================================================
 # Export Summary
 # ==========================================================
+
 
 def export_summary(
     analysis: dict[str, Any],
@@ -341,47 +243,30 @@ def export_summary(
         {},
     )
 
-
     lines = [
-
         "=" * 70,
-
         "Screenshot Analysis Summary",
-
         "=" * 70,
-
         "",
-
         f"Total Targets       : {statistics.get('total_targets',0)}",
-
         f"Captured            : {statistics.get('captured',0)}",
-
         f"Failed              : {statistics.get('failed',0)}",
-
         f"Success Rate        : {statistics.get('success_rate',0)}%",
-
         f"Average Time        : {statistics.get('average_time',0)} sec",
-
         f"Average Size        : {statistics.get('average_size',0)} bytes",
-
         "",
-
     ]
 
-
     return write_text(
-
         SUMMARY_TXT,
-
         lines,
-
     )
-
 
 
 # ==========================================================
 # Export All
 # ==========================================================
+
 
 def export_all(
     analysis: dict[str, Any],
@@ -391,42 +276,28 @@ def export_all(
     """
 
     exporters = (
-
         export_results,
-
         export_json,
-
         export_summary,
-
     )
-
 
     for exporter in exporters:
 
         try:
 
-            exporter(
-                analysis
-            )
+            exporter(analysis)
 
         except Exception as error:
 
-            warning(
+            warning(f"{exporter.__name__}: {error}")
 
-                f"{exporter.__name__}: {error}"
-
-            )
-
-
-    success(
-        "Screenshot reports exported successfully."
-    )
-
+    success("Screenshot reports exported successfully.")
 
 
 # ==========================================================
 # Show Summary
 # ==========================================================
+
 
 def show_summary(
     analysis: dict[str, Any],
@@ -440,62 +311,23 @@ def show_summary(
         {},
     )
 
-
     print()
 
-    print(
-        "=" * 80
-    )
+    print("=" * 80)
 
-    print(
-        "Screenshot Capture Summary"
-    )
+    print("Screenshot Capture Summary")
 
-    print(
-        "=" * 80
-    )
+    print("=" * 80)
 
+    print(f"{'Total Targets':<30}" f"{statistics.get('total_targets',0)}")
 
-    print(
+    print(f"{'Captured':<30}" f"{statistics.get('captured',0)}")
 
-        f"{'Total Targets':<30}"
+    print(f"{'Failed':<30}" f"{statistics.get('failed',0)}")
 
-        f"{statistics.get('total_targets',0)}"
+    print(f"{'Success Rate':<30}" f"{statistics.get('success_rate',0)}%")
 
-    )
-
-
-    print(
-
-        f"{'Captured':<30}"
-
-        f"{statistics.get('captured',0)}"
-
-    )
-
-
-    print(
-
-        f"{'Failed':<30}"
-
-        f"{statistics.get('failed',0)}"
-
-    )
-
-
-    print(
-
-        f"{'Success Rate':<30}"
-
-        f"{statistics.get('success_rate',0)}%"
-
-    )
-
-
-    print(
-        "=" * 80
-    )
-
+    print("=" * 80)
 
 
 # ==========================================================
@@ -503,15 +335,9 @@ def show_summary(
 # ==========================================================
 
 __all__ = [
-
     "export_results",
-
     "export_json",
-
     "export_summary",
-
     "export_all",
-
     "show_summary",
-
 ]

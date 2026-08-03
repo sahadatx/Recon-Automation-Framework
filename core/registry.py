@@ -28,7 +28,6 @@ from modules.tls.manager import run as run_tls
 from modules.vhost.manager import run as run_vhost
 from modules.waf.manager import run as run_waf
 
-
 Runner = Callable[..., dict[str, Any]]
 
 
@@ -65,9 +64,7 @@ def get_runner(
         return RUNNERS[module]
 
     except KeyError as error:
-        raise ValueError(
-            f"Unknown module: {module}"
-        ) from error
+        raise ValueError(f"Unknown module: {module}") from error
 
 
 def registered_modules() -> set[str]:

@@ -10,10 +10,10 @@ from __future__ import annotations
 from collections import deque
 from threading import Lock
 
-
 # ==========================================================
 # Crawl Queue
 # ==========================================================
+
 
 class CrawlQueue:
     """
@@ -95,9 +95,7 @@ class CrawlQueue:
 
             item = self._queue.popleft()
 
-            self._queued.discard(
-                item["url"]
-            )
+            self._queued.discard(item["url"])
 
             return item
 

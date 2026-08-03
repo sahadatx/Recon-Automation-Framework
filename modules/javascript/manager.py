@@ -26,7 +26,6 @@ from modules.javascript.helpers import is_valid_url
 from modules.javascript.interesting import detect_interesting
 from modules.javascript.parser import parse_file
 
-
 # ==========================================================
 # Process One JavaScript
 # ==========================================================
@@ -43,9 +42,7 @@ def process_javascript(
 
     if not is_valid_url(url):
 
-        warning(
-            f"Invalid JavaScript URL: {url}"
-        )
+        warning(f"Invalid JavaScript URL: {url}")
 
         return (
             url,
@@ -95,9 +92,7 @@ def process_javascript(
 
     except Exception as error:
 
-        warning(
-            f"Parse failed: {filepath} ({error})"
-        )
+        warning(f"Parse failed: {filepath} ({error})")
 
         analysis = None
 
@@ -122,12 +117,7 @@ def process_javascript(
 
     except Exception as error:
 
-        warning(
-            (
-                "Interesting detection failed: "
-                f"{filepath} ({error})"
-            )
-        )
+        warning(("Interesting detection failed: " f"{filepath} ({error})"))
 
         metadata["interesting"] = None
 
@@ -148,9 +138,7 @@ def process_javascript(
 
     except Exception as error:
 
-        warning(
-            f"{filepath}: {error}"
-        )
+        warning(f"{filepath}: {error}")
 
         content = ""
 
@@ -166,12 +154,7 @@ def process_javascript(
 
     except Exception as error:
 
-        warning(
-            (
-                "Secret detection failed: "
-                f"{filepath} ({error})"
-            )
-        )
+        warning(("Secret detection failed: " f"{filepath} ({error})"))
 
         metadata["secrets"] = None
 
@@ -198,9 +181,7 @@ def collect_results(
     JavaScript files.
     """
 
-    info(
-        "Starting JavaScript analysis..."
-    )
+    info("Starting JavaScript analysis...")
 
     javascript_urls = sorted(
         {
@@ -214,9 +195,7 @@ def collect_results(
 
     if not javascript_urls:
 
-        warning(
-            "No valid JavaScript URLs found."
-        )
+        warning("No valid JavaScript URLs found.")
 
         return (
             {},
@@ -227,9 +206,7 @@ def collect_results(
 
     if executor is None:
 
-        raise RuntimeError(
-            "Shared thread pool is not initialized."
-        )
+        raise RuntimeError("Shared thread pool is not initialized.")
 
     results: dict[
         str,
@@ -245,24 +222,19 @@ def collect_results(
     completed = 0
 
     futures = {
-
         executor.submit(
             process_javascript,
             context,
             url,
         ): url
-
         for url in javascript_urls
-
     }
 
     for future in as_completed(
         futures,
     ):
 
-        url = futures[
-            future
-        ]
+        url = futures[future]
 
         completed += 1
 
@@ -275,9 +247,7 @@ def collect_results(
 
         except Exception as error:
 
-            warning(
-                f"{url}: {error}"
-            )
+            warning(f"{url}: {error}")
 
             failed.append(
                 url,
@@ -305,9 +275,7 @@ def collect_results(
 
             continue
 
-        results[
-            js_url
-        ] = metadata
+        results[js_url] = metadata
 
         progress_status(
             completed,
@@ -315,9 +283,7 @@ def collect_results(
             f"✓ {js_url}",
         )
 
-    success(
-        f"Processed {len(results)} JavaScript file(s)."
-    )
+    success(f"Processed {len(results)} JavaScript file(s).")
 
     return (
         results,
@@ -370,11 +336,7 @@ def run(
 
     if failed:
 
-        warning(
-            "Failed "
-            f"{len(failed)} "
-            "JavaScript file(s)."
-        )
+        warning("Failed " f"{len(failed)} " "JavaScript file(s).")
 
     return analysis
 

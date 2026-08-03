@@ -17,10 +17,10 @@ from .helpers import (
     current_timestamp,
 )
 
-
 # ==========================================================
 # Report Generator
 # ==========================================================
+
 
 def generate_report(
     analyses: dict[str, Any],
@@ -37,29 +37,19 @@ def generate_report(
     """
 
     report = {
-
         # --------------------------------------------------
         # Metadata
         # --------------------------------------------------
-
         "metadata": {
-
             "title": REPORT_TITLE,
-
             "version": REPORT_VERSION,
-
             "author": AUTHOR,
-
             "generated_at": current_timestamp(),
-
         },
-
         # --------------------------------------------------
         # Module Results
         # --------------------------------------------------
-
         "modules": analyses,
-
     }
 
     return report

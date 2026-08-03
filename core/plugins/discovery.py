@@ -13,7 +13,6 @@ from pathlib import Path
 
 from .base import BasePlugin
 
-
 # ==========================================================
 # Plugin Discovery
 # ==========================================================
@@ -87,9 +86,7 @@ class PluginDiscovery:
         Discover plugins from one package.
         """
 
-        plugins: list[
-            BasePlugin
-        ] = []
+        plugins: list[BasePlugin] = []
 
         root = Path(package)
 
@@ -110,10 +107,7 @@ class PluginDiscovery:
 
                 continue
 
-            module_name = (
-                f"{package}."
-                f"{directory.name}.plugin"
-            )
+            module_name = f"{package}." f"{directory.name}.plugin"
 
             try:
 

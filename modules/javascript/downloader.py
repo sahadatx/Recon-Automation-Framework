@@ -24,7 +24,6 @@ from modules.javascript.helpers import (
     save_javascript,
 )
 
-
 # ==========================================================
 # Download One JavaScript File
 # ==========================================================
@@ -45,15 +44,11 @@ def download_one(
         url,
     ):
 
-        warning(
-            f"Invalid JavaScript URL: {url}"
-        )
+        warning(f"Invalid JavaScript URL: {url}")
 
         return None
 
-    debug(
-        f"Downloading {url}"
-    )
+    debug(f"Downloading {url}")
 
     try:
 
@@ -64,17 +59,13 @@ def download_one(
 
     except Exception as error:
 
-        warning(
-            f"{url}: {error}"
-        )
+        warning(f"{url}: {error}")
 
         return None
 
     if response is None:
 
-        warning(
-            f"Failed: {url}"
-        )
+        warning(f"Failed: {url}")
 
         return None
 
@@ -91,33 +82,24 @@ def download_one(
 
     except Exception as error:
 
-        warning(
-            f"{url}: {error}"
-        )
+        warning(f"{url}: {error}")
 
         return None
 
     return {
-
         "url": url,
-
         "filename": filename,
-
         "path": str(
             filepath,
         ),
-
         "status": response.status_code,
-
         "size": len(
             response.text,
         ),
-
         "content_type": response.headers.get(
             "Content-Type",
             "",
         ),
-
     }
 
 
@@ -137,9 +119,7 @@ def download_multiple(
     Download multiple JavaScript files.
     """
 
-    info(
-        "Downloading JavaScript files..."
-    )
+    info("Downloading JavaScript files...")
 
     urls = sorted(
         {
@@ -151,13 +131,9 @@ def download_multiple(
         }
     )
 
-    results: list[
-        dict[str, Any]
-    ] = []
+    results: list[dict[str, Any]] = []
 
-    failed: list[
-        str
-    ] = []
+    failed: list[str] = []
 
     for url in urls:
 
@@ -178,17 +154,11 @@ def download_multiple(
             metadata,
         )
 
-    info(
-        f"Downloaded {len(results)} "
-        "JavaScript file(s)."
-    )
+    info(f"Downloaded {len(results)} " "JavaScript file(s).")
 
     if failed:
 
-        warning(
-            f"Failed {len(failed)} "
-            "JavaScript file(s)."
-        )
+        warning(f"Failed {len(failed)} " "JavaScript file(s).")
 
     return (
         results,

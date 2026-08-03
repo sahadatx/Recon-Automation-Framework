@@ -6,10 +6,10 @@ Generate statistics for technology detection.
 
 from __future__ import annotations
 
-
 # ==========================================================
 # Generate Statistics
 # ==========================================================
+
 
 def generate_statistics(
     results: dict,
@@ -26,10 +26,7 @@ def generate_statistics(
         Statistics dictionary.
     """
 
-    hosts_analyzed = (
-        len(results)
-        + len(failed_hosts)
-    )
+    hosts_analyzed = len(results) + len(failed_hosts)
 
     technology_counts: dict[
         str,
@@ -57,19 +54,13 @@ def generate_statistics(
             [],
         )
 
-        technology_count += len(
-            technologies
-        )
+        technology_count += len(technologies)
 
-        security_header_count += len(
-            security_headers
-        )
+        security_header_count += len(security_headers)
 
         for technology in technologies:
 
-            technology_counts[
-                technology
-            ] = (
+            technology_counts[technology] = (
                 technology_counts.get(
                     technology,
                     0,
@@ -79,9 +70,7 @@ def generate_statistics(
 
         for header in security_headers:
 
-            security_header_counts[
-                header
-            ] = (
+            security_header_counts[header] = (
                 security_header_counts.get(
                     header,
                     0,
@@ -90,18 +79,10 @@ def generate_statistics(
             )
 
     return {
-        "hosts_analyzed": (
-            hosts_analyzed
-        ),
-        "failed_hosts": len(
-            failed_hosts
-        ),
-        "technology_count": (
-            technology_count
-        ),
-        "security_header_count": (
-            security_header_count
-        ),
+        "hosts_analyzed": (hosts_analyzed),
+        "failed_hosts": len(failed_hosts),
+        "technology_count": (technology_count),
+        "security_header_count": (security_header_count),
         "technology_counts": dict(
             sorted(
                 technology_counts.items(),

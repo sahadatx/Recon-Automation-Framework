@@ -8,7 +8,6 @@ from __future__ import annotations
 
 from typing import Any
 
-
 # ==========================================================
 # Generate Performance Report
 # ==========================================================
@@ -35,11 +34,7 @@ def generate_report(
         "memory": memory,
         "bottlenecks": bottlenecks,
         "summary": {
-            "status": (
-                "Healthy"
-                if not bottlenecks
-                else "Attention Required"
-            ),
+            "status": ("Healthy" if not bottlenecks else "Attention Required"),
             "bottleneck_count": len(
                 bottlenecks,
             ),
@@ -48,9 +43,7 @@ def generate_report(
 
     if benchmark is not None:
 
-        report[
-            "benchmark"
-        ] = benchmark
+        report["benchmark"] = benchmark
 
     return report
 
@@ -67,106 +60,59 @@ def generate_markdown(
     Convert report to Markdown.
     """
 
-    execution = report[
-        "execution"
-    ]
+    execution = report["execution"]
 
-    memory = report[
-        "memory"
-    ]
+    memory = report["memory"]
 
-    summary = report[
-        "summary"
-    ]
+    summary = report["summary"]
 
     lines = [
         "# Performance Report",
         "",
         "## Execution",
         "",
-        (
-            f"- Execution Time: "
-            f"{execution['time_seconds']:.3f} sec"
-        ),
+        (f"- Execution Time: " f"{execution['time_seconds']:.3f} sec"),
         "",
         "## Memory",
         "",
-        (
-            f"- Current: "
-            f"{memory['memory']['current_mb']:.2f} MB"
-        ),
-        (
-            f"- Peak: "
-            f"{memory['memory']['peak_mb']:.2f} MB"
-        ),
-        (
-            f"- Difference: "
-            f"{memory['memory']['difference_mb']:.2f} MB"
-        ),
+        (f"- Current: " f"{memory['memory']['current_mb']:.2f} MB"),
+        (f"- Peak: " f"{memory['memory']['peak_mb']:.2f} MB"),
+        (f"- Difference: " f"{memory['memory']['difference_mb']:.2f} MB"),
         "",
         "## Summary",
         "",
-        (
-            f"- Status: "
-            f"{summary['status']}"
-        ),
-        (
-            f"- Bottlenecks: "
-            f"{summary['bottleneck_count']}"
-        ),
+        (f"- Status: " f"{summary['status']}"),
+        (f"- Bottlenecks: " f"{summary['bottleneck_count']}"),
         "",
         "## Bottlenecks",
     ]
 
-    if report[
-        "bottlenecks"
-    ]:
+    if report["bottlenecks"]:
 
-        for item in report[
-            "bottlenecks"
-        ]:
+        for item in report["bottlenecks"]:
 
             lines.extend(
                 [
-                    (
-                        f"- **{item['category']}** "
-                        f"({item['severity']})"
-                    ),
-                    (
-                        f"  - Value: "
-                        f"{item['value']}"
-                    ),
-                    (
-                        f"  - Recommendation: "
-                        f"{item['recommendation']}"
-                    ),
+                    (f"- **{item['category']}** " f"({item['severity']})"),
+                    (f"  - Value: " f"{item['value']}"),
+                    (f"  - Recommendation: " f"{item['recommendation']}"),
                 ]
             )
 
     else:
 
-        lines.append(
-            "- None detected."
-        )
+        lines.append("- None detected.")
 
-    if (
-        "benchmark"
-        in report
-    ):
+    if "benchmark" in report:
 
-        benchmark = report[
-            "benchmark"
-        ]
+        benchmark = report["benchmark"]
 
         lines.extend(
             [
                 "",
                 "## Benchmark",
                 "",
-                (
-                    f"- Runs: "
-                    f"{benchmark.get('runs', 0)}"
-                ),
+                (f"- Runs: " f"{benchmark.get('runs', 0)}"),
                 (
                     f"- Average Peak Memory: "
                     f"{benchmark.get('average_peak_mb', 0.0):.2f} MB"
@@ -204,27 +150,13 @@ def generate_text(
         "PERFORMANCE REPORT",
         "=" * 60,
         "",
-        (
-            "Execution Time : "
-            f"{report['execution']['time_seconds']:.3f} sec"
-        ),
-        (
-            "Memory Peak    : "
-            f"{report['memory']['memory']['peak_mb']:.2f} MB"
-        ),
-        (
-            "Status         : "
-            f"{report['summary']['status']}"
-        ),
-        (
-            "Bottlenecks    : "
-            f"{report['summary']['bottleneck_count']}"
-        ),
+        ("Execution Time : " f"{report['execution']['time_seconds']:.3f} sec"),
+        ("Memory Peak    : " f"{report['memory']['memory']['peak_mb']:.2f} MB"),
+        ("Status         : " f"{report['summary']['status']}"),
+        ("Bottlenecks    : " f"{report['summary']['bottleneck_count']}"),
     ]
 
-    if report[
-        "bottlenecks"
-    ]:
+    if report["bottlenecks"]:
 
         lines.extend(
             [
@@ -233,16 +165,9 @@ def generate_text(
             ]
         )
 
-        for item in report[
-            "bottlenecks"
-        ]:
+        for item in report["bottlenecks"]:
 
-            lines.append(
-                (
-                    f"- {item['category']} "
-                    f"[{item['severity']}]"
-                )
-            )
+            lines.append((f"- {item['category']} " f"[{item['severity']}]"))
 
     else:
 

@@ -29,10 +29,10 @@ from .helpers import (
     safe_lower,
 )
 
-
 # ==========================================================
 # HTTP Body Detection
 # ==========================================================
+
 
 def detect_http_provider(
     body: str,
@@ -63,6 +63,7 @@ def detect_http_provider(
 # Status Detection
 # ==========================================================
 
+
 def detect_status(
     status_code: int,
 ) -> list[str]:
@@ -76,6 +77,7 @@ def detect_status(
 # ==========================================================
 # CNAME Detection
 # ==========================================================
+
 
 def detect_cname_provider(
     cname: str | None,
@@ -104,6 +106,7 @@ def detect_cname_provider(
 # DNS Detection
 # ==========================================================
 
+
 def detect_dns(
     ip: str | None,
 ) -> list[str]:
@@ -117,6 +120,7 @@ def detect_dns(
 # ==========================================================
 # Confidence
 # ==========================================================
+
 
 def calculate_confidence(
     methods: list[str],
@@ -140,6 +144,7 @@ def calculate_confidence(
 # Recommendations
 # ==========================================================
 
+
 def build_recommendations(
     vulnerable: bool,
 ) -> list[str]:
@@ -161,6 +166,7 @@ def build_recommendations(
 # ==========================================================
 # Analyze Target
 # ==========================================================
+
 
 def analyze_target(
     target: str,
@@ -202,10 +208,7 @@ def analyze_target(
         detect_dns(ip),
     )
 
-    vulnerable = (
-        provider is not None
-        and len(methods) >= 2
-    )
+    vulnerable = provider is not None and len(methods) >= 2
 
     result["vulnerable"] = vulnerable
     result["provider"] = provider

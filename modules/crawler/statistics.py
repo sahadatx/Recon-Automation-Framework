@@ -6,10 +6,10 @@ Generate statistics for crawler results.
 
 from __future__ import annotations
 
-
 # ==========================================================
 # Generate Statistics
 # ==========================================================
+
 
 def generate_statistics(
     results: dict[str, dict],
@@ -25,9 +25,7 @@ def generate_statistics(
         Aggregated crawler statistics.
     """
 
-    hosts = len(
-        results
-    )
+    hosts = len(results)
 
     total_urls = 0
 
@@ -53,93 +51,51 @@ def generate_statistics(
     for (
         host,
         result,
-    ) in sorted(
-        results.items()
-    ):
+    ) in sorted(results.items()):
 
-        statistics = result[
-            "statistics"
-        ]
+        statistics = result["statistics"]
 
-        count = len(
-            result[
-                "pages"
-            ]
-        )
+        count = len(result["pages"])
 
-        urls_per_host[
-            host
-        ] = count
+        urls_per_host[host] = count
 
         total_urls += count
 
-        total_failed += statistics[
-            "failed"
-        ]
+        total_failed += statistics["failed"]
 
-        total_internal += statistics[
-            "internal_urls"
-        ]
+        total_internal += statistics["internal_urls"]
 
-        total_external += statistics[
-            "external_urls"
-        ]
+        total_external += statistics["external_urls"]
 
-        total_javascript += statistics[
-            "javascript"
-        ]
+        total_javascript += statistics["javascript"]
 
-        total_css += statistics[
-            "css"
-        ]
+        total_css += statistics["css"]
 
-        total_forms += statistics[
-            "forms"
-        ]
+        total_forms += statistics["forms"]
 
-        total_emails += statistics[
-            "emails"
-        ]
+        total_emails += statistics["emails"]
 
     average_urls_per_host = 0.0
 
     if hosts:
 
         average_urls_per_host = round(
-
-            total_urls
-            / hosts,
-
+            total_urls / hosts,
             2,
-
         )
 
     return {
-
         "hosts": hosts,
-
         "total_urls": total_urls,
-
-        "average_urls_per_host": (
-            average_urls_per_host
-        ),
-
+        "average_urls_per_host": (average_urls_per_host),
         "failed": total_failed,
-
         "internal_urls": total_internal,
-
         "external_urls": total_external,
-
         "javascript": total_javascript,
-
         "css": total_css,
-
         "forms": total_forms,
-
         "emails": total_emails,
-
         "urls_per_host": urls_per_host,
-
     }
 
 

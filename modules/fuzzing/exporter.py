@@ -28,10 +28,10 @@ from .constants import (
     INTERESTING_FILE,
 )
 
-
 # ==========================================================
 # Output Directory
 # ==========================================================
+
 
 def create_output_directory() -> None:
     """
@@ -47,6 +47,7 @@ def create_output_directory() -> None:
 # ==========================================================
 # Write Text
 # ==========================================================
+
 
 def write_text(
     output_file: Path,
@@ -73,15 +74,11 @@ def write_text(
             encoding="utf-8",
         )
 
-        success(
-            f"Saved {output_file}"
-        )
+        success(f"Saved {output_file}")
 
     except OSError as error:
 
-        warning(
-            f"{output_file}: {error}"
-        )
+        warning(f"{output_file}: {error}")
 
     return output_file
 
@@ -89,6 +86,7 @@ def write_text(
 # ==========================================================
 # Write JSON
 # ==========================================================
+
 
 def write_json(
     output_file: Path,
@@ -124,15 +122,11 @@ def write_json(
                 default=str,
             )
 
-        success(
-            f"Saved {output_file}"
-        )
+        success(f"Saved {output_file}")
 
     except OSError as error:
 
-        warning(
-            f"{output_file}: {error}"
-        )
+        warning(f"{output_file}: {error}")
 
     return output_file
 
@@ -140,6 +134,7 @@ def write_json(
 # ==========================================================
 # Write CSV
 # ==========================================================
+
 
 def write_csv(
     output_file: Path,
@@ -202,15 +197,11 @@ def write_csv(
                         ]
                     )
 
-        success(
-            f"Saved {output_file}"
-        )
+        success(f"Saved {output_file}")
 
     except OSError as error:
 
-        warning(
-            f"{output_file}: {error}"
-        )
+        warning(f"{output_file}: {error}")
 
     return output_file
 
@@ -218,6 +209,7 @@ def write_csv(
 # ==========================================================
 # Export JSON
 # ==========================================================
+
 
 def export_json(
     analysis: dict[str, Any],
@@ -235,6 +227,7 @@ def export_json(
 # ==========================================================
 # Export TXT
 # ==========================================================
+
 
 def export_txt(
     analysis: dict[str, Any],
@@ -256,19 +249,13 @@ def export_txt(
 
         statistics = target_analysis["statistics"]
 
-        lines.append(
-            f"Target : {target}"
-        )
+        lines.append(f"Target : {target}")
 
         lines.append("-" * 80)
 
-        lines.append(
-            f"Results                 : {statistics['total_results']}"
-        )
+        lines.append(f"Results                 : {statistics['total_results']}")
 
-        lines.append(
-            f"Interesting Files       : {statistics['interesting_files']}"
-        )
+        lines.append(f"Interesting Files       : {statistics['interesting_files']}")
 
         lines.append(
             f"Interesting Directories : {statistics['interesting_directories']}"
@@ -278,9 +265,7 @@ def export_txt(
 
         for result in target_analysis["results"]:
 
-            lines.append(
-                f"[{result.get('status', '')}] {result.get('url', '')}"
-            )
+            lines.append(f"[{result.get('status', '')}] {result.get('url', '')}")
 
         lines.append("")
         lines.append("")
@@ -294,6 +279,7 @@ def export_txt(
 # ==========================================================
 # Export CSV
 # ==========================================================
+
 
 def export_csv(
     analysis: dict[str, Any],
@@ -311,6 +297,7 @@ def export_csv(
 # ==========================================================
 # Export Interesting
 # ==========================================================
+
 
 def export_interesting(
     analysis: dict[str, Any],
@@ -345,9 +332,7 @@ def export_interesting(
             [],
         )
 
-        lines.append(
-            f"Target : {target}"
-        )
+        lines.append(f"Target : {target}")
 
         lines.append("-" * 80)
 
@@ -357,22 +342,16 @@ def export_interesting(
 
             for item in files:
 
-                lines.append(
-                    f"  [FILE] {item.get('url', '')}"
-                )
+                lines.append(f"  [FILE] {item.get('url', '')}")
 
         if directories:
 
             lines.append("")
-            lines.append(
-                "Interesting Directories"
-            )
+            lines.append("Interesting Directories")
 
             for item in directories:
 
-                lines.append(
-                    f"  [DIR ] {item.get('url', '')}"
-                )
+                lines.append(f"  [DIR ] {item.get('url', '')}")
 
         lines.append("")
 
@@ -386,6 +365,7 @@ def export_interesting(
 # Export Summary
 # ==========================================================
 
+
 def export_summary(
     analysis: dict[str, Any],
 ) -> Path:
@@ -396,23 +376,14 @@ def export_summary(
     statistics = analysis["statistics"]
 
     lines = [
-
         "Directory Fuzzing Summary",
-
         "=" * 40,
-
         f"Targets                  : {statistics['targets']}",
-
         f"Successful               : {statistics['successful']}",
-
         f"Failed                   : {statistics['failed']}",
-
         f"Discovered Paths         : {statistics['total_results']}",
-
         f"Interesting Files        : {statistics['interesting_files']}",
-
         f"Interesting Directories  : {statistics['interesting_directories']}",
-
     ]
 
     return write_text(
@@ -424,6 +395,7 @@ def export_summary(
 # ==========================================================
 # Show Summary
 # ==========================================================
+
 
 def show_summary(
     analysis: dict[str, Any],
@@ -442,9 +414,7 @@ def show_summary(
     print()
 
     print("=" * 80)
-    print(
-        "Directory Fuzzing Summary".center(80)
-    )
+    print("Directory Fuzzing Summary".center(80))
     print("=" * 80)
 
     print(f"Targets                  : {statistics['targets']}")
@@ -462,9 +432,7 @@ def show_summary(
 
         for target in failed:
 
-            print(
-                f" • {target}"
-            )
+            print(f" • {target}")
 
     print("=" * 80)
 
@@ -472,6 +440,7 @@ def show_summary(
 # ==========================================================
 # Export All
 # ==========================================================
+
 
 def export_all(
     analysis: dict[str, Any],

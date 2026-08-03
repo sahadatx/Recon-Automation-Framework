@@ -18,10 +18,10 @@ from modules.http.constants import (
     SUMMARY_TXT,
 )
 
-
 # ==========================================================
 # Helpers
 # ==========================================================
+
 
 def create_output_directory() -> None:
     """
@@ -37,6 +37,7 @@ def create_output_directory() -> None:
 # ==========================================================
 # Results (TXT)
 # ==========================================================
+
 
 def export_results_txt(
     analysis: dict[str, Any],
@@ -62,9 +63,7 @@ def export_results_txt(
 
             for key, value in results[host].items():
 
-                file.write(
-                    f"{key:<18}: {value}\n"
-                )
+                file.write(f"{key:<18}: {value}\n")
 
             file.write("\n")
 
@@ -72,6 +71,7 @@ def export_results_txt(
 # ==========================================================
 # Results (JSON)
 # ==========================================================
+
 
 def export_results_json(
     analysis: dict[str, Any],
@@ -99,6 +99,7 @@ def export_results_json(
 # Summary
 # ==========================================================
 
+
 def export_summary(
     analysis: dict[str, Any],
 ) -> None:
@@ -115,64 +116,38 @@ def export_summary(
         encoding="utf-8",
     ) as file:
 
-        file.write(
-            "HTTP PROBE SUMMARY\n"
-        )
+        file.write("HTTP PROBE SUMMARY\n")
 
-        file.write(
-            "=" * 70 + "\n\n"
-        )
+        file.write("=" * 70 + "\n\n")
 
-        file.write(
-            f"Alive Hosts     : "
-            f"{statistics['alive_hosts']}\n"
-        )
+        file.write(f"Alive Hosts     : " f"{statistics['alive_hosts']}\n")
 
-        file.write(
-            f"Dead Hosts      : "
-            f"{statistics['dead_hosts']}\n"
-        )
+        file.write(f"Dead Hosts      : " f"{statistics['dead_hosts']}\n")
 
-        file.write(
-            f"HTTP Hosts      : "
-            f"{statistics['http_hosts']}\n"
-        )
+        file.write(f"HTTP Hosts      : " f"{statistics['http_hosts']}\n")
 
-        file.write(
-            f"HTTPS Hosts     : "
-            f"{statistics['https_hosts']}\n"
-        )
+        file.write(f"HTTPS Hosts     : " f"{statistics['https_hosts']}\n")
 
-        file.write(
-            f"Average Response: "
-            f"{statistics['average_response_time']} sec\n"
-        )
+        file.write(f"Average Response: " f"{statistics['average_response_time']} sec\n")
 
         file.write("\n")
 
-        file.write(
-            "Status Codes\n"
-        )
+        file.write("Status Codes\n")
 
-        file.write(
-            "-" * 70 + "\n"
-        )
+        file.write("-" * 70 + "\n")
 
         for (
             status,
             count,
-        ) in statistics[
-            "status_codes"
-        ].items():
+        ) in statistics["status_codes"].items():
 
-            file.write(
-                f"{status:<10}{count}\n"
-            )
+            file.write(f"{status:<10}{count}\n")
 
 
 # ==========================================================
 # Alive Hosts
 # ==========================================================
+
 
 def export_alive(
     analysis: dict[str, Any],
@@ -192,14 +167,13 @@ def export_alive(
 
         for host in statistics["alive"]:
 
-            file.write(
-                f"{host}\n"
-            )
+            file.write(f"{host}\n")
 
 
 # ==========================================================
 # Dead Hosts
 # ==========================================================
+
 
 def export_dead(
     analysis: dict[str, Any],
@@ -219,14 +193,13 @@ def export_dead(
 
         for host in statistics["dead"]:
 
-            file.write(
-                f"{host}\n"
-            )
+            file.write(f"{host}\n")
 
 
 # ==========================================================
 # Export Everything
 # ==========================================================
+
 
 def export_all(
     analysis: dict[str, Any],

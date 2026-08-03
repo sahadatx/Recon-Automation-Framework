@@ -14,54 +14,44 @@ from core.logger import (
     debug,
 )
 
-
 # ==========================================================
 # Interesting Files
 # ==========================================================
 
 INTERESTING_FILES = {
-
     ".env",
     ".env.local",
     ".env.dev",
     ".env.test",
     ".env.production",
-
     "config.js",
     "config.json",
     "config.php",
     "settings.js",
     "settings.json",
     "settings.yml",
-
     "swagger.json",
     "swagger.yaml",
     "swagger.yml",
     "openapi.json",
     "openapi.yaml",
-
     "manifest.json",
     "asset-manifest.json",
-
     "package.json",
     "package-lock.json",
     "composer.json",
     "composer.lock",
     "yarn.lock",
-
     "webpack.config.js",
     "vite.config.js",
-
     "firebase.json",
     "credentials.json",
     "service-account.json",
     "aws-exports.js",
-
     ".git",
     ".gitignore",
     ".git/config",
     ".svn",
-
     "backup.zip",
     "backup.tar",
     "backup.tar.gz",
@@ -69,14 +59,11 @@ INTERESTING_FILES = {
     "db.sql",
     "database.sql",
     "dump.sql",
-
     "Dockerfile",
     "docker-compose.yml",
     "docker-compose.yaml",
-
     "robots.txt",
     "security.txt",
-
 }
 
 
@@ -85,48 +72,32 @@ INTERESTING_FILES = {
 # ==========================================================
 
 INTERESTING_DIRECTORIES = {
-
     "api",
     "api/v1",
     "api/v2",
-
     "admin",
-
     "dashboard",
-
     "graphql",
     "graphiql",
-
     "internal",
-
     "uploads",
-
     "backup",
-
     "config",
-
     "debug",
-
     "dev",
-
     "staging",
-
     "sandbox",
-
     "docs",
-
     "swagger",
-
     "test",
-
     "tests",
-
 }
 
 
 # ==========================================================
 # Normalize Path
 # ==========================================================
+
 
 def normalize(
     value: str,
@@ -144,27 +115,17 @@ def normalize(
 
     try:
 
-        parsed = urlparse(
-            value
-        )
+        parsed = urlparse(value)
 
     except ValueError as error:
 
-        debug(
-            f"Skipping invalid URL: {value} ({error})"
-        )
+        debug(f"Skipping invalid URL: {value} ({error})")
 
         return ""
 
     try:
 
-        path = str(
-
-            PurePosixPath(
-                parsed.path
-            )
-
-        )
+        path = str(PurePosixPath(parsed.path))
 
     except Exception:
 
@@ -176,6 +137,7 @@ def normalize(
 # ==========================================================
 # Interesting File
 # ==========================================================
+
 
 def is_interesting_file(
     path: str,
@@ -192,24 +154,15 @@ def is_interesting_file(
 
         return False
 
-    filename = PurePosixPath(
-        path
-    ).name.lower()
+    filename = PurePosixPath(path).name.lower()
 
-    return (
-
-        filename
-
-        in
-
-        INTERESTING_FILES
-
-    )
+    return filename in INTERESTING_FILES
 
 
 # ==========================================================
 # Interesting Directory
 # ==========================================================
+
 
 def is_interesting_directory(
     path: str,
@@ -231,23 +184,14 @@ def is_interesting_directory(
     parts = path.split("/")
 
     return any(
-
-        directory in path
-
-        or
-
-        directory in parts
-
-        for directory
-
-        in INTERESTING_DIRECTORIES
-
+        directory in path or directory in parts for directory in INTERESTING_DIRECTORIES
     )
 
 
 # ==========================================================
 # Detect Interesting Files
 # ==========================================================
+
 
 def detect_interesting_files(
     urls: list[str],
@@ -263,31 +207,23 @@ def detect_interesting_files(
 
     for url in urls:
 
-        path = normalize(
-            url
-        )
+        path = normalize(url)
 
         if not path:
 
             continue
 
-        if is_interesting_file(
-            path
-        ):
+        if is_interesting_file(path):
 
-            findings.add(
-                path
-            )
+            findings.add(path)
 
-    return sorted(
-        findings
-    )
-
+    return sorted(findings)
 
 
 # ==========================================================
 # Detect Interesting Directories
 # ==========================================================
+
 
 def detect_interesting_directories(
     urls: list[str],
@@ -303,30 +239,23 @@ def detect_interesting_directories(
 
     for url in urls:
 
-        path = normalize(
-            url
-        )
+        path = normalize(url)
 
         if not path:
 
             continue
 
-        if is_interesting_directory(
-            path
-        ):
+        if is_interesting_directory(path):
 
-            findings.add(
-                path
-            )
+            findings.add(path)
 
-    return sorted(
-        findings
-    )
+    return sorted(findings)
 
 
 # ==========================================================
 # Generate Statistics
 # ==========================================================
+
 
 def generate_statistics(
     files: list[str],
@@ -340,31 +269,16 @@ def generate_statistics(
     """
 
     return {
-
-        "interesting_files": len(
-            files
-        ),
-
-        "interesting_directories": len(
-            directories
-        ),
-
-        "total": (
-
-            len(files)
-
-            +
-
-            len(directories)
-
-        ),
-
+        "interesting_files": len(files),
+        "interesting_directories": len(directories),
+        "total": (len(files) + len(directories)),
     }
 
 
 # ==========================================================
 # Scan
 # ==========================================================
+
 
 def scan(
     urls: list[str],
@@ -377,34 +291,24 @@ def scan(
         dict
     """
 
-    files = detect_interesting_files(
-        urls
-    )
+    files = detect_interesting_files(urls)
 
-    directories = detect_interesting_directories(
-        urls
-    )
+    directories = detect_interesting_directories(urls)
 
     return {
-
         "files": files,
-
         "directories": directories,
-
         "statistics": generate_statistics(
-
             files,
-
             directories,
-
         ),
-
     }
 
 
 # ==========================================================
 # Entry Point
 # ==========================================================
+
 
 def detect_interesting(
     urls: list[str],
@@ -417,9 +321,7 @@ def detect_interesting(
         dict
     """
 
-    return scan(
-        urls
-    )
+    return scan(urls)
 
 
 # ==========================================================
@@ -427,25 +329,14 @@ def detect_interesting(
 # ==========================================================
 
 __all__ = [
-
     "INTERESTING_FILES",
-
     "INTERESTING_DIRECTORIES",
-
     "normalize",
-
     "is_interesting_file",
-
     "is_interesting_directory",
-
     "detect_interesting_files",
-
     "detect_interesting_directories",
-
     "generate_statistics",
-
     "scan",
-
     "detect_interesting",
-
 ]

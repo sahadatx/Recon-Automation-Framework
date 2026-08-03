@@ -24,10 +24,10 @@ from modules.http.helpers import (
     show_probe,
 )
 
-
 # ==========================================================
 # Probe URL
 # ==========================================================
+
 
 def probe_url(
     session: requests.Session,
@@ -52,9 +52,7 @@ def probe_url(
         url,
     )
 
-    start_time = (
-        time.perf_counter()
-    )
+    start_time = time.perf_counter()
 
     try:
 
@@ -69,69 +67,54 @@ def probe_url(
         return None
 
     elapsed = round(
-        time.perf_counter()
-        - start_time,
+        time.perf_counter() - start_time,
         3,
     )
 
     return {
-
         # --------------------------------------------------
         # General
         # --------------------------------------------------
-
         "alive": True,
-
         "url": response.url,
-
         "scheme": response.url.split(
             "://",
             1,
         )[0],
-
         "status": response.status_code,
-
         "response_time": elapsed,
-
         "redirect": bool(
             response.history,
         ),
-
         # --------------------------------------------------
         # Common Headers
         # --------------------------------------------------
-
         "server": response.headers.get(
             "Server",
             "",
         ),
-
         "content_type": response.headers.get(
             "Content-Type",
             "",
         ),
-
         "content_length": response.headers.get(
             "Content-Length",
             "0",
         ),
-
         # --------------------------------------------------
         # Raw Data
         # --------------------------------------------------
-
         "headers": dict(
             response.headers,
         ),
-
         "html": response.text,
-
     }
 
 
 # ==========================================================
 # Probe HTTP
 # ==========================================================
+
 
 def probe_http(
     session: requests.Session,
@@ -151,6 +134,7 @@ def probe_http(
 # Probe HTTPS
 # ==========================================================
 
+
 def probe_https(
     session: requests.Session,
     host: str,
@@ -168,6 +152,7 @@ def probe_https(
 # ==========================================================
 # Probe Host
 # ==========================================================
+
 
 def probe_host(
     session: requests.Session,
@@ -199,9 +184,7 @@ def probe_host(
 
         return result
 
-    warning(
-        f"{host} is not reachable."
-    )
+    warning(f"{host} is not reachable.")
 
     return None
 

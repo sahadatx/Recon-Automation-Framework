@@ -18,10 +18,10 @@ from .validation import (
     validate_timeout,
 )
 
-
 # ==========================================================
 # Build Configuration
 # ==========================================================
+
 
 def build_config(
     arguments: argparse.Namespace,
@@ -31,7 +31,6 @@ def build_config(
     """
 
     modules = {
-
         module: (
             arguments.all
             or getattr(
@@ -39,35 +38,25 @@ def build_config(
                 module,
             )
         )
-
         for module in MODULES
-
     }
 
     return {
-
         "target": validate_target(
             arguments.target,
         ),
-
         "threads": validate_threads(
             arguments.threads,
         ),
-
         "timeout": validate_timeout(
             arguments.timeout,
         ),
-
         "retries": validate_retries(
             arguments.retries,
         ),
-
         "verbose": arguments.verbose,
-
         "quiet": arguments.quiet,
-
         "modules": modules,
-
     }
 
 
@@ -76,7 +65,5 @@ def build_config(
 # ==========================================================
 
 __all__ = [
-
     "build_config",
-
 ]

@@ -9,10 +9,10 @@ from modules.dns.helpers import (
     show_lookup,
 )
 
-
 # ==========================================================
 # Resolve IPv4 (A)
 # ==========================================================
+
 
 def resolve_a(domain: str) -> list[str]:
     """
@@ -35,14 +35,13 @@ def resolve_a(domain: str) -> list[str]:
         "A",
     )
 
-    return sorted(
-        set(records)
-    )
+    return sorted(set(records))
 
 
 # ==========================================================
 # Resolve IPv6 (AAAA)
 # ==========================================================
+
 
 def resolve_aaaa(domain: str) -> list[str]:
     """
@@ -65,14 +64,13 @@ def resolve_aaaa(domain: str) -> list[str]:
         "AAAA",
     )
 
-    return sorted(
-        set(records)
-    )
+    return sorted(set(records))
 
 
 # ==========================================================
 # Resolve Both
 # ==========================================================
+
 
 def resolve_ip_addresses(domain: str) -> dict:
     """
@@ -83,9 +81,6 @@ def resolve_ip_addresses(domain: str) -> dict:
     """
 
     return {
-
         "A": resolve_a(domain),
-
         "AAAA": resolve_aaaa(domain),
-
     }

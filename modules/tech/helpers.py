@@ -9,10 +9,10 @@ from modules.tech.fingerprints import (
     HTML_KEYWORDS,
 )
 
-
 # ==========================================================
 # Normalize Technologies
 # ==========================================================
+
 
 def normalize_technologies(
     technologies: list[str],
@@ -21,18 +21,13 @@ def normalize_technologies(
     Remove duplicates and sort technologies.
     """
 
-    return sorted(
-        set(
-            tech.strip()
-            for tech in technologies
-            if tech
-        )
-    )
+    return sorted(set(tech.strip() for tech in technologies if tech))
 
 
 # ==========================================================
 # Extract Headers
 # ==========================================================
+
 
 def extract_headers(
     response: dict,
@@ -44,23 +39,15 @@ def extract_headers(
         dict
     """
 
-    headers = response.get(
-        "headers",
-        {}
-    )
+    headers = response.get("headers", {})
 
-    return {
-
-        str(key).lower(): str(value)
-
-        for key, value in headers.items()
-
-    }
+    return {str(key).lower(): str(value) for key, value in headers.items()}
 
 
 # ==========================================================
 # Extract HTML
 # ==========================================================
+
 
 def extract_html(
     response: dict,
@@ -72,15 +59,13 @@ def extract_html(
         str
     """
 
-    return response.get(
-        "html",
-        ""
-    ).lower()
+    return response.get("html", "").lower()
 
 
 # ==========================================================
 # Detect Security Headers
 # ==========================================================
+
 
 def detect_security_headers(
     headers: dict,
@@ -95,34 +80,19 @@ def detect_security_headers(
     security_headers = []
 
     checks = {
-
-        "content-security-policy":
-            "Content Security Policy",
-
-        "strict-transport-security":
-            "HSTS",
-
-        "x-frame-options":
-            "X-Frame-Options",
-
-        "x-content-type-options":
-            "X-Content-Type-Options",
-
-        "referrer-policy":
-            "Referrer Policy",
-
-        "permissions-policy":
-            "Permissions Policy",
-
+        "content-security-policy": "Content Security Policy",
+        "strict-transport-security": "HSTS",
+        "x-frame-options": "X-Frame-Options",
+        "x-content-type-options": "X-Content-Type-Options",
+        "referrer-policy": "Referrer Policy",
+        "permissions-policy": "Permissions Policy",
     }
 
     for header, name in checks.items():
 
         if header in headers:
 
-            security_headers.append(
-                name
-            )
+            security_headers.append(name)
 
     return security_headers
 
@@ -130,6 +100,7 @@ def detect_security_headers(
 # ==========================================================
 # Detect HTML Technologies
 # ==========================================================
+
 
 def detect_html_technologies(
     html: str,
@@ -149,12 +120,8 @@ def detect_html_technologies(
 
             if keyword.lower() in html:
 
-                technologies.append(
-                    technology
-                )
+                technologies.append(technology)
 
                 break
 
-    return normalize_technologies(
-        technologies
-    )
+    return normalize_technologies(technologies)

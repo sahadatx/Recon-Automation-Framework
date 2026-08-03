@@ -28,7 +28,6 @@ from .scanner import (
     scan_target,
 )
 
-
 # ==========================================================
 # Process Target
 # ==========================================================
@@ -104,9 +103,7 @@ def collect_findings(
     Merge findings from all targets.
     """
 
-    findings: list[
-        dict[str, Any]
-    ] = []
+    findings: list[dict[str, Any]] = []
 
     for target_findings in results.values():
 
@@ -141,9 +138,7 @@ def run_nuclei(
 
     if not targets:
 
-        warning(
-            "No targets supplied."
-        )
+        warning("No targets supplied.")
 
         analysis = analyze(
             results=[],
@@ -157,9 +152,7 @@ def run_nuclei(
 
         return analysis
 
-    info(
-        "Starting Nuclei Scan..."
-    )
+    info("Starting Nuclei Scan...")
 
     targets = sorted(
         set(
@@ -171,9 +164,7 @@ def run_nuclei(
 
     if executor is None:
 
-        raise RuntimeError(
-            "Shared thread pool is not initialized."
-        )
+        raise RuntimeError("Shared thread pool is not initialized.")
 
     results: dict[
         str,
@@ -189,23 +180,18 @@ def run_nuclei(
     )
 
     futures = {
-
         executor.submit(
             process_target,
             target,
         ): target
-
         for target in targets
-
     }
 
     for future in as_completed(
         futures,
     ):
 
-        target = futures[
-            future
-        ]
+        target = futures[future]
 
         completed += 1
 
@@ -218,9 +204,7 @@ def run_nuclei(
 
             if findings is not None:
 
-                results[
-                    hostname
-                ] = findings
+                results[hostname] = findings
 
                 progress_status(
                     completed,
@@ -242,17 +226,13 @@ def run_nuclei(
 
         except KeyboardInterrupt:
 
-            warning(
-                "Scan interrupted."
-            )
+            warning("Scan interrupted.")
 
             raise
 
         except Exception as error:
 
-            warning(
-                f"{target}: {error}"
-            )
+            warning(f"{target}: {error}")
 
             failed.append(
                 target,
@@ -273,9 +253,7 @@ def run_nuclei(
         failed=failed,
     )
 
-    statistics = analysis[
-        "statistics"
-    ]
+    statistics = analysis["statistics"]
 
     statistics.update(
         {
@@ -290,21 +268,13 @@ def run_nuclei(
         analysis,
     )
 
-    success(
-        f"Targets      : {statistics['total_targets']}"
-    )
+    success(f"Targets      : {statistics['total_targets']}")
 
-    success(
-        f"Successful   : {statistics['successful']}"
-    )
+    success(f"Successful   : {statistics['successful']}")
 
-    success(
-        f"Failed       : {statistics['failed']}"
-    )
+    success(f"Failed       : {statistics['failed']}")
 
-    success(
-        f"Findings     : {statistics['total_findings']}"
-    )
+    success(f"Findings     : {statistics['total_findings']}")
 
     return analysis
 
@@ -341,9 +311,7 @@ def successful_targets(
     Return successful targets.
     """
 
-    target_statistics = analysis[
-        "statistics"
-    ].get(
+    target_statistics = analysis["statistics"].get(
         "target_statistics",
         {},
     )

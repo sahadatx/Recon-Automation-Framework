@@ -32,7 +32,6 @@ from .helpers import (
 )
 from .target_analyzer import analyze_target
 
-
 # ==========================================================
 # Run Email Security Analysis
 # ==========================================================
@@ -67,17 +66,13 @@ def run_email_security(
 
         return analysis
 
-    info(
-        "Starting Email Security Analysis..."
-    )
+    info("Starting Email Security Analysis...")
 
     results: list[dict[str, Any]] = []
 
     for target in targets:
 
-        info(
-            f"Analyzing {target}..."
-        )
+        info(f"Analyzing {target}...")
 
         host = normalize_target(
             target,
@@ -132,37 +127,21 @@ def run_email_security(
         analysis,
     )
 
-    statistics = analysis[
-        "statistics"
-    ]
+    statistics = analysis["statistics"]
 
-    success(
-        f"Targets             : {statistics['targets']}"
-    )
+    success(f"Targets             : {statistics['targets']}")
 
-    success(
-        f"Low Risk            : {statistics['low']}"
-    )
+    success(f"Low Risk            : {statistics['low']}")
 
-    success(
-        f"Medium Risk         : {statistics['medium']}"
-    )
+    success(f"Medium Risk         : {statistics['medium']}")
 
-    success(
-        f"High Risk           : {statistics['high']}"
-    )
+    success(f"High Risk           : {statistics['high']}")
 
-    success(
-        f"Critical Risk       : {statistics['critical']}"
-    )
+    success(f"Critical Risk       : {statistics['critical']}")
 
-    success(
-        f"Average Score       : {statistics['average_score']}"
-    )
+    success(f"Average Score       : {statistics['average_score']}")
 
-    success(
-        f"Highest Score       : {statistics['highest_score']}"
-    )
+    success(f"Highest Score       : {statistics['highest_score']}")
 
     return analysis
 

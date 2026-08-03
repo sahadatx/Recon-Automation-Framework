@@ -22,10 +22,10 @@ from core.logger import (
     warning,
 )
 
-
 # ==========================================================
 # Create Resolver
 # ==========================================================
+
 
 def create_resolver() -> dns.resolver.Resolver:
     """
@@ -51,6 +51,7 @@ def create_resolver() -> dns.resolver.Resolver:
 # ==========================================================
 # Resolve Record
 # ==========================================================
+
 
 def resolve_record(
     domain: str,
@@ -85,12 +86,7 @@ def resolve_record(
             if answers.rrset is None:
                 return []
 
-            return sorted(
-                {
-                    answer.to_text().strip()
-                    for answer in answers
-                }
-            )
+            return sorted({answer.to_text().strip() for answer in answers})
 
         except dns.exception.Timeout:
 
@@ -104,36 +100,25 @@ def resolve_record(
 
                 continue
 
-            warning(
-                f"{record_type} lookup timed out "
-                f"for {domain}."
-            )
+            warning(f"{record_type} lookup timed out " f"for {domain}.")
 
             return []
 
         except dns.resolver.NXDOMAIN:
 
-            warning(
-                f"{domain} does not exist."
-            )
+            warning(f"{domain} does not exist.")
 
             return []
 
         except dns.resolver.NoNameservers:
 
-            warning(
-                f"No nameservers available "
-                f"for {domain}."
-            )
+            warning(f"No nameservers available " f"for {domain}.")
 
             return []
 
         except Exception as error:
 
-            warning(
-                f"{record_type} lookup failed "
-                f"for {domain}: {error}"
-            )
+            warning(f"{record_type} lookup failed " f"for {domain}: {error}")
 
             return []
 
@@ -143,6 +128,7 @@ def resolve_record(
 # ==========================================================
 # Show Lookup
 # ==========================================================
+
 
 def show_lookup(
     domain: str,
@@ -156,10 +142,7 @@ def show_lookup(
         record_type: DNS record type.
     """
 
-    info(
-        f"Resolving {record_type} "
-        f"records for {domain}"
-    )
+    info(f"Resolving {record_type} " f"records for {domain}")
 
 
 # ==========================================================

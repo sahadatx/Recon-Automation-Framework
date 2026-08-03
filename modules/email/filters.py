@@ -23,26 +23,20 @@ from .constants import (
 # ==========================================================
 
 VALID_PROVIDERS = set(
-
     MAIL_PROVIDERS,
-
 )
 
 VALID_RISK = {
-
     LOW_RISK,
-
     MEDIUM_RISK,
-
     HIGH_RISK,
-
     CRITICAL_RISK,
-
 }
 
 # ==========================================================
 # Reset Analysis
 # ==========================================================
+
 
 def reset_analysis(
     result: dict,
@@ -69,6 +63,7 @@ def reset_analysis(
 # Normalize Score
 # ==========================================================
 
+
 def normalize_score(
     score,
 ) -> int:
@@ -82,9 +77,7 @@ def normalize_score(
     try:
 
         score = int(
-
             score,
-
         )
 
     except Exception:
@@ -92,17 +85,11 @@ def normalize_score(
         score = 0
 
     score = max(
-
         0,
-
         min(
-
             score,
-
             100,
-
         ),
-
     )
 
     return score
@@ -111,6 +98,7 @@ def normalize_score(
 # ==========================================================
 # Normalize Provider
 # ==========================================================
+
 
 def normalize_provider(
     provider,
@@ -127,9 +115,7 @@ def normalize_provider(
         return ""
 
     provider = str(
-
         provider,
-
     ).strip()
 
     if provider in VALID_PROVIDERS:
@@ -142,6 +128,7 @@ def normalize_provider(
 # ==========================================================
 # Normalize Risk
 # ==========================================================
+
 
 def normalize_risk(
     risk,
@@ -158,9 +145,7 @@ def normalize_risk(
         return LOW_RISK
 
     risk = str(
-
         risk,
-
     ).strip()
 
     if risk in VALID_RISK:
@@ -173,6 +158,7 @@ def normalize_risk(
 # ==========================================================
 # Normalize Recommendations
 # ==========================================================
+
 
 def normalize_recommendations(
     recommendations,
@@ -189,34 +175,13 @@ def normalize_recommendations(
 
         return []
 
-    return sorted(
-
-        {
-
-            item.strip()
-
-            for item
-
-            in recommendations
-
-            if (
-
-                item
-
-                and
-
-                item.strip()
-
-            )
-
-        }
-
-    )
+    return sorted({item.strip() for item in recommendations if (item and item.strip())})
 
 
 # ==========================================================
 # Validate Analysis
 # ==========================================================
+
 
 def validate_analysis(
     result,
@@ -228,68 +193,32 @@ def validate_analysis(
         dict
     """
 
-    result["score"] = (
-
-        normalize_score(
-
-            result.get(
-
-                "score",
-
-                0,
-
-            )
-
+    result["score"] = normalize_score(
+        result.get(
+            "score",
+            0,
         )
-
     )
 
-    result["provider"] = (
-
-        normalize_provider(
-
-            result.get(
-
-                "provider",
-
-                "",
-
-            )
-
+    result["provider"] = normalize_provider(
+        result.get(
+            "provider",
+            "",
         )
-
     )
 
-    result["risk"] = (
-
-        normalize_risk(
-
-            result.get(
-
-                "risk",
-
-                LOW_RISK,
-
-            )
-
+    result["risk"] = normalize_risk(
+        result.get(
+            "risk",
+            LOW_RISK,
         )
-
     )
 
-    result["recommendations"] = (
-
-        normalize_recommendations(
-
-            result.get(
-
-                "recommendations",
-
-                [],
-
-            )
-
+    result["recommendations"] = normalize_recommendations(
+        result.get(
+            "recommendations",
+            [],
         )
-
     )
 
     return result
@@ -298,6 +227,7 @@ def validate_analysis(
 # ==========================================================
 # Filter Single Result
 # ==========================================================
+
 
 def filter_result(
     result,
@@ -311,21 +241,18 @@ def filter_result(
     """
 
     filtered = deepcopy(
-
         result,
-
     )
 
     return validate_analysis(
-
         filtered,
-
     )
 
 
 # ==========================================================
 # Filter Results
 # ==========================================================
+
 
 def filter_results(
     results,
@@ -339,43 +266,24 @@ def filter_results(
     """
 
     filtered = [
-
         filter_result(
-
             result,
-
         )
-
-        for result
-
-        in results
-
+        for result in results
     ]
 
     filtered.sort(
-
         key=lambda item: (
-
             item.get(
-
                 "score",
-
                 0,
-
             ),
-
             item.get(
-
                 "provider",
-
                 "",
-
             ),
-
         ),
-
         reverse=True,
-
     )
 
     return filtered
@@ -384,6 +292,7 @@ def filter_results(
 # ==========================================================
 # High Risk Only
 # ==========================================================
+
 
 def high_risk_only(
     results,
@@ -397,35 +306,22 @@ def high_risk_only(
     """
 
     return [
-
         result
-
-        for result
-
-        in results
-
+        for result in results
         if result.get(
-
             "risk",
-
         )
-
-        in
-
-        (
-
+        in (
             HIGH_RISK,
-
             CRITICAL_RISK,
-
         )
-
     ]
 
 
 # ==========================================================
 # Critical Only
 # ==========================================================
+
 
 def critical_only(
     results,
@@ -439,29 +335,19 @@ def critical_only(
     """
 
     return [
-
         result
-
-        for result
-
-        in results
-
+        for result in results
         if result.get(
-
             "risk",
-
         )
-
-        ==
-
-        CRITICAL_RISK
-
+        == CRITICAL_RISK
     ]
 
 
 # ==========================================================
 # Remove Low Risk
 # ==========================================================
+
 
 def remove_low_risk(
     results,
@@ -475,23 +361,12 @@ def remove_low_risk(
     """
 
     return [
-
         result
-
-        for result
-
-        in results
-
+        for result in results
         if result.get(
-
             "risk",
-
         )
-
-        !=
-
-        LOW_RISK
-
+        != LOW_RISK
     ]
 
 
@@ -500,31 +375,17 @@ def remove_low_risk(
 # ==========================================================
 
 __all__ = [
-
     "VALID_PROVIDERS",
-
     "VALID_RISK",
-
     "reset_analysis",
-
     "normalize_score",
-
     "normalize_provider",
-
     "normalize_risk",
-
     "normalize_recommendations",
-
     "validate_analysis",
-
     "filter_result",
-
     "filter_results",
-
     "high_risk_only",
-
     "critical_only",
-
     "remove_low_risk",
-
 ]

@@ -18,7 +18,6 @@ from .exporter import (
 from .statistics import generate_statistics
 from .manager import run
 
-
 # ==========================================================
 # Report Generator Plugin
 # ==========================================================
@@ -41,9 +40,7 @@ class ReportPlugin(BasePlugin):
         "and export it in multiple formats."
     )
 
-    depends_on = (
-        "dashboard",
-    )
+    depends_on = ("dashboard",)
 
     config = {
         "json": True,

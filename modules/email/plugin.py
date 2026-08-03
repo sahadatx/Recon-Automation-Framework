@@ -14,7 +14,6 @@ from core.plugins.base import BasePlugin
 from .exporter import export_all
 from .manager import run
 
-
 # ==========================================================
 # Email Security Plugin
 # ==========================================================
@@ -38,9 +37,7 @@ class EmailSecurityPlugin(BasePlugin):
         "MTA-STS and TLS-RPT."
     )
 
-    depends_on = (
-        "dns",
-    )
+    depends_on = ("dns",)
 
     config = {
         "threads": False,

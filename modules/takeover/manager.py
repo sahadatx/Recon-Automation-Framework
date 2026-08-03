@@ -48,7 +48,6 @@ from .target_analyzer import (
     analyze_target,
 )
 
-
 # ==========================================================
 # Process Target
 # ==========================================================
@@ -151,17 +150,13 @@ def run_takeover_detection(
 
         return analysis
 
-    info(
-        "Starting Subdomain Takeover Detection..."
-    )
+    info("Starting Subdomain Takeover Detection...")
 
     executor = context.get_thread_pool()
 
     if executor is None:
 
-        raise RuntimeError(
-            "Shared thread pool is not initialized."
-        )
+        raise RuntimeError("Shared thread pool is not initialized.")
 
     targets = sorted(
         set(
@@ -175,28 +170,21 @@ def run_takeover_detection(
         targets,
     )
 
-    results: list[
-        dict[str, Any]
-    ] = []
+    results: list[dict[str, Any]] = []
 
     futures = {
-
         executor.submit(
             process_target,
             target,
         ): target
-
         for target in targets
-
     }
 
     for future in as_completed(
         futures,
     ):
 
-        target = futures[
-            future
-        ]
+        target = futures[future]
 
         completed += 1
 
@@ -229,9 +217,7 @@ def run_takeover_detection(
 
         except Exception as error:
 
-            warning(
-                f"{target}: {error}"
-            )
+            warning(f"{target}: {error}")
 
             progress_status(
                 completed,
@@ -252,29 +238,17 @@ def run_takeover_detection(
         analysis,
     )
 
-    statistics = analysis[
-        "statistics"
-    ]
+    statistics = analysis["statistics"]
 
-    success(
-        f"Targets             : {statistics['targets']}"
-    )
+    success(f"Targets             : {statistics['targets']}")
 
-    success(
-        f"Vulnerable          : {statistics['vulnerable']}"
-    )
+    success(f"Vulnerable          : {statistics['vulnerable']}")
 
-    success(
-        f"Safe                : {statistics['safe']}"
-    )
+    success(f"Safe                : {statistics['safe']}")
 
-    success(
-        f"Average Confidence  : {statistics['average_confidence']}"
-    )
+    success(f"Average Confidence  : {statistics['average_confidence']}")
 
-    success(
-        f"Highest Confidence  : {statistics['highest_confidence']}"
-    )
+    success(f"Highest Confidence  : {statistics['highest_confidence']}")
 
     return analysis
 

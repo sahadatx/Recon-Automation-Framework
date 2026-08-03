@@ -22,7 +22,6 @@ from core.logger import (
 from modules.crawler.analyzer import analyze
 from modules.crawler.crawler import crawl_host
 
-
 # ==========================================================
 # Crawl One Host
 # ==========================================================
@@ -58,17 +57,13 @@ def crawl_hosts(
     Crawl multiple hosts in parallel.
     """
 
-    info(
-        "Starting URL Crawling..."
-    )
+    info("Starting URL Crawling...")
 
     executor = context.get_thread_pool()
 
     if executor is None:
 
-        raise RuntimeError(
-            "Thread pool not initialized."
-        )
+        raise RuntimeError("Thread pool not initialized.")
 
     results: dict[
         str,
@@ -82,15 +77,12 @@ def crawl_hosts(
     )
 
     futures = {
-
         executor.submit(
             crawl_one_host,
             context,
             host,
         ): host
-
         for host in hosts
-
     }
 
     for future in as_completed(
@@ -99,9 +91,7 @@ def crawl_hosts(
 
         completed += 1
 
-        host = futures[
-            future
-        ]
+        host = futures[future]
 
         try:
 
@@ -112,23 +102,14 @@ def crawl_hosts(
 
             if result is not None:
 
-                results[
-                    hostname
-                ] = result
+                results[hostname] = result
 
-                pages = result[
-                    "statistics"
-                ][
-                    "pages"
-                ]
+                pages = result["statistics"]["pages"]
 
                 progress_status(
                     completed,
                     total,
-                    (
-                        f"✓ {hostname} "
-                        f"({pages} pages)"
-                    ),
+                    (f"✓ {hostname} " f"({pages} pages)"),
                 )
 
             else:

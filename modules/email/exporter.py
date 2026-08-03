@@ -26,10 +26,10 @@ from .constants import (
     HIGH_RISK_FILE,
 )
 
-
 # ==========================================================
 # Output Directory
 # ==========================================================
+
 
 def create_output_directory() -> None:
     """
@@ -45,6 +45,7 @@ def create_output_directory() -> None:
 # ==========================================================
 # Write Text
 # ==========================================================
+
 
 def write_text(
     output_file: Path,
@@ -71,15 +72,11 @@ def write_text(
             encoding="utf-8",
         )
 
-        success(
-            f"Saved {output_file}"
-        )
+        success(f"Saved {output_file}")
 
     except OSError as error:
 
-        warning(
-            f"{output_file}: {error}"
-        )
+        warning(f"{output_file}: {error}")
 
     return output_file
 
@@ -87,6 +84,7 @@ def write_text(
 # ==========================================================
 # Write JSON
 # ==========================================================
+
 
 def write_json(
     output_file: Path,
@@ -122,15 +120,11 @@ def write_json(
                 default=str,
             )
 
-        success(
-            f"Saved {output_file}"
-        )
+        success(f"Saved {output_file}")
 
     except OSError as error:
 
-        warning(
-            f"{output_file}: {error}"
-        )
+        warning(f"{output_file}: {error}")
 
     return output_file
 
@@ -138,6 +132,7 @@ def write_json(
 # ==========================================================
 # Write CSV
 # ==========================================================
+
 
 def write_csv(
     output_file: Path,
@@ -201,15 +196,11 @@ def write_csv(
                     ]
                 )
 
-        success(
-            f"Saved {output_file}"
-        )
+        success(f"Saved {output_file}")
 
     except OSError as error:
 
-        warning(
-            f"{output_file}: {error}"
-        )
+        warning(f"{output_file}: {error}")
 
     return output_file
 
@@ -217,6 +208,7 @@ def write_csv(
 # ==========================================================
 # Export JSON
 # ==========================================================
+
 
 def export_json(
     analysis: dict[str, Any],
@@ -235,6 +227,7 @@ def export_json(
 # Export TXT
 # ==========================================================
 
+
 def export_txt(
     analysis: dict[str, Any],
 ) -> Path:
@@ -250,54 +243,29 @@ def export_txt(
 
         lines.append("=" * 80)
 
-        lines.append(
-            f"Target              : {result.get('target', '-')}"
-        )
+        lines.append(f"Target              : {result.get('target', '-')}")
 
-        lines.append(
-            f"Provider            : {result.get('provider', '-')}"
-        )
+        lines.append(f"Provider            : {result.get('provider', '-')}")
 
-        lines.append(
-            f"Risk                : {result.get('risk', '-')}"
-        )
+        lines.append(f"Risk                : {result.get('risk', '-')}")
 
-        lines.append(
-            f"Score               : {result.get('score', 0)}"
-        )
+        lines.append(f"Score               : {result.get('score', 0)}")
 
-        lines.append(
-            "MX Records          : "
-            + ", ".join(result.get("mx", []))
-        )
+        lines.append("MX Records          : " + ", ".join(result.get("mx", [])))
 
-        lines.append(
-            f"SPF                 : {result.get('spf', False)}"
-        )
+        lines.append(f"SPF                 : {result.get('spf', False)}")
 
-        lines.append(
-            f"DKIM                : {result.get('dkim', False)}"
-        )
+        lines.append(f"DKIM                : {result.get('dkim', False)}")
 
-        lines.append(
-            f"DMARC               : {result.get('dmarc', False)}"
-        )
+        lines.append(f"DMARC               : {result.get('dmarc', False)}")
 
-        lines.append(
-            f"MTA-STS             : {result.get('mta_sts', False)}"
-        )
+        lines.append(f"MTA-STS             : {result.get('mta_sts', False)}")
 
-        lines.append(
-            f"TLS-RPT             : {result.get('tls_rpt', False)}"
-        )
+        lines.append(f"TLS-RPT             : {result.get('tls_rpt', False)}")
 
-        lines.append(
-            f"BIMI                : {result.get('bimi', False)}"
-        )
+        lines.append(f"BIMI                : {result.get('bimi', False)}")
 
-        lines.append(
-            f"DNSSEC              : {result.get('dnssec', False)}"
-        )
+        lines.append(f"DNSSEC              : {result.get('dnssec', False)}")
 
         lines.append("Recommendations")
 
@@ -310,15 +278,11 @@ def export_txt(
 
             for recommendation in recommendations:
 
-                lines.append(
-                    f"  - {recommendation}"
-                )
+                lines.append(f"  - {recommendation}")
 
         else:
 
-            lines.append(
-                "  None"
-            )
+            lines.append("  None")
 
         lines.append("")
 
@@ -331,6 +295,7 @@ def export_txt(
 # ==========================================================
 # Export CSV
 # ==========================================================
+
 
 def export_csv(
     analysis: dict[str, Any],
@@ -348,6 +313,7 @@ def export_csv(
 # ==========================================================
 # Export High Risk
 # ==========================================================
+
 
 def export_high_risk(
     analysis: dict[str, Any],
@@ -372,12 +338,10 @@ def export_high_risk(
             continue
 
         lines.append(
-
             f"{result.get('target', '-')}"
             f" -> "
             f"{result.get('risk', '-')}"
             f" (Score: {result.get('score', 0)})"
-
         )
 
     return write_text(
@@ -390,6 +354,7 @@ def export_high_risk(
 # Export Summary
 # ==========================================================
 
+
 def export_summary(
     analysis: dict[str, Any],
 ) -> Path:
@@ -400,44 +365,26 @@ def export_summary(
     statistics = analysis["statistics"]
 
     lines = [
-
         "Email Security Summary",
-
         "=" * 40,
-
         f"Targets            : {statistics['targets']}",
-
         f"Low Risk           : {statistics['low']}",
-
         f"Medium Risk        : {statistics['medium']}",
-
         f"High Risk          : {statistics['high']}",
-
         f"Critical Risk      : {statistics['critical']}",
-
         f"SPF Enabled        : {statistics['spf_enabled']}",
-
         f"DKIM Enabled       : {statistics['dkim_enabled']}",
-
         f"DMARC Enabled      : {statistics['dmarc_enabled']}",
-
         f"Average Score      : {statistics['average_score']}",
-
         f"Highest Score      : {statistics['highest_score']}",
-
         "",
-
         "Risk Levels",
-
         "-" * 40,
-
     ]
 
     for level, count in statistics["risk_statistics"].items():
 
-        lines.append(
-            f"{level:<20}{count}"
-        )
+        lines.append(f"{level:<20}{count}")
 
     lines.extend(
         [
@@ -449,9 +396,7 @@ def export_summary(
 
     for provider, count in statistics["provider_statistics"].items():
 
-        lines.append(
-            f"{provider:<20}{count}"
-        )
+        lines.append(f"{provider:<20}{count}")
 
     return write_text(
         SUMMARY_FILE,
@@ -462,6 +407,7 @@ def export_summary(
 # ==========================================================
 # Show Summary
 # ==========================================================
+
 
 def show_summary(
     analysis: dict[str, Any],
@@ -476,9 +422,7 @@ def show_summary(
 
     print("=" * 80)
 
-    print(
-        "Email Security Summary".center(80)
-    )
+    print("Email Security Summary".center(80))
 
     print("=" * 80)
 
@@ -501,9 +445,7 @@ def show_summary(
 
     for level, count in statistics["risk_statistics"].items():
 
-        print(
-            f"{level:<30}{count}"
-        )
+        print(f"{level:<30}{count}")
 
     print("-" * 80)
 
@@ -513,9 +455,7 @@ def show_summary(
 
     for provider, count in statistics["provider_statistics"].items():
 
-        print(
-            f"{provider:<30}{count}"
-        )
+        print(f"{provider:<30}{count}")
 
     print("=" * 80)
 
@@ -523,6 +463,7 @@ def show_summary(
 # ==========================================================
 # Export All
 # ==========================================================
+
 
 def export_all(
     analysis: dict[str, Any],

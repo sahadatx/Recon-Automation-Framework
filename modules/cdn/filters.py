@@ -17,33 +17,24 @@ from .constants import (
     CDN_PROVIDERS,
 )
 
-
 # ==========================================================
 # Constants
 # ==========================================================
 
-VALID_PROVIDERS = set(
-
-    CDN_PROVIDERS
-
-)
+VALID_PROVIDERS = set(CDN_PROVIDERS)
 
 VALID_CONFIDENCE = {
-
     HIGH_CONFIDENCE,
-
     MEDIUM_CONFIDENCE,
-
     LOW_CONFIDENCE,
-
     UNKNOWN_CONFIDENCE,
-
 }
 
 
 # ==========================================================
 # Reset Analysis
 # ==========================================================
+
 
 def reset_analysis(
     result: dict,
@@ -72,6 +63,7 @@ def reset_analysis(
 # Normalize Confidence
 # ==========================================================
 
+
 def normalize_confidence(
     confidence,
 ) -> int:
@@ -85,9 +77,7 @@ def normalize_confidence(
     try:
 
         confidence = int(
-
             confidence,
-
         )
 
     except Exception:
@@ -95,17 +85,11 @@ def normalize_confidence(
         confidence = UNKNOWN_CONFIDENCE
 
     confidence = max(
-
         0,
-
         min(
-
             confidence,
-
             100,
-
         ),
-
     )
 
     return confidence
@@ -114,6 +98,7 @@ def normalize_confidence(
 # ==========================================================
 # Normalize Provider
 # ==========================================================
+
 
 def normalize_provider(
     provider,
@@ -130,9 +115,7 @@ def normalize_provider(
         return ""
 
     provider = str(
-
         provider,
-
     ).strip()
 
     if provider in VALID_PROVIDERS:
@@ -145,6 +128,7 @@ def normalize_provider(
 # ==========================================================
 # Normalize Methods
 # ==========================================================
+
 
 def normalize_methods(
     methods,
@@ -168,30 +152,29 @@ def normalize_methods(
 
             continue
 
-        method = str(
-
-            method,
-
-        ).strip().lower()
+        method = (
+            str(
+                method,
+            )
+            .strip()
+            .lower()
+        )
 
         if method and method not in normalized:
 
             normalized.append(
-
                 method,
-
             )
 
     return sorted(
-
         normalized,
-
     )
 
 
 # ==========================================================
 # Normalize Recommendations
 # ==========================================================
+
 
 def normalize_recommendations(
     recommendations,
@@ -207,26 +190,13 @@ def normalize_recommendations(
 
         return []
 
-    return sorted(
-
-        {
-
-            item.strip()
-
-            for item
-
-            in recommendations
-
-            if item and item.strip()
-
-        }
-
-    )
+    return sorted({item.strip() for item in recommendations if item and item.strip()})
 
 
 # ==========================================================
 # Validate Analysis
 # ==========================================================
+
 
 def validate_analysis(
     result,
@@ -238,78 +208,38 @@ def validate_analysis(
         dict
     """
 
-    result["confidence"] = (
-
-        normalize_confidence(
-
-            result.get(
-
-                "confidence",
-
-                UNKNOWN_CONFIDENCE,
-
-            )
-
+    result["confidence"] = normalize_confidence(
+        result.get(
+            "confidence",
+            UNKNOWN_CONFIDENCE,
         )
-
     )
 
-    result["provider"] = (
-
-        normalize_provider(
-
-            result.get(
-
-                "provider",
-
-                "",
-
-            )
-
+    result["provider"] = normalize_provider(
+        result.get(
+            "provider",
+            "",
         )
-
     )
 
-    result["method"] = (
-
-        normalize_methods(
-
-            result.get(
-
-                "method",
-
-                [],
-
-            )
-
+    result["method"] = normalize_methods(
+        result.get(
+            "method",
+            [],
         )
-
     )
 
-    result["recommendations"] = (
-
-        normalize_recommendations(
-
-            result.get(
-
-                "recommendations",
-
-                [],
-
-            )
-
+    result["recommendations"] = normalize_recommendations(
+        result.get(
+            "recommendations",
+            [],
         )
-
     )
 
     result["cdn"] = bool(
-
         result.get(
-
             "provider",
-
         )
-
     )
 
     return result
@@ -318,6 +248,7 @@ def validate_analysis(
 # ==========================================================
 # Filter Single Result
 # ==========================================================
+
 
 def filter_result(
     result,
@@ -330,20 +261,18 @@ def filter_result(
     """
 
     filtered = deepcopy(
-
         result,
-
     )
 
     return validate_analysis(
-
         filtered,
-
     )
+
 
 # ==========================================================
 # Filter Results
 # ==========================================================
+
 
 def filter_results(
     results,
@@ -356,43 +285,24 @@ def filter_results(
     """
 
     filtered = [
-
         filter_result(
-
             result,
-
         )
-
-        for result
-
-        in results
-
+        for result in results
     ]
 
     filtered.sort(
-
         key=lambda item: (
-
             item.get(
-
                 "confidence",
-
                 UNKNOWN_CONFIDENCE,
-
             ),
-
             item.get(
-
                 "provider",
-
                 "",
-
             ),
-
         ),
-
         reverse=True,
-
     )
 
     return filtered
@@ -401,6 +311,7 @@ def filter_results(
 # ==========================================================
 # Detected Only
 # ==========================================================
+
 
 def detected_only(
     results,
@@ -413,25 +324,18 @@ def detected_only(
     """
 
     return [
-
         result
-
-        for result
-
-        in results
-
+        for result in results
         if result.get(
-
             "cdn",
-
         )
-
     ]
 
 
 # ==========================================================
 # Undetected Only
 # ==========================================================
+
 
 def undetected_only(
     results,
@@ -444,25 +348,18 @@ def undetected_only(
     """
 
     return [
-
         result
-
-        for result
-
-        in results
-
+        for result in results
         if not result.get(
-
             "cdn",
-
         )
-
     ]
 
 
 # ==========================================================
 # Failed Only
 # ==========================================================
+
 
 def failed_only(
     results,
@@ -475,25 +372,18 @@ def failed_only(
     """
 
     return [
-
         result
-
-        for result
-
-        in results
-
+        for result in results
         if result.get(
-
             "error",
-
         )
-
     ]
 
 
 # ==========================================================
 # Remove Failed
 # ==========================================================
+
 
 def remove_failed(
     results,
@@ -506,19 +396,11 @@ def remove_failed(
     """
 
     return [
-
         result
-
-        for result
-
-        in results
-
+        for result in results
         if not result.get(
-
             "error",
-
         )
-
     ]
 
 
@@ -527,34 +409,18 @@ def remove_failed(
 # ==========================================================
 
 __all__ = [
-
     "VALID_PROVIDERS",
-
     "VALID_CONFIDENCE",
-
     "reset_analysis",
-
     "normalize_confidence",
-
     "normalize_provider",
-
     "normalize_methods",
-
     "normalize_recommendations",
-
     "validate_analysis",
-
     "filter_result",
-
     "filter_results",
-
     "detected_only",
-
     "undetected_only",
-
     "failed_only",
-
     "remove_failed",
-
 ]
-

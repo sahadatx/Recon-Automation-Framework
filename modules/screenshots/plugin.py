@@ -17,7 +17,6 @@ from .exporter import (
 )
 from .manager import run
 
-
 # ==========================================================
 # Screenshot Plugin
 # ==========================================================
@@ -40,9 +39,7 @@ class ScreenshotPlugin(BasePlugin):
         "reconnaissance reports."
     )
 
-    depends_on = (
-        "http",
-    )
+    depends_on = ("http",)
 
     config = {
         "async": True,

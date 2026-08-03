@@ -8,7 +8,6 @@ from __future__ import annotations
 
 from typing import Any
 
-
 # ==========================================================
 # Analyze Results
 # ==========================================================
@@ -29,17 +28,9 @@ def analyze(
         results,
     )
 
-    successful_sources = sum(
-        1
-        for subdomains in results.values()
-        if subdomains
-    )
+    successful_sources = sum(1 for subdomains in results.values() if subdomains)
 
-    empty_sources = sum(
-        1
-        for subdomains in results.values()
-        if not subdomains
-    )
+    empty_sources = sum(1 for subdomains in results.values() if not subdomains)
 
     source_statistics: dict[
         str,
@@ -54,16 +45,10 @@ def analyze(
         status = (
             "FAILED"
             if source in failed_sources
-            else (
-                "SUCCESS"
-                if subdomains
-                else "EMPTY"
-            )
+            else ("SUCCESS" if subdomains else "EMPTY")
         )
 
-        source_statistics[
-            source
-        ] = {
+        source_statistics[source] = {
             "count": len(
                 subdomains,
             ),

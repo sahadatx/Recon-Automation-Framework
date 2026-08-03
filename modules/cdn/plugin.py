@@ -14,7 +14,6 @@ from core.plugins.base import BasePlugin
 from .exporter import export_all
 from .manager import run
 
-
 # ==========================================================
 # CDN Plugin
 # ==========================================================
@@ -37,9 +36,7 @@ class CDNPlugin(BasePlugin):
         "fingerprints."
     )
 
-    depends_on = (
-        "http",
-    )
+    depends_on = ("http",)
 
     config = {
         "http": True,

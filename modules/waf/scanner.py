@@ -23,7 +23,6 @@ from config.config import (
 
 from core.context import ExecutionContext
 
-
 # ==========================================================
 # Empty Result
 # ==========================================================
@@ -59,9 +58,7 @@ def scan_target(
     session = context.get_http_session()
 
     if session is None:
-        raise RuntimeError(
-            "Shared HTTP session is not initialized."
-        )
+        raise RuntimeError("Shared HTTP session is not initialized.")
 
     result = deepcopy(
         EMPTY_RESULT,
@@ -81,13 +78,11 @@ def scan_target(
         result["status"] = response.status_code
 
         result["headers"] = {
-            key.lower(): value
-            for key, value in response.headers.items()
+            key.lower(): value for key, value in response.headers.items()
         }
 
         result["cookies"] = {
-            key.lower(): value
-            for key, value in response.cookies.items()
+            key.lower(): value for key, value in response.cookies.items()
         }
 
         result["server"] = response.headers.get(
@@ -95,9 +90,7 @@ def scan_target(
             "",
         ).lower()
 
-        result["body"] = response.text[
-            :8192
-        ].lower()
+        result["body"] = response.text[:8192].lower()
 
         result["response_time"] = round(
             response.elapsed.total_seconds(),
@@ -144,9 +137,7 @@ def scan_targets(
         List of scan results.
     """
 
-    results: list[
-        dict[str, Any]
-    ] = []
+    results: list[dict[str, Any]] = []
 
     total = len(
         targets,
@@ -158,8 +149,7 @@ def scan_targets(
     ):
 
         print(
-            f"[{index}/{total}] "
-            f"Scanning {target}",
+            f"[{index}/{total}] " f"Scanning {target}",
         )
 
         results.append(

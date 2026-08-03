@@ -14,7 +14,6 @@ from core.plugins.base import BasePlugin
 from .exporter import export_all
 from .manager import run
 
-
 # ==========================================================
 # HTTP Probe Plugin
 # ==========================================================
@@ -37,9 +36,7 @@ class HTTPPlugin(BasePlugin):
         "collect response metadata."
     )
 
-    depends_on = (
-        "dns",
-    )
+    depends_on = ("dns",)
 
     config = {
         "threads": True,

@@ -19,10 +19,10 @@ from config.config import (
     HTTP_VERIFY_SSL,
 )
 
-
 # ==========================================================
 # Create HTTP Session
 # ==========================================================
+
 
 def create_http_session() -> requests.Session:
     """

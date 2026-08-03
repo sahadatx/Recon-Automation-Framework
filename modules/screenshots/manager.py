@@ -33,7 +33,6 @@ from modules.screenshots.helpers import (
     start_playwright,
 )
 
-
 # ==========================================================
 # Capture One Host
 # ==========================================================
@@ -97,9 +96,7 @@ async def capture_hosts(
 
     _ = context
 
-    info(
-        "Starting Screenshot Capture..."
-    )
+    info("Starting Screenshot Capture...")
 
     results: dict[
         str,
@@ -116,9 +113,7 @@ async def capture_hosts(
 
     if total == 0:
 
-        warning(
-            "No HTTP targets found."
-        )
+        warning("No HTTP targets found.")
 
         return (
             {},
@@ -138,19 +133,16 @@ async def capture_hosts(
     try:
 
         tasks = [
-
             capture_one(
                 semaphore,
                 browser,
                 host,
                 response,
             )
-
             for (
                 host,
                 response,
             ) in http_results.items()
-
         ]
 
         for task in asyncio.as_completed(
@@ -171,9 +163,7 @@ async def capture_hosts(
                     False,
                 ):
 
-                    results[
-                        host
-                    ] = metadata
+                    results[host] = metadata
 
                     progress_status(
                         completed,
@@ -206,13 +196,9 @@ async def capture_hosts(
             browser,
         )
 
-    success(
-        f"Captured Screenshots : {len(results)}"
-    )
+    success(f"Captured Screenshots : {len(results)}")
 
-    warning(
-        f"Failed Screenshots : {len(failed)}"
-    )
+    warning(f"Failed Screenshots : {len(failed)}")
 
     return (
         results,
@@ -258,9 +244,7 @@ async def run_async(
         ),
     )
 
-    analysis[
-        "failed_hosts"
-    ] = failed
+    analysis["failed_hosts"] = failed
 
     context.set_analysis(
         "screenshots",

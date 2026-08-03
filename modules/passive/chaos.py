@@ -49,9 +49,7 @@ def run_chaos(
 
     if not PDCP_API_KEY:
 
-        error(
-            "PDCP_API_KEY is not configured."
-        )
+        error("PDCP_API_KEY is not configured.")
 
         return []
 

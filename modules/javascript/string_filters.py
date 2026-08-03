@@ -7,7 +7,6 @@ to remove noise and false positives.
 
 import re
 
-
 # ==========================================================
 # Configuration
 # ==========================================================
@@ -15,43 +14,29 @@ import re
 MIN_STRING_LENGTH = 3
 
 PLACEHOLDERS = {
-
     "",
-
     "null",
     "none",
-
     "true",
     "false",
-
     "undefined",
-
     "nan",
-
     "api",
-
     "token",
-
     "secret",
-
     "password",
-
     "key",
-
     "example",
-
     "sample",
-
     "dummy",
-
     "test",
-
 }
 
 
 # ==========================================================
 # Too Short
 # ==========================================================
+
 
 def is_short(
     value: str,
@@ -60,16 +45,13 @@ def is_short(
     Ignore very short strings.
     """
 
-    return len(
-
-        value.strip()
-
-    ) < MIN_STRING_LENGTH
+    return len(value.strip()) < MIN_STRING_LENGTH
 
 
 # ==========================================================
 # Numeric
 # ==========================================================
+
 
 def is_numeric(
     value: str,
@@ -85,6 +67,7 @@ def is_numeric(
 # Placeholder
 # ==========================================================
 
+
 def is_placeholder(
     value: str,
 ):
@@ -92,20 +75,13 @@ def is_placeholder(
     Ignore placeholder values.
     """
 
-    return (
-
-        value.lower().strip()
-
-        in
-
-        PLACEHOLDERS
-
-    )
+    return value.lower().strip() in PLACEHOLDERS
 
 
 # ==========================================================
 # Hex String
 # ==========================================================
+
 
 def is_hex(
     value: str,
@@ -115,27 +91,19 @@ def is_hex(
     """
 
     return (
-
         len(value) >= 16
-
-        and
-
-        re.fullmatch(
-
+        and re.fullmatch(
             r"[0-9a-fA-F]+",
-
             value,
-
         )
-
         is not None
-
     )
 
 
 # ==========================================================
 # Base64
 # ==========================================================
+
 
 def is_base64(
     value: str,
@@ -145,27 +113,19 @@ def is_base64(
     """
 
     return (
-
         len(value) >= 16
-
-        and
-
-        re.fullmatch(
-
+        and re.fullmatch(
             r"[A-Za-z0-9+/=]+",
-
             value,
-
         )
-
         is not None
-
     )
 
 
 # ==========================================================
 # Repeated Characters
 # ==========================================================
+
 
 def is_repeated(
     value: str,
@@ -180,16 +140,13 @@ def is_repeated(
         111111111111
     """
 
-    return len(
-
-        set(value)
-
-    ) <= 2
+    return len(set(value)) <= 2
 
 
 # ==========================================================
 # Junk Characters
 # ==========================================================
+
 
 def is_junk(
     value: str,
@@ -199,23 +156,18 @@ def is_junk(
     """
 
     return (
-
         re.fullmatch(
-
             r"[\W_]+",
-
             value,
-
         )
-
         is not None
-
     )
 
 
 # ==========================================================
 # Keep String
 # ==========================================================
+
 
 def keep_string(
     value: str,
@@ -231,59 +183,31 @@ def keep_string(
 
         return False
 
-    if is_short(
-
-        value
-
-    ):
+    if is_short(value):
 
         return False
 
-    if is_numeric(
-
-        value
-
-    ):
+    if is_numeric(value):
 
         return False
 
-    if is_placeholder(
-
-        value
-
-    ):
+    if is_placeholder(value):
 
         return False
 
-    if is_hex(
-
-        value
-
-    ):
+    if is_hex(value):
 
         return False
 
-    if is_base64(
-
-        value
-
-    ):
+    if is_base64(value):
 
         return False
 
-    if is_repeated(
-
-        value
-
-    ):
+    if is_repeated(value):
 
         return False
 
-    if is_junk(
-
-        value
-
-    ):
+    if is_junk(value):
 
         return False
 
@@ -293,6 +217,7 @@ def keep_string(
 # ==========================================================
 # Filter Strings
 # ==========================================================
+
 
 def filter_strings(
     strings,
@@ -304,24 +229,6 @@ def filter_strings(
         list
     """
 
-    filtered = {
+    filtered = {string.strip() for string in strings if keep_string(string)}
 
-        string.strip()
-
-        for string
-
-        in strings
-
-        if keep_string(
-
-            string
-
-        )
-
-    }
-
-    return sorted(
-
-        filtered
-
-    )
+    return sorted(filtered)

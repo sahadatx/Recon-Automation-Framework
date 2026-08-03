@@ -8,7 +8,6 @@ from __future__ import annotations
 
 from typing import Any
 
-
 # ==========================================================
 # Memory Benchmark
 # ==========================================================
@@ -21,9 +20,7 @@ class MemoryBenchmark:
 
     def __init__(self) -> None:
 
-        self._results: list[
-            dict[str, Any]
-        ] = []
+        self._results: list[dict[str, Any]] = []
 
     # ------------------------------------------------------
     # Add Result
@@ -90,9 +87,7 @@ class MemoryBenchmark:
 
         return min(
             self._results,
-            key=lambda item: item[
-                "peak_mb"
-            ],
+            key=lambda item: item["peak_mb"],
         )
 
     # ------------------------------------------------------
@@ -113,9 +108,7 @@ class MemoryBenchmark:
 
         return max(
             self._results,
-            key=lambda item: item[
-                "peak_mb"
-            ],
+            key=lambda item: item["peak_mb"],
         )
 
     # ------------------------------------------------------
@@ -139,28 +132,20 @@ class MemoryBenchmark:
                 "highest_peak_mb": 0.0,
             }
 
-        current = [
-            item["current_mb"]
-            for item in self._results
-        ]
+        current = [item["current_mb"] for item in self._results]
 
-        peak = [
-            item["peak_mb"]
-            for item in self._results
-        ]
+        peak = [item["peak_mb"] for item in self._results]
 
         return {
             "runs": len(
                 self._results,
             ),
             "average_current_mb": round(
-                sum(current)
-                / len(current),
+                sum(current) / len(current),
                 2,
             ),
             "average_peak_mb": round(
-                sum(peak)
-                / len(peak),
+                sum(peak) / len(peak),
                 2,
             ),
             "lowest_peak_mb": round(
@@ -187,44 +172,30 @@ class MemoryBenchmark:
         """
 
         left = next(
-            (
-                item
-                for item in self._results
-                if item["name"] == first
-            ),
+            (item for item in self._results if item["name"] == first),
             None,
         )
 
         right = next(
-            (
-                item
-                for item in self._results
-                if item["name"] == second
-            ),
+            (item for item in self._results if item["name"] == second),
             None,
         )
 
-        if (
-            left is None
-            or right is None
-        ):
+        if left is None or right is None:
 
             return None
 
         return {
             "current_mb": round(
-                right["current_mb"]
-                - left["current_mb"],
+                right["current_mb"] - left["current_mb"],
                 2,
             ),
             "peak_mb": round(
-                right["peak_mb"]
-                - left["peak_mb"],
+                right["peak_mb"] - left["peak_mb"],
                 2,
             ),
             "difference_mb": round(
-                right["difference_mb"]
-                - left["difference_mb"],
+                right["difference_mb"] - left["difference_mb"],
                 2,
             ),
         }

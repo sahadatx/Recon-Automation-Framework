@@ -10,22 +10,17 @@ Nuclei findings.
 # ==========================================================
 
 DEFAULT_SEVERITIES = {
-
     "critical",
-
     "high",
-
     "medium",
-
     "low",
-
     "info",
-
 }
 
 # ==========================================================
 # Remove Duplicates
 # ==========================================================
+
 
 def remove_duplicates(
     findings: list,
@@ -42,31 +37,25 @@ def remove_duplicates(
     for finding in findings:
 
         key = (
-
             finding.get(
                 "url",
                 "",
             ),
-
             finding.get(
                 "template_id",
                 "",
             ),
-
         )
 
         unique[key] = finding
 
-    return list(
-
-        unique.values()
-
-    )
+    return list(unique.values())
 
 
 # ==========================================================
 # Filter Severity
 # ==========================================================
+
 
 def filter_severity(
     findings: list,
@@ -83,34 +72,23 @@ def filter_severity(
 
         severities = DEFAULT_SEVERITIES
 
-    severities = {
-
-        severity.lower()
-
-        for severity in severities
-
-    }
+    severities = {severity.lower() for severity in severities}
 
     return [
-
         finding
-
         for finding in findings
-
         if finding.get(
-
             "severity",
-
             "",
-
-        ).lower() in severities
-
+        ).lower()
+        in severities
     ]
 
 
 # ==========================================================
 # Filter Templates
 # ==========================================================
+
 
 def filter_templates(
     findings: list,
@@ -127,31 +105,23 @@ def filter_templates(
 
         return findings
 
-    templates = set(
-
-        templates
-
-    )
+    templates = set(templates)
 
     return [
-
         finding
-
         for finding in findings
-
         if finding.get(
-
             "template_id",
-
             "",
-
-        ) in templates
-
+        )
+        in templates
     ]
+
 
 # ==========================================================
 # Filter Tags
 # ==========================================================
+
 
 def filter_tags(
     findings: list,
@@ -169,43 +139,23 @@ def filter_tags(
 
         return findings
 
-    tags = {
-
-        tag.lower()
-
-        for tag in tags
-
-    }
+    tags = {tag.lower() for tag in tags}
 
     filtered = []
 
     for finding in findings:
 
         finding_tags = {
-
             tag.lower()
-
             for tag in finding.get(
-
                 "tags",
-
                 [],
-
             )
-
         }
 
-        if finding_tags.intersection(
+        if finding_tags.intersection(tags):
 
-            tags
-
-        ):
-
-            filtered.append(
-
-                finding
-
-            )
+            filtered.append(finding)
 
     return filtered
 
@@ -213,6 +163,7 @@ def filter_tags(
 # ==========================================================
 # CVE Only
 # ==========================================================
+
 
 def filter_cves(
     findings: list,
@@ -230,28 +181,18 @@ def filter_cves(
     for finding in findings:
 
         classification = finding.get(
-
             "classification",
-
             {},
-
         )
 
         cves = classification.get(
-
             "cves",
-
             [],
-
         )
 
         if cves:
 
-            filtered.append(
-
-                finding
-
-            )
+            filtered.append(finding)
 
     return filtered
 
@@ -259,6 +200,7 @@ def filter_cves(
 # ==========================================================
 # Exclude Templates
 # ==========================================================
+
 
 def exclude_templates(
     findings: list,
@@ -275,32 +217,23 @@ def exclude_templates(
 
         return findings
 
-    templates = set(
-
-        templates
-
-    )
+    templates = set(templates)
 
     return [
-
         finding
-
         for finding in findings
-
         if finding.get(
-
             "template_id",
-
             "",
-
-        ) not in templates
-
+        )
+        not in templates
     ]
 
 
 # ==========================================================
 # Exclude Tags
 # ==========================================================
+
 
 def exclude_tags(
     findings: list,
@@ -318,43 +251,23 @@ def exclude_tags(
 
         return findings
 
-    tags = {
-
-        tag.lower()
-
-        for tag in tags
-
-    }
+    tags = {tag.lower() for tag in tags}
 
     filtered = []
 
     for finding in findings:
 
         finding_tags = {
-
             tag.lower()
-
             for tag in finding.get(
-
                 "tags",
-
                 [],
-
             )
-
         }
 
-        if not finding_tags.intersection(
+        if not finding_tags.intersection(tags):
 
-            tags
-
-        ):
-
-            filtered.append(
-
-                finding
-
-            )
+            filtered.append(finding)
 
     return filtered
 
@@ -362,6 +275,7 @@ def exclude_tags(
 # ==========================================================
 # Remove Informational Findings
 # ==========================================================
+
 
 def remove_informational(
     findings: list,
@@ -374,26 +288,20 @@ def remove_informational(
     """
 
     return [
-
         finding
-
         for finding in findings
-
         if finding.get(
-
             "severity",
-
             "",
-
-        ).lower() != "info"
-
+        ).lower()
+        != "info"
     ]
-
 
 
 # ==========================================================
 # Apply Filters
 # ==========================================================
+
 
 def apply_filters(
     findings: list,
@@ -441,20 +349,15 @@ def apply_filters(
     # Remove Duplicates
     # ------------------------------------------------------
 
-    findings = remove_duplicates(
-        findings
-    )
+    findings = remove_duplicates(findings)
 
     # ------------------------------------------------------
     # Severity
     # ------------------------------------------------------
 
     findings = filter_severity(
-
         findings,
-
         severities,
-
     )
 
     # ------------------------------------------------------
@@ -462,19 +365,13 @@ def apply_filters(
     # ------------------------------------------------------
 
     findings = filter_templates(
-
         findings,
-
         templates,
-
     )
 
     findings = exclude_templates(
-
         findings,
-
         exclude_template_list,
-
     )
 
     # ------------------------------------------------------
@@ -482,19 +379,13 @@ def apply_filters(
     # ------------------------------------------------------
 
     findings = filter_tags(
-
         findings,
-
         tags,
-
     )
 
     findings = exclude_tags(
-
         findings,
-
         exclude_tag_list,
-
     )
 
     # ------------------------------------------------------
@@ -503,9 +394,7 @@ def apply_filters(
 
     if cves_only:
 
-        findings = filter_cves(
-            findings
-        )
+        findings = filter_cves(findings)
 
     # ------------------------------------------------------
     # Remove Info
@@ -513,9 +402,7 @@ def apply_filters(
 
     if remove_info:
 
-        findings = remove_informational(
-            findings
-        )
+        findings = remove_informational(findings)
 
     return findings
 
@@ -523,6 +410,7 @@ def apply_filters(
 # ==========================================================
 # Helpers
 # ==========================================================
+
 
 def count_findings(
     findings: list,
@@ -534,9 +422,7 @@ def count_findings(
         int
     """
 
-    return len(
-        findings
-    )
+    return len(findings)
 
 
 def has_findings(
@@ -549,9 +435,7 @@ def has_findings(
         bool
     """
 
-    return bool(
-        findings
-    )
+    return bool(findings)
 
 
 # ==========================================================
@@ -561,62 +445,31 @@ def has_findings(
 if __name__ == "__main__":
 
     sample = [
-
         {
-
             "url": "https://example.com",
-
             "template_id": "git-config",
-
             "severity": "high",
-
             "tags": [
-
                 "git",
-
                 "exposure",
-
             ],
-
             "classification": {
-
                 "cves": [],
-
             },
-
         },
-
         {
-
             "url": "https://example.com",
-
             "template_id": "git-config",
-
             "severity": "high",
-
             "tags": [
-
                 "git",
-
             ],
-
             "classification": {
-
                 "cves": [],
-
             },
-
         },
-
     ]
 
-    filtered = apply_filters(
-        sample
-    )
+    filtered = apply_filters(sample)
 
-    print(
-        f"Findings : {count_findings(filtered)}"
-    )
-
-
-
+    print(f"Findings : {count_findings(filtered)}")

@@ -16,10 +16,10 @@ from .analyzer import analyze
 from .exporter import export_all
 from .loader import load_report
 
-
 # ==========================================================
 # Run Dashboard
 # ==========================================================
+
 
 def run_dashboard(
     context: ExecutionContext,
@@ -79,6 +79,7 @@ def run_dashboard(
 # ==========================================================
 # Public Entry Point
 # ==========================================================
+
 
 def run(
     context: ExecutionContext,

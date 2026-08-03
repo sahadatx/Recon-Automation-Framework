@@ -28,14 +28,11 @@ from core.logger import (
     warning,
 )
 
-
 # ==========================================================
 # Constants
 # ==========================================================
 
-DOMAIN_RE = re.compile(
-    r"^(?:[a-zA-Z0-9_-]+\.)+[a-zA-Z]{2,}$"
-)
+DOMAIN_RE = re.compile(r"^(?:[a-zA-Z0-9_-]+\.)+[a-zA-Z]{2,}$")
 
 IGNORED_KEYWORDS = frozenset(
     {
@@ -62,6 +59,7 @@ IGNORED_PREFIXES = (
 # ==========================================================
 # Run External Command
 # ==========================================================
+
 
 def run_command(
     command: list[str],
@@ -95,50 +93,37 @@ def run_command(
 
     except FileNotFoundError:
 
-        error(
-            f"{command[0]} is not installed."
-        )
+        error(f"{command[0]} is not installed.")
 
         return []
 
     except subprocess.TimeoutExpired:
 
-        error(
-            f"{command[0]} timed out."
-        )
+        error(f"{command[0]} timed out.")
 
         return []
 
     except subprocess.CalledProcessError as exc:
 
-        error(
-            f"{command[0]} failed."
-        )
+        error(f"{command[0]} failed.")
 
         if exc.stdout:
 
-            warning(
-                exc.stdout.strip()
-            )
+            warning(exc.stdout.strip())
 
         if exc.stderr:
 
-            error(
-                exc.stderr.strip()
-            )
+            error(exc.stderr.strip())
 
         return []
 
-    return [
-        line.strip()
-        for line in result.stdout.splitlines()
-        if line.strip()
-    ]
+    return [line.strip() for line in result.stdout.splitlines() if line.strip()]
 
 
 # ==========================================================
 # Normalize Subdomains
 # ==========================================================
+
 
 def normalize_subdomains(
     subdomains: list[str],
@@ -166,11 +151,7 @@ def normalize_subdomains(
         Sorted normalized subdomains.
     """
 
-    target_domain = (
-        domain
-        .strip()
-        .lower()
-    )
+    target_domain = domain.strip().lower()
 
     suffix = f".{target_domain}"
 
@@ -178,11 +159,7 @@ def normalize_subdomains(
 
     for subdomain in subdomains:
 
-        normalized = (
-            subdomain
-            .strip()
-            .lower()
-        )
+        normalized = subdomain.strip().lower()
 
         if not normalized:
             continue
@@ -191,45 +168,30 @@ def normalize_subdomains(
 
             normalized = normalized[2:]
 
-        if normalized.startswith(
-            IGNORED_PREFIXES
-        ):
+        if normalized.startswith(IGNORED_PREFIXES):
             continue
 
-        if any(
-            keyword in normalized
-            for keyword in IGNORED_KEYWORDS
-        ):
+        if any(keyword in normalized for keyword in IGNORED_KEYWORDS):
             continue
 
         if " " in normalized:
             continue
 
-        if not DOMAIN_RE.fullmatch(
-            normalized
-        ):
+        if not DOMAIN_RE.fullmatch(normalized):
             continue
 
-        if (
-            normalized != target_domain
-            and not normalized.endswith(
-                suffix
-            )
-        ):
+        if normalized != target_domain and not normalized.endswith(suffix):
             continue
 
-        cleaned.add(
-            normalized
-        )
+        cleaned.add(normalized)
 
-    return sorted(
-        cleaned
-    )
+    return sorted(cleaned)
 
 
 # ==========================================================
 # Execute Enumeration Source
 # ==========================================================
+
 
 def execute_source(
     name: str,
@@ -252,9 +214,7 @@ def execute_source(
         Normalized subdomains discovered by the tool.
     """
 
-    info(
-        f"Running {name}..."
-    )
+    info(f"Running {name}...")
 
     raw_results = run_command(
         command=command,
@@ -269,16 +229,11 @@ def execute_source(
 
     if normalized_results:
 
-        success(
-            f"{name} found "
-            f"{len(normalized_results)} subdomains."
-        )
+        success(f"{name} found " f"{len(normalized_results)} subdomains.")
 
     else:
 
-        warning(
-            f"{name} returned no results."
-        )
+        warning(f"{name} returned no results.")
 
     return normalized_results
 
@@ -347,9 +302,7 @@ def retry_request(
                         delay,
                     )
 
-            raise RuntimeError(
-                "Retry logic terminated unexpectedly."
-            )
+            raise RuntimeError("Retry logic terminated unexpectedly.")
 
         return wrapper
 

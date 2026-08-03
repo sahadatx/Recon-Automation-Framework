@@ -5,97 +5,57 @@ Detect interesting
 virtual hosts.
 """
 
-
 # ==========================================================
 # Interesting Keywords
 # ==========================================================
 
 INTERESTING_KEYWORDS = {
-
     "admin",
-
     "api",
-
     "auth",
-
     "backup",
-
     "beta",
-
     "cdn",
-
     "dashboard",
-
     "db",
-
     "demo",
-
     "dev",
-
     "docs",
-
     "git",
-
     "gitlab",
-
     "grafana",
-
     "internal",
-
     "jenkins",
-
     "jira",
-
     "kibana",
-
     "mail",
-
     "monitor",
-
     "panel",
-
     "portal",
-
     "preview",
-
     "prod",
-
     "qa",
-
     "secure",
-
     "security",
-
     "soa",
-
     "sso",
-
     "stage",
-
     "staging",
-
     "status",
-
     "storage",
-
     "support",
-
     "test",
-
     "uat",
-
     "vpn",
-
     "webadmin",
-
     "webmail",
-
 }
 
 
 # ==========================================================
 # Interesting Host
 # ==========================================================
+
 
 def is_interesting(
     host: str,
@@ -114,18 +74,13 @@ def is_interesting(
 
     host = host.lower()
 
-    return any(
-
-        keyword in host
-
-        for keyword in INTERESTING_KEYWORDS
-
-    )
+    return any(keyword in host for keyword in INTERESTING_KEYWORDS)
 
 
 # ==========================================================
 # Scan Results
 # ==========================================================
+
 
 def scan(
     results: list,
@@ -147,24 +102,13 @@ def scan(
     for result in results:
 
         host = result.get(
-
             "host",
-
             "",
-
         )
 
-        if is_interesting(
+        if is_interesting(host):
 
-            host
-
-        ):
-
-            interesting.append(
-
-                result
-
-            )
+            interesting.append(result)
 
     return interesting
 
@@ -172,6 +116,7 @@ def scan(
 # ==========================================================
 # Count Interesting Hosts
 # ==========================================================
+
 
 def count(
     results: list,
@@ -187,12 +132,4 @@ def count(
         int
     """
 
-    return len(
-
-        scan(
-
-            results
-
-        )
-
-    )
+    return len(scan(results))

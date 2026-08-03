@@ -59,6 +59,7 @@ RETRY_STATUS_CODES: set[int] = {
 # Normalize URL
 # ==========================================================
 
+
 def normalize_url(
     base_url: str,
     link: str,
@@ -101,6 +102,7 @@ def normalize_url(
 # Same Domain
 # ==========================================================
 
+
 def same_domain(
     root_url: str,
     url: str,
@@ -110,16 +112,13 @@ def same_domain(
     belong to the same host.
     """
 
-    return (
-        urlparse(root_url).netloc
-        ==
-        urlparse(url).netloc
-    )
+    return urlparse(root_url).netloc == urlparse(url).netloc
 
 
 # ==========================================================
 # HTML Detection
 # ==========================================================
+
 
 def is_html(
     response: requests.Response | None,
@@ -138,16 +137,13 @@ def is_html(
         "",
     ).lower()
 
-    return (
-        "text/html" in content_type
-        or
-        "application/xhtml+xml" in content_type
-    )
+    return "text/html" in content_type or "application/xhtml+xml" in content_type
 
 
 # ==========================================================
 # Retry Policy
 # ==========================================================
+
 
 def should_retry(
     error: Exception,
@@ -184,11 +180,7 @@ def should_retry(
 
             return False
 
-        return (
-            response.status_code
-            in
-            RETRY_STATUS_CODES
-        )
+        return response.status_code in RETRY_STATUS_CODES
 
     return False
 
@@ -196,6 +188,7 @@ def should_retry(
 # ==========================================================
 # Download Page
 # ==========================================================
+
 
 def download_page(
     session: requests.Session,
@@ -221,8 +214,7 @@ def download_page(
             )
 
             response.elapsed_time = round(
-                time.perf_counter()
-                - start,
+                time.perf_counter() - start,
                 3,
             )
 
@@ -259,8 +251,7 @@ def download_page(
                         error,
                         HTTPError,
                     )
-                    and
-                    error.response is not None
+                    and error.response is not None
                 ):
 
                     debug(
@@ -279,12 +270,10 @@ def download_page(
                 f"Retry ({attempt + 1}/{CRAWLER_RETRIES}): {url}",
             )
 
-            if attempt < (
-                CRAWLER_RETRIES - 1
-            ):
+            if attempt < (CRAWLER_RETRIES - 1):
 
                 time.sleep(
-                    2 ** attempt,
+                    2**attempt,
                 )
 
     debug(
@@ -297,6 +286,7 @@ def download_page(
 # ==========================================================
 # Extract Domain
 # ==========================================================
+
 
 def get_domain(
     url: str,

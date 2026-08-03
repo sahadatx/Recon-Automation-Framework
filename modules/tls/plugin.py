@@ -14,7 +14,6 @@ from core.plugins.base import BasePlugin
 from .exporter import export_all
 from .manager import run
 
-
 # ==========================================================
 # TLS Analysis Plugin
 # ==========================================================
@@ -38,9 +37,7 @@ class TLSPlugin(BasePlugin):
         "security posture."
     )
 
-    depends_on = (
-        "http",
-    )
+    depends_on = ("http",)
 
     config = {
         "certificate": True,

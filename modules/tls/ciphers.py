@@ -14,43 +14,26 @@ from .helpers import (
     connect_tls,
 )
 
-
 # ==========================================================
 # Default Result
 # ==========================================================
 
 EMPTY_CIPHER = {
-
     "host": "",
-
     "port": 443,
-
     "name": "",
-
     "protocol": "",
-
     "bits": 0,
-
     "description": "",
-
     "key_exchange": "Unknown",
-
     "authentication": "Unknown",
-
     "encryption": "Unknown",
-
     "hash": "Unknown",
-
     "forward_secrecy": False,
-
     "aead": False,
-
     "weak": False,
-
     "strength": "Unknown",
-
     "error": None,
-
 }
 
 
@@ -59,39 +42,24 @@ EMPTY_CIPHER = {
 # ==========================================================
 
 WEAK_KEYWORDS = (
-
     "RC4",
-
     "DES",
-
     "3DES",
-
     "NULL",
-
     "EXPORT",
-
     "MD5",
-
 )
 
 FORWARD_SECRECY_KEYWORDS = (
-
     "ECDHE",
-
     "DHE",
-
 )
 
 AEAD_KEYWORDS = (
-
     "GCM",
-
     "CHACHA20",
-
     "POLY1305",
-
     "CCM",
-
 )
 
 
@@ -100,21 +68,17 @@ AEAD_KEYWORDS = (
 # ==========================================================
 
 TLS_VERSION_MAP = {
-
     "TLSv1": "TLS 1.0",
-
     "TLSv1.1": "TLS 1.1",
-
     "TLSv1.2": "TLS 1.2",
-
     "TLSv1.3": "TLS 1.3",
-
 }
 
 
 # ==========================================================
 # Helper Functions
 # ==========================================================
+
 
 def contains_keyword(
     text: str,
@@ -130,13 +94,7 @@ def contains_keyword(
 
     upper = text.upper()
 
-    return any(
-
-        keyword.upper() in upper
-
-        for keyword in keywords
-
-    )
+    return any(keyword.upper() in upper for keyword in keywords)
 
 
 def split_cipher(
@@ -160,41 +118,26 @@ def split_cipher(
     if "_WITH_" not in cipher_name:
 
         return (
-
             "",
-
             "",
-
             "",
-
         )
 
     left, right = cipher_name.split(
-
         "_WITH_",
-
         1,
-
     )
 
     left = left.replace(
-
         "TLS_",
-
         "",
-
     ).replace(
-
         "SSL_",
-
         "",
-
     )
 
     parts = right.split(
-
         "_",
-
     )
 
     if len(parts) == 1:
@@ -206,27 +149,22 @@ def split_cipher(
     else:
 
         encryption = "_".join(
-
             parts[:-1],
-
         )
 
         digest = parts[-1]
 
     return (
-
         left,
-
         encryption,
-
         digest,
-
     )
 
 
 # ==========================================================
 # Detect Cipher
 # ==========================================================
+
 
 def detect_cipher(
     host: str,
@@ -245,11 +183,8 @@ def detect_cipher(
     try:
 
         tls = connect_tls(
-
             host,
-
             port,
-
         )
 
         return tls.cipher()
@@ -264,6 +199,7 @@ def detect_cipher(
 # ==========================================================
 # Cipher Name
 # ==========================================================
+
 
 def cipher_name(
     cipher,
@@ -283,6 +219,7 @@ def cipher_name(
 # Cipher Protocol
 # ==========================================================
 
+
 def cipher_protocol(
     cipher,
 ):
@@ -297,17 +234,15 @@ def cipher_protocol(
     protocol = cipher[1]
 
     return TLS_VERSION_MAP.get(
-
         protocol,
-
         protocol,
-
     )
 
 
 # ==========================================================
 # Cipher Bits
 # ==========================================================
+
 
 def cipher_bits(
     cipher,
@@ -323,9 +258,7 @@ def cipher_bits(
     try:
 
         return int(
-
             cipher[2],
-
         )
 
     except Exception:
@@ -337,6 +270,7 @@ def cipher_bits(
 # Key Exchange
 # ==========================================================
 
+
 def key_exchange(
     cipher_name: str,
 ):
@@ -345,9 +279,7 @@ def key_exchange(
     """
 
     exchange, _, _ = split_cipher(
-
         cipher_name,
-
     )
 
     if not exchange:
@@ -361,6 +293,7 @@ def key_exchange(
 # Authentication
 # ==========================================================
 
+
 def authentication(
     cipher_name: str,
 ):
@@ -369,9 +302,7 @@ def authentication(
     """
 
     exchange = key_exchange(
-
         cipher_name,
-
     )
 
     upper = exchange.upper()
@@ -395,6 +326,7 @@ def authentication(
 # Encryption Algorithm
 # ==========================================================
 
+
 def encryption_algorithm(
     cipher_name: str,
 ):
@@ -403,9 +335,7 @@ def encryption_algorithm(
     """
 
     _, encryption, _ = split_cipher(
-
         cipher_name,
-
     )
 
     if not encryption:
@@ -419,6 +349,7 @@ def encryption_algorithm(
 # Hash Algorithm
 # ==========================================================
 
+
 def hash_algorithm(
     cipher_name: str,
 ):
@@ -427,9 +358,7 @@ def hash_algorithm(
     """
 
     _, _, digest = split_cipher(
-
         cipher_name,
-
     )
 
     if not digest:
@@ -443,6 +372,7 @@ def hash_algorithm(
 # Forward Secrecy
 # ==========================================================
 
+
 def forward_secrecy(
     cipher_name: str,
     protocol: str,
@@ -452,28 +382,22 @@ def forward_secrecy(
     """
 
     if protocol in (
-
         "TLS 1.3",
-
         "TLSv1.3",
-
     ):
 
         return True
 
     return contains_keyword(
-
         cipher_name,
-
         FORWARD_SECRECY_KEYWORDS,
-
     )
-
 
 
 # ==========================================================
 # AEAD Cipher
 # ==========================================================
+
 
 def is_aead_cipher(
     cipher_name: str,
@@ -483,17 +407,15 @@ def is_aead_cipher(
     """
 
     return contains_keyword(
-
         cipher_name,
-
         AEAD_KEYWORDS,
-
     )
 
 
 # ==========================================================
 # Weak Cipher
 # ==========================================================
+
 
 def is_weak_cipher(
     cipher_name: str,
@@ -503,17 +425,15 @@ def is_weak_cipher(
     """
 
     return contains_keyword(
-
         cipher_name,
-
         WEAK_KEYWORDS,
-
     )
 
 
 # ==========================================================
 # Cipher Strength
 # ==========================================================
+
 
 def cipher_strength(
     cipher_name: str,
@@ -524,9 +444,7 @@ def cipher_strength(
     """
 
     if is_weak_cipher(
-
         cipher_name,
-
     ):
 
         return "Insecure"
@@ -554,6 +472,7 @@ def cipher_strength(
 # Collect Cipher
 # ==========================================================
 
+
 def collect_cipher(
     host: str,
     port: int = 443,
@@ -566,9 +485,7 @@ def collect_cipher(
     """
 
     result = deepcopy(
-
         EMPTY_CIPHER,
-
     )
 
     result["host"] = host
@@ -578,141 +495,72 @@ def collect_cipher(
     try:
 
         cipher = detect_cipher(
-
             host,
-
             port,
-
         )
 
         if not cipher:
 
-            result["error"] = (
-
-                "No cipher negotiated."
-
-            )
+            result["error"] = "No cipher negotiated."
 
             return result
 
         name = cipher_name(
-
             cipher,
-
         )
 
         bits = cipher_bits(
-
             cipher,
-
         )
 
         result["name"] = name
 
         result["protocol"] = cipher_protocol(
-
             cipher,
-
         )
 
         result["bits"] = bits
 
-        result["description"] = (
+        result["description"] = f"{name} ({bits}-bit)"
 
-            f"{name} ({bits}-bit)"
-
+        result["key_exchange"] = key_exchange(
+            name,
         )
 
-        result["key_exchange"] = (
-
-            key_exchange(
-
-                name,
-
-            )
-
+        result["authentication"] = authentication(
+            name,
         )
 
-        result["authentication"] = (
-
-            authentication(
-
-                name,
-
-            )
-
+        result["encryption"] = encryption_algorithm(
+            name,
         )
 
-        result["encryption"] = (
-
-            encryption_algorithm(
-
-                name,
-
-            )
-
+        result["hash"] = hash_algorithm(
+            name,
         )
 
-        result["hash"] = (
-
-            hash_algorithm(
-
-                name,
-
-            )
-
+        result["forward_secrecy"] = forward_secrecy(
+            name,
+            result["protocol"],
         )
 
-        result["forward_secrecy"] = (
-
-            forward_secrecy(
-
-                name,
-
-                result["protocol"],
-
-            )
-
+        result["aead"] = is_aead_cipher(
+            name,
         )
 
-        result["aead"] = (
-
-            is_aead_cipher(
-
-                name,
-
-            )
-
+        result["weak"] = is_weak_cipher(
+            name,
         )
 
-        result["weak"] = (
-
-            is_weak_cipher(
-
-                name,
-
-            )
-
-        )
-
-        result["strength"] = (
-
-            cipher_strength(
-
-                name,
-
-                bits,
-
-            )
-
+        result["strength"] = cipher_strength(
+            name,
+            bits,
         )
 
     except Exception as exc:
 
         result["error"] = str(
-
             exc,
-
         )
 
     return result
@@ -721,6 +569,7 @@ def collect_cipher(
 # ==========================================================
 # Cipher Summary
 # ==========================================================
+
 
 def cipher_summary(
     cipher_data: dict,
@@ -737,77 +586,34 @@ def cipher_summary(
         return {}
 
     return {
-
-        "cipher":
-
-            cipher_data.get(
-
-                "name",
-
-                "",
-
-            ),
-
-        "protocol":
-
-            cipher_data.get(
-
-                "protocol",
-
-                "",
-
-            ),
-
-        "bits":
-
-            cipher_data.get(
-
-                "bits",
-
-                0,
-
-            ),
-
-        "strength":
-
-            cipher_data.get(
-
-                "strength",
-
-                "",
-
-            ),
-
-        "forward_secrecy":
-
-            cipher_data.get(
-
-                "forward_secrecy",
-
-                False,
-
-            ),
-
-        "aead":
-
-            cipher_data.get(
-
-                "aead",
-
-                False,
-
-            ),
-
-        "weak":
-
-            cipher_data.get(
-
-                "weak",
-
-                False,
-
-            ),
-
+        "cipher": cipher_data.get(
+            "name",
+            "",
+        ),
+        "protocol": cipher_data.get(
+            "protocol",
+            "",
+        ),
+        "bits": cipher_data.get(
+            "bits",
+            0,
+        ),
+        "strength": cipher_data.get(
+            "strength",
+            "",
+        ),
+        "forward_secrecy": cipher_data.get(
+            "forward_secrecy",
+            False,
+        ),
+        "aead": cipher_data.get(
+            "aead",
+            False,
+        ),
+        "weak": cipher_data.get(
+            "weak",
+            False,
+        ),
     }
 
 
@@ -816,35 +622,19 @@ def cipher_summary(
 # ==========================================================
 
 __all__ = [
-
     "EMPTY_CIPHER",
-
     "detect_cipher",
-
     "cipher_name",
-
     "cipher_protocol",
-
     "cipher_bits",
-
     "key_exchange",
-
     "authentication",
-
     "encryption_algorithm",
-
     "hash_algorithm",
-
     "forward_secrecy",
-
     "is_aead_cipher",
-
     "is_weak_cipher",
-
     "cipher_strength",
-
     "collect_cipher",
-
     "cipher_summary",
-
 ]

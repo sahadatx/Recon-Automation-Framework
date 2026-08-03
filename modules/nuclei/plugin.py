@@ -14,7 +14,6 @@ from core.plugins.base import BasePlugin
 from .exporter import export_all
 from .manager import run
 
-
 # ==========================================================
 # Nuclei Plugin
 # ==========================================================
@@ -37,9 +36,7 @@ class NucleiPlugin(BasePlugin):
         "generate consolidated findings."
     )
 
-    depends_on = (
-        "http",
-    )
+    depends_on = ("http",)
 
     config = {
         "threads": True,

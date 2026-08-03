@@ -8,7 +8,6 @@ from __future__ import annotations
 
 from typing import Any
 
-
 # ==========================================================
 # Generate Report
 # ==========================================================
@@ -103,13 +102,9 @@ def generate_markdown(
     Generate a Markdown memory report.
     """
 
-    memory = report[
-        "memory"
-    ]
+    memory = report["memory"]
 
-    analysis = report[
-        "analysis"
-    ]
+    analysis = report["analysis"]
 
     lines = [
         "# Memory Report",
@@ -123,23 +118,17 @@ def generate_markdown(
         "## Recommendations",
     ]
 
-    recommendations = analysis[
-        "recommendations"
-    ]
+    recommendations = analysis["recommendations"]
 
     if recommendations:
 
         for item in recommendations:
 
-            lines.append(
-                f"- {item}"
-            )
+            lines.append(f"- {item}")
 
     else:
 
-        lines.append(
-            "- No recommendations."
-        )
+        lines.append("- No recommendations.")
 
     return "\n".join(
         lines,

@@ -24,10 +24,10 @@ from .helpers import (
     safe_lower,
 )
 
-
 # ==========================================================
 # Mail Provider
 # ==========================================================
+
 
 def detect_provider(
     mx_records: list[str],
@@ -55,6 +55,7 @@ def detect_provider(
 # ==========================================================
 # Risk Score
 # ==========================================================
+
 
 def calculate_score(
     result: dict[str, Any],
@@ -97,6 +98,7 @@ def calculate_score(
 # Risk Level
 # ==========================================================
 
+
 def calculate_risk(
     score: int,
 ) -> str:
@@ -120,6 +122,7 @@ def calculate_risk(
 # Recommendations
 # ==========================================================
 
+
 def build_recommendations(
     result: dict[str, Any],
 ) -> list[str]:
@@ -130,45 +133,29 @@ def build_recommendations(
     recommendations: list[str] = []
 
     if not result["spf"]:
-        recommendations.append(
-            "Configure an SPF record."
-        )
+        recommendations.append("Configure an SPF record.")
 
     if not result["dkim"]:
-        recommendations.append(
-            "Configure DKIM signing."
-        )
+        recommendations.append("Configure DKIM signing.")
 
     if not result["dmarc"]:
-        recommendations.append(
-            "Configure a DMARC policy."
-        )
+        recommendations.append("Configure a DMARC policy.")
 
     if not result["mta_sts"]:
-        recommendations.append(
-            "Enable MTA-STS."
-        )
+        recommendations.append("Enable MTA-STS.")
 
     if not result["tls_rpt"]:
-        recommendations.append(
-            "Enable SMTP TLS Reporting."
-        )
+        recommendations.append("Enable SMTP TLS Reporting.")
 
     if not result["bimi"]:
-        recommendations.append(
-            "Consider enabling BIMI."
-        )
+        recommendations.append("Consider enabling BIMI.")
 
     if not result["dnssec"]:
-        recommendations.append(
-            "Enable DNSSEC protection."
-        )
+        recommendations.append("Enable DNSSEC protection.")
 
     if not recommendations:
 
-        recommendations.append(
-            "Email security configuration looks healthy."
-        )
+        recommendations.append("Email security configuration looks healthy.")
 
     return recommendations
 
@@ -176,6 +163,7 @@ def build_recommendations(
 # ==========================================================
 # Analyze Target
 # ==========================================================
+
 
 def analyze_target(
     result: dict[str, Any],
@@ -197,10 +185,8 @@ def analyze_target(
         result["score"],
     )
 
-    result["recommendations"] = (
-        build_recommendations(
-            result,
-        )
+    result["recommendations"] = build_recommendations(
+        result,
     )
 
     return result

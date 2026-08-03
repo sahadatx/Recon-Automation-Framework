@@ -10,7 +10,6 @@ from pathlib import Path
 
 from modules.report.constants import REPORT_JSON
 
-
 # ==========================================================
 # Directories
 # ==========================================================

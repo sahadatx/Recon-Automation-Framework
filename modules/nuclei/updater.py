@@ -13,23 +13,17 @@ from modules.nuclei.helpers import (
     ensure_directory,
 )
 
-
 # ==========================================================
 # Default Template Directory
 # ==========================================================
 
-DEFAULT_TEMPLATE_DIRECTORY = (
-
-    Path.home()
-
-    / "nuclei-templates"
-
-)
+DEFAULT_TEMPLATE_DIRECTORY = Path.home() / "nuclei-templates"
 
 
 # ==========================================================
 # Get Template Directory
 # ==========================================================
+
 
 def get_templates_directory():
     """
@@ -39,11 +33,7 @@ def get_templates_directory():
         Path
     """
 
-    ensure_directory(
-
-        DEFAULT_TEMPLATE_DIRECTORY
-
-    )
+    ensure_directory(DEFAULT_TEMPLATE_DIRECTORY)
 
     return DEFAULT_TEMPLATE_DIRECTORY
 
@@ -51,6 +41,7 @@ def get_templates_directory():
 # ==========================================================
 # Check Templates
 # ==========================================================
+
 
 def is_templates_installed():
     """
@@ -61,22 +52,15 @@ def is_templates_installed():
         bool
     """
 
-    directory = (
+    directory = get_templates_directory()
 
-        get_templates_directory()
-
-    )
-
-    return any(
-
-        directory.iterdir()
-
-    )
+    return any(directory.iterdir())
 
 
 # ==========================================================
 # Get Template Version
 # ==========================================================
+
 
 def get_templates_version():
     """
@@ -87,13 +71,7 @@ def get_templates_version():
         str | None
     """
 
-    version_file = (
-
-        get_templates_directory()
-
-        / ".version"
-
-    )
+    version_file = get_templates_directory() / ".version"
 
     if not version_file.exists():
 
@@ -101,19 +79,9 @@ def get_templates_version():
 
     try:
 
-        return (
-
-            version_file
-
-            .read_text(
-
-                encoding="utf-8",
-
-            )
-
-            .strip()
-
-        )
+        return version_file.read_text(
+            encoding="utf-8",
+        ).strip()
 
     except Exception:
 
@@ -123,6 +91,7 @@ def get_templates_version():
 # ==========================================================
 # Install Templates
 # ==========================================================
+
 
 def install_templates():
     """
@@ -135,28 +104,16 @@ def install_templates():
     try:
 
         result = subprocess.run(
-
             [
-
                 "nuclei",
-
                 "-update-templates",
-
             ],
-
             capture_output=True,
-
             text=True,
-
             timeout=600,
-
         )
 
-        return (
-
-            result.returncode == 0
-
-        )
+        return result.returncode == 0
 
     except Exception:
 
@@ -166,6 +123,7 @@ def install_templates():
 # ==========================================================
 # Update Templates
 # ==========================================================
+
 
 def update_templates():
     """
@@ -182,6 +140,7 @@ def update_templates():
 # ==========================================================
 # Check For Updates
 # ==========================================================
+
 
 def check_for_updates():
     """
@@ -204,48 +163,22 @@ def check_for_updates():
     try:
 
         result = subprocess.run(
-
             [
-
                 "nuclei",
-
                 "-update-templates",
-
             ],
-
             capture_output=True,
-
             text=True,
-
             timeout=600,
-
         )
 
-        output = (
-
-            result.stdout
-
-            + result.stderr
-
-        ).lower()
+        output = (result.stdout + result.stderr).lower()
 
         if result.returncode != 0:
 
             return None
 
-        if (
-
-            "already"
-
-            in output
-
-            or
-
-            "up-to-date"
-
-            in output
-
-        ):
+        if "already" in output or "up-to-date" in output:
 
             return False
 
@@ -259,6 +192,7 @@ def check_for_updates():
 # ==========================================================
 # Auto Update
 # ==========================================================
+
 
 def auto_update():
     """
@@ -280,6 +214,7 @@ def auto_update():
 # Show Status
 # ==========================================================
 
+
 def show_status():
     """
     Display template status.
@@ -289,58 +224,24 @@ def show_status():
     """
 
     status = {
-
-        "installed":
-
-            is_templates_installed(),
-
-        "directory":
-
-            str(
-
-                get_templates_directory()
-
-            ),
-
-        "version":
-
-            get_templates_version(),
-
+        "installed": is_templates_installed(),
+        "directory": str(get_templates_directory()),
+        "version": get_templates_version(),
     }
 
     print()
 
     print("=" * 60)
 
-    print(
-        "Nuclei Templates"
-    )
+    print("Nuclei Templates")
 
     print("=" * 60)
 
-    print(
+    print(f"{'Installed':<20}" f"{status['installed']}")
 
-        f"{'Installed':<20}"
+    print(f"{'Directory':<20}" f"{status['directory']}")
 
-        f"{status['installed']}"
-
-    )
-
-    print(
-
-        f"{'Directory':<20}"
-
-        f"{status['directory']}"
-
-    )
-
-    print(
-
-        f"{'Version':<20}"
-
-        f"{status['version']}"
-
-    )
+    print(f"{'Version':<20}" f"{status['version']}")
 
     print("=" * 60)
 
@@ -357,34 +258,18 @@ if __name__ == "__main__":
 
     print()
 
-    print(
-
-        "Checking for updates..."
-
-    )
+    print("Checking for updates...")
 
     update = check_for_updates()
 
     if update is True:
 
-        print(
-
-            "Updates available."
-
-        )
+        print("Updates available.")
 
     elif update is False:
 
-        print(
-
-            "Templates are already up-to-date."
-
-        )
+        print("Templates are already up-to-date.")
 
     else:
 
-        print(
-
-            "Unable to check for updates."
-
-        )
+        print("Unable to check for updates.")

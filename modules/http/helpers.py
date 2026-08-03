@@ -18,10 +18,10 @@ from core.logger import (
     debug,
 )
 
-
 # ==========================================================
 # Show Probe
 # ==========================================================
+
 
 def show_probe(
     url: str,
@@ -37,14 +37,13 @@ def show_probe(
 
         return
 
-    debug(
-        f"Probing {url}"
-    )
+    debug(f"Probing {url}")
 
 
 # ==========================================================
 # Request Timeout
 # ==========================================================
+
 
 def request_timeout() -> int | float:
     """

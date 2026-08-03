@@ -14,7 +14,6 @@ from typing import Any, ClassVar
 
 from core.context import ExecutionContext
 
-
 # ==========================================================
 # Base Plugin
 # ==========================================================

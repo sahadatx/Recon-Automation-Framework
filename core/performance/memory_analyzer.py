@@ -9,7 +9,6 @@ from __future__ import annotations
 
 from typing import Any
 
-
 # ==========================================================
 # Memory Thresholds (MB)
 # ==========================================================
@@ -86,18 +85,14 @@ def analyze_memory(
         status = "Good"
         grade = "A"
 
-        recommendations.append(
-            "Memory usage is healthy."
-        )
+        recommendations.append("Memory usage is healthy.")
 
     else:
 
         status = "Excellent"
         grade = "A+"
 
-        recommendations.append(
-            "Memory usage is excellent."
-        )
+        recommendations.append("Memory usage is excellent.")
 
     return {
         "memory": {
@@ -134,13 +129,9 @@ def summary(
     Return a human-readable summary.
     """
 
-    memory = analysis[
-        "memory"
-    ]
+    memory = analysis["memory"]
 
-    result = analysis[
-        "analysis"
-    ]
+    result = analysis["analysis"]
 
     return (
         f"Status: {result['status']} | "

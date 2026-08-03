@@ -10,10 +10,10 @@ from urllib.parse import (
     urlunparse,
 )
 
-
 # ==========================================================
 # Remove Fragment
 # ==========================================================
+
 
 def remove_fragment(
     url: str,
@@ -27,22 +27,17 @@ def remove_fragment(
         https://site.com/page
     """
 
-    parsed = urlparse(
-        url
-    )
+    parsed = urlparse(url)
 
-    parsed = parsed._replace(
-        fragment=""
-    )
+    parsed = parsed._replace(fragment="")
 
-    return urlunparse(
-        parsed
-    )
+    return urlunparse(parsed)
 
 
 # ==========================================================
 # Remove Trailing Slash
 # ==========================================================
+
 
 def remove_trailing_slash(
     url: str,
@@ -56,36 +51,23 @@ def remove_trailing_slash(
         https://site.com/page
     """
 
-    parsed = urlparse(
-        url
-    )
+    parsed = urlparse(url)
 
     path = parsed.path
 
-    if (
-
-        path != "/"
-
-        and
-
-        path.endswith("/")
-
-    ):
+    if path != "/" and path.endswith("/"):
 
         path = path[:-1]
 
-    parsed = parsed._replace(
-        path=path
-    )
+    parsed = parsed._replace(path=path)
 
-    return urlunparse(
-        parsed
-    )
+    return urlunparse(parsed)
 
 
 # ==========================================================
 # Normalize URL
 # ==========================================================
+
 
 def normalize_url(
     url: str,
@@ -102,13 +84,9 @@ def normalize_url(
         str
     """
 
-    url = remove_fragment(
-        url
-    )
+    url = remove_fragment(url)
 
-    url = remove_trailing_slash(
-        url
-    )
+    url = remove_trailing_slash(url)
 
     return url
 
@@ -116,6 +94,7 @@ def normalize_url(
 # ==========================================================
 # Same Domain
 # ==========================================================
+
 
 def same_domain(
     root_url: str,
@@ -129,24 +108,13 @@ def same_domain(
         bool
     """
 
-    return (
-
-        urlparse(
-            root_url
-        ).netloc
-
-        ==
-
-        urlparse(
-            url
-        ).netloc
-
-    )
+    return urlparse(root_url).netloc == urlparse(url).netloc
 
 
 # ==========================================================
 # Is HTTP URL
 # ==========================================================
+
 
 def is_http_url(
     url: str,
@@ -159,18 +127,12 @@ def is_http_url(
         bool
     """
 
-    scheme = urlparse(
-        url
-    ).scheme.lower()
+    scheme = urlparse(url).scheme.lower()
 
     return scheme in (
-
         "http",
-
         "https",
-
     )
-
 
 
 # ==========================================================
@@ -178,7 +140,6 @@ def is_http_url(
 # ==========================================================
 
 IGNORED_EXTENSIONS = {
-
     ".jpg",
     ".jpeg",
     ".png",
@@ -187,36 +148,31 @@ IGNORED_EXTENSIONS = {
     ".ico",
     ".bmp",
     ".webp",
-
     ".pdf",
     ".zip",
     ".rar",
     ".7z",
     ".tar",
     ".gz",
-
     ".mp3",
     ".wav",
     ".ogg",
-
     ".mp4",
     ".avi",
     ".mov",
     ".mkv",
-
     ".woff",
     ".woff2",
     ".ttf",
     ".eot",
-
     ".css",
-
 }
 
 
 # ==========================================================
 # Extension Filter
 # ==========================================================
+
 
 def extension_filter(
     url: str,
@@ -228,28 +184,15 @@ def extension_filter(
         bool
     """
 
-    path = urlparse(
-        url
-    ).path.lower()
+    path = urlparse(url).path.lower()
 
-    return not any(
-
-        path.endswith(
-            extension
-        )
-
-        for extension
-
-        in
-
-        IGNORED_EXTENSIONS
-
-    )
+    return not any(path.endswith(extension) for extension in IGNORED_EXTENSIONS)
 
 
 # ==========================================================
 # Robots Filter
 # ==========================================================
+
 
 def robots_filter(
     url: str,
@@ -266,23 +209,11 @@ def robots_filter(
 
         return True
 
-    path = urlparse(
-        url
-    ).path
+    path = urlparse(url).path
 
     for rule in rules:
 
-        if (
-
-            rule
-
-            and
-
-            path.startswith(
-                rule
-            )
-
-        ):
+        if rule and path.startswith(rule):
 
             return False
 
@@ -292,6 +223,7 @@ def robots_filter(
 # ==========================================================
 # Duplicate Filter
 # ==========================================================
+
 
 def duplicate_filter(
     url: str,
@@ -311,6 +243,7 @@ def duplicate_filter(
 # Depth Filter
 # ==========================================================
 
+
 def depth_filter(
     depth: int,
     max_depth: int,
@@ -329,6 +262,7 @@ def depth_filter(
 # Should Enqueue
 # ==========================================================
 
+
 def should_enqueue(
     root_url: str,
     url: str,
@@ -345,9 +279,7 @@ def should_enqueue(
         bool
     """
 
-    url = normalize_url(
-        url
-    )
+    url = normalize_url(url)
 
     if not is_http_url(
         url,
@@ -396,6 +328,7 @@ def should_enqueue(
 # Should Crawl
 # ==========================================================
 
+
 def should_crawl(
     url: str,
     visited: set,
@@ -408,9 +341,7 @@ def should_crawl(
         bool
     """
 
-    url = normalize_url(
-        url
-    )
+    url = normalize_url(url)
 
     if not is_http_url(
         url,
@@ -432,6 +363,7 @@ def should_crawl(
 # Normalize URL List
 # ==========================================================
 
+
 def normalize_urls(
     urls: list[str],
 ):
@@ -442,21 +374,6 @@ def normalize_urls(
         list[str]
     """
 
-    normalized = {
+    normalized = {normalize_url(url) for url in urls if is_http_url(url)}
 
-        normalize_url(
-            url
-        )
-
-        for url in urls
-
-        if is_http_url(
-            url
-        )
-
-    }
-
-    return sorted(
-        normalized
-    )
-
+    return sorted(normalized)

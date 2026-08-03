@@ -16,23 +16,18 @@ from copy import deepcopy
 MAX_RISK_SCORE = 100
 
 VALID_RISK_LEVELS = {
-
     "Safe",
-
     "Low",
-
     "Medium",
-
     "High",
-
     "Critical",
-
 }
 
 
 # ==========================================================
 # Reset Analysis
 # ==========================================================
+
 
 def reset_analysis(
     result: dict,
@@ -57,6 +52,7 @@ def reset_analysis(
 # Normalize Risk Score
 # ==========================================================
 
+
 def normalize_risk_score(
     score,
 ):
@@ -76,23 +72,18 @@ def normalize_risk_score(
         score = 0
 
     return max(
-
         0,
-
         min(
-
             score,
-
             MAX_RISK_SCORE,
-
         ),
-
     )
 
 
 # ==========================================================
 # Normalize Recommendations
 # ==========================================================
+
 
 def normalize_recommendations(
     recommendations,
@@ -108,26 +99,13 @@ def normalize_recommendations(
 
         return []
 
-    return sorted(
-
-        {
-
-            item.strip()
-
-            for item
-
-            in recommendations
-
-            if item and item.strip()
-
-        }
-
-    )
+    return sorted({item.strip() for item in recommendations if item and item.strip()})
 
 
 # ==========================================================
 # Validate Risk Level
 # ==========================================================
+
 
 def validate_risk_level(
     level,
@@ -150,6 +128,7 @@ def validate_risk_level(
 # Validate Analysis
 # ==========================================================
 
+
 def validate_analysis(
     result,
 ):
@@ -161,46 +140,33 @@ def validate_analysis(
     """
 
     result["risk_score"] = normalize_risk_score(
-
         result.get(
-
             "risk_score",
-
             0,
-
         )
-
     )
 
     result["risk_level"] = validate_risk_level(
-
         result.get(
-
             "risk_level",
-
             "Safe",
-
         )
-
     )
 
     result["recommendations"] = normalize_recommendations(
-
         result.get(
-
             "recommendations",
-
             [],
-
         )
-
     )
 
     return result
 
+
 # ==========================================================
 # Filter Single Result
 # ==========================================================
+
 
 def filter_result(
     result,
@@ -213,15 +179,11 @@ def filter_result(
     """
 
     filtered = deepcopy(
-
         result,
-
     )
 
     filtered = validate_analysis(
-
         filtered,
-
     )
 
     return filtered
@@ -230,6 +192,7 @@ def filter_result(
 # ==========================================================
 # Filter Results
 # ==========================================================
+
 
 def filter_results(
     results,
@@ -242,43 +205,24 @@ def filter_results(
     """
 
     filtered = [
-
         filter_result(
-
             result,
-
         )
-
-        for result
-
-        in results
-
+        for result in results
     ]
 
     filtered.sort(
-
         key=lambda item: (
-
             item.get(
-
                 "risk_score",
-
                 0,
-
             ),
-
             item.get(
-
                 "risk_level",
-
                 "Safe",
-
             ),
-
         ),
-
         reverse=True,
-
     )
 
     return filtered
@@ -287,6 +231,7 @@ def filter_results(
 # ==========================================================
 # High Risk Only
 # ==========================================================
+
 
 def high_risk_only(
     results,
@@ -300,33 +245,22 @@ def high_risk_only(
     """
 
     return [
-
         result
-
-        for result
-
-        in results
-
+        for result in results
         if result.get(
-
             "risk_level",
-
         )
-
         in {
-
             "High",
-
             "Critical",
-
         }
-
     ]
 
 
 # ==========================================================
 # Safe Only
 # ==========================================================
+
 
 def safe_only(
     results,
@@ -339,27 +273,19 @@ def safe_only(
     """
 
     return [
-
         result
-
-        for result
-
-        in results
-
+        for result in results
         if result.get(
-
             "risk_level",
-
         )
-
         == "Safe"
-
     ]
 
 
 # ==========================================================
 # Failed Only
 # ==========================================================
+
 
 def failed_only(
     results,
@@ -372,25 +298,18 @@ def failed_only(
     """
 
     return [
-
         result
-
-        for result
-
-        in results
-
+        for result in results
         if result.get(
-
             "error",
-
         )
-
     ]
 
 
 # ==========================================================
 # Remove Failed
 # ==========================================================
+
 
 def remove_failed(
     results,
@@ -403,19 +322,11 @@ def remove_failed(
     """
 
     return [
-
         result
-
-        for result
-
-        in results
-
+        for result in results
         if not result.get(
-
             "error",
-
         )
-
     ]
 
 
@@ -424,33 +335,17 @@ def remove_failed(
 # ==========================================================
 
 __all__ = [
-
     "MAX_RISK_SCORE",
-
     "VALID_RISK_LEVELS",
-
     "reset_analysis",
-
     "normalize_risk_score",
-
     "normalize_recommendations",
-
     "validate_risk_level",
-
     "validate_analysis",
-
     "filter_result",
-
     "filter_results",
-
     "high_risk_only",
-
     "safe_only",
-
     "failed_only",
-
     "remove_failed",
-
 ]
-
-

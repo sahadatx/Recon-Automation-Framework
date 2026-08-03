@@ -43,9 +43,7 @@ def scan_host(
     executor = context.get_thread_pool()
 
     if executor is None:
-        raise RuntimeError(
-            "Shared thread pool is not initialized."
-        )
+        raise RuntimeError("Shared thread pool is not initialized.")
 
     open_ports: list[dict[str, Any]] = []
 
@@ -62,9 +60,7 @@ def scan_host(
         futures,
     ):
 
-        port = futures[
-            future
-        ]
+        port = futures[future]
 
         show_scan(
             host,

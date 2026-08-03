@@ -31,7 +31,6 @@ from modules.fuzzing.scanner import (
     scan_target,
 )
 
-
 # ==========================================================
 # Process Target
 # ==========================================================
@@ -123,9 +122,7 @@ def run_fuzzing(
         Return Analysis
     """
 
-    info(
-        "Starting Directory Fuzzing..."
-    )
+    info("Starting Directory Fuzzing...")
 
     targets = sorted(
         set(
@@ -135,9 +132,7 @@ def run_fuzzing(
 
     if not targets:
 
-        warning(
-            "No targets supplied."
-        )
+        warning("No targets supplied.")
 
         analysis = {
             "results": {},
@@ -163,9 +158,7 @@ def run_fuzzing(
 
     if executor is None:
 
-        raise RuntimeError(
-            "Shared thread pool is not initialized."
-        )
+        raise RuntimeError("Shared thread pool is not initialized.")
 
     results: dict[
         str,
@@ -181,23 +174,18 @@ def run_fuzzing(
     )
 
     futures = {
-
         executor.submit(
             process_target,
             target,
         ): target
-
         for target in targets
-
     }
 
     for future in as_completed(
         futures,
     ):
 
-        target = futures[
-            future
-        ]
+        target = futures[future]
 
         completed += 1
 
@@ -210,9 +198,7 @@ def run_fuzzing(
 
             if analysis is not None:
 
-                results[
-                    hostname
-                ] = analysis
+                results[hostname] = analysis
 
                 progress_status(
                     completed,
@@ -279,29 +265,17 @@ def run_fuzzing(
             0,
         )
 
-    success(
-        f"Targets                  : {overall['targets']}"
-    )
+    success(f"Targets                  : {overall['targets']}")
 
-    success(
-        f"Successful               : {overall['successful']}"
-    )
+    success(f"Successful               : {overall['successful']}")
 
-    success(
-        f"Failed                   : {overall['failed']}"
-    )
+    success(f"Failed                   : {overall['failed']}")
 
-    success(
-        f"Discovered Paths         : {overall['total_results']}"
-    )
+    success(f"Discovered Paths         : {overall['total_results']}")
 
-    success(
-        f"Interesting Files        : {overall['interesting_files']}"
-    )
+    success(f"Interesting Files        : {overall['interesting_files']}")
 
-    success(
-        f"Interesting Directories  : {overall['interesting_directories']}"
-    )
+    success(f"Interesting Directories  : {overall['interesting_directories']}")
 
     analysis = {
         "results": results,

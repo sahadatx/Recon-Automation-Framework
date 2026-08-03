@@ -6,10 +6,10 @@ Generate statistics for DNS resolution results.
 
 from __future__ import annotations
 
-
 # ==========================================================
 # Generate Statistics
 # ==========================================================
+
 
 def generate_statistics(
     results: dict[str, dict[str, list[str]]],
@@ -39,15 +39,9 @@ def generate_statistics(
         "CNAME",
     )
 
-    record_counts = {
-        record_type: 0
-        for record_type in record_types
-    }
+    record_counts = {record_type: 0 for record_type in record_types}
 
-    enabled_hosts = {
-        record_type: 0
-        for record_type in record_types
-    }
+    enabled_hosts = {record_type: 0 for record_type in record_types}
 
     for records in results.values():
 
@@ -64,22 +58,14 @@ def generate_statistics(
 
                 enabled_hosts[record_type] += 1
 
-    total_records = sum(
-        record_counts.values()
-    )
+    total_records = sum(record_counts.values())
 
     return {
-
         "resolved_hosts": len(results),
-
         "failed_hosts": len(failed_hosts),
-
         "total_records": total_records,
-
         "record_counts": record_counts,
-
         "enabled_hosts": enabled_hosts,
-
     }
 
 

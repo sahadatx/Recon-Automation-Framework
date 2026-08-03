@@ -5,43 +5,30 @@ Filters false positives and
 normalizes ffuf results.
 """
 
-
 # ==========================================================
 # Default Status Codes
 # ==========================================================
 
 DEFAULT_STATUS_CODES = {
-
     200,
-
     201,
-
     202,
-
     204,
-
     301,
-
     302,
-
     307,
-
     308,
-
     401,
-
     403,
-
     405,
-
     500,
-
 }
 
 
 # ==========================================================
 # Remove Duplicate URLs
 # ==========================================================
+
 
 def remove_duplicates(
     results: list,
@@ -64,18 +51,15 @@ def remove_duplicates(
 
         if url:
 
-            unique[
-                url
-            ] = result
+            unique[url] = result
 
-    return list(
-        unique.values()
-    )
+    return list(unique.values())
 
 
 # ==========================================================
 # Filter Status Codes
 # ==========================================================
+
 
 def filter_status_codes(
     results: list,
@@ -91,27 +75,23 @@ def filter_status_codes(
 
     if allowed is None:
 
-        allowed = (
-            DEFAULT_STATUS_CODES
-        )
+        allowed = DEFAULT_STATUS_CODES
 
     return [
-
         result
-
         for result in results
-
         if result.get(
             "status",
             0,
-        ) in allowed
-
+        )
+        in allowed
     ]
 
 
 # ==========================================================
 # Remove Invalid Responses
 # ==========================================================
+
 
 def remove_invalid(
     results: list,
@@ -133,16 +113,17 @@ def remove_invalid(
 
     for result in results:
 
-        if result.get(
-            "status",
-            0,
-        ) == 0:
+        if (
+            result.get(
+                "status",
+                0,
+            )
+            == 0
+        ):
 
             continue
 
-        filtered.append(
-            result
-        )
+        filtered.append(result)
 
     return filtered
 
@@ -150,6 +131,7 @@ def remove_invalid(
 # ==========================================================
 # Filter Extensions
 # ==========================================================
+
 
 def filter_extensions(
     results: list,
@@ -166,29 +148,17 @@ def filter_extensions(
     if blocked is None:
 
         blocked = {
-
             ".png",
-
             ".jpg",
-
             ".jpeg",
-
             ".gif",
-
             ".svg",
-
             ".ico",
-
             ".woff",
-
             ".woff2",
-
             ".ttf",
-
             ".eot",
-
             ".otf",
-
         }
 
     filtered = []
@@ -200,21 +170,11 @@ def filter_extensions(
             "",
         ).lower()
 
-        if any(
-
-            url.endswith(
-                extension
-            )
-
-            for extension in blocked
-
-        ):
+        if any(url.endswith(extension) for extension in blocked):
 
             continue
 
-        filtered.append(
-            result
-        )
+        filtered.append(result)
 
     return filtered
 
@@ -222,6 +182,7 @@ def filter_extensions(
 # ==========================================================
 # Apply Filters
 # ==========================================================
+
 
 def apply_filters(
     results: list,
@@ -233,20 +194,12 @@ def apply_filters(
         list
     """
 
-    results = remove_duplicates(
-        results
-    )
+    results = remove_duplicates(results)
 
-    results = filter_status_codes(
-        results
-    )
+    results = filter_status_codes(results)
 
-    results = remove_invalid(
-        results
-    )
+    results = remove_invalid(results)
 
-    results = filter_extensions(
-        results
-    )
+    results = filter_extensions(results)
 
     return results

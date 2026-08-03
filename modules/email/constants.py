@@ -10,9 +10,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from config.config import (
-
     DNS_TIMEOUT,
-
 )
 
 # ==========================================================
@@ -20,17 +18,12 @@ from config.config import (
 # ==========================================================
 
 OUTPUT_DIR = Path(
-
     "output/email",
-
 )
 
 OUTPUT_DIR.mkdir(
-
     parents=True,
-
     exist_ok=True,
-
 )
 
 TXT_FILE = OUTPUT_DIR / "results.txt"
@@ -86,41 +79,23 @@ DNSKEY_RECORD = "DNSKEY"
 # ==========================================================
 
 EMPTY_RESULT = {
-
     "target": "",
-
     "mx": [],
-
     "provider": "",
-
     "spf": False,
-
     "spf_record": "",
-
     "dkim": False,
-
     "dkim_selector": "",
-
     "dmarc": False,
-
     "dmarc_record": "",
-
     "mta_sts": False,
-
     "tls_rpt": False,
-
     "bimi": False,
-
     "dnssec": False,
-
     "score": 0,
-
     "risk": LOW_RISK,
-
     "recommendations": [],
-
     "error": None,
-
 }
 
 
@@ -129,87 +104,28 @@ EMPTY_RESULT = {
 # ==========================================================
 
 MAIL_PROVIDERS = {
-
     "Google Workspace": (
-
         ".google.com",
-
         ".googlemail.com",
-
         ".l.google.com",
-
     ),
-
     "Microsoft 365": (
-
         ".outlook.com",
-
         ".protection.outlook.com",
-
     ),
-
-    "Zoho Mail": (
-
-        ".zoho.com",
-
-    ),
-
+    "Zoho Mail": (".zoho.com",),
     "Proton Mail": (
-
         ".protonmail.ch",
-
         ".protonmail.net",
-
     ),
-
-    "Fastmail": (
-
-        ".messagingengine.com",
-
-    ),
-
-    "Amazon SES": (
-
-        ".amazonses.com",
-
-    ),
-
-    "Mailgun": (
-
-        ".mailgun.org",
-
-    ),
-
-    "SendGrid": (
-
-        ".sendgrid.net",
-
-    ),
-
-    "Proofpoint": (
-
-        ".pphosted.com",
-
-    ),
-
-    "Mimecast": (
-
-        ".mimecast.com",
-
-    ),
-
-    "Cisco ESA": (
-
-        ".iphmx.com",
-
-    ),
-
-    "Barracuda": (
-
-        ".ess.barracudanetworks.com",
-
-    ),
-
+    "Fastmail": (".messagingengine.com",),
+    "Amazon SES": (".amazonses.com",),
+    "Mailgun": (".mailgun.org",),
+    "SendGrid": (".sendgrid.net",),
+    "Proofpoint": (".pphosted.com",),
+    "Mimecast": (".mimecast.com",),
+    "Cisco ESA": (".iphmx.com",),
+    "Barracuda": (".ess.barracudanetworks.com",),
 }
 
 # ==========================================================
@@ -217,19 +133,12 @@ MAIL_PROVIDERS = {
 # ==========================================================
 
 DKIM_SELECTORS = (
-
     "default",
-
     "google",
-
     "selector1",
-
     "selector2",
-
     "k1",
-
     "mail",
-
 )
 
 # ==========================================================
@@ -249,25 +158,15 @@ BIMI_PREFIX = "default._bimi"
 # ==========================================================
 
 RECOMMENDATIONS = {
-
     True: [
-
         "Review missing email security records.",
-
         "Configure SPF, DKIM and DMARC.",
-
         "Enable MTA-STS and TLS Reporting.",
-
         "Consider enabling BIMI and DNSSEC.",
-
     ],
-
     False: [
-
         "Email security configuration looks healthy.",
-
     ],
-
 }
 
 # ==========================================================
@@ -275,29 +174,17 @@ RECOMMENDATIONS = {
 # ==========================================================
 
 EXPORT_FIELDS = (
-
     "target",
-
     "provider",
-
     "spf",
-
     "dkim",
-
     "dmarc",
-
     "mta_sts",
-
     "tls_rpt",
-
     "bimi",
-
     "dnssec",
-
     "score",
-
     "risk",
-
 )
 
 # ==========================================================
@@ -305,41 +192,23 @@ EXPORT_FIELDS = (
 # ==========================================================
 
 DEFAULT_ANALYSIS = {
-
     "target": "",
-
     "mx": [],
-
     "provider": "",
-
     "spf": False,
-
     "spf_record": "",
-
     "dkim": False,
-
     "dkim_selector": "",
-
     "dmarc": False,
-
     "dmarc_record": "",
-
     "mta_sts": False,
-
     "tls_rpt": False,
-
     "bimi": False,
-
     "dnssec": False,
-
     "score": 0,
-
     "risk": LOW_RISK,
-
     "recommendations": [],
-
     "error": None,
-
 }
 
 # ==========================================================
@@ -347,60 +216,31 @@ DEFAULT_ANALYSIS = {
 # ==========================================================
 
 __all__ = [
-
     "OUTPUT_DIR",
-
     "TXT_FILE",
-
     "JSON_FILE",
-
     "CSV_FILE",
-
     "SUMMARY_FILE",
-
     "HIGH_RISK_FILE",
-
     "DEFAULT_TIMEOUT",
-
     "LOW_RISK",
-
     "MEDIUM_RISK",
-
     "HIGH_RISK",
-
     "CRITICAL_RISK",
-
     "LOW_SCORE",
-
     "MEDIUM_SCORE",
-
     "HIGH_SCORE",
-
     "MX_RECORD",
-
     "TXT_RECORD",
-
     "DNSKEY_RECORD",
-
     "EMPTY_RESULT",
-
     "MAIL_PROVIDERS",
-
     "DKIM_SELECTORS",
-
     "DMARC_PREFIX",
-
     "MTA_STS_PREFIX",
-
     "TLS_RPT_PREFIX",
-
     "BIMI_PREFIX",
-
     "RECOMMENDATIONS",
-
     "EXPORT_FIELDS",
-
     "DEFAULT_ANALYSIS",
-
 ]
-

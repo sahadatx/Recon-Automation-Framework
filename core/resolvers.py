@@ -11,7 +11,6 @@ from typing import Callable
 
 from core.context import ExecutionContext
 
-
 Analysis = dict[str, Any]
 
 Resolver = Callable[
@@ -183,9 +182,7 @@ def resolve_javascript(
         }
     )
 
-    return (
-        javascript_urls,
-    )
+    return (javascript_urls,)
 
 
 def resolve_screenshots(
@@ -209,9 +206,7 @@ def resolve_report(
     All analyses → Report
     """
 
-    return (
-        context.to_dict(),
-    )
+    return (context.to_dict(),)
 
 
 def resolve_dashboard(
@@ -234,7 +229,6 @@ RESOLVERS: dict[str, Resolver] = {
     "http": resolve_http,
     "ports": resolve_ports,
     "tech": resolve_tech,
-
     "crawler": resolve_live_urls,
     "fuzzing": resolve_live_urls,
     "vhost": resolve_live_urls,
@@ -244,10 +238,8 @@ RESOLVERS: dict[str, Resolver] = {
     "cdn": resolve_live_urls,
     "takeover": resolve_live_urls,
     "email": resolve_live_urls,
-
     "javascript": resolve_javascript,
     "screenshots": resolve_screenshots,
-
     "report": resolve_report,
     "dashboard": resolve_dashboard,
 }
@@ -266,9 +258,7 @@ def resolve_inputs(
 
     except KeyError as error:
 
-        raise ValueError(
-            f"Unknown module: {module}"
-        ) from error
+        raise ValueError(f"Unknown module: {module}") from error
 
     return resolver(
         context,

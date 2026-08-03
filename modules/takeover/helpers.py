@@ -25,21 +25,19 @@ from .constants import (
     DEFAULT_HEADERS,
 )
 
-
 # ==========================================================
 # Default Result
 # ==========================================================
 
 EMPTY_TAKEOVER_RESULT = deepcopy(
-
     DEFAULT_ANALYSIS,
-
 )
 
 
 # ==========================================================
 # Normalize Target
 # ==========================================================
+
 
 def normalize_target(
     target: str,
@@ -63,9 +61,7 @@ def normalize_target(
         target = f"https://{target}"
 
     parsed = urlparse(
-
         target,
-
     )
 
     return parsed.hostname or ""
@@ -74,6 +70,7 @@ def normalize_target(
 # ==========================================================
 # Resolve IPv4
 # ==========================================================
+
 
 def resolve_ipv4(
     host: str,
@@ -88,9 +85,7 @@ def resolve_ipv4(
     try:
 
         return socket.gethostbyname(
-
             host,
-
         )
 
     except Exception:
@@ -101,6 +96,7 @@ def resolve_ipv4(
 # ==========================================================
 # HTTP Request
 # ==========================================================
+
 
 def request_page(
     target: str,
@@ -115,15 +111,10 @@ def request_page(
     try:
 
         response = requests.get(
-
             target,
-
             headers=DEFAULT_HEADERS,
-
             timeout=HTTP_TIMEOUT,
-
             allow_redirects=True,
-
         )
 
         return response
@@ -136,6 +127,7 @@ def request_page(
 # ==========================================================
 # Status Code
 # ==========================================================
+
 
 def extract_status_code(
     response,
@@ -158,6 +150,7 @@ def extract_status_code(
 # Response Body
 # ==========================================================
 
+
 def extract_body(
     response,
 ):
@@ -179,6 +172,7 @@ def extract_body(
 # HTML Title
 # ==========================================================
 
+
 def extract_title(
     response,
 ):
@@ -196,19 +190,14 @@ def extract_title(
     try:
 
         soup = BeautifulSoup(
-
             response.text,
-
             "html.parser",
-
         )
 
         if soup.title:
 
             return soup.title.get_text(
-
                 strip=True,
-
             )
 
     except Exception:
@@ -221,6 +210,7 @@ def extract_title(
 # ==========================================================
 # DNS CNAME
 # ==========================================================
+
 
 def resolve_cname(
     host: str,
@@ -235,17 +225,12 @@ def resolve_cname(
     try:
 
         answers = dns.resolver.resolve(
-
             host,
-
             "CNAME",
-
         )
 
         return str(
-
             answers[0].target,
-
         ).rstrip(".")
 
     except Exception:
@@ -256,6 +241,7 @@ def resolve_cname(
 # ==========================================================
 # Safe Lower
 # ==========================================================
+
 
 def safe_lower(
     value: Any,
@@ -273,15 +259,14 @@ def safe_lower(
         return ""
 
     return str(
-
         value,
-
     ).lower()
 
 
 # ==========================================================
 # Fingerprint Detection
 # ==========================================================
+
 
 def contains_fingerprint(
     content: str,
@@ -296,23 +281,16 @@ def contains_fingerprint(
     """
 
     content = safe_lower(
-
         content,
-
     )
 
     for fingerprint in fingerprints:
 
         if (
-
             safe_lower(
                 fingerprint,
             )
-
-            in
-
-            content
-
+            in content
         ):
 
             return fingerprint
@@ -323,6 +301,7 @@ def contains_fingerprint(
 # ==========================================================
 # Merge Detection Methods
 # ==========================================================
+
 
 def merge_methods(
     *methods,
@@ -348,9 +327,7 @@ def merge_methods(
             if method not in merged:
 
                 merged.append(
-
                     method,
-
                 )
 
     return merged
@@ -359,6 +336,7 @@ def merge_methods(
 # ==========================================================
 # Deep Copy Result
 # ==========================================================
+
 
 def create_result():
     """
@@ -370,9 +348,7 @@ def create_result():
     """
 
     return deepcopy(
-
         EMPTY_TAKEOVER_RESULT,
-
     )
 
 
@@ -381,30 +357,16 @@ def create_result():
 # ==========================================================
 
 __all__ = [
-
     "EMPTY_TAKEOVER_RESULT",
-
     "normalize_target",
-
     "resolve_ipv4",
-
     "request_page",
-
     "extract_status_code",
-
     "extract_body",
-
     "extract_title",
-
     "resolve_cname",
-
     "safe_lower",
-
     "contains_fingerprint",
-
     "merge_methods",
-
     "create_result",
-
 ]
-

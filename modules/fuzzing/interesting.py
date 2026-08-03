@@ -7,44 +7,34 @@ from directory fuzzing results.
 
 from pathlib import PurePosixPath
 
-
 # ==========================================================
 # Interesting Directories
 # ==========================================================
 
 INTERESTING_DIRECTORIES = {
-
     "admin",
     "administrator",
     "login",
     "dashboard",
     "panel",
     "cpanel",
-
     "api",
     "api/v1",
     "api/v2",
-
     "graphql",
     "graphiql",
-
     "swagger",
     "openapi",
     "docs",
-
     "debug",
     "dev",
     "staging",
     "sandbox",
     "internal",
-
     ".git",
-
     "uploads",
     "backup",
-
     "config",
-
 }
 
 
@@ -53,44 +43,35 @@ INTERESTING_DIRECTORIES = {
 # ==========================================================
 
 INTERESTING_FILES = {
-
     ".env",
     ".env.local",
     ".env.production",
-
     "robots.txt",
     "security.txt",
-
     "config.php",
     "config.json",
     "config.yml",
-
     "settings.json",
     "settings.js",
-
     "package.json",
     "composer.json",
-
     "backup.zip",
     "backup.tar.gz",
-
     "db.sql",
     "database.sql",
     "dump.sql",
-
     "swagger.json",
     "swagger.yaml",
     "openapi.json",
-
     ".gitignore",
     ".git/config",
-
 }
 
 
 # ==========================================================
 # Normalize Path
 # ==========================================================
+
 
 def normalize_path(
     url: str,
@@ -131,6 +112,7 @@ def normalize_path(
 # Interesting File
 # ==========================================================
 
+
 def is_interesting_file(
     path: str,
 ) -> bool:
@@ -141,24 +123,15 @@ def is_interesting_file(
         bool
     """
 
-    filename = PurePosixPath(
-        path
-    ).name.lower()
+    filename = PurePosixPath(path).name.lower()
 
-    return (
-
-        filename
-
-        in
-
-        INTERESTING_FILES
-
-    )
+    return filename in INTERESTING_FILES
 
 
 # ==========================================================
 # Interesting Directory
 # ==========================================================
+
 
 def is_interesting_directory(
     path: str,
@@ -176,21 +149,7 @@ def is_interesting_directory(
 
     for directory in INTERESTING_DIRECTORIES:
 
-        if (
-
-            directory == path
-
-            or
-
-            directory in parts
-
-            or
-
-            path.startswith(
-                directory + "/"
-            )
-
-        ):
+        if directory == path or directory in parts or path.startswith(directory + "/"):
 
             return True
 
@@ -200,6 +159,7 @@ def is_interesting_directory(
 # ==========================================================
 # Detect Interesting Results
 # ==========================================================
+
 
 def detect_interesting(
     results: list,
@@ -222,70 +182,41 @@ def detect_interesting(
     for result in results:
 
         path = normalize_path(
-
             result.get(
                 "url",
                 "",
             )
-
         )
 
         if not path:
 
             continue
 
-        if is_interesting_file(
-            path
-        ):
+        if is_interesting_file(path):
 
-            files.append(
-                result
-            )
+            files.append(result)
 
-        if is_interesting_directory(
-            path
-        ):
+        if is_interesting_directory(path):
 
-            directories.append(
-                result
-            )
+            directories.append(result)
 
     statistics = {
-
-        "interesting_files": len(
-            files
-        ),
-
-        "interesting_directories": len(
-            directories
-        ),
-
-        "total": (
-
-            len(files)
-
-            +
-
-            len(directories)
-
-        ),
-
+        "interesting_files": len(files),
+        "interesting_directories": len(directories),
+        "total": (len(files) + len(directories)),
     }
 
     return {
-
         "files": files,
-
         "directories": directories,
-
         "statistics": statistics,
-
     }
 
 
 # ==========================================================
 # Entry Point
 # ==========================================================
+
 
 def scan(
     results: list,
@@ -301,6 +232,4 @@ def scan(
         dict
     """
 
-    return detect_interesting(
-        results
-    )
+    return detect_interesting(results)

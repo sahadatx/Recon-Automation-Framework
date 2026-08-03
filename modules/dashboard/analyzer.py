@@ -13,10 +13,10 @@ from .statistics import (
     generate_statistics,
 )
 
-
 # ==========================================================
 # Analyze Dashboard
 # ==========================================================
+
 
 def analyze(
     report: dict[str, Any],
@@ -79,32 +79,23 @@ def analyze(
     )
 
     dashboard = {
-
         "target": target,
-
         "metadata": report.get(
             "metadata",
             {},
         ),
-
         "modules": modules,
-
         "module_count": len(
             modules,
         ),
-
         "module_names": sorted(
             modules.keys(),
         ),
-
     }
 
     return {
-
         "results": dashboard,
-
         "statistics": statistics,
-
     }
 
 

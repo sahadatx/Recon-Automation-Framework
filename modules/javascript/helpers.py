@@ -31,7 +31,6 @@ from modules.javascript.constants import (
     FILES_DIR,
 )
 
-
 # ==========================================================
 # Retryable HTTP Status Codes
 # ==========================================================
@@ -88,14 +87,11 @@ def is_valid_url(
     except ValueError:
         return False
 
-    return (
-        parsed.scheme in {
-            "http",
-            "https",
-        }
-        and bool(
-            parsed.netloc,
-        )
+    return parsed.scheme in {
+        "http",
+        "https",
+    } and bool(
+        parsed.netloc,
     )
 
 
@@ -112,15 +108,12 @@ def safe_filename(
     a filesystem-safe filename.
     """
 
-    filename = (
-        url.replace(
-            "https://",
-            "",
-        )
-        .replace(
-            "http://",
-            "",
-        )
+    filename = url.replace(
+        "https://",
+        "",
+    ).replace(
+        "http://",
+        "",
     )
 
     for character in (
@@ -157,10 +150,7 @@ def save_javascript(
     Save JavaScript file.
     """
 
-    filepath = (
-        create_output_directory()
-        / filename
-    )
+    filepath = create_output_directory() / filename
 
     filepath.write_text(
         content,
@@ -205,11 +195,7 @@ def should_retry(
             None,
         )
 
-        return (
-            response is not None
-            and response.status_code
-            in RETRY_STATUS_CODES
-        )
+        return response is not None and response.status_code in RETRY_STATUS_CODES
 
     return False
 
@@ -230,9 +216,7 @@ def make_request(
     session = context.get_http_session()
 
     if session is None:
-        raise RuntimeError(
-            "Shared HTTP session is not initialized."
-        )
+        raise RuntimeError("Shared HTTP session is not initialized.")
 
     response = session.get(
         url,
@@ -262,9 +246,7 @@ def download_file(
         url,
     ):
 
-        debug(
-            f"Invalid URL skipped: {url}"
-        )
+        debug(f"Invalid URL skipped: {url}")
 
         return None
 
@@ -283,17 +265,13 @@ def download_file(
 
         except requests.exceptions.SSLError as error:
 
-            debug(
-                f"SSL Error: {url} ({error})"
-            )
+            debug(f"SSL Error: {url} ({error})")
 
             return None
 
         except ValueError as error:
 
-            debug(
-                f"Invalid URL: {url} ({error})"
-            )
+            debug(f"Invalid URL: {url} ({error})")
 
             return None
 
@@ -311,15 +289,11 @@ def download_file(
                     and error.response is not None
                 ):
 
-                    debug(
-                        f"HTTP {error.response.status_code}: {url}"
-                    )
+                    debug(f"HTTP {error.response.status_code}: {url}")
 
                 else:
 
-                    debug(
-                        f"Not retrying: {url} ({error})"
-                    )
+                    debug(f"Not retrying: {url} ({error})")
 
                 return None
 
@@ -338,14 +312,9 @@ def download_file(
 
             else:
 
-                debug(
-                    f"Retry ({attempt + 1}/{attempts}): "
-                    f"{url} ({error})"
-                )
+                debug(f"Retry ({attempt + 1}/{attempts}): " f"{url} ({error})")
 
-    debug(
-        f"Failed after {attempts} attempts: {url}"
-    )
+    debug(f"Failed after {attempts} attempts: {url}")
 
     return None
 

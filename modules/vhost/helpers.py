@@ -12,15 +12,13 @@ from urllib.parse import (
 )
 
 from config.config import (
-
     VHOST_OUTPUT_DIR,
-
 )
-
 
 # ==========================================================
 # Output Directory
 # ==========================================================
+
 
 def ensure_output_directory() -> Path:
     """
@@ -31,11 +29,8 @@ def ensure_output_directory() -> Path:
     """
 
     VHOST_OUTPUT_DIR.mkdir(
-
         parents=True,
-
         exist_ok=True,
-
     )
 
     return VHOST_OUTPUT_DIR
@@ -44,6 +39,7 @@ def ensure_output_directory() -> Path:
 # ==========================================================
 # Normalize Target
 # ==========================================================
+
 
 def normalize_target(
     target: str,
@@ -64,6 +60,7 @@ def normalize_target(
 # Extract Hostname
 # ==========================================================
 
+
 def hostname(
     target: str,
 ) -> str:
@@ -74,15 +71,7 @@ def hostname(
         str
     """
 
-    parsed = urlparse(
-
-        normalize_target(
-
-            target
-
-        )
-
-    )
+    parsed = urlparse(normalize_target(target))
 
     return parsed.hostname or ""
 
@@ -90,6 +79,7 @@ def hostname(
 # ==========================================================
 # Safe Filename
 # ==========================================================
+
 
 def safe_filename(
     target: str,
@@ -102,28 +92,18 @@ def safe_filename(
         str
     """
 
-    host = hostname(
-        target
-    )
+    host = hostname(target)
 
-    return (
-
-        host
-
-        .replace(
-
-            ".",
-
-            "_",
-
-        )
-
+    return host.replace(
+        ".",
+        "_",
     )
 
 
 # ==========================================================
 # Build Host Header
 # ==========================================================
+
 
 def build_host_header(
     target: str,
@@ -143,9 +123,7 @@ def build_host_header(
         str
     """
 
-    domain = hostname(
-        target
-    )
+    domain = hostname(target)
 
     return f"{host}.{domain}"
 
@@ -153,6 +131,7 @@ def build_host_header(
 # ==========================================================
 # Is HTTPS
 # ==========================================================
+
 
 def is_https(
     target: str,
@@ -164,20 +143,13 @@ def is_https(
         bool
     """
 
-    return normalize_target(
-
-        target
-
-    ).startswith(
-
-        "https://"
-
-    )
+    return normalize_target(target).startswith("https://")
 
 
 # ==========================================================
 # Is HTTP
 # ==========================================================
+
 
 def is_http(
     target: str,
@@ -189,12 +161,4 @@ def is_http(
         bool
     """
 
-    return normalize_target(
-
-        target
-
-    ).startswith(
-
-        "http://"
-
-    )
+    return normalize_target(target).startswith("http://")

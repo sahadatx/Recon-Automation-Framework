@@ -25,10 +25,10 @@ from core.logger import (
     warning,
 )
 
-
 # ==========================================================
 # Ensure Image Directory
 # ==========================================================
+
 
 def ensure_output_directory() -> Path:
     """
@@ -39,11 +39,8 @@ def ensure_output_directory() -> Path:
     """
 
     IMAGES_DIR.mkdir(
-
         parents=True,
-
         exist_ok=True,
-
     )
 
     return IMAGES_DIR
@@ -52,6 +49,7 @@ def ensure_output_directory() -> Path:
 # ==========================================================
 # Safe Filename
 # ==========================================================
+
 
 def safe_filename(
     url: str,
@@ -66,45 +64,28 @@ def safe_filename(
     filename = url
 
     for char in (
-
         "https://",
-
         "http://",
-
         "/",
-
         "\\",
-
         ":",
-
         "?",
-
         "&",
-
         "=",
-
         "%",
-
         "#",
-
     ):
 
         filename = filename.replace(
-
             char,
-
             "_",
-
         )
 
     while "__" in filename:
 
         filename = filename.replace(
-
             "__",
-
             "_",
-
         )
 
     return filename.strip("_")
@@ -113,6 +94,7 @@ def safe_filename(
 # ==========================================================
 # Build Screenshot Path
 # ==========================================================
+
 
 def screenshot_path(
     url: str,
@@ -126,20 +108,13 @@ def screenshot_path(
 
     directory = ensure_output_directory()
 
-    return (
-
-        directory
-
-        /
-
-        f"{safe_filename(url)}.png"
-
-    )
+    return directory / f"{safe_filename(url)}.png"
 
 
 # ==========================================================
 # Capture One Host
 # ==========================================================
+
 
 async def capture_host(
     context: BrowserContext,
@@ -159,172 +134,90 @@ async def capture_host(
         dict
     """
 
-    url = target.get(
-        "url"
-    )
+    url = target.get("url")
 
     if not url:
 
         return {
-
             "captured": False,
-
             "reason": "Missing URL",
-
         }
 
-
-    debug(
-        f"Screenshot: {url}"
-    )
-
+    debug(f"Screenshot: {url}")
 
     page = None
 
-    output = screenshot_path(
-        url
-    )
+    output = screenshot_path(url)
 
     start = perf_counter()
-
 
     try:
 
         page = await context.new_page()
-
 
         # --------------------------------------------------
         # Load Page
         # --------------------------------------------------
 
         response = await page.goto(
-
             url,
-
             wait_until="domcontentloaded",
-
             timeout=SCREENSHOT_TIMEOUT,
-
         )
 
-
-        await page.wait_for_timeout(
-            1000
-        )
-
+        await page.wait_for_timeout(1000)
 
         # --------------------------------------------------
         # Screenshot
         # --------------------------------------------------
 
         await page.screenshot(
-
             path=str(output),
-
             full_page=SCREENSHOT_FULL_PAGE,
-
         )
-
 
         elapsed = round(
-
-            perf_counter()
-
-            - start,
-
+            perf_counter() - start,
             2,
-
         )
-
 
         title = await page.title()
 
-
-        file_size = (
-
-            output.stat().st_size
-
-            if output.exists()
-
-            else 0
-
-        )
-
+        file_size = output.stat().st_size if output.exists() else 0
 
         return {
-
             "captured": True,
-
             "url": url,
-
             "title": title,
-
             "path": str(output),
-
-            "status": (
-
-                response.status
-
-                if response
-
-                else target.get("status")
-
-            ),
-
+            "status": (response.status if response else target.get("status")),
             "elapsed": elapsed,
-
             "filesize": file_size,
-
         }
-
 
     except PlaywrightTimeoutError:
 
-
-        warning(
-
-            f"{url}: Screenshot timeout"
-
-        )
-
+        warning(f"{url}: Screenshot timeout")
 
         return {
-
             "captured": False,
-
             "url": url,
-
             "reason": "Timeout",
-
         }
-
 
     except Exception as error:
 
-
-        warning(
-
-            f"{url}: {error}"
-
-        )
-
+        warning(f"{url}: {error}")
 
         return {
-
             "captured": False,
-
             "url": url,
-
             "reason": str(error),
-
         }
-
 
     finally:
 
-
         if page:
-
 
             try:
 
@@ -339,6 +232,7 @@ async def capture_host(
 # Capture Multiple
 # ==========================================================
 
+
 async def capture_multiple(
     context: BrowserContext,
     targets: list[dict],
@@ -352,23 +246,14 @@ async def capture_multiple(
 
     results = []
 
-
     for target in targets:
 
         result = await capture_host(
-
             context,
-
             target,
-
         )
 
-        results.append(
-
-            result
-
-        )
-
+        results.append(result)
 
     return results
 
@@ -378,15 +263,9 @@ async def capture_multiple(
 # ==========================================================
 
 __all__ = [
-
     "ensure_output_directory",
-
     "safe_filename",
-
     "screenshot_path",
-
     "capture_host",
-
     "capture_multiple",
-
 ]

@@ -7,10 +7,10 @@ capture results.
 
 from __future__ import annotations
 
-
 # ==========================================================
 # Generate Statistics
 # ==========================================================
+
 
 def generate_statistics(
     results: list[dict],
@@ -26,9 +26,7 @@ def generate_statistics(
         dict
     """
 
-    total = len(
-        results
-    )
+    total = len(results)
 
     captured = 0
 
@@ -44,7 +42,6 @@ def generate_statistics(
 
     failed_urls: list[str] = []
 
-
     for result in results:
 
         if result.get(
@@ -54,15 +51,11 @@ def generate_statistics(
 
             captured += 1
 
-            url = result.get(
-                "url"
-            )
+            url = result.get("url")
 
             if url:
 
-                successful_urls.append(
-                    url
-                )
+                successful_urls.append(url)
 
             total_size += result.get(
                 "filesize",
@@ -74,16 +67,11 @@ def generate_statistics(
                 0.0,
             )
 
-
-            status = result.get(
-                "status"
-            )
+            status = result.get("status")
 
             if status:
 
-                status = str(
-                    status
-                )
+                status = str(status)
 
                 status_codes[status] = (
                     status_codes.get(
@@ -93,90 +81,59 @@ def generate_statistics(
                     + 1
                 )
 
-
         else:
 
             failed += 1
 
-            url = result.get(
-                "url"
-            )
+            url = result.get("url")
 
             if url:
 
-                failed_urls.append(
-                    url
-                )
-
+                failed_urls.append(url)
 
     average_time = 0.0
 
     if captured:
 
         average_time = round(
-
             total_time / captured,
-
             2,
-
         )
-
 
     average_size = 0
 
     if captured:
 
         average_size = round(
-
             total_size / captured,
-
             2,
-
         )
 
-
     return {
-
         "total_targets": total,
-
         "captured": captured,
-
         "failed": failed,
-
         "success_rate": (
-
             round(
-
                 (captured / total) * 100,
-
                 2,
-
             )
-
             if total
-
             else 0.0
-
         ),
-
         "total_size": total_size,
-
         "average_size": average_size,
-
         "average_time": average_time,
-
         "status_codes": status_codes,
-
         "successful_urls": successful_urls,
-
         "failed_urls": failed_urls,
-
     }
 
 
 # ==========================================================
 # Capture Summary
 # ==========================================================
+
 
 def generate_summary(
     results: list[dict],
@@ -188,32 +145,14 @@ def generate_summary(
         dict
     """
 
-    statistics = generate_statistics(
-        results
-    )
+    statistics = generate_statistics(results)
 
     return {
-
-        "screenshots": statistics[
-            "captured"
-        ],
-
-        "failed": statistics[
-            "failed"
-        ],
-
-        "success_rate": statistics[
-            "success_rate"
-        ],
-
-        "average_time": statistics[
-            "average_time"
-        ],
-
-        "average_size": statistics[
-            "average_size"
-        ],
-
+        "screenshots": statistics["captured"],
+        "failed": statistics["failed"],
+        "success_rate": statistics["success_rate"],
+        "average_time": statistics["average_time"],
+        "average_size": statistics["average_size"],
     }
 
 
@@ -222,9 +161,6 @@ def generate_summary(
 # ==========================================================
 
 __all__ = [
-
     "generate_statistics",
-
     "generate_summary",
-
 ]

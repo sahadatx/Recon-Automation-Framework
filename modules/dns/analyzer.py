@@ -12,7 +12,6 @@ from modules.dns.statistics import (
     generate_statistics,
 )
 
-
 # ==========================================================
 # Analyze DNS Results
 # ==========================================================

@@ -13,10 +13,10 @@ from modules.crawler.helpers import (
     same_domain,
 )
 
-
 # ==========================================================
 # Extract Links
 # ==========================================================
+
 
 def extract_links(
     base_url: str,
@@ -72,6 +72,7 @@ def extract_links(
 # Extract JavaScript Files
 # ==========================================================
 
+
 def extract_scripts(
     base_url: str,
     soup: BeautifulSoup,
@@ -104,6 +105,7 @@ def extract_scripts(
 # Extract CSS Assets
 # ==========================================================
 
+
 def extract_css(
     base_url: str,
     soup: BeautifulSoup,
@@ -127,10 +129,7 @@ def extract_css(
             [],
         )
 
-        rel = [
-            r.lower()
-            for r in rel
-        ]
+        rel = [r.lower() for r in rel]
 
         if "stylesheet" in rel:
 
@@ -148,6 +147,7 @@ def extract_css(
 # Extract Forms
 # ==========================================================
 
+
 def extract_forms(
     base_url: str,
     soup: BeautifulSoup,
@@ -161,18 +161,14 @@ def extract_forms(
 
     forms = []
 
-    for form in soup.find_all(
-        "form"
-    ):
+    for form in soup.find_all("form"):
 
         forms.append(
             {
-
                 "method": form.get(
                     "method",
                     "GET",
                 ).upper(),
-
                 "action": normalize_url(
                     base_url,
                     form.get(
@@ -180,7 +176,6 @@ def extract_forms(
                         "",
                     ),
                 ),
-
             }
         )
 
@@ -190,6 +185,7 @@ def extract_forms(
 # ==========================================================
 # Extract Meta Refresh
 # ==========================================================
+
 
 def extract_meta_refresh(
     soup: BeautifulSoup,
@@ -203,14 +199,7 @@ def extract_meta_refresh(
 
     meta = soup.find(
         "meta",
-        attrs={
-            "http-equiv": (
-                lambda x:
-                x
-                and
-                x.lower() == "refresh"
-            )
-        },
+        attrs={"http-equiv": (lambda x: x and x.lower() == "refresh")},
     )
 
     if not meta:
@@ -230,9 +219,7 @@ def extract_meta_refresh(
 
     if match:
 
-        return match.group(
-            1
-        ).strip()
+        return match.group(1).strip()
 
     return None
 
@@ -240,6 +227,7 @@ def extract_meta_refresh(
 # ==========================================================
 # Extract Emails
 # ==========================================================
+
 
 def extract_emails(
     html: str,
@@ -251,11 +239,7 @@ def extract_emails(
         list
     """
 
-    pattern = (
-        r"[A-Za-z0-9._%+-]+"
-        r"@[A-Za-z0-9.-]+"
-        r"\.[A-Za-z]{2,}"
-    )
+    pattern = r"[A-Za-z0-9._%+-]+" r"@[A-Za-z0-9.-]+" r"\.[A-Za-z]{2,}"
 
     return sorted(
         set(
@@ -270,6 +254,7 @@ def extract_emails(
 # ==========================================================
 # Parse HTML
 # ==========================================================
+
 
 def parse_html(
     url: str,
@@ -315,49 +300,20 @@ def parse_html(
         html,
     )
 
-
     return {
-
         "internal_links": internal,
-
         "external_links": external,
-
         "javascript": javascript,
-
         "css": css,
-
         "forms": forms,
-
         "meta_refresh": meta_refresh,
-
         "emails": emails,
-
         "statistics": {
-
-            "internal_links": len(
-                internal
-            ),
-
-            "external_links": len(
-                external
-            ),
-
-            "javascript": len(
-                javascript
-            ),
-
-            "css": len(
-                css
-            ),
-
-            "forms": len(
-                forms
-            ),
-
-            "emails": len(
-                emails
-            ),
-
+            "internal_links": len(internal),
+            "external_links": len(external),
+            "javascript": len(javascript),
+            "css": len(css),
+            "forms": len(forms),
+            "emails": len(emails),
         },
-
     }

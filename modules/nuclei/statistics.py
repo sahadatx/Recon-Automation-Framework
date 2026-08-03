@@ -18,10 +18,10 @@ from .constants import (
     UNKNOWN,
 )
 
-
 # ==========================================================
 # Empty Statistics
 # ==========================================================
+
 
 def empty_statistics() -> dict:
     """
@@ -55,6 +55,7 @@ def empty_statistics() -> dict:
 # ==========================================================
 # Generate Statistics
 # ==========================================================
+
 
 def generate_statistics(
     findings: list[dict],
@@ -132,87 +133,64 @@ def generate_statistics(
     )
 
     return {
-
         "total_targets": len(targets),
-
         "total_findings": total,
-
         "critical": severity.get(
             CRITICAL,
             0,
         ),
-
         "high": severity.get(
             HIGH,
             0,
         ),
-
         "medium": severity.get(
             MEDIUM,
             0,
         ),
-
         "low": severity.get(
             LOW,
             0,
         ),
-
         "info": severity.get(
             INFO,
             0,
         ),
-
         "unknown": severity.get(
             UNKNOWN,
             0,
         ),
-
         "severity_statistics": dict(
             severity,
         ),
-
         "template_statistics": dict(
             templates,
         ),
-
         "target_statistics": dict(
             targets,
         ),
-
         "protocol_statistics": dict(
             protocols,
         ),
-
         "tag_statistics": dict(
             tags,
         ),
-
         "unique_templates": len(
             templates,
         ),
-
         "unique_targets": len(
             targets,
         ),
-
         "top_templates": templates.most_common(
             10,
         ),
-
         "top_targets": targets.most_common(
             10,
         ),
-
         "top_tags": tags.most_common(
             10,
         ),
-
         "cve_count": cves,
-
-        "average_findings_per_target": (
-            average_findings_per_target
-        ),
-
+        "average_findings_per_target": (average_findings_per_target),
     }
 
 

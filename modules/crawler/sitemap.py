@@ -17,15 +17,12 @@ from core.logger import (
     debug,
 )
 
-
 # ==========================================================
 # XML Namespace
 # ==========================================================
 
 SITEMAP_NS = {
-
     "sm": "http://www.sitemaps.org/schemas/sitemap/0.9",
-
 }
 
 
@@ -42,6 +39,7 @@ MAX_SITEMAPS = 100
 # Download Sitemap
 # ==========================================================
 
+
 def download_sitemap(
     sitemap_url: str,
 ) -> str | None:
@@ -54,9 +52,7 @@ def download_sitemap(
     - sitemap.xml.gz
     """
 
-    response = download_page(
-        sitemap_url
-    )
+    response = download_page(sitemap_url)
 
     if response is None:
 
@@ -64,38 +60,28 @@ def download_sitemap(
 
     content = response.content
 
-    if sitemap_url.endswith(
-        ".gz"
-    ):
+    if sitemap_url.endswith(".gz"):
 
         try:
 
-            content = gzip.decompress(
-                content
-            )
+            content = gzip.decompress(content)
 
         except OSError:
 
-            debug(
-
-                f"Invalid gzip sitemap: {sitemap_url}"
-
-            )
+            debug(f"Invalid gzip sitemap: {sitemap_url}")
 
             return None
 
     return content.decode(
-
         "utf-8",
-
         errors="ignore",
-
     )
 
 
 # ==========================================================
 # Parse URL Sitemap
 # ==========================================================
+
 
 def parse_urlset(
     root: ElementTree.Element,
@@ -111,54 +97,34 @@ def parse_urlset(
 
     for element in root.iter():
 
-        if not element.tag.endswith(
-            "url"
-        ):
+        if not element.tag.endswith("url"):
 
             continue
 
         for child in element:
 
-            if (
-
-                child.tag.endswith(
-                    "loc"
-                )
-
-                and
-
-                child.text
-
-            ):
+            if child.tag.endswith("loc") and child.text:
 
                 url = child.text.strip()
 
                 if url.startswith(
-
                     (
-
                         "http://",
-
                         "https://",
-
                     )
-
                 ):
 
-                    urls.append(
-                        url
-                    )
+                    urls.append(url)
 
                 break
 
-    return list(
-        dict.fromkeys(urls)
-    )
+    return list(dict.fromkeys(urls))
 
 
 # ==========================================================
 # Parse Sitemap Index
 # ==========================================================
+
 
 def parse_sitemap_index(
     root: ElementTree.Element,
@@ -175,54 +141,34 @@ def parse_sitemap_index(
 
     for element in root.iter():
 
-        if not element.tag.endswith(
-            "sitemap"
-        ):
+        if not element.tag.endswith("sitemap"):
 
             continue
 
         for child in element:
 
-            if (
-
-                child.tag.endswith(
-                    "loc"
-                )
-
-                and
-
-                child.text
-
-            ):
+            if child.tag.endswith("loc") and child.text:
 
                 url = child.text.strip()
 
                 if url.startswith(
-
                     (
-
                         "http://",
-
                         "https://",
-
                     )
-
                 ):
 
-                    sitemaps.append(
-                        url
-                    )
+                    sitemaps.append(url)
 
                 break
 
-    return list(
-        dict.fromkeys(sitemaps)
-    )
+    return list(dict.fromkeys(sitemaps))
 
 
 # ==========================================================
 # Crawl Sitemap
 # ==========================================================
+
 
 def crawl_sitemap(
     sitemap_url: str,
@@ -247,11 +193,7 @@ def crawl_sitemap(
 
     if depth > MAX_SITEMAP_DEPTH:
 
-        debug(
-
-            f"Maximum sitemap depth reached: {sitemap_url}"
-
-        )
+        debug(f"Maximum sitemap depth reached: {sitemap_url}")
 
         return []
 
@@ -261,11 +203,7 @@ def crawl_sitemap(
 
     if len(visited) >= MAX_SITEMAPS:
 
-        debug(
-
-            "Maximum sitemap limit reached."
-
-        )
+        debug("Maximum sitemap limit reached.")
 
         return []
 
@@ -277,21 +215,13 @@ def crawl_sitemap(
 
         return []
 
-    visited.add(
-
-        sitemap_url
-
-    )
+    visited.add(sitemap_url)
 
     # ------------------------------------------
     # Download
     # ------------------------------------------
 
-    content = download_sitemap(
-
-        sitemap_url
-
-    )
+    content = download_sitemap(sitemap_url)
 
     if content is None:
 
@@ -303,19 +233,11 @@ def crawl_sitemap(
 
     try:
 
-        root = ElementTree.fromstring(
-
-            content
-
-        )
+        root = ElementTree.fromstring(content)
 
     except ElementTree.ParseError:
 
-        debug(
-
-            f"Invalid sitemap XML: {sitemap_url}"
-
-        )
+        debug(f"Invalid sitemap XML: {sitemap_url}")
 
         return []
 
@@ -325,68 +247,33 @@ def crawl_sitemap(
     # URLSET
     # ------------------------------------------
 
-    if tag.endswith(
+    if tag.endswith("urlset"):
 
-        "urlset"
-
-    ):
-
-        return parse_urlset(
-
-            root
-
-        )
-
+        return parse_urlset(root)
 
     # ------------------------------------------
     # SITEMAP INDEX
     # ------------------------------------------
 
-    if tag.endswith(
-
-        "sitemapindex"
-
-    ):
+    if tag.endswith("sitemapindex"):
 
         urls = []
 
-        sitemap_urls = parse_sitemap_index(
-
-            root
-
-        )
+        sitemap_urls = parse_sitemap_index(root)
 
         for child in sitemap_urls:
 
             urls.extend(
-
                 crawl_sitemap(
-
                     child,
-
                     visited,
-
                     depth + 1,
-
                 )
-
             )
 
-        return list(
+        return list(dict.fromkeys(urls))
 
-            dict.fromkeys(
-
-                urls
-
-            )
-
-        )
-
-    debug(
-
-        f"Unknown sitemap format: {sitemap_url}"
-
-    )
+    debug(f"Unknown sitemap format: {sitemap_url}")
 
     return []
 
@@ -431,24 +318,16 @@ def fetch_sitemap(
 
         if discovered:
 
-            urls.extend(
-                discovered
-            )
+            urls.extend(discovered)
 
             break
 
-    urls = sorted(
-        set(urls)
-    )
+    urls = sorted(set(urls))
 
     return {
-
         "found": bool(urls),
-
         "count": len(urls),
-
         "urls": urls,
-
     }
 
 
@@ -457,15 +336,9 @@ def fetch_sitemap(
 # ==========================================================
 
 __all__ = [
-
     "download_sitemap",
-
     "parse_urlset",
-
     "parse_sitemap_index",
-
     "crawl_sitemap",
-
     "fetch_sitemap",
-
 ]

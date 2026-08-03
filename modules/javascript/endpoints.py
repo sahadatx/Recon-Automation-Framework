@@ -9,57 +9,43 @@ from __future__ import annotations
 
 import re
 
-
 # ==========================================================
 # Interesting Endpoint Keywords
 # ==========================================================
 
 INTERESTING_KEYWORDS = (
-
     "/api",
-
     "/v1",
     "/v2",
     "/v3",
-
     "/graphql",
-
     "/auth",
     "/login",
     "/logout",
     "/register",
     "/signup",
-
     "/admin",
     "/dashboard",
-
     "/upload",
     "/download",
-
     "/user",
     "/users",
-
     "/account",
     "/profile",
-
     "/oauth",
     "/token",
-
     "/config",
     "/settings",
-
     "/search",
-
     "/internal",
-
     "/debug",
-
 )
 
 
 # ==========================================================
 # Normalize Endpoint
 # ==========================================================
+
 
 def normalize_endpoint(
     endpoint: str,
@@ -98,6 +84,7 @@ def normalize_endpoint(
 # Interesting Endpoint Check
 # ==========================================================
 
+
 def is_interesting(
     endpoint: str,
 ) -> bool:
@@ -111,20 +98,13 @@ def is_interesting(
 
     endpoint = endpoint.lower()
 
-    return any(
-
-        keyword in endpoint
-
-        for keyword
-
-        in INTERESTING_KEYWORDS
-
-    )
+    return any(keyword in endpoint for keyword in INTERESTING_KEYWORDS)
 
 
 # ==========================================================
 # Filter Endpoints
 # ==========================================================
+
 
 def filter_endpoints(
     urls: list[str],
@@ -140,30 +120,23 @@ def filter_endpoints(
 
     for url in urls:
 
-        endpoint = normalize_endpoint(
-            url
-        )
+        endpoint = normalize_endpoint(url)
 
         if not endpoint:
 
             continue
 
-        if is_interesting(
-            endpoint
-        ):
+        if is_interesting(endpoint):
 
-            endpoints.add(
-                endpoint
-            )
+            endpoints.add(endpoint)
 
-    return sorted(
-        endpoints
-    )
+    return sorted(endpoints)
 
 
 # ==========================================================
 # API Version Detection
 # ==========================================================
+
 
 def detect_api_versions(
     urls: list[str],
@@ -176,35 +149,19 @@ def detect_api_versions(
     """
 
     pattern = re.compile(
-
         r"/v\d+(?:/|$)",
-
         re.IGNORECASE,
-
     )
 
-    apis = {
+    apis = {normalize_endpoint(url) for url in urls if pattern.search(url)}
 
-        normalize_endpoint(
-            url
-        )
-
-        for url in urls
-
-        if pattern.search(
-            url
-        )
-
-    }
-
-    return sorted(
-        apis
-    )
+    return sorted(apis)
 
 
 # ==========================================================
 # GraphQL Detection
 # ==========================================================
+
 
 def detect_graphql(
     urls: list[str],
@@ -216,28 +173,15 @@ def detect_graphql(
         list[str]
     """
 
-    graphql = {
+    graphql = {normalize_endpoint(url) for url in urls if "graphql" in url.lower()}
 
-        normalize_endpoint(
-            url
-        )
-
-        for url in urls
-
-        if "graphql"
-
-        in url.lower()
-
-    }
-
-    return sorted(
-        graphql
-    )
+    return sorted(graphql)
 
 
 # ==========================================================
 # Extract Endpoints
 # ==========================================================
+
 
 def extract_endpoints(
     urls: list[str],
@@ -251,33 +195,13 @@ def extract_endpoints(
 
     endpoints: set[str] = set()
 
-    endpoints.update(
+    endpoints.update(filter_endpoints(urls))
 
-        filter_endpoints(
-            urls
-        )
+    endpoints.update(detect_api_versions(urls))
 
-    )
+    endpoints.update(detect_graphql(urls))
 
-    endpoints.update(
-
-        detect_api_versions(
-            urls
-        )
-
-    )
-
-    endpoints.update(
-
-        detect_graphql(
-            urls
-        )
-
-    )
-
-    return sorted(
-        endpoints
-    )
+    return sorted(endpoints)
 
 
 # ==========================================================
@@ -285,19 +209,11 @@ def extract_endpoints(
 # ==========================================================
 
 __all__ = [
-
     "INTERESTING_KEYWORDS",
-
     "normalize_endpoint",
-
     "is_interesting",
-
     "filter_endpoints",
-
     "detect_api_versions",
-
     "detect_graphql",
-
     "extract_endpoints",
-
 ]

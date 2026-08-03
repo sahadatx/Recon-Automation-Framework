@@ -17,7 +17,6 @@ from modules.javascript.string_filters import (
     filter_strings,
 )
 
-
 # ==========================================================
 # Regex Patterns
 # ==========================================================
@@ -50,7 +49,7 @@ COMMENT_PATTERN = re.compile(
 )
 
 STRING_PATTERN = re.compile(
-    r'''
+    r"""
     (?P<quote>["'])
     (
         (?:
@@ -59,7 +58,7 @@ STRING_PATTERN = re.compile(
         )*
     )
     (?P=quote)
-    ''',
+    """,
     re.VERBOSE | re.DOTALL,
 )
 
@@ -74,6 +73,7 @@ SOURCEMAP_PATTERN = re.compile(
 # ==========================================================
 # URL Validation
 # ==========================================================
+
 
 def is_valid_url(
     url: str,
@@ -101,36 +101,22 @@ def is_valid_url(
 
     try:
 
-        parsed = urlparse(
-            url
-        )
+        parsed = urlparse(url)
 
     except ValueError:
 
         return False
 
-    return (
-
-        parsed.scheme in {
-
-            "http",
-
-            "https",
-
-        }
-
-        and
-
-        bool(
-            parsed.netloc
-        )
-
-    )
+    return parsed.scheme in {
+        "http",
+        "https",
+    } and bool(parsed.netloc)
 
 
 # ==========================================================
 # Normalize Values
 # ==========================================================
+
 
 def normalize(
     items: list,
@@ -142,26 +128,13 @@ def normalize(
         list
     """
 
-    return sorted(
-
-        {
-
-            str(item).strip()
-
-            for item in items
-
-            if item
-
-            and str(item).strip()
-
-        }
-
-    )
+    return sorted({str(item).strip() for item in items if item and str(item).strip()})
 
 
 # ==========================================================
 # Extract URLs
 # ==========================================================
+
 
 def extract_urls(
     content: str,
@@ -173,28 +146,13 @@ def extract_urls(
         list[str]
     """
 
-    return normalize(
-
-        [
-
-            url
-
-            for url in URL_PATTERN.findall(
-                content
-            )
-
-            if is_valid_url(
-                url
-            )
-
-        ]
-
-    )
+    return normalize([url for url in URL_PATTERN.findall(content) if is_valid_url(url)])
 
 
 # ==========================================================
 # Extract Comments
 # ==========================================================
+
 
 def extract_comments(
     content: str,
@@ -208,28 +166,21 @@ def extract_comments(
 
     comments: list[str] = []
 
-    for match in COMMENT_PATTERN.finditer(
-        content
-    ):
+    for match in COMMENT_PATTERN.finditer(content):
 
-        value = match.group(
-            0
-        ).strip()
+        value = match.group(0).strip()
 
         if value:
 
-            comments.append(
-                value
-            )
+            comments.append(value)
 
-    return normalize(
-        comments
-    )
+    return normalize(comments)
 
 
 # ==========================================================
 # Extract Strings
 # ==========================================================
+
 
 def extract_strings(
     content: str,
@@ -243,32 +194,21 @@ def extract_strings(
 
     strings: list[str] = []
 
-    for match in STRING_PATTERN.finditer(
-        content
-    ):
+    for match in STRING_PATTERN.finditer(content):
 
-        value = match.group(
-            2
-        ).strip()
+        value = match.group(2).strip()
 
         if value:
 
-            strings.append(
-                value
-            )
+            strings.append(value)
 
-    return filter_strings(
-
-        normalize(
-            strings
-        )
-
-    )
+    return filter_strings(normalize(strings))
 
 
 # ==========================================================
 # Extract Source Maps
 # ==========================================================
+
 
 def extract_source_maps(
     content: str,
@@ -280,18 +220,13 @@ def extract_source_maps(
         list[str]
     """
 
-    return normalize(
-
-        SOURCEMAP_PATTERN.findall(
-            content
-        )
-
-    )
+    return normalize(SOURCEMAP_PATTERN.findall(content))
 
 
 # ==========================================================
 # Generate Statistics
 # ==========================================================
+
 
 def generate_statistics(
     urls: list[str],
@@ -307,29 +242,17 @@ def generate_statistics(
     """
 
     return {
-
-        "urls": len(
-            urls
-        ),
-
-        "comments": len(
-            comments
-        ),
-
-        "strings": len(
-            strings
-        ),
-
-        "source_maps": len(
-            source_maps
-        ),
-
+        "urls": len(urls),
+        "comments": len(comments),
+        "strings": len(strings),
+        "source_maps": len(source_maps),
     }
 
 
 # ==========================================================
 # Parse Content
 # ==========================================================
+
 
 def parse_content(
     content: str,
@@ -341,44 +264,25 @@ def parse_content(
         dict
     """
 
-    urls = extract_urls(
-        content
-    )
+    urls = extract_urls(content)
 
-    comments = extract_comments(
-        content
-    )
+    comments = extract_comments(content)
 
-    strings = extract_strings(
-        content
-    )
+    strings = extract_strings(content)
 
-    source_maps = extract_source_maps(
-        content
-    )
+    source_maps = extract_source_maps(content)
 
     return {
-
         "urls": urls,
-
         "comments": comments,
-
         "strings": strings,
-
         "source_maps": source_maps,
-
         "statistics": generate_statistics(
-
             urls,
-
             comments,
-
             strings,
-
             source_maps,
-
         ),
-
     }
 
 
@@ -387,17 +291,10 @@ def parse_content(
 # ==========================================================
 
 __all__ = [
-
     "extract_urls",
-
     "extract_comments",
-
     "extract_strings",
-
     "extract_source_maps",
-
     "generate_statistics",
-
     "parse_content",
-
 ]

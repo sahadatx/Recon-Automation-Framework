@@ -23,6 +23,7 @@ from modules.tech.constants import (
 # Helpers
 # ==========================================================
 
+
 def create_output_directory() -> None:
     """
     Create output directory.
@@ -37,6 +38,7 @@ def create_output_directory() -> None:
 # ==========================================================
 # Results (TXT)
 # ==========================================================
+
 
 def export_results_txt(
     analysis: dict[str, Any],
@@ -74,9 +76,7 @@ def export_results_txt(
 
                 for technology in technologies:
 
-                    file.write(
-                        f"- {technology}\n"
-                    )
+                    file.write(f"- {technology}\n")
 
             else:
 
@@ -84,13 +84,9 @@ def export_results_txt(
 
             file.write("\n")
 
-            file.write(
-                "Security Headers\n"
-            )
+            file.write("Security Headers\n")
 
-            file.write(
-                "-" * 70 + "\n"
-            )
+            file.write("-" * 70 + "\n")
 
             headers = data.get(
                 "security_headers",
@@ -101,9 +97,7 @@ def export_results_txt(
 
                 for header in headers:
 
-                    file.write(
-                        f"- {header}\n"
-                    )
+                    file.write(f"- {header}\n")
 
             else:
 
@@ -115,6 +109,7 @@ def export_results_txt(
 # ==========================================================
 # Results (JSON)
 # ==========================================================
+
 
 def export_results_json(
     analysis: dict[str, Any],
@@ -141,6 +136,7 @@ def export_results_json(
 # ==========================================================
 # Results (CSV)
 # ==========================================================
+
 
 def export_results_csv(
     analysis: dict[str, Any],
@@ -196,6 +192,7 @@ def export_results_csv(
 # Summary
 # ==========================================================
 
+
 def export_summary(
     analysis: dict[str, Any],
 ) -> None:
@@ -212,78 +209,49 @@ def export_summary(
         encoding="utf-8",
     ) as file:
 
-        file.write(
-            "TECHNOLOGY DETECTION SUMMARY\n"
-        )
+        file.write("TECHNOLOGY DETECTION SUMMARY\n")
+
+        file.write("=" * 70 + "\n\n")
+
+        file.write(f"Hosts Analyzed        : " f"{statistics['hosts_analyzed']}\n")
+
+        file.write(f"Failed Hosts          : " f"{statistics['failed_hosts']}\n")
+
+        file.write(f"Detected Technologies : " f"{statistics['technology_count']}\n")
 
         file.write(
-            "=" * 70 + "\n\n"
+            f"Security Headers      : " f"{statistics['security_header_count']}\n"
         )
 
-        file.write(
-            f"Hosts Analyzed        : "
-            f"{statistics['hosts_analyzed']}\n"
-        )
+        file.write("Technology Breakdown\n")
 
-        file.write(
-            f"Failed Hosts          : "
-            f"{statistics['failed_hosts']}\n"
-        )
-
-        file.write(
-            f"Detected Technologies : "
-            f"{statistics['technology_count']}\n"
-        )
-
-        file.write(
-            f"Security Headers      : "
-            f"{statistics['security_header_count']}\n"
-        )
-
-        file.write(
-            "Technology Breakdown\n"
-        )
-
-        file.write(
-            "-" * 70 + "\n"
-        )
+        file.write("-" * 70 + "\n")
 
         for (
             technology,
             count,
-        ) in statistics[
-            "technology_counts"
-        ].items():
+        ) in statistics["technology_counts"].items():
 
-            file.write(
-                f"{technology:<30}{count}\n"
-            )
+            file.write(f"{technology:<30}{count}\n")
 
         file.write("\n")
 
-        file.write(
-            "Security Header Breakdown\n"
-        )
+        file.write("Security Header Breakdown\n")
 
-        file.write(
-            "-" * 70 + "\n"
-        )
+        file.write("-" * 70 + "\n")
 
         for (
             header,
             count,
-        ) in statistics[
-            "security_header_counts"
-        ].items():
+        ) in statistics["security_header_counts"].items():
 
-            file.write(
-                f"{header:<30}{count}\n"
-            )
+            file.write(f"{header:<30}{count}\n")
 
 
 # ==========================================================
 # Technologies
 # ==========================================================
+
 
 def export_technologies(
     analysis: dict[str, Any],
@@ -301,18 +269,15 @@ def export_technologies(
         encoding="utf-8",
     ) as file:
 
-        for technology in statistics[
-            "technologies"
-        ]:
+        for technology in statistics["technologies"]:
 
-            file.write(
-                f"{technology}\n"
-            )
+            file.write(f"{technology}\n")
 
 
 # ==========================================================
 # Export Everything
 # ==========================================================
+
 
 def export_all(
     analysis: dict[str, Any],

@@ -48,15 +48,11 @@ def run_securitytrails(
         subdomains.
     """
 
-    info(
-        "Running SecurityTrails..."
-    )
+    info("Running SecurityTrails...")
 
     if not SECURITYTRAILS_API_KEY:
 
-        warning(
-            "SecurityTrails API key not configured."
-        )
+        warning("SecurityTrails API key not configured.")
 
         return []
 
@@ -64,14 +60,9 @@ def run_securitytrails(
 
     if session is None:
 
-        raise RuntimeError(
-            "HTTP session not initialized."
-        )
+        raise RuntimeError("HTTP session not initialized.")
 
-    url = (
-        f"https://api.securitytrails.com/v1/"
-        f"domain/{domain}/subdomains"
-    )
+    url = f"https://api.securitytrails.com/v1/" f"domain/{domain}/subdomains"
 
     headers = {
         "APIKEY": SECURITYTRAILS_API_KEY,
@@ -90,51 +81,37 @@ def run_securitytrails(
         requests.ConnectionError,
     ):
 
-        warning(
-            "SecurityTrails connection failed. "
-            "Retrying..."
-        )
+        warning("SecurityTrails connection failed. " "Retrying...")
 
         raise
 
     except requests.RequestException as exc:
 
-        error(
-            f"SecurityTrails request failed: {exc}"
-        )
+        error(f"SecurityTrails request failed: {exc}")
 
         return []
 
     if response.status_code == 401:
 
-        error(
-            "Invalid SecurityTrails API key."
-        )
+        error("Invalid SecurityTrails API key.")
 
         return []
 
     if response.status_code == 403:
 
-        error(
-            "SecurityTrails access denied."
-        )
+        error("SecurityTrails access denied.")
 
         return []
 
     if response.status_code == 404:
 
-        warning(
-            f"No SecurityTrails data for "
-            f"{domain}."
-        )
+        warning(f"No SecurityTrails data for " f"{domain}.")
 
         return []
 
     if response.status_code == 429:
 
-        retry_after = response.headers.get(
-            "Retry-After"
-        )
+        retry_after = response.headers.get("Retry-After")
 
         if retry_after:
 
@@ -146,24 +123,17 @@ def run_securitytrails(
 
         else:
 
-            warning(
-                "SecurityTrails rate limit "
-                "exceeded."
-            )
+            warning("SecurityTrails rate limit " "exceeded.")
 
         return []
 
     if response.status_code >= 500:
 
         warning(
-            f"SecurityTrails server error "
-            f"({response.status_code}). "
-            "Retrying..."
+            f"SecurityTrails server error " f"({response.status_code}). " "Retrying..."
         )
 
-        raise requests.HTTPError(
-            f"HTTP {response.status_code}"
-        )
+        raise requests.HTTPError(f"HTTP {response.status_code}")
 
     try:
 
@@ -171,10 +141,7 @@ def run_securitytrails(
 
     except ValueError:
 
-        error(
-            "Invalid JSON response from "
-            "SecurityTrails."
-        )
+        error("Invalid JSON response from " "SecurityTrails.")
 
         return []
 
@@ -191,17 +158,11 @@ def run_securitytrails(
 
     if subdomains:
 
-        success(
-            f"SecurityTrails found "
-            f"{len(subdomains)} subdomains."
-        )
+        success(f"SecurityTrails found " f"{len(subdomains)} subdomains.")
 
     else:
 
-        warning(
-            "SecurityTrails returned "
-            "no results."
-        )
+        warning("SecurityTrails returned " "no results.")
 
     return subdomains
 

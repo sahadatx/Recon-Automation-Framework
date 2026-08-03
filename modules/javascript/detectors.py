@@ -19,29 +19,23 @@ from modules.javascript.secrets import (
     SECRET_PATTERNS,
 )
 
-
 # ==========================================================
 # Empty Result
 # ==========================================================
 
 EMPTY_RESULT = {
-
     "findings": {},
-
     "statistics": {
-
         "secret_types": 0,
-
         "total_secrets": 0,
-
     },
-
 }
 
 
 # ==========================================================
 # Normalize Matches
 # ==========================================================
+
 
 def normalize_matches(
     matches,
@@ -63,41 +57,25 @@ def normalize_matches(
         ):
 
             value = next(
-
-                (
-
-                    item.strip()
-
-                    for item in match
-
-                    if item
-
-                ),
-
+                (item.strip() for item in match if item),
                 "",
-
             )
 
         else:
 
-            value = str(
-                match
-            ).strip()
+            value = str(match).strip()
 
         if value:
 
-            normalized.add(
-                value
-            )
+            normalized.add(value)
 
-    return sorted(
-        normalized
-    )
+    return sorted(normalized)
 
 
 # ==========================================================
 # Detect Pattern
 # ==========================================================
+
 
 def detect_pattern(
     content: str,
@@ -112,19 +90,11 @@ def detect_pattern(
 
     try:
 
-        return normalize_matches(
-
-            pattern.findall(
-                content
-            )
-
-        )
+        return normalize_matches(pattern.findall(content))
 
     except Exception as error:
 
-        warning(
-            f"Regex failed: {error}"
-        )
+        warning(f"Regex failed: {error}")
 
         return []
 
@@ -132,6 +102,7 @@ def detect_pattern(
 # ==========================================================
 # Detect Secrets
 # ==========================================================
+
 
 def detect_secrets(
     content: str,
@@ -149,24 +120,21 @@ def detect_secrets(
     for secret_type, pattern in SECRET_PATTERNS.items():
 
         matches = detect_pattern(
-
             content,
-
             pattern,
-
         )
 
         if matches:
 
-            findings[
-                secret_type
-            ] = matches
+            findings[secret_type] = matches
 
     return findings
+
 
 # ==========================================================
 # Generate Statistics
 # ==========================================================
+
 
 def generate_statistics(
     findings: dict[str, list[str]],
@@ -179,25 +147,15 @@ def generate_statistics(
     """
 
     return {
-
-        "secret_types": len(
-            findings
-        ),
-
-        "total_secrets": sum(
-
-            len(values)
-
-            for values in findings.values()
-
-        ),
-
+        "secret_types": len(findings),
+        "total_secrets": sum(len(values) for values in findings.values()),
     }
 
 
 # ==========================================================
 # Process Findings
 # ==========================================================
+
 
 def process_findings(
     content: str,
@@ -215,18 +173,15 @@ def process_findings(
         dict[str, list[str]]
     """
 
-    findings = detect_secrets(
-        content
-    )
+    findings = detect_secrets(content)
 
-    return filter_findings(
-        findings
-    )
+    return filter_findings(findings)
 
 
 # ==========================================================
 # Scan Content
 # ==========================================================
+
 
 def scan_content(
     content: str,
@@ -254,26 +209,17 @@ def scan_content(
 
     try:
 
-        findings = process_findings(
-            content
-        )
+        findings = process_findings(content)
 
     except Exception as error:
 
-        warning(
-            f"Secret detection failed: {error}"
-        )
+        warning(f"Secret detection failed: {error}")
 
         return EMPTY_RESULT.copy()
 
     return {
-
         "findings": findings,
-
-        "statistics": generate_statistics(
-            findings
-        ),
-
+        "statistics": generate_statistics(findings),
     }
 
 
@@ -282,19 +228,11 @@ def scan_content(
 # ==========================================================
 
 __all__ = [
-
     "EMPTY_RESULT",
-
     "normalize_matches",
-
     "detect_pattern",
-
     "detect_secrets",
-
     "generate_statistics",
-
     "process_findings",
-
     "scan_content",
-
 ]

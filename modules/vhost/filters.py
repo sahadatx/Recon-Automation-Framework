@@ -8,38 +8,28 @@ normalizes ffuf results.
 from collections import Counter
 
 from config.config import (
-
     VHOST_FILTER_DEFAULT_RESPONSES,
-
 )
-
 
 # ==========================================================
 # Default Status Codes
 # ==========================================================
 
 DEFAULT_STATUS_CODES = {
-
     200,
-
     204,
-
     301,
-
     302,
-
     307,
-
     401,
-
     403,
-
 }
 
 
 # ==========================================================
 # Remove Duplicate Hosts
 # ==========================================================
+
 
 def remove_duplicates(
     results: list,
@@ -54,29 +44,21 @@ def remove_duplicates(
     for result in results:
 
         host = result.get(
-
             "host",
-
             "",
-
         )
 
         if host:
 
-            unique[
-                host
-            ] = result
+            unique[host] = result
 
-    return list(
-
-        unique.values()
-
-    )
+    return list(unique.values())
 
 
 # ==========================================================
 # Filter Status Codes
 # ==========================================================
+
 
 def filter_status_codes(
     results: list,
@@ -92,25 +74,20 @@ def filter_status_codes(
         allowed = DEFAULT_STATUS_CODES
 
     return [
-
         result
-
         for result in results
-
         if result.get(
-
             "status",
-
             0,
-
-        ) in allowed
-
+        )
+        in allowed
     ]
 
 
 # ==========================================================
 # Remove Invalid Hosts
 # ==========================================================
+
 
 def remove_invalid(
     results: list,
@@ -120,25 +97,19 @@ def remove_invalid(
     """
 
     return [
-
         result
-
         for result in results
-
         if result.get(
-
             "host",
-
             "",
-
         )
-
     ]
 
 
 # ==========================================================
 # Remove Empty Responses
 # ==========================================================
+
 
 def remove_empty(
     results: list,
@@ -149,25 +120,20 @@ def remove_empty(
     """
 
     return [
-
         result
-
         for result in results
-
         if result.get(
-
             "length",
-
             0,
-
-        ) > 0
-
+        )
+        > 0
     ]
 
 
 # ==========================================================
 # Remove Redirect Loops
 # ==========================================================
+
 
 def remove_redirect_loops(
     results: list,
@@ -181,38 +147,20 @@ def remove_redirect_loops(
     for result in results:
 
         url = result.get(
-
             "url",
-
             "",
-
         )
 
         redirect = result.get(
-
             "redirect",
-
             "",
-
         )
 
-        if (
-
-            redirect
-
-            and
-
-            redirect == url
-
-        ):
+        if redirect and redirect == url:
 
             continue
 
-        filtered.append(
-
-            result
-
-        )
+        filtered.append(result)
 
     return filtered
 
@@ -220,6 +168,7 @@ def remove_redirect_loops(
 # ==========================================================
 # Remove Default Responses
 # ==========================================================
+
 
 def remove_default_responses(
     results: list,
@@ -238,49 +187,34 @@ def remove_default_responses(
         return results
 
     counter = Counter(
-
         result.get(
-
             "length",
-
             0,
-
         )
-
         for result in results
-
     )
 
     length, count = counter.most_common(1)[0]
 
-    if count < (
-
-        len(results) // 2
-
-    ):
+    if count < (len(results) // 2):
 
         return results
 
     return [
-
         result
-
         for result in results
-
         if result.get(
-
             "length",
-
             0,
-
-        ) != length
-
+        )
+        != length
     ]
 
 
 # ==========================================================
 # Apply Filters
 # ==========================================================
+
 
 def apply_filters(
     results: list,
@@ -289,42 +223,18 @@ def apply_filters(
     Apply all filters.
     """
 
-    results = remove_duplicates(
+    results = remove_duplicates(results)
 
-        results
+    results = filter_status_codes(results)
 
-    )
+    results = remove_invalid(results)
 
-    results = filter_status_codes(
+    results = remove_empty(results)
 
-        results
-
-    )
-
-    results = remove_invalid(
-
-        results
-
-    )
-
-    results = remove_empty(
-
-        results
-
-    )
-
-    results = remove_redirect_loops(
-
-        results
-
-    )
+    results = remove_redirect_loops(results)
 
     if VHOST_FILTER_DEFAULT_RESPONSES:
 
-        results = remove_default_responses(
-
-            results
-
-        )
+        results = remove_default_responses(results)
 
     return results

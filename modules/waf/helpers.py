@@ -7,10 +7,10 @@ for the WAF Detection module.
 
 from __future__ import annotations
 
-
 # ==========================================================
 # Safe Lower
 # ==========================================================
+
 
 def safe_lower(value):
     """
@@ -31,6 +31,7 @@ def safe_lower(value):
 # Normalize Headers
 # ==========================================================
 
+
 def normalize_headers(headers):
     """
     Normalize response headers.
@@ -43,20 +44,13 @@ def normalize_headers(headers):
 
         return set()
 
-    return {
-
-        safe_lower(key)
-
-        for key
-
-        in headers.keys()
-
-    }
+    return {safe_lower(key) for key in headers.keys()}
 
 
 # ==========================================================
 # Normalize Cookies
 # ==========================================================
+
 
 def normalize_cookies(cookies):
     """
@@ -70,20 +64,13 @@ def normalize_cookies(cookies):
 
         return set()
 
-    return {
-
-        safe_lower(key)
-
-        for key
-
-        in cookies.keys()
-
-    }
+    return {safe_lower(key) for key in cookies.keys()}
 
 
 # ==========================================================
 # Extract Server
 # ==========================================================
+
 
 def extract_server(headers):
     """
@@ -98,21 +85,17 @@ def extract_server(headers):
         return ""
 
     return safe_lower(
-
         headers.get(
-
             "server",
-
             "",
-
         )
-
     )
 
 
 # ==========================================================
 # Match Keys
 # ==========================================================
+
 
 def match_keys(
     values,
@@ -129,17 +112,9 @@ def match_keys(
 
     for fingerprint in fingerprints:
 
-        if safe_lower(
+        if safe_lower(fingerprint) in values:
 
-            fingerprint
-
-        ) in values:
-
-            matches.append(
-
-                fingerprint
-
-            )
+            matches.append(fingerprint)
 
     return matches
 
@@ -147,6 +122,7 @@ def match_keys(
 # ==========================================================
 # Match Substrings
 # ==========================================================
+
 
 def match_substrings(
     text,
@@ -159,27 +135,15 @@ def match_substrings(
         list
     """
 
-    text = safe_lower(
-
-        text
-
-    )
+    text = safe_lower(text)
 
     matches = []
 
     for fingerprint in fingerprints:
 
-        if safe_lower(
+        if safe_lower(fingerprint) in text:
 
-            fingerprint
-
-        ) in text:
-
-            matches.append(
-
-                fingerprint
-
-            )
+            matches.append(fingerprint)
 
     return matches
 
@@ -187,6 +151,7 @@ def match_substrings(
 # ==========================================================
 # Has Header
 # ==========================================================
+
 
 def has_header(
     headers,
@@ -199,16 +164,13 @@ def has_header(
         bool
     """
 
-    return safe_lower(
-
-        header
-
-    ) in headers
+    return safe_lower(header) in headers
 
 
 # ==========================================================
 # Has Cookie
 # ==========================================================
+
 
 def has_cookie(
     cookies,
@@ -221,16 +183,13 @@ def has_cookie(
         bool
     """
 
-    return safe_lower(
-
-        cookie
-
-    ) in cookies
+    return safe_lower(cookie) in cookies
 
 
 # ==========================================================
 # Remove Duplicate Evidence
 # ==========================================================
+
 
 def unique_evidence(
     evidence,
@@ -242,26 +201,13 @@ def unique_evidence(
         list
     """
 
-    return sorted(
-
-        {
-
-            item.strip()
-
-            for item
-
-            in evidence
-
-            if item
-
-        }
-
-    )
+    return sorted({item.strip() for item in evidence if item})
 
 
 # ==========================================================
 # Cap Score
 # ==========================================================
+
 
 def cap_score(
     score,

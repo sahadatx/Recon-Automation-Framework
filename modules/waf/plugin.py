@@ -17,7 +17,6 @@ from .exporter import (
 )
 from .manager import run
 
-
 # ==========================================================
 # WAF Detection Plugin
 # ==========================================================
@@ -41,9 +40,7 @@ class WAFPlugin(BasePlugin):
         "signatures."
     )
 
-    depends_on = (
-        "http",
-    )
+    depends_on = ("http",)
 
     config = {
         "fingerprints": True,

@@ -14,7 +14,6 @@ from core.plugins.base import BasePlugin
 from .exporter import export_all
 from .manager import run
 
-
 # ==========================================================
 # Technology Detection Plugin
 # ==========================================================
@@ -37,9 +36,7 @@ class TechnologyPlugin(BasePlugin):
         "discovered web applications."
     )
 
-    depends_on = (
-        "http",
-    )
+    depends_on = ("http",)
 
     config = {
         "threads": True,

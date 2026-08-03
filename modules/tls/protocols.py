@@ -13,41 +13,29 @@ from copy import deepcopy
 
 from config.config import HTTP_TIMEOUT
 
-
 # ==========================================================
 # Default Result
 # ==========================================================
 
 EMPTY_PROTOCOL = {
-
     "host": "",
-
     "port": 443,
-
     "tls13": False,
-
     "tls12": False,
-
     "tls11": False,
-
     "tls10": False,
-
     "ssl3": False,
-
     "ssl2": False,
-
     "highest_protocol": "",
-
     "security": "",
-
     "error": None,
-
 }
 
 
 # ==========================================================
 # Create SSL Context
 # ==========================================================
+
 
 def create_protocol_context(
     version: ssl.TLSVersion,
@@ -61,9 +49,7 @@ def create_protocol_context(
     """
 
     context = ssl.SSLContext(
-
         ssl.PROTOCOL_TLS_CLIENT,
-
     )
 
     context.check_hostname = False
@@ -80,6 +66,7 @@ def create_protocol_context(
 # ==========================================================
 # Test TLS Version
 # ==========================================================
+
 
 def test_protocol(
     host: str,
@@ -101,53 +88,35 @@ def test_protocol(
     try:
 
         context = create_protocol_context(
-
             version,
-
         )
 
         sock = socket.create_connection(
-
             (
-
                 host,
-
                 port,
-
             ),
-
             timeout=HTTP_TIMEOUT,
-
         )
 
         tls = context.wrap_socket(
-
             sock,
-
             server_hostname=host,
-
         )
 
         tls.do_handshake()
 
         expected_versions = {
-
             ssl.TLSVersion.TLSv1: "TLSv1",
-
             ssl.TLSVersion.TLSv1_1: "TLSv1.1",
-
             ssl.TLSVersion.TLSv1_2: "TLSv1.2",
-
             ssl.TLSVersion.TLSv1_3: "TLSv1.3",
-
         }
 
         negotiated = tls.version()
 
         expected = expected_versions.get(
-
             version,
-
         )
 
         return negotiated == expected
@@ -171,6 +140,7 @@ def test_protocol(
 # TLS 1.3
 # ==========================================================
 
+
 def supports_tls13(
     host: str,
     port: int = 443,
@@ -183,19 +153,16 @@ def supports_tls13(
     """
 
     return test_protocol(
-
         host,
-
         ssl.TLSVersion.TLSv1_3,
-
         port,
-
     )
 
 
 # ==========================================================
 # TLS 1.2
 # ==========================================================
+
 
 def supports_tls12(
     host: str,
@@ -209,18 +176,16 @@ def supports_tls12(
     """
 
     return test_protocol(
-
         host,
-
         ssl.TLSVersion.TLSv1_2,
-
         port,
-
     )
+
 
 # ==========================================================
 # TLS 1.1
 # ==========================================================
+
 
 def supports_tls11(
     host: str,
@@ -234,19 +199,16 @@ def supports_tls11(
     """
 
     return test_protocol(
-
         host,
-
         ssl.TLSVersion.TLSv1_1,
-
         port,
-
     )
 
 
 # ==========================================================
 # TLS 1.0
 # ==========================================================
+
 
 def supports_tls10(
     host: str,
@@ -260,19 +222,16 @@ def supports_tls10(
     """
 
     return test_protocol(
-
         host,
-
         ssl.TLSVersion.TLSv1,
-
         port,
-
     )
 
 
 # ==========================================================
 # SSL 3.0
 # ==========================================================
+
 
 def supports_ssl3(
     host: str,
@@ -294,19 +253,16 @@ def supports_ssl3(
         return False
 
     return test_protocol(
-
         host,
-
         version,
-
         port,
-
     )
 
 
 # ==========================================================
 # SSL 2.0
 # ==========================================================
+
 
 def supports_ssl2(
     host: str,
@@ -326,6 +282,7 @@ def supports_ssl2(
 # ==========================================================
 # Highest Supported Protocol
 # ==========================================================
+
 
 def highest_protocol(
     result: dict,
@@ -369,6 +326,7 @@ def highest_protocol(
 # Protocol Security Rating
 # ==========================================================
 
+
 def protocol_security(
     protocol: str,
 ):
@@ -411,6 +369,7 @@ def protocol_security(
 # Collect Protocols
 # ==========================================================
 
+
 def collect_protocols(
     host: str,
     port: int = 443,
@@ -424,9 +383,7 @@ def collect_protocols(
     """
 
     result = deepcopy(
-
         EMPTY_PROTOCOL,
-
     )
 
     result["host"] = host
@@ -436,79 +393,47 @@ def collect_protocols(
     try:
 
         result["tls13"] = supports_tls13(
-
             host,
-
             port,
-
         )
 
         result["tls12"] = supports_tls12(
-
             host,
-
             port,
-
         )
 
         result["tls11"] = supports_tls11(
-
             host,
-
             port,
-
         )
 
         result["tls10"] = supports_tls10(
-
             host,
-
             port,
-
         )
 
         result["ssl3"] = supports_ssl3(
-
             host,
-
             port,
-
         )
 
         result["ssl2"] = supports_ssl2(
-
             host,
-
             port,
-
         )
 
-        result["highest_protocol"] = (
-
-            highest_protocol(
-
-                result,
-
-            )
-
+        result["highest_protocol"] = highest_protocol(
+            result,
         )
 
-        result["security"] = (
-
-            protocol_security(
-
-                result["highest_protocol"],
-
-            )
-
+        result["security"] = protocol_security(
+            result["highest_protocol"],
         )
 
     except Exception as exc:
 
         result["error"] = str(
-
             exc,
-
         )
 
     return result
@@ -517,6 +442,7 @@ def collect_protocols(
 # ==========================================================
 # Protocol Summary
 # ==========================================================
+
 
 def protocol_summary(
     protocol_data: dict,
@@ -533,53 +459,26 @@ def protocol_summary(
         return {}
 
     return {
-
-        "highest_protocol":
-
-            protocol_data.get(
-
-                "highest_protocol",
-
-                "",
-
-            ),
-
-        "security":
-
-            protocol_data.get(
-
-                "security",
-
-                "",
-
-            ),
-
-        "supported_protocols":
-
-            [
-
-                version
-
-                for version, enabled in (
-
-                    ("TLSv1.3", protocol_data["tls13"]),
-
-                    ("TLSv1.2", protocol_data["tls12"]),
-
-                    ("TLSv1.1", protocol_data["tls11"]),
-
-                    ("TLSv1", protocol_data["tls10"]),
-
-                    ("SSLv3", protocol_data["ssl3"]),
-
-                    ("SSLv2", protocol_data["ssl2"]),
-
-                )
-
-                if enabled
-
-            ],
-
+        "highest_protocol": protocol_data.get(
+            "highest_protocol",
+            "",
+        ),
+        "security": protocol_data.get(
+            "security",
+            "",
+        ),
+        "supported_protocols": [
+            version
+            for version, enabled in (
+                ("TLSv1.3", protocol_data["tls13"]),
+                ("TLSv1.2", protocol_data["tls12"]),
+                ("TLSv1.1", protocol_data["tls11"]),
+                ("TLSv1", protocol_data["tls10"]),
+                ("SSLv3", protocol_data["ssl3"]),
+                ("SSLv2", protocol_data["ssl2"]),
+            )
+            if enabled
+        ],
     }
 
 
@@ -588,31 +487,17 @@ def protocol_summary(
 # ==========================================================
 
 __all__ = [
-
     "EMPTY_PROTOCOL",
-
     "create_protocol_context",
-
     "test_protocol",
-
     "supports_tls13",
-
     "supports_tls12",
-
     "supports_tls11",
-
     "supports_tls10",
-
     "supports_ssl3",
-
     "supports_ssl2",
-
     "highest_protocol",
-
     "protocol_security",
-
     "collect_protocols",
-
     "protocol_summary",
-
 ]

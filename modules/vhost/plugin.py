@@ -17,7 +17,6 @@ from .exporter import (
 )
 from .manager import run
 
-
 # ==========================================================
 # Virtual Host Discovery Plugin
 # ==========================================================
@@ -40,9 +39,7 @@ class VHostPlugin(BasePlugin):
         "identify interesting responses."
     )
 
-    depends_on = (
-        "http",
-    )
+    depends_on = ("http",)
 
     config = {
         "threads": True,

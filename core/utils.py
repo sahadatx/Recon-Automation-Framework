@@ -17,10 +17,7 @@ def create_directory(directory: str) -> None:
         directory: Directory path.
     """
 
-    Path(directory).mkdir(
-        parents=True,
-        exist_ok=True
-    )
+    Path(directory).mkdir(parents=True, exist_ok=True)
 
 
 def read_file(file_path: str) -> list[str]:
@@ -39,16 +36,9 @@ def read_file(file_path: str) -> list[str]:
     if not path.exists():
         return []
 
-    with path.open(
-        "r",
-        encoding="utf-8"
-    ) as file:
+    with path.open("r", encoding="utf-8") as file:
 
-        return [
-            line.strip()
-            for line in file
-            if line.strip()
-        ]
+        return [line.strip() for line in file if line.strip()]
 
 
 def write_file(file_path: str, data: list[str]) -> None:
@@ -64,10 +54,7 @@ def write_file(file_path: str, data: list[str]) -> None:
 
     create_directory(path.parent)
 
-    with path.open(
-        "w",
-        encoding="utf-8"
-    ) as file:
+    with path.open("w", encoding="utf-8") as file:
 
         for item in data:
             file.write(f"{item}\n")
@@ -84,10 +71,7 @@ def timer(start_time: float) -> float:
         Elapsed seconds.
     """
 
-    return round(
-        time.time() - start_time,
-        2
-    )
+    return round(time.time() - start_time, 2)
 
 
 def validate_domain(domain: str) -> bool:
@@ -108,9 +92,4 @@ def validate_domain(domain: str) -> bool:
         r"[A-Za-z]{2,}$"
     )
 
-    return bool(
-        re.fullmatch(
-            pattern,
-            domain.strip()
-        )
-    )
+    return bool(re.fullmatch(pattern, domain.strip()))

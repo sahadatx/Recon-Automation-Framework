@@ -12,7 +12,6 @@ from modules.tech.statistics import (
     generate_statistics,
 )
 
-
 # ==========================================================
 # Analyze Results
 # ==========================================================
@@ -41,10 +40,7 @@ def analyze(
             results=results,
             failed_hosts=failed_hosts,
         ),
-        "hosts_analyzed": (
-            len(results)
-            + len(failed_hosts)
-        ),
+        "hosts_analyzed": (len(results) + len(failed_hosts)),
         "failed_hosts": len(
             failed_hosts,
         ),

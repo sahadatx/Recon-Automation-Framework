@@ -57,7 +57,6 @@ from modules.passive.subfinder import (
     run_subfinder,
 )
 
-
 # ==========================================================
 # Type Definitions
 # ==========================================================
@@ -113,9 +112,7 @@ RETRYABLE_TOOLS: frozenset[str] = frozenset(
     }
 )
 
-DOMAIN_RE = re.compile(
-    r"^(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$"
-)
+DOMAIN_RE = re.compile(r"^(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$")
 
 
 # ==========================================================
@@ -144,8 +141,7 @@ def timed_runner(
     )
 
     elapsed = round(
-        time.perf_counter()
-        - start_time,
+        time.perf_counter() - start_time,
         2,
     )
 
@@ -173,17 +169,13 @@ def collect_subdomains(
     concurrently.
     """
 
-    info(
-        "Starting Passive Enumeration..."
-    )
+    info("Starting Passive Enumeration...")
 
     executor = context.get_thread_pool()
 
     if executor is None:
 
-        raise RuntimeError(
-            "Thread pool not initialized."
-        )
+        raise RuntimeError("Thread pool not initialized.")
 
     results: dict[
         str,
@@ -211,7 +203,6 @@ def collect_subdomains(
     completed_sources = 0
 
     futures = {
-
         executor.submit(
             timed_runner,
             context,
@@ -221,12 +212,10 @@ def collect_subdomains(
             name,
             function,
         )
-
         for (
             name,
             function,
         ) in PASSIVE_SOURCES
-
     }
 
     for future in as_completed(
@@ -236,9 +225,7 @@ def collect_subdomains(
         (
             name,
             function,
-        ) = futures[
-            future
-        ]
+        ) = futures[future]
 
         completed_sources += 1
 
@@ -251,9 +238,7 @@ def collect_subdomains(
 
         except Exception as exc:
 
-            warning(
-                f"{name} crashed: {exc}"
-            )
+            warning(f"{name} crashed: {exc}")
 
             subdomains = []
 
@@ -263,23 +248,13 @@ def collect_subdomains(
                 name,
             )
 
-        results[
-            name
-        ] = subdomains
+        results[name] = subdomains
 
-        timings[
-            name
-        ] = elapsed
+        timings[name] = elapsed
 
-        info(
-            f"[{completed_sources}/{total_sources}] "
-            f"{name} completed."
-        )
+        info(f"[{completed_sources}/{total_sources}] " f"{name} completed.")
 
-        if (
-            not subdomains
-            and name in RETRYABLE_TOOLS
-        ):
+        if not subdomains and name in RETRYABLE_TOOLS:
 
             retry_queue.append(
                 (
@@ -290,9 +265,7 @@ def collect_subdomains(
 
     if retry_queue:
 
-        info(
-            "Retrying failed sources..."
-        )
+        info("Retrying failed sources...")
 
         for (
             name,
@@ -308,14 +281,9 @@ def collect_subdomains(
 
                 if retry_results:
 
-                    results[
-                        name
-                    ] = retry_results
+                    results[name] = retry_results
 
-                    if (
-                        name
-                        in failed_sources
-                    ):
+                    if name in failed_sources:
 
                         failed_sources.remove(
                             name,
@@ -323,9 +291,7 @@ def collect_subdomains(
 
             except Exception as exc:
 
-                warning(
-                    f"{name} retry failed: {exc}"
-                )
+                warning(f"{name} retry failed: {exc}")
 
     return (
         results,
@@ -364,18 +330,10 @@ def merge_results(
 
                 continue
 
-            normalized = (
-                subdomain
-                .strip()
-                .lower()
-                .rstrip(".")
-            )
+            normalized = subdomain.strip().lower().rstrip(".")
 
-            if (
-                normalized != target_domain
-                and not normalized.endswith(
-                    suffix,
-                )
+            if normalized != target_domain and not normalized.endswith(
+                suffix,
             ):
 
                 continue

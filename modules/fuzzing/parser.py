@@ -8,10 +8,10 @@ normalized Python objects.
 import json
 from pathlib import Path
 
-
 # ==========================================================
 # Read JSON
 # ==========================================================
+
 
 def read_json(
     filepath: str | Path,
@@ -27,9 +27,7 @@ def read_json(
         dict | None
     """
 
-    path = Path(
-        filepath
-    )
+    path = Path(filepath)
 
     if not path.exists():
 
@@ -38,16 +36,11 @@ def read_json(
     try:
 
         with path.open(
-
             "r",
-
             encoding="utf-8",
-
         ) as file:
 
-            return json.load(
-                file
-            )
+            return json.load(file)
 
     except Exception:
 
@@ -57,6 +50,7 @@ def read_json(
 # ==========================================================
 # Normalize Result
 # ==========================================================
+
 
 def normalize_result(
     result: dict,
@@ -73,48 +67,41 @@ def normalize_result(
     """
 
     return {
-
         "url": result.get(
             "url",
             "",
         ),
-
         "status": result.get(
             "status",
             0,
         ),
-
         "length": result.get(
             "length",
             0,
         ),
-
         "words": result.get(
             "words",
             0,
         ),
-
         "lines": result.get(
             "lines",
             0,
         ),
-
         "content_type": result.get(
             "content-type",
             "",
         ),
-
         "redirect": result.get(
             "redirectlocation",
             "",
         ),
-
     }
 
 
 # ==========================================================
 # Parse Results
 # ==========================================================
+
 
 def parse_results(
     data: dict,
@@ -131,22 +118,18 @@ def parse_results(
     """
 
     return [
-
-        normalize_result(
-            item
-        )
-
+        normalize_result(item)
         for item in data.get(
             "results",
             [],
         )
-
     ]
 
 
 # ==========================================================
 # Parse File
 # ==========================================================
+
 
 def parse_file(
     filepath: str | Path,
@@ -162,26 +145,19 @@ def parse_file(
         dict | None
     """
 
-    data = read_json(
-        filepath
-    )
+    data = read_json(filepath)
 
     if data is None:
 
         return None
 
-    return {
-
-        "results": parse_results(
-            data
-        )
-
-    }
+    return {"results": parse_results(data)}
 
 
 # ==========================================================
 # Entry Point
 # ==========================================================
+
 
 def parse_ffuf(
     filepath: str | Path,
@@ -197,6 +173,4 @@ def parse_ffuf(
         dict | None
     """
 
-    return parse_file(
-        filepath
-    )
+    return parse_file(filepath)

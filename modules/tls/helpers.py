@@ -16,33 +16,25 @@ from typing import Any
 
 from config.config import HTTP_TIMEOUT
 
-
 # ==========================================================
 # Default Result
 # ==========================================================
 
 EMPTY_CERTIFICATE = {
-
     "host": "",
-
     "port": 443,
-
     "tls_version": "",
-
     "cipher": "",
-
     "certificate": None,
-
     "certificate_der": None,
-
     "error": None,
-
 }
 
 
 # ==========================================================
 # SSL Context
 # ==========================================================
+
 
 def create_ssl_context():
     """
@@ -65,6 +57,7 @@ def create_ssl_context():
 # TCP Connection
 # ==========================================================
 
+
 def create_socket(
     host: str,
     port: int = 443,
@@ -78,17 +71,15 @@ def create_socket(
     """
 
     return socket.create_connection(
-
         (host, port),
-
         timeout=timeout,
-
     )
 
 
 # ==========================================================
 # TLS Connection
 # ==========================================================
+
 
 def connect_tls(
     host: str,
@@ -104,19 +95,13 @@ def connect_tls(
     context = create_ssl_context()
 
     raw_socket = create_socket(
-
         host,
-
         port,
-
     )
 
     tls_socket = context.wrap_socket(
-
         raw_socket,
-
         server_hostname=host,
-
     )
 
     return tls_socket
@@ -125,6 +110,7 @@ def connect_tls(
 # ==========================================================
 # Download Certificate
 # ==========================================================
+
 
 def get_certificate(
     host: str,
@@ -137,11 +123,7 @@ def get_certificate(
         dict
     """
 
-    result = deepcopy(
-
-        EMPTY_CERTIFICATE
-
-    )
+    result = deepcopy(EMPTY_CERTIFICATE)
 
     result["host"] = host
 
@@ -152,38 +134,19 @@ def get_certificate(
     try:
 
         tls_socket = connect_tls(
-
             host,
-
             port,
-
         )
 
-        result["certificate"] = (
-
-            tls_socket.getpeercert(
-
-                binary_form=False,
-
-            )
-
+        result["certificate"] = tls_socket.getpeercert(
+            binary_form=False,
         )
 
-        result["certificate_der"] = (
-
-            tls_socket.getpeercert(
-
-                binary_form=True,
-
-            )
-
+        result["certificate_der"] = tls_socket.getpeercert(
+            binary_form=True,
         )
 
-        result["tls_version"] = (
-
-            tls_socket.version()
-
-        )
+        result["tls_version"] = tls_socket.version()
 
         cipher = tls_socket.cipher()
 
@@ -207,6 +170,7 @@ def get_certificate(
 # ==========================================================
 # Parse X509 Name
 # ==========================================================
+
 
 def parse_name(
     name,
@@ -238,6 +202,7 @@ def parse_name(
 # Subject
 # ==========================================================
 
+
 def get_subject(
     certificate,
 ):
@@ -253,21 +218,17 @@ def get_subject(
         return {}
 
     return parse_name(
-
         certificate.get(
-
             "subject",
-
             (),
-
         )
-
     )
 
 
 # ==========================================================
 # Issuer
 # ==========================================================
+
 
 def get_issuer(
     certificate,
@@ -284,21 +245,17 @@ def get_issuer(
         return {}
 
     return parse_name(
-
         certificate.get(
-
             "issuer",
-
             (),
-
         )
-
     )
 
 
 # ==========================================================
 # Subject Alternative Names
 # ==========================================================
+
 
 def get_san(
     certificate,
@@ -318,31 +275,21 @@ def get_san(
     san = []
 
     for key, value in certificate.get(
-
         "subjectAltName",
-
         (),
-
     ):
 
         if key == "DNS":
 
-            san.append(
+            san.append(value)
 
-                value
-
-            )
-
-    return sorted(
-
-        set(san)
-
-    )
+    return sorted(set(san))
 
 
 # ==========================================================
 # Serial Number
 # ==========================================================
+
 
 def get_serial_number(
     certificate,
@@ -359,17 +306,15 @@ def get_serial_number(
         return ""
 
     return certificate.get(
-
         "serialNumber",
-
         "",
-
     )
 
 
 # ==========================================================
 # Not Before
 # ==========================================================
+
 
 def get_not_before(
     certificate,
@@ -386,17 +331,15 @@ def get_not_before(
         return ""
 
     return certificate.get(
-
         "notBefore",
-
         "",
-
     )
 
 
 # ==========================================================
 # Not After
 # ==========================================================
+
 
 def get_not_after(
     certificate,
@@ -413,17 +356,15 @@ def get_not_after(
         return ""
 
     return certificate.get(
-
         "notAfter",
-
         "",
-
     )
 
 
 # ==========================================================
 # Parse Datetime
 # ==========================================================
+
 
 def parse_datetime(
     value: str,
@@ -443,11 +384,8 @@ def parse_datetime(
     try:
 
         return datetime.strptime(
-
             value,
-
             "%b %d %H:%M:%S %Y %Z",
-
         )
 
     except Exception:
@@ -458,6 +396,7 @@ def parse_datetime(
 # ==========================================================
 # Days Remaining
 # ==========================================================
+
 
 def days_remaining(
     certificate,
@@ -471,29 +410,22 @@ def days_remaining(
     """
 
     expires = parse_datetime(
-
         get_not_after(
-
             certificate,
-
         )
-
     )
 
     if expires is None:
 
         return None
 
-    return (
-
-        expires - datetime.utcnow()
-
-    ).days
+    return (expires - datetime.utcnow()).days
 
 
 # ==========================================================
 # Expired
 # ==========================================================
+
 
 def is_expired(
     certificate,
@@ -507,9 +439,7 @@ def is_expired(
     """
 
     remaining = days_remaining(
-
         certificate,
-
     )
 
     if remaining is None:
@@ -523,6 +453,7 @@ def is_expired(
 # Self Signed
 # ==========================================================
 
+
 def is_self_signed(
     certificate,
 ):
@@ -533,28 +464,17 @@ def is_self_signed(
         bool
     """
 
-    return (
-
-        get_subject(
-
-            certificate,
-
-        )
-
-        ==
-
-        get_issuer(
-
-            certificate,
-
-        )
-
+    return get_subject(
+        certificate,
+    ) == get_issuer(
+        certificate,
     )
 
 
 # ==========================================================
 # Wildcard
 # ==========================================================
+
 
 def is_wildcard(
     certificate,
@@ -567,29 +487,23 @@ def is_wildcard(
     """
 
     subject = get_subject(
-
         certificate,
-
     )
 
     common_name = subject.get(
-
         "commonName",
-
         "",
-
     )
 
     return common_name.startswith(
-
         "*.",
-
     )
 
 
 # ==========================================================
 # Hostname Match
 # ==========================================================
+
 
 def hostname_match(
     host: str,
@@ -607,9 +521,7 @@ def hostname_match(
         return False
 
     san = get_san(
-
         certificate,
-
     )
 
     if host in san:
@@ -617,36 +529,19 @@ def hostname_match(
         return True
 
     subject = get_subject(
-
         certificate,
-
     )
 
     common_name = subject.get(
-
         "commonName",
-
         "",
-
     )
 
     if common_name.startswith("*."):
 
         domain = common_name[2:]
 
-        return (
-
-            host == domain
-
-            or
-
-            host.endswith(
-
-                "." + domain
-
-            )
-
-        )
+        return host == domain or host.endswith("." + domain)
 
     return host == common_name
 
@@ -656,41 +551,22 @@ def hostname_match(
 # ==========================================================
 
 __all__ = [
-
     "EMPTY_CERTIFICATE",
-
     "create_ssl_context",
-
     "create_socket",
-
     "connect_tls",
-
     "get_certificate",
-
     "parse_name",
-
     "get_subject",
-
     "get_issuer",
-
     "get_san",
-
     "get_serial_number",
-
     "get_not_before",
-
     "get_not_after",
-
     "parse_datetime",
-
     "days_remaining",
-
     "is_expired",
-
     "is_self_signed",
-
     "is_wildcard",
-
     "hostname_match",
-
 ]

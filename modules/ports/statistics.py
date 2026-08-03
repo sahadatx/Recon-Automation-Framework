@@ -6,10 +6,10 @@ Generate statistics for port scan results.
 
 from __future__ import annotations
 
-
 # ==========================================================
 # Generate Statistics
 # ==========================================================
+
 
 def generate_statistics(
     results: dict,
@@ -31,14 +31,9 @@ def generate_statistics(
 
     hosts_with_open_ports = len(results)
 
-    hosts_without_open_ports = len(
-        failed_hosts
-    )
+    hosts_without_open_ports = len(failed_hosts)
 
-    hosts_scanned = (
-        hosts_with_open_ports
-        + hosts_without_open_ports
-    )
+    hosts_scanned = hosts_with_open_ports + hosts_without_open_ports
 
     total_open_ports = 0
 
@@ -65,8 +60,7 @@ def generate_statistics(
 
     average_open_ports = (
         round(
-            total_open_ports
-            / hosts_with_open_ports,
+            total_open_ports / hosts_with_open_ports,
             2,
         )
         if hosts_with_open_ports
@@ -74,31 +68,16 @@ def generate_statistics(
     )
 
     return {
-
         "hosts_scanned": hosts_scanned,
-
-        "hosts_with_open_ports": (
-            hosts_with_open_ports
-        ),
-
-        "hosts_without_open_ports": (
-            hosts_without_open_ports
-        ),
-
-        "total_open_ports": (
-            total_open_ports
-        ),
-
-        "average_open_ports": (
-            average_open_ports
-        ),
-
+        "hosts_with_open_ports": (hosts_with_open_ports),
+        "hosts_without_open_ports": (hosts_without_open_ports),
+        "total_open_ports": (total_open_ports),
+        "average_open_ports": (average_open_ports),
         "service_counts": dict(
             sorted(
                 service_counts.items(),
             )
         ),
-
     }
 
 

@@ -9,44 +9,26 @@ from __future__ import annotations
 
 from pathlib import Path
 
-
 # ==========================================================
 # Output Directory
 # ==========================================================
 
-OUTPUT_DIR = Path(
-    "output/fuzzing"
-)
+OUTPUT_DIR = Path("output/fuzzing")
 
 
 # ==========================================================
 # Output Files
 # ==========================================================
 
-TXT_FILE = (
-    OUTPUT_DIR
-    / "fuzzing.txt"
-)
+TXT_FILE = OUTPUT_DIR / "fuzzing.txt"
 
-JSON_FILE = (
-    OUTPUT_DIR
-    / "fuzzing.json"
-)
+JSON_FILE = OUTPUT_DIR / "fuzzing.json"
 
-CSV_FILE = (
-    OUTPUT_DIR
-    / "fuzzing.csv"
-)
+CSV_FILE = OUTPUT_DIR / "fuzzing.csv"
 
-SUMMARY_FILE = (
-    OUTPUT_DIR
-    / "summary.txt"
-)
+SUMMARY_FILE = OUTPUT_DIR / "summary.txt"
 
-INTERESTING_FILE = (
-    OUTPUT_DIR
-    / "interesting.txt"
-)
+INTERESTING_FILE = OUTPUT_DIR / "interesting.txt"
 
 
 # ==========================================================

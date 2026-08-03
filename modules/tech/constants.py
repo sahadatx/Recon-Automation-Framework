@@ -6,44 +6,26 @@ from __future__ import annotations
 
 from pathlib import Path
 
-
 # ==========================================================
 # Output Directory
 # ==========================================================
 
-TECH_OUTPUT_DIR = Path(
-    "output/technology"
-)
+TECH_OUTPUT_DIR = Path("output/technology")
 
 
 # ==========================================================
 # Output Files
 # ==========================================================
 
-RESULTS_TXT = (
-    TECH_OUTPUT_DIR
-    / "results.txt"
-)
+RESULTS_TXT = TECH_OUTPUT_DIR / "results.txt"
 
-RESULTS_JSON = (
-    TECH_OUTPUT_DIR
-    / "results.json"
-)
+RESULTS_JSON = TECH_OUTPUT_DIR / "results.json"
 
-RESULTS_CSV = (
-    TECH_OUTPUT_DIR
-    / "results.csv"
-)
+RESULTS_CSV = TECH_OUTPUT_DIR / "results.csv"
 
-SUMMARY_TXT = (
-    TECH_OUTPUT_DIR
-    / "summary.txt"
-)
+SUMMARY_TXT = TECH_OUTPUT_DIR / "summary.txt"
 
-TECHNOLOGIES_TXT = (
-    TECH_OUTPUT_DIR
-    / "technologies.txt"
-)
+TECHNOLOGIES_TXT = TECH_OUTPUT_DIR / "technologies.txt"
 
 
 # ==========================================================

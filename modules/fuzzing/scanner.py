@@ -11,38 +11,25 @@ import tempfile
 from pathlib import Path
 
 from config.config import (
-
     FUZZ_THREADS,
-
     FUZZ_TIMEOUT,
-
     FUZZ_RATE_LIMIT,
-
     FUZZ_MATCH_CODES,
-
     FUZZ_FILTER_CODES,
-
     FUZZ_DEFAULT_WORDLIST,
-
     HTTP_USER_AGENT,
-
     FUZZ_AUTO_CALIBRATION,
-    
-
 )
 
 from core.logger import (
-
     info,
-
     warning,
-
 )
-
 
 # ==========================================================
 # Validate Target
 # ==========================================================
+
 
 def validate_target(
     target: str,
@@ -58,30 +45,18 @@ def validate_target(
         bool
     """
 
-    return (
-
-        bool(target)
-
-        and
-
-        target.startswith(
-
-            (
-
-                "http://",
-
-                "https://",
-
-            )
-
+    return bool(target) and target.startswith(
+        (
+            "http://",
+            "https://",
         )
-
     )
 
 
 # ==========================================================
 # Build ffuf Command
 # ==========================================================
+
 
 def build_command(
     target: str,
@@ -119,134 +94,72 @@ def build_command(
         tuple
     """
 
-    if not validate_target(
-        target
-    ):
+    if not validate_target(target):
 
-        raise ValueError(
-
-            f"Invalid target: {target}"
-
-        )
+        raise ValueError(f"Invalid target: {target}")
 
     if threads < 1:
 
-        raise ValueError(
-
-            "Thread count must be greater than zero."
-
-        )
+        raise ValueError("Thread count must be greater than zero.")
 
     if timeout < 1:
 
-        raise ValueError(
-
-            "Timeout must be greater than zero."
-
-        )
+        raise ValueError("Timeout must be greater than zero.")
 
     target = target.rstrip("/")
 
     if wordlist is None:
 
-        wordlist = (
-
-            FUZZ_DEFAULT_WORDLIST
-
-        )
+        wordlist = FUZZ_DEFAULT_WORDLIST
 
     else:
 
-        wordlist = Path(
+        wordlist = Path(wordlist)
 
-            wordlist
+    if not wordlist.exists() or not wordlist.is_file():
 
-        )
-
-    if (
-
-        not wordlist.exists()
-
-        or
-
-        not wordlist.is_file()
-
-    ):
-
-        raise FileNotFoundError(
-
-            f"Wordlist not found: {wordlist}"
-
-        )
+        raise FileNotFoundError(f"Wordlist not found: {wordlist}")
 
     output_file = Path(
-
         tempfile.mkstemp(
-
             suffix=".json",
-
         )[1]
-
     )
 
     command = [
-
         "ffuf",
-
         "-u",
-
         f"{target}/FUZZ",
-
         "-w",
-
         str(wordlist),
-
         "-H",
-
         f"User-Agent: {HTTP_USER_AGENT}",
-
         "-t",
-
         str(threads),
-
         "-maxtime",
-
         str(timeout),
-
         "-rate",
-
         str(FUZZ_RATE_LIMIT),
-
         "-mc",
-
         match_codes,
-
         "-fc",
-
         filter_codes,
-
         "-of",
-
         "json",
-
         "-o",
-
         str(output_file),
-
     ]
 
     return (
-
         command,
-
         output_file,
-
     )
 
 
 # ==========================================================
 # Run ffuf
 # ==========================================================
+
 
 def run_ffuf(
     target: str,
@@ -264,105 +177,64 @@ def run_ffuf(
     """
 
     command, output_file = build_command(
-
         target=target,
-
         wordlist=wordlist,
-
         threads=threads,
-
         timeout=timeout,
-
         match_codes=match_codes,
-
         filter_codes=filter_codes,
-
     )
 
-    info(
-
-        f"Running ffuf against {target}"
-
-    )
+    info(f"Running ffuf against {target}")
 
     try:
 
         subprocess.run(
-
             command,
-
             stdout=subprocess.DEVNULL,
-
             stderr=subprocess.PIPE,
-
             text=True,
-
             timeout=timeout,
-
             check=True,
-
         )
 
         return (
-
             output_file,
-
             None,
-
         )
 
     except subprocess.CalledProcessError as error:
 
-        warning(
-
-            f"ffuf failed: {target}"
-
-        )
+        warning(f"ffuf failed: {target}")
 
         return (
-
             None,
-
             error.stderr.strip(),
-
         )
 
     except subprocess.TimeoutExpired:
 
-        warning(
-
-            f"ffuf timeout: {target}"
-
-        )
+        warning(f"ffuf timeout: {target}")
 
         return (
-
             None,
-
             f"Timeout ({timeout}s)",
-
         )
 
     except FileNotFoundError:
 
-        warning(
-
-            "ffuf is not installed."
-
-        )
+        warning("ffuf is not installed.")
 
         return (
-
             None,
-
             "ffuf not installed",
-
         )
 
 
 # ==========================================================
 # Scan Target
 # ==========================================================
+
 
 def scan_target(
     target: str,
@@ -376,29 +248,22 @@ def scan_target(
     """
 
     output_file, error = run_ffuf(
-
         target=target,
-
         wordlist=wordlist,
-
     )
 
     return {
-
         "target": target,
-
         "success": error is None,
-
         "output": output_file,
-
         "error": error,
-
     }
 
 
 # ==========================================================
 # Cleanup
 # ==========================================================
+
 
 def cleanup(
     output_file: Path | None,
@@ -418,9 +283,7 @@ def cleanup(
     try:
 
         output_file.unlink(
-
             missing_ok=True,
-
         )
 
     except Exception:
@@ -431,6 +294,7 @@ def cleanup(
 # ==========================================================
 # Check ffuf Installation
 # ==========================================================
+
 
 def is_ffuf_installed() -> bool:
     """
@@ -444,21 +308,13 @@ def is_ffuf_installed() -> bool:
     try:
 
         subprocess.run(
-
             [
-
                 "ffuf",
-
                 "-V",
-
             ],
-
             stdout=subprocess.DEVNULL,
-
             stderr=subprocess.DEVNULL,
-
             check=True,
-
         )
 
         return True
@@ -472,6 +328,7 @@ def is_ffuf_installed() -> bool:
 # ffuf Version
 # ==========================================================
 
+
 def get_ffuf_version() -> str:
     """
     Return installed
@@ -484,21 +341,13 @@ def get_ffuf_version() -> str:
     try:
 
         result = subprocess.run(
-
             [
-
                 "ffuf",
-
                 "-V",
-
             ],
-
             capture_output=True,
-
             text=True,
-
             check=True,
-
         )
 
         return result.stdout.strip()
@@ -511,6 +360,7 @@ def get_ffuf_version() -> str:
 # ==========================================================
 # JSON Support
 # ==========================================================
+
 
 def supports_json() -> bool:
     """
@@ -528,6 +378,7 @@ def supports_json() -> bool:
 # Recursion Support
 # ==========================================================
 
+
 def supports_recursion() -> bool:
     """
     Check whether ffuf
@@ -543,6 +394,7 @@ def supports_recursion() -> bool:
 # ==========================================================
 # Auto Calibration Support
 # ==========================================================
+
 
 def supports_auto_calibration() -> bool:
     """

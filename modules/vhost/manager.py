@@ -46,7 +46,6 @@ from .scanner import (
     scan_target,
 )
 
-
 # ==========================================================
 # Process Target
 # ==========================================================
@@ -73,9 +72,7 @@ def process_target(
             None,
         )
 
-    output = scan[
-        "output"
-    ]
+    output = scan["output"]
 
     try:
 
@@ -133,13 +130,9 @@ def collect_results(
     Merge scan results.
     """
 
-    findings: list[
-        dict[str, Any]
-    ] = []
+    findings: list[dict[str, Any]] = []
 
-    interesting: list[
-        dict[str, Any]
-    ] = []
+    interesting: list[dict[str, Any]] = []
 
     for data in results.values():
 
@@ -238,23 +231,18 @@ def run_vhosts(
     )
 
     futures = {
-
         executor.submit(
             process_target,
             target,
         ): target
-
         for target in targets
-
     }
 
     for future in as_completed(
         futures,
     ):
 
-        target = futures[
-            future
-        ]
+        target = futures[future]
 
         completed += 1
 
@@ -279,9 +267,7 @@ def run_vhosts(
 
                 continue
 
-            results[
-                hostname
-            ] = data
+            results[hostname] = data
 
             progress_status(
                 completed,
@@ -317,9 +303,7 @@ def run_vhosts(
         interesting=interesting,
     )
 
-    statistics = analysis[
-        "statistics"
-    ]
+    statistics = analysis["statistics"]
 
     statistics.update(
         {
@@ -333,9 +317,7 @@ def run_vhosts(
         },
     )
 
-    analysis[
-        "failed"
-    ] = sorted(
+    analysis["failed"] = sorted(
         failed,
     )
 
@@ -357,13 +339,11 @@ def run_vhosts(
     )
 
     success(
-        f"Discovered Hosts    : "
-        f"{statistics['total_results']}",
+        f"Discovered Hosts    : " f"{statistics['total_results']}",
     )
 
     success(
-        f"Interesting Hosts   : "
-        f"{statistics['interesting_hosts']}",
+        f"Interesting Hosts   : " f"{statistics['interesting_hosts']}",
     )
 
     return analysis
@@ -407,12 +387,10 @@ def successful_targets(
                 "target",
                 "",
             )
-
             for result in analysis.get(
                 "results",
                 [],
             )
-
             if result.get(
                 "target",
             )

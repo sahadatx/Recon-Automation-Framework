@@ -14,7 +14,6 @@ from core.plugins.base import BasePlugin
 from .exporter import export_all
 from .manager import run
 
-
 # ==========================================================
 # Crawler Plugin
 # ==========================================================
@@ -37,9 +36,7 @@ class CrawlerPlugin(BasePlugin):
         "parameters and assets."
     )
 
-    depends_on = (
-        "http",
-    )
+    depends_on = ("http",)
 
     config = {
         "http": True,

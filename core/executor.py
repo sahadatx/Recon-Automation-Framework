@@ -59,9 +59,7 @@ def execute_module(
 
     except Exception as exception:
 
-        warning(
-            f"{module}: {exception}"
-        )
+        warning(f"{module}: {exception}")
 
         analysis = empty_analysis()
 
@@ -70,9 +68,7 @@ def execute_module(
         dict,
     ):
 
-        warning(
-            f"{module} returned invalid analysis."
-        )
+        warning(f"{module} returned invalid analysis.")
 
         analysis = empty_analysis()
 

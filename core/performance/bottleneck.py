@@ -9,18 +9,17 @@ from __future__ import annotations
 
 from typing import Any
 
-
 # ==========================================================
 # Thresholds
 # ==========================================================
 
-TIME_WARNING = 5.0          # seconds
+TIME_WARNING = 5.0  # seconds
 TIME_CRITICAL = 15.0
 
-MEMORY_WARNING = 250.0      # MB
+MEMORY_WARNING = 250.0  # MB
 MEMORY_CRITICAL = 500.0
 
-CPU_WARNING = 70.0          # %
+CPU_WARNING = 70.0  # %
 CPU_CRITICAL = 90.0
 
 
@@ -45,9 +44,7 @@ def detect_bottlenecks(
     }
     """
 
-    bottlenecks: list[
-        dict[str, Any]
-    ] = []
+    bottlenecks: list[dict[str, Any]] = []
 
     execution = metrics.get(
         "execution_time",
@@ -76,8 +73,7 @@ def detect_bottlenecks(
                 "severity": "Critical",
                 "value": execution,
                 "recommendation": (
-                    "Optimize slow modules or "
-                    "increase parallel execution."
+                    "Optimize slow modules or " "increase parallel execution."
                 ),
             }
         )
@@ -89,9 +85,7 @@ def detect_bottlenecks(
                 "category": "Execution Time",
                 "severity": "Warning",
                 "value": execution,
-                "recommendation": (
-                    "Review slow-running tasks."
-                ),
+                "recommendation": ("Review slow-running tasks."),
             }
         )
 
@@ -107,8 +101,7 @@ def detect_bottlenecks(
                 "severity": "Critical",
                 "value": memory,
                 "recommendation": (
-                    "Reduce memory usage or "
-                    "process data in batches."
+                    "Reduce memory usage or " "process data in batches."
                 ),
             }
         )
@@ -120,10 +113,7 @@ def detect_bottlenecks(
                 "category": "Memory",
                 "severity": "Warning",
                 "value": memory,
-                "recommendation": (
-                    "Review large objects and "
-                    "unused allocations."
-                ),
+                "recommendation": ("Review large objects and " "unused allocations."),
             }
         )
 
@@ -139,8 +129,7 @@ def detect_bottlenecks(
                 "severity": "Critical",
                 "value": cpu,
                 "recommendation": (
-                    "Reduce CPU-intensive tasks "
-                    "or optimize algorithms."
+                    "Reduce CPU-intensive tasks " "or optimize algorithms."
                 ),
             }
         )
@@ -152,9 +141,7 @@ def detect_bottlenecks(
                 "category": "CPU",
                 "severity": "Warning",
                 "value": cpu,
-                "recommendation": (
-                    "Investigate CPU-heavy modules."
-                ),
+                "recommendation": ("Investigate CPU-heavy modules."),
             }
         )
 
@@ -167,9 +154,7 @@ def detect_bottlenecks(
 
 
 def summary(
-    bottlenecks: list[
-        dict[str, Any]
-    ],
+    bottlenecks: list[dict[str, Any]],
 ) -> str:
     """
     Generate a human-readable summary.
@@ -177,9 +162,7 @@ def summary(
 
     if not bottlenecks:
 
-        return (
-            "No performance bottlenecks detected."
-        )
+        return "No performance bottlenecks detected."
 
     lines = [
         "Performance Bottlenecks",

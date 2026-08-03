@@ -13,7 +13,6 @@ from modules.http.statistics import (
     generate_statistics,
 )
 
-
 # ==========================================================
 # Analyze HTTP Results
 # ==========================================================

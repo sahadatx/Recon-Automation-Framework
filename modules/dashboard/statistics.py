@@ -8,10 +8,10 @@ from __future__ import annotations
 
 from typing import Any
 
-
 # ==========================================================
 # Empty Statistics
 # ==========================================================
+
 
 def empty_statistics() -> dict[str, Any]:
     """
@@ -30,6 +30,7 @@ def empty_statistics() -> dict[str, Any]:
 # ==========================================================
 # Generate Statistics
 # ==========================================================
+
 
 def generate_statistics(
     report: dict[str, Any],
@@ -150,19 +151,13 @@ def generate_statistics(
             findings += 1
 
     return {
-
         "target": target,
-
         "modules": len(
             modules,
         ),
-
         "completed_modules": completed_modules,
-
         "failed_modules": failed_modules,
-
         "findings": findings,
-
     }
 
 

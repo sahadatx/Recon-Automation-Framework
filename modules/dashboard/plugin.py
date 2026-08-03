@@ -13,7 +13,6 @@ from core.plugins.base import BasePlugin
 
 from .manager import run
 
-
 # ==========================================================
 # Dashboard Plugin
 # ==========================================================
@@ -30,14 +29,9 @@ class DashboardPlugin(BasePlugin):
 
     author = "Sahadat Hossain"
 
-    description = (
-        "Generate a unified dashboard "
-        "from the framework report."
-    )
+    description = "Generate a unified dashboard " "from the framework report."
 
-    depends_on = (
-        "report",
-    )
+    depends_on = ("report",)
 
     config = {
         "output": True,

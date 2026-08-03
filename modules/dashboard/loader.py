@@ -13,10 +13,10 @@ from core.logger import warning
 
 from .constants import REPORT_FILE
 
-
 # ==========================================================
 # Load Report
 # ==========================================================
+
 
 def load_report() -> dict[str, Any]:
     """
@@ -28,9 +28,7 @@ def load_report() -> dict[str, Any]:
 
     if not REPORT_FILE.exists():
 
-        warning(
-            f"Report not found: {REPORT_FILE}"
-        )
+        warning(f"Report not found: {REPORT_FILE}")
 
         return {}
 
@@ -52,9 +50,7 @@ def load_report() -> dict[str, Any]:
         json.JSONDecodeError,
     ) as error:
 
-        warning(
-            f"Failed to load report: {error}"
-        )
+        warning(f"Failed to load report: {error}")
 
         return {}
 

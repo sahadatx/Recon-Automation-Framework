@@ -19,10 +19,10 @@ from modules.ports.constants import (
     SUMMARY_TXT,
 )
 
-
 # ==========================================================
 # Helpers
 # ==========================================================
+
 
 def create_output_directory() -> None:
     """
@@ -38,6 +38,7 @@ def create_output_directory() -> None:
 # ==========================================================
 # Results (TXT)
 # ==========================================================
+
 
 def export_results_txt(
     analysis: dict[str, Any],
@@ -76,6 +77,7 @@ def export_results_txt(
 # Results (JSON)
 # ==========================================================
 
+
 def export_results_json(
     analysis: dict[str, Any],
 ) -> None:
@@ -101,6 +103,7 @@ def export_results_json(
 # ==========================================================
 # Results (CSV)
 # ==========================================================
+
 
 def export_results_csv(
     analysis: dict[str, Any],
@@ -148,6 +151,7 @@ def export_results_csv(
 # Summary
 # ==========================================================
 
+
 def export_summary(
     analysis: dict[str, Any],
 ) -> None:
@@ -164,62 +168,42 @@ def export_summary(
         encoding="utf-8",
     ) as file:
 
+        file.write("PORT SCAN SUMMARY\n")
+
+        file.write("=" * 70 + "\n\n")
+
+        file.write(f"Hosts Scanned            : " f"{statistics['hosts_scanned']}\n")
+
         file.write(
-            "PORT SCAN SUMMARY\n"
+            f"Hosts With Open Ports    : " f"{statistics['hosts_with_open_ports']}\n"
         )
 
         file.write(
-            "=" * 70 + "\n\n"
+            f"Hosts Without Open Ports : " f"{statistics['hosts_without_open_ports']}\n"
         )
 
-        file.write(
-            f"Hosts Scanned            : "
-            f"{statistics['hosts_scanned']}\n"
-        )
+        file.write(f"Total Open Ports         : " f"{statistics['total_open_ports']}\n")
 
         file.write(
-            f"Hosts With Open Ports    : "
-            f"{statistics['hosts_with_open_ports']}\n"
+            f"Average Open Ports       : " f"{statistics['average_open_ports']}\n"
         )
 
-        file.write(
-            f"Hosts Without Open Ports : "
-            f"{statistics['hosts_without_open_ports']}\n"
-        )
+        file.write("Service Breakdown\n")
 
-        file.write(
-            f"Total Open Ports         : "
-            f"{statistics['total_open_ports']}\n"
-        )
-
-        file.write(
-            f"Average Open Ports       : "
-            f"{statistics['average_open_ports']}\n"
-        )
-
-        file.write(
-            "Service Breakdown\n"
-        )
-
-        file.write(
-            "-" * 70 + "\n"
-        )
+        file.write("-" * 70 + "\n")
 
         for (
             service,
             count,
-        ) in statistics[
-            "service_counts"
-        ].items():
+        ) in statistics["service_counts"].items():
 
-            file.write(
-                f"{service:<20}{count}\n"
-            )
+            file.write(f"{service:<20}{count}\n")
 
 
 # ==========================================================
 # Open Hosts
 # ==========================================================
+
 
 def export_open_ports(
     analysis: dict[str, Any],
@@ -237,18 +221,15 @@ def export_open_ports(
         encoding="utf-8",
     ) as file:
 
-        for host in statistics[
-            "open_hosts"
-        ]:
+        for host in statistics["open_hosts"]:
 
-            file.write(
-                f"{host}\n"
-            )
+            file.write(f"{host}\n")
 
 
 # ==========================================================
 # Export Everything
 # ==========================================================
+
 
 def export_all(
     analysis: dict[str, Any],

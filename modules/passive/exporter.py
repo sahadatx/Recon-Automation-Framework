@@ -19,10 +19,10 @@ from .constants import (
     SUMMARY_TXT,
 )
 
-
 # ==========================================================
 # Helpers
 # ==========================================================
+
 
 def create_output_directory() -> None:
     """
@@ -38,6 +38,7 @@ def create_output_directory() -> None:
 # ==========================================================
 # Human Readable Results
 # ==========================================================
+
 
 def export_results_txt(
     analysis: dict[str, Any],
@@ -56,41 +57,27 @@ def export_results_txt(
         encoding="utf-8",
     ) as file:
 
-        file.write(
-            "PASSIVE ENUMERATION RESULTS\n"
-        )
+        file.write("PASSIVE ENUMERATION RESULTS\n")
 
-        file.write(
-            "=" * 70 + "\n\n"
-        )
+        file.write("=" * 70 + "\n\n")
 
-        file.write(
-            f"Target : {statistics['target']}\n"
-        )
+        file.write(f"Target : {statistics['target']}\n")
 
-        file.write(
-            f"Unique Subdomains : "
-            f"{statistics['total_subdomains']}\n\n"
-        )
+        file.write(f"Unique Subdomains : " f"{statistics['total_subdomains']}\n\n")
 
-        file.write(
-            "Subdomains\n"
-        )
+        file.write("Subdomains\n")
 
-        file.write(
-            "-" * 70 + "\n"
-        )
+        file.write("-" * 70 + "\n")
 
         for subdomain in results:
 
-            file.write(
-                f"{subdomain}\n"
-            )
+            file.write(f"{subdomain}\n")
 
 
 # ==========================================================
 # JSON Export
 # ==========================================================
+
 
 def export_results_json(
     analysis: dict[str, Any],
@@ -117,6 +104,7 @@ def export_results_json(
 # Summary
 # ==========================================================
 
+
 def export_summary(
     analysis: dict[str, Any],
 ) -> None:
@@ -133,42 +121,27 @@ def export_summary(
         encoding="utf-8",
     ) as file:
 
-        file.write(
-            "PASSIVE ENUMERATION SUMMARY\n"
-        )
+        file.write("PASSIVE ENUMERATION SUMMARY\n")
 
-        file.write(
-            "=" * 70 + "\n\n"
-        )
+        file.write("=" * 70 + "\n\n")
 
-        file.write(
-            f"Target              : {statistics['target']}\n"
-        )
+        file.write(f"Target              : {statistics['target']}\n")
 
-        file.write(
-            f"Sources             : {statistics['total_sources']}\n"
-        )
+        file.write(f"Sources             : {statistics['total_sources']}\n")
 
-        file.write(
-            f"Successful Sources  : {statistics['successful_sources']}\n"
-        )
+        file.write(f"Successful Sources  : {statistics['successful_sources']}\n")
 
-        file.write(
-            f"Failed Sources      : {statistics['failed_sources']}\n"
-        )
+        file.write(f"Failed Sources      : {statistics['failed_sources']}\n")
 
-        file.write(
-            f"Empty Sources       : {statistics['empty_sources']}\n"
-        )
+        file.write(f"Empty Sources       : {statistics['empty_sources']}\n")
 
-        file.write(
-            f"Unique Subdomains   : {statistics['total_subdomains']}\n"
-        )
+        file.write(f"Unique Subdomains   : {statistics['total_subdomains']}\n")
 
 
 # ==========================================================
 # Subdomains
 # ==========================================================
+
 
 def export_subdomains(
     subdomains: list[str],
@@ -186,14 +159,13 @@ def export_subdomains(
 
         for subdomain in subdomains:
 
-            file.write(
-                f"{subdomain}\n"
-            )
+            file.write(f"{subdomain}\n")
 
 
 # ==========================================================
 # Raw Results
 # ==========================================================
+
 
 def export_raw_results(
     sources: dict[str, list[str]],
@@ -211,32 +183,23 @@ def export_raw_results(
 
         for source, subdomains in sources.items():
 
-            file.write(
-                "=" * 70 + "\n"
-            )
+            file.write("=" * 70 + "\n")
 
-            file.write(
-                f"{source}\n"
-            )
+            file.write(f"{source}\n")
 
-            file.write(
-                "=" * 70 + "\n"
-            )
+            file.write("=" * 70 + "\n")
 
             for subdomain in subdomains:
 
-                file.write(
-                    f"{subdomain}\n"
-                )
+                file.write(f"{subdomain}\n")
 
-            file.write(
-                "\n"
-            )
+            file.write("\n")
 
 
 # ==========================================================
 # Export All
 # ==========================================================
+
 
 def export_all(
     analysis: dict[str, Any],

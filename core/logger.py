@@ -14,44 +14,36 @@ console = Console()
 # Basic Logs
 # ==========================================================
 
+
 def info(message: str) -> None:
     """Display an informational message."""
-    console.print(
-        f"[bold cyan][INFO][/bold cyan] {message}"
-    )
+    console.print(f"[bold cyan][INFO][/bold cyan] {message}")
 
 
 def success(message: str) -> None:
     """Display a success message."""
-    console.print(
-        f"[bold green][SUCCESS][/bold green] {message}"
-    )
+    console.print(f"[bold green][SUCCESS][/bold green] {message}")
 
 
 def warning(message: str) -> None:
     """Display a warning message."""
-    console.print(
-        f"[bold yellow][WARNING][/bold yellow] {message}"
-    )
+    console.print(f"[bold yellow][WARNING][/bold yellow] {message}")
 
 
 def error(message: str) -> None:
     """Display an error message."""
-    console.print(
-        f"[bold red][ERROR][/bold red] {message}"
-    )
+    console.print(f"[bold red][ERROR][/bold red] {message}")
 
 
 def debug(message: str) -> None:
     """Display a debug message."""
-    console.print(
-        f"[bold magenta][DEBUG][/bold magenta] {message}"
-    )
+    console.print(f"[bold magenta][DEBUG][/bold magenta] {message}")
 
 
 # ==========================================================
 # Sections
 # ==========================================================
+
 
 def section(title: str) -> None:
     """
@@ -88,14 +80,13 @@ def divider() -> None:
     Display a separator line.
     """
 
-    console.rule(
-        style="grey50"
-    )
+    console.rule(style="grey50")
 
 
 # ==========================================================
 # Progress
 # ==========================================================
+
 
 def progress(
     current: int,
@@ -106,17 +97,13 @@ def progress(
     Display progress information.
     """
 
-    console.print(
-        f"[bold cyan]"
-        f"[{current}/{total}]"
-        f"[/bold cyan] "
-        f"{message}"
-    )
+    console.print(f"[bold cyan]" f"[{current}/{total}]" f"[/bold cyan] " f"{message}")
 
 
 # ==========================================================
 # Progress Bar
 # ==========================================================
+
 
 def progress_bar(
     current: int,
@@ -136,28 +123,21 @@ def progress_bar(
 
     ratio = current / total
 
-    filled = int(
-        width * ratio
-    )
+    filled = int(width * ratio)
 
     empty = width - filled
 
-    bar = (
-        "█" * filled
-        + "░" * empty
-    )
+    bar = "█" * filled + "░" * empty
 
     percent = ratio * 100
 
-    return (
-        f"{bar} "
-        f"{percent:.0f}%"
-    )
+    return f"{bar} " f"{percent:.0f}%"
 
 
 # ==========================================================
 # Progress Line
 # ==========================================================
+
 
 def progress_status(
     current: int,
@@ -179,9 +159,5 @@ def progress_status(
     )
 
     console.print(
-        f"[bold cyan]"
-        f"[{current}/{total}]"
-        f"[/bold cyan] "
-        f"{bar} "
-        f"{message}"
+        f"[bold cyan]" f"[{current}/{total}]" f"[/bold cyan] " f"{bar} " f"{message}"
     )

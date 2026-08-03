@@ -29,7 +29,6 @@ from .helpers import (
 )
 from .target_analyzer import analyze_target
 
-
 # ==========================================================
 # Run CDN Detection
 # ==========================================================
@@ -56,17 +55,13 @@ def run_cdn_detection(
 
         return analysis
 
-    info(
-        "Starting CDN Detection..."
-    )
+    info("Starting CDN Detection...")
 
     results: list[dict[str, Any]] = []
 
     for target in targets:
 
-        info(
-            f"Analyzing {target}..."
-        )
+        info(f"Analyzing {target}...")
 
         host = normalize_target(
             target,
@@ -113,31 +108,17 @@ def run_cdn_detection(
         analysis,
     )
 
-    statistics = analysis[
-        "statistics"
-    ]
+    statistics = analysis["statistics"]
 
-    success(
-        f"Targets             : {statistics['targets']}"
-    )
+    success(f"Targets             : {statistics['targets']}")
 
-    success(
-        f"CDN Detected        : {statistics['detected']}"
-    )
+    success(f"CDN Detected        : {statistics['detected']}")
 
-    success(
-        f"CDN Not Detected    : {statistics['undetected']}"
-    )
+    success(f"CDN Not Detected    : {statistics['undetected']}")
 
-    success(
-        f"Average Confidence  : "
-        f"{statistics['average_confidence']}"
-    )
+    success(f"Average Confidence  : " f"{statistics['average_confidence']}")
 
-    success(
-        f"Highest Confidence  : "
-        f"{statistics['highest_confidence']}"
-    )
+    success(f"Highest Confidence  : " f"{statistics['highest_confidence']}")
 
     return analysis
 

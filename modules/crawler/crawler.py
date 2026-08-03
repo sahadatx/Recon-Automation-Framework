@@ -47,10 +47,10 @@ from config.config import (
     CRAWLER_MAX_URLS,
 )
 
-
 # ==========================================================
 # Create Statistics
 # ==========================================================
+
 
 def create_statistics() -> dict:
     """
@@ -58,41 +58,27 @@ def create_statistics() -> dict:
     """
 
     return {
-
         "pages": 0,
-
         "visited": 0,
-
         "queued": 0,
-
         "internal_urls": 0,
-
         "external_urls": 0,
-
         "javascript": 0,
-
         "css": 0,
-
         "forms": 0,
-
         "emails": 0,
-
         "failed": 0,
-
         "elapsed": 0.0,
-
         "unique_javascript": set(),
-
         "unique_css": set(),
-
         "failed_urls": [],
-
     }
 
 
 # ==========================================================
 # Create Result
 # ==========================================================
+
 
 def create_result(
     host: str,
@@ -102,19 +88,16 @@ def create_result(
     """
 
     return {
-
         "host": host,
-
         "pages": {},
-
         "statistics": create_statistics(),
-
     }
 
 
 # ==========================================================
 # Crawl URL
 # ==========================================================
+
 
 def crawl_url(
     session: requests.Session,
@@ -131,9 +114,7 @@ def crawl_url(
         Parsed page information.
     """
 
-    debug(
-        f"Crawling {url}"
-    )
+    debug(f"Crawling {url}")
 
     try:
 
@@ -147,37 +128,26 @@ def crawl_url(
             return None
 
         parsed = parse_html(
-
             url,
-
             response.text,
-
         )
 
         return {
-
             "url": url,
-
             "status": response.status_code,
-
             "content_type": response.headers.get(
                 "Content-Type",
                 "",
             ),
-
             "content_length": len(
                 response.text,
             ),
-
             "parsed": parsed,
-
         }
 
     except Exception as error:
 
-        warning(
-            f"{url}: {error}"
-        )
+        warning(f"{url}: {error}")
 
         return None
 
@@ -185,6 +155,7 @@ def crawl_url(
 # ==========================================================
 # Initialize Queue
 # ==========================================================
+
 
 def initialize_queue(
     host: str,
@@ -196,13 +167,9 @@ def initialize_queue(
     queue = CrawlQueue()
 
     queue.enqueue(
-
         host,
-
         depth=0,
-
         parent=None,
-
     )
 
     return queue
@@ -211,6 +178,7 @@ def initialize_queue(
 # ==========================================================
 # Load Robots Rules
 # ==========================================================
+
 
 def load_robots(
     host: str,
@@ -239,6 +207,7 @@ def load_robots(
 # Load Sitemap
 # ==========================================================
 
+
 def load_sitemap(
     queue: CrawlQueue,
     host: str,
@@ -264,20 +233,17 @@ def load_sitemap(
                 parent=host,
             )
 
-        info(
-            f"Sitemap URLs: "
-            f"{sitemap.get('count', 0)}"
-        )
+        info(f"Sitemap URLs: " f"{sitemap.get('count', 0)}")
 
     except Exception as error:
 
-        warning(
-            f"Sitemap: {error}"
-        )
+        warning(f"Sitemap: {error}")
+
 
 # ==========================================================
 # Update Statistics
 # ==========================================================
+
 
 def update_statistics(
     result: dict,
@@ -288,9 +254,7 @@ def update_statistics(
     Update crawler statistics.
     """
 
-    statistics = result[
-        "statistics"
-    ]
+    statistics = result["statistics"]
 
     internal = parsed.get(
         "internal_links",
@@ -322,74 +286,33 @@ def update_statistics(
         [],
     )
 
-    statistics[
-        "pages"
-    ] += 1
+    statistics["pages"] += 1
 
-    statistics[
-        "visited"
-    ] = queue.visited_count()
+    statistics["visited"] = queue.visited_count()
 
-    statistics[
-        "queued"
-    ] = queue.size()
+    statistics["queued"] = queue.size()
 
-    statistics[
-        "internal_urls"
-    ] += len(
-        internal
-    )
+    statistics["internal_urls"] += len(internal)
 
-    statistics[
-        "external_urls"
-    ] += len(
-        external
-    )
+    statistics["external_urls"] += len(external)
 
-    statistics[
-        "unique_javascript"
-    ].update(
-        javascript
-    )
+    statistics["unique_javascript"].update(javascript)
 
-    statistics[
-        "unique_css"
-    ].update(
-        css
-    )
+    statistics["unique_css"].update(css)
 
-    statistics[
-        "javascript"
-    ] = len(
-        statistics[
-            "unique_javascript"
-        ]
-    )
+    statistics["javascript"] = len(statistics["unique_javascript"])
 
-    statistics[
-        "css"
-    ] = len(
-        statistics[
-            "unique_css"
-        ]
-    )
+    statistics["css"] = len(statistics["unique_css"])
 
-    statistics[
-        "forms"
-    ] += len(
-        forms
-    )
+    statistics["forms"] += len(forms)
 
-    statistics[
-        "emails"
-    ] += len(
-        emails
-    )
+    statistics["emails"] += len(emails)
 
 
 # ==========================================================
 # Enqueue Internal Links
 # ==========================================================
+
 
 def enqueue_links(
     queue: CrawlQueue,
@@ -406,37 +329,27 @@ def enqueue_links(
     for url in links:
 
         if not should_enqueue(
-
             root_url=host,
-
             url=url,
-
             visited=queue.visited_urls(),
-
             robots_rules=robots_rules,
-
             depth=depth + 1,
-
             max_depth=CRAWLER_DEPTH,
-
         ):
 
             continue
 
         queue.enqueue(
-
             url,
-
             depth=depth + 1,
-
             parent=parent,
-
         )
 
 
 # ==========================================================
 # Finalize Statistics
 # ==========================================================
+
 
 def finalize_statistics(
     result: dict,
@@ -447,49 +360,26 @@ def finalize_statistics(
     Finalize crawler statistics.
     """
 
-    statistics = result[
-        "statistics"
-    ]
+    statistics = result["statistics"]
 
-    statistics[
-        "visited"
-    ] = queue.visited_count()
+    statistics["visited"] = queue.visited_count()
 
-    statistics[
-        "queued"
-    ] = queue.size()
+    statistics["queued"] = queue.size()
 
-    statistics[
-        "unique_javascript"
-    ] = sorted(
-        statistics[
-            "unique_javascript"
-        ]
-    )
+    statistics["unique_javascript"] = sorted(statistics["unique_javascript"])
 
-    statistics[
-        "unique_css"
-    ] = sorted(
-        statistics[
-            "unique_css"
-        ]
-    )
+    statistics["unique_css"] = sorted(statistics["unique_css"])
 
-    statistics[
-        "elapsed"
-    ] = round(
-
-        time.perf_counter()
-
-        - start_time,
-
+    statistics["elapsed"] = round(
+        time.perf_counter() - start_time,
         2,
-
     )
+
 
 # ==========================================================
 # Crawl Host
 # ==========================================================
+
 
 def crawl_host(
     context: ExecutionContext,
@@ -510,21 +400,15 @@ def crawl_host(
         Crawl result.
     """
 
-    info(
-        f"Starting crawl: {host}"
-    )
+    info(f"Starting crawl: {host}")
 
     session = context.get_http_session()
 
     if session is None:
 
-        raise RuntimeError(
-            "HTTP session not initialized."
-        )
+        raise RuntimeError("HTTP session not initialized.")
 
-    start_time = (
-        time.perf_counter()
-    )
+    start_time = time.perf_counter()
 
     result = create_result(
         host,
@@ -541,11 +425,8 @@ def crawl_host(
     if use_sitemap:
 
         load_sitemap(
-
             queue,
-
             host,
-
         )
 
     while not queue.empty():
@@ -554,19 +435,9 @@ def crawl_host(
         # Maximum URL Limit
         # --------------------------------------------------
 
-        if (
+        if queue.visited_count() >= CRAWLER_MAX_URLS:
 
-            queue.visited_count()
-
-            >=
-
-            CRAWLER_MAX_URLS
-
-        ):
-
-            warning(
-                "Maximum crawl limit reached."
-            )
+            warning("Maximum crawl limit reached.")
 
             break
 
@@ -576,17 +447,11 @@ def crawl_host(
 
             break
 
-        url = item[
-            "url"
-        ]
+        url = item["url"]
 
-        depth = item[
-            "depth"
-        ]
+        depth = item["depth"]
 
-        parent = item[
-            "parent"
-        ]
+        parent = item["parent"]
 
         # --------------------------------------------------
         # Depth Control
@@ -610,9 +475,7 @@ def crawl_host(
             url,
         )
 
-        debug(
-            f"[Depth {depth}] {url}"
-        )
+        debug(f"[Depth {depth}] {url}")
 
         page = crawl_url(
             session=session,
@@ -633,53 +496,32 @@ def crawl_host(
 
             continue
 
-        result[
-            "pages"
-        ][
-            url
-        ] = page
+        result["pages"][url] = page
 
-        parsed = page[
-            "parsed"
-        ]
+        parsed = page["parsed"]
 
         update_statistics(
-
             result=result,
-
             queue=queue,
-
             parsed=parsed,
-
         )
 
         enqueue_links(
-
             queue=queue,
-
             host=host,
-
             parent=url,
-
             depth=depth,
-
             links=parsed.get(
                 "internal_links",
                 [],
             ),
-
             robots_rules=robots_rules,
-
         )
 
     finalize_statistics(
-
         result=result,
-
         queue=queue,
-
         start_time=start_time,
-
     )
 
     return result
@@ -690,9 +532,5 @@ def crawl_host(
 # ==========================================================
 
 __all__ = [
-
     "crawl_host",
-
 ]
-
-

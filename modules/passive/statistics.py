@@ -6,10 +6,10 @@ Generate passive enumeration statistics.
 
 from typing import Any
 
-
 # ==========================================================
 # Generate Statistics
 # ==========================================================
+
 
 def generate_statistics(
     results: dict[str, list[str]],
@@ -55,9 +55,7 @@ def generate_statistics(
             empty_sources += 1
 
         statistics[source] = {
-
             "count": len(subdomains),
-
             "time": round(
                 timings.get(
                     source,
@@ -65,23 +63,15 @@ def generate_statistics(
                 ),
                 2,
             ),
-
             "status": status,
-
         }
 
     return {
-
         "total_sources": len(results),
-
         "successful_sources": successful_sources,
-
         "failed_sources": len(failed_sources),
-
         "empty_sources": empty_sources,
-
         "statistics": statistics,
-
     }
 
 

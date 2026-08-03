@@ -18,10 +18,10 @@ from modules.crawler.constants import (
     SUMMARY_TXT,
 )
 
-
 # ==========================================================
 # Helpers
 # ==========================================================
+
 
 def create_output_directory() -> None:
     """
@@ -37,6 +37,7 @@ def create_output_directory() -> None:
 # ==========================================================
 # Export Results (TXT)
 # ==========================================================
+
 
 def export_results_txt(
     analysis: dict[str, Any],
@@ -57,29 +58,17 @@ def export_results_txt(
         for (
             host,
             result,
-        ) in sorted(
-            results.items()
-        ):
+        ) in sorted(results.items()):
 
-            file.write(
-                "=" * 70 + "\n"
-            )
+            file.write("=" * 70 + "\n")
 
-            file.write(
-                f"{host}\n"
-            )
+            file.write(f"{host}\n")
 
-            file.write(
-                "=" * 70 + "\n"
-            )
+            file.write("=" * 70 + "\n")
 
-            for url in sorted(
-                result["pages"]
-            ):
+            for url in sorted(result["pages"]):
 
-                file.write(
-                    f"{url}\n"
-                )
+                file.write(f"{url}\n")
 
             file.write("\n")
 
@@ -87,6 +76,7 @@ def export_results_txt(
 # ==========================================================
 # Export Results (JSON)
 # ==========================================================
+
 
 def export_results_json(
     analysis: dict[str, Any],
@@ -120,6 +110,7 @@ def export_results_json(
 # ==========================================================
 # Export Results (CSV)
 # ==========================================================
+
 
 def export_results_csv(
     analysis: dict[str, Any],
@@ -155,16 +146,12 @@ def export_results_csv(
         for (
             host,
             result,
-        ) in sorted(
-            results.items()
-        ):
+        ) in sorted(results.items()):
 
             for (
                 url,
                 page,
-            ) in sorted(
-                result["pages"].items()
-            ):
+            ) in sorted(result["pages"].items()):
 
                 writer.writerow(
                     [
@@ -181,6 +168,7 @@ def export_results_csv(
 # Export Summary
 # ==========================================================
 
+
 def export_summary(
     analysis: dict[str, Any],
 ) -> None:
@@ -190,96 +178,53 @@ def export_summary(
 
     create_output_directory()
 
-    statistics = analysis[
-        "statistics"
-    ]
+    statistics = analysis["statistics"]
 
     with SUMMARY_TXT.open(
         "w",
         encoding="utf-8",
     ) as file:
 
-        file.write(
-            "CRAWLER SUMMARY\n"
-        )
+        file.write("CRAWLER SUMMARY\n")
 
-        file.write(
-            "=" * 70 + "\n\n"
-        )
+        file.write("=" * 70 + "\n\n")
 
-        file.write(
-            f"Hosts             : "
-            f"{statistics['hosts']}\n"
-        )
+        file.write(f"Hosts             : " f"{statistics['hosts']}\n")
 
-        file.write(
-            f"Total URLs        : "
-            f"{statistics['total_urls']}\n"
-        )
+        file.write(f"Total URLs        : " f"{statistics['total_urls']}\n")
 
-        file.write(
-            f"Average URLs/Host : "
-            f"{statistics['average_urls_per_host']}\n"
-        )
+        file.write(f"Average URLs/Host : " f"{statistics['average_urls_per_host']}\n")
 
-        file.write(
-            f"Failed Pages      : "
-            f"{statistics['failed']}\n"
-        )
+        file.write(f"Failed Pages      : " f"{statistics['failed']}\n")
 
-        file.write(
-            f"Internal URLs     : "
-            f"{statistics['internal_urls']}\n"
-        )
+        file.write(f"Internal URLs     : " f"{statistics['internal_urls']}\n")
 
-        file.write(
-            f"External URLs     : "
-            f"{statistics['external_urls']}\n"
-        )
+        file.write(f"External URLs     : " f"{statistics['external_urls']}\n")
 
-        file.write(
-            f"JavaScript Files  : "
-            f"{statistics['javascript']}\n"
-        )
+        file.write(f"JavaScript Files  : " f"{statistics['javascript']}\n")
 
-        file.write(
-            f"CSS Files         : "
-            f"{statistics['css']}\n"
-        )
+        file.write(f"CSS Files         : " f"{statistics['css']}\n")
 
-        file.write(
-            f"Forms             : "
-            f"{statistics['forms']}\n"
-        )
+        file.write(f"Forms             : " f"{statistics['forms']}\n")
 
-        file.write(
-            f"Emails            : "
-            f"{statistics['emails']}\n"
-        )
+        file.write(f"Emails            : " f"{statistics['emails']}\n")
 
-        file.write(
-            "URLs Per Host\n"
-        )
+        file.write("URLs Per Host\n")
 
-        file.write(
-            "-" * 70 + "\n"
-        )
+        file.write("-" * 70 + "\n")
 
         for (
             host,
             count,
-        ) in statistics[
-            "urls_per_host"
-        ].items():
+        ) in statistics["urls_per_host"].items():
 
-            file.write(
-                f"{host:<40}{count}\n"
-            )
+            file.write(f"{host:<40}{count}\n")
 
 
 # ==========================================================
 # Export All
 # ==========================================================
+
 
 def export_all(
     analysis: dict[str, Any],

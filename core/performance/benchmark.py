@@ -8,7 +8,6 @@ from __future__ import annotations
 
 from typing import Any
 
-
 # ==========================================================
 # Framework Benchmark
 # ==========================================================
@@ -119,9 +118,7 @@ class Benchmark:
 
         return min(
             self._results,
-            key=lambda item: item[
-                "execution_time"
-            ],
+            key=lambda item: item["execution_time"],
         )
 
     # ------------------------------------------------------
@@ -138,9 +135,7 @@ class Benchmark:
 
         return max(
             self._results,
-            key=lambda item: item[
-                "execution_time"
-            ],
+            key=lambda item: item["execution_time"],
         )
 
     # ------------------------------------------------------
@@ -160,8 +155,7 @@ class Benchmark:
             return 0.0
 
         return round(
-            self._targets
-            / self._execution_time,
+            self._targets / self._execution_time,
             2,
         )
 
@@ -180,16 +174,8 @@ class Benchmark:
 
         if self._results:
 
-            average = (
-                sum(
-                    item[
-                        "execution_time"
-                    ]
-                    for item in self._results
-                )
-                / len(
-                    self._results
-                )
+            average = sum(item["execution_time"] for item in self._results) / len(
+                self._results
             )
 
         return {

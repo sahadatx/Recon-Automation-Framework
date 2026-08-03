@@ -8,44 +8,26 @@ from __future__ import annotations
 
 from pathlib import Path
 
-
 # ==========================================================
 # Output Directory
 # ==========================================================
 
-PORT_OUTPUT_DIR = Path(
-    "output/ports"
-)
+PORT_OUTPUT_DIR = Path("output/ports")
 
 
 # ==========================================================
 # Output Files
 # ==========================================================
 
-RESULTS_TXT = (
-    PORT_OUTPUT_DIR
-    / "results.txt"
-)
+RESULTS_TXT = PORT_OUTPUT_DIR / "results.txt"
 
-RESULTS_JSON = (
-    PORT_OUTPUT_DIR
-    / "results.json"
-)
+RESULTS_JSON = PORT_OUTPUT_DIR / "results.json"
 
-RESULTS_CSV = (
-    PORT_OUTPUT_DIR
-    / "results.csv"
-)
+RESULTS_CSV = PORT_OUTPUT_DIR / "results.csv"
 
-SUMMARY_TXT = (
-    PORT_OUTPUT_DIR
-    / "summary.txt"
-)
+SUMMARY_TXT = PORT_OUTPUT_DIR / "summary.txt"
 
-OPEN_PORTS_TXT = (
-    PORT_OUTPUT_DIR
-    / "open_ports.txt"
-)
+OPEN_PORTS_TXT = PORT_OUTPUT_DIR / "open_ports.txt"
 
 
 # ==========================================================

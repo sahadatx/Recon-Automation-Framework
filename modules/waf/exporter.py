@@ -23,10 +23,10 @@ from core.logger import (
     warning,
 )
 
-
 # ==========================================================
 # Create Output Directory
 # ==========================================================
+
 
 def create_output_directory() -> Path:
     """
@@ -47,6 +47,7 @@ def create_output_directory() -> Path:
 # ==========================================================
 # Write Text File
 # ==========================================================
+
 
 def write_text(
     output_file: Path,
@@ -77,21 +78,15 @@ def write_text(
 
             for line in lines:
 
-                file.write(
-                    f"{line}\n"
-                )
+                file.write(f"{line}\n")
 
     except Exception as error:
 
-        warning(
-            f"{output_file}: {error}"
-        )
+        warning(f"{output_file}: {error}")
 
         return output_file
 
-    success(
-        f"Saved {output_file}"
-    )
+    success(f"Saved {output_file}")
 
     return output_file
 
@@ -99,6 +94,7 @@ def write_text(
 # ==========================================================
 # Write JSON File
 # ==========================================================
+
 
 def write_json(
     output_file: Path,
@@ -138,15 +134,11 @@ def write_json(
 
     except Exception as error:
 
-        warning(
-            f"{output_file}: {error}"
-        )
+        warning(f"{output_file}: {error}")
 
         return output_file
 
-    success(
-        f"Saved {output_file}"
-    )
+    success(f"Saved {output_file}")
 
     return output_file
 
@@ -154,6 +146,7 @@ def write_json(
 # ==========================================================
 # Write CSV File
 # ==========================================================
+
 
 def write_csv(
     output_file: Path,
@@ -209,21 +202,19 @@ def write_csv(
 
     except Exception as error:
 
-        warning(
-            f"{output_file}: {error}"
-        )
+        warning(f"{output_file}: {error}")
 
         return output_file
 
-    success(
-        f"Saved {output_file}"
-    )
+    success(f"Saved {output_file}")
 
     return output_file
+
 
 # ==========================================================
 # Export JSON
 # ==========================================================
+
 
 def export_json(
     analysis: dict[str, Any],
@@ -249,6 +240,7 @@ def export_json(
 # Export TXT
 # ==========================================================
 
+
 def export_txt(
     analysis: dict[str, Any],
 ) -> Path:
@@ -271,25 +263,15 @@ def export_txt(
 
         lines.append("=" * 80)
 
-        lines.append(
-            f"Target      : {result.get('url', '-')}"
-        )
+        lines.append(f"Target      : {result.get('url', '-')}")
 
-        lines.append(
-            f"Detected    : {result.get('detected', False)}"
-        )
+        lines.append(f"Detected    : {result.get('detected', False)}")
 
-        lines.append(
-            f"Vendor      : {result.get('vendor', '-')}"
-        )
+        lines.append(f"Vendor      : {result.get('vendor', '-')}")
 
-        lines.append(
-            f"Confidence  : {result.get('confidence', '-')}"
-        )
+        lines.append(f"Confidence  : {result.get('confidence', '-')}")
 
-        lines.append(
-            f"Score       : {result.get('score', 0)}"
-        )
+        lines.append(f"Score       : {result.get('score', 0)}")
 
         lines.append("Evidence")
 
@@ -298,9 +280,7 @@ def export_txt(
             [],
         ):
 
-            lines.append(
-                f"  - {item}"
-            )
+            lines.append(f"  - {item}")
 
         lines.append("")
 
@@ -313,6 +293,7 @@ def export_txt(
 # ==========================================================
 # Export CSV
 # ==========================================================
+
 
 def export_csv(
     analysis: dict[str, Any],
@@ -337,6 +318,7 @@ def export_csv(
 # ==========================================================
 # Export Detected Targets
 # ==========================================================
+
 
 def export_detected(
     analysis: dict[str, Any],
@@ -366,12 +348,10 @@ def export_detected(
             continue
 
         lines.append(
-
             f"{result.get('url', '-')}"
             f" -> "
             f"{result.get('vendor', '-')}"
             f" ({result.get('confidence', '-')})"
-
         )
 
     return write_text(
@@ -379,9 +359,11 @@ def export_detected(
         lines,
     )
 
+
 # ==========================================================
 # Export Summary
 # ==========================================================
+
 
 def export_summary(
     analysis: dict[str, Any],
@@ -400,29 +382,17 @@ def export_summary(
     statistics = analysis["statistics"]
 
     lines = [
-
         "WAF Detection Summary",
-
         "=" * 80,
-
         f"Targets                : {statistics['targets']}",
-
         f"WAF Detected           : {statistics['detected']}",
-
         f"Not Detected           : {statistics['not_detected']}",
-
         f"Success Rate           : {statistics['success_rate']}%",
-
         f"Average Score          : {statistics['average_score']}",
-
         f"Highest Score          : {statistics['highest_score']}",
-
         "",
-
         "Detected Vendors",
-
         "-" * 80,
-
     ]
 
     vendors = statistics.get(
@@ -434,28 +404,18 @@ def export_summary(
 
         for vendor, count in vendors.items():
 
-            lines.append(
-                f"{vendor:<30}{count}"
-            )
+            lines.append(f"{vendor:<30}{count}")
 
     else:
 
-        lines.append(
-            "None"
-        )
+        lines.append("None")
 
     lines.extend(
-
         [
-
             "",
-
             "Confidence Levels",
-
             "-" * 80,
-
         ]
-
     )
 
     confidence = statistics.get(
@@ -467,15 +427,11 @@ def export_summary(
 
         for level, count in confidence.items():
 
-            lines.append(
-                f"{level:<30}{count}"
-            )
+            lines.append(f"{level:<30}{count}")
 
     else:
 
-        lines.append(
-            "None"
-        )
+        lines.append("None")
 
     return write_text(
         WAF_OUTPUT_DIR / "summary.txt",
@@ -486,6 +442,7 @@ def export_summary(
 # ==========================================================
 # Show Summary
 # ==========================================================
+
 
 def show_summary(
     analysis: dict[str, Any],
@@ -500,41 +457,21 @@ def show_summary(
 
     print("=" * 80)
 
-    print(
-        "WAF Detection Summary"
-    )
+    print("WAF Detection Summary")
 
     print("=" * 80)
 
-    print(
-        f"{'Targets':<30}"
-        f"{statistics['targets']}"
-    )
+    print(f"{'Targets':<30}" f"{statistics['targets']}")
 
-    print(
-        f"{'WAF Detected':<30}"
-        f"{statistics['detected']}"
-    )
+    print(f"{'WAF Detected':<30}" f"{statistics['detected']}")
 
-    print(
-        f"{'Not Detected':<30}"
-        f"{statistics['not_detected']}"
-    )
+    print(f"{'Not Detected':<30}" f"{statistics['not_detected']}")
 
-    print(
-        f"{'Success Rate':<30}"
-        f"{statistics['success_rate']}%"
-    )
+    print(f"{'Success Rate':<30}" f"{statistics['success_rate']}%")
 
-    print(
-        f"{'Average Score':<30}"
-        f"{statistics['average_score']}"
-    )
+    print(f"{'Average Score':<30}" f"{statistics['average_score']}")
 
-    print(
-        f"{'Highest Score':<30}"
-        f"{statistics['highest_score']}"
-    )
+    print(f"{'Highest Score':<30}" f"{statistics['highest_score']}")
 
     print("-" * 80)
 
@@ -551,15 +488,11 @@ def show_summary(
 
         for vendor, count in vendors.items():
 
-            print(
-                f"{vendor:<30}{count}"
-            )
+            print(f"{vendor:<30}{count}")
 
     else:
 
-        print(
-            "None"
-        )
+        print("None")
 
     print("-" * 80)
 
@@ -576,15 +509,11 @@ def show_summary(
 
         for level, count in confidence.items():
 
-            print(
-                f"{level:<30}{count}"
-            )
+            print(f"{level:<30}{count}")
 
     else:
 
-        print(
-            "None"
-        )
+        print("None")
 
     print("=" * 80)
 
@@ -592,6 +521,7 @@ def show_summary(
 # ==========================================================
 # Export All
 # ==========================================================
+
 
 def export_all(
     analysis: dict[str, Any],
@@ -605,36 +535,24 @@ def export_all(
     """
 
     exporters = (
-
         export_json,
-
         export_txt,
-
         export_csv,
-
         export_detected,
-
         export_summary,
-
     )
 
     for exporter in exporters:
 
         try:
 
-            exporter(
-                analysis
-            )
+            exporter(analysis)
 
         except Exception as error:
 
-            warning(
-                f"{exporter.__name__}: {error}"
-            )
+            warning(f"{exporter.__name__}: {error}")
 
-    success(
-        "WAF Detection reports exported successfully."
-    )
+    success("WAF Detection reports exported successfully.")
 
 
 # ==========================================================

@@ -13,10 +13,10 @@ from core.logger import (
     warning,
 )
 
-
 # ==========================================================
 # Load JSON
 # ==========================================================
+
 
 def load_json(
     file: Path,
@@ -35,30 +35,18 @@ def load_json(
     try:
 
         with file.open(
-
             "r",
-
             encoding="utf-8",
-
         ) as handle:
 
-            return json.load(
-                handle
-            )
+            return json.load(handle)
 
     except (
-
         OSError,
-
         json.JSONDecodeError,
-
     ) as error:
 
-        warning(
-
-            f"Unable to parse {file}: {error}"
-
-        )
+        warning(f"Unable to parse {file}: {error}")
 
         return None
 
@@ -66,6 +54,7 @@ def load_json(
 # ==========================================================
 # Parse Results
 # ==========================================================
+
 
 def parse_results(
     results: list,
@@ -86,73 +75,39 @@ def parse_results(
     for result in results:
 
         parsed.append(
-
             {
-
                 "host": result.get(
-
                     "input",
-
                     {},
-
                 ).get(
-
                     "FUZZ",
-
                     "",
-
                 ),
-
                 "url": result.get(
-
                     "url",
-
                     "",
-
                 ),
-
                 "status": result.get(
-
                     "status",
-
                     0,
-
                 ),
-
                 "length": result.get(
-
                     "length",
-
                     0,
-
                 ),
-
                 "words": result.get(
-
                     "words",
-
                     0,
-
                 ),
-
                 "lines": result.get(
-
                     "lines",
-
                     0,
-
                 ),
-
                 "redirect": result.get(
-
                     "redirectlocation",
-
                     "",
-
                 ),
-
             }
-
         )
 
     return parsed
@@ -161,6 +116,7 @@ def parse_results(
 # ==========================================================
 # Parse ffuf Output
 # ==========================================================
+
 
 def parse_ffuf(
     file: Path,
@@ -176,50 +132,34 @@ def parse_ffuf(
         dict | None
     """
 
-    data = load_json(
-        file
-    )
+    data = load_json(file)
 
     if data is None:
 
         return None
 
     return {
-
         "commandline": data.get(
-
             "commandline",
-
             "",
-
         ),
-
         "time": data.get(
-
             "time",
-
             "",
-
         ),
-
         "results": parse_results(
-
             data.get(
-
                 "results",
-
                 [],
-
             )
-
         ),
-
     }
 
 
 # ==========================================================
 # JSON Validation
 # ==========================================================
+
 
 def validate_json(
     file: Path,
@@ -235,16 +175,6 @@ def validate_json(
         bool
     """
 
-    data = load_json(
-        file
-    )
+    data = load_json(file)
 
-    return (
-
-        data is not None
-
-        and
-
-        "results" in data
-
-    )
+    return data is not None and "results" in data

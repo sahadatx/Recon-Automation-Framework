@@ -26,10 +26,10 @@ from modules.javascript.endpoints import (
     extract_endpoints,
 )
 
-
 # ==========================================================
 # Read JavaScript File
 # ==========================================================
+
 
 def read_javascript(
     filepath: str | Path,
@@ -45,9 +45,7 @@ def read_javascript(
 
     if not path.exists():
 
-        warning(
-            f"File not found: {path}"
-        )
+        warning(f"File not found: {path}")
 
         return None
 
@@ -60,9 +58,7 @@ def read_javascript(
 
     except Exception as error:
 
-        warning(
-            f"{path}: {error}"
-        )
+        warning(f"{path}: {error}")
 
         return None
 
@@ -70,6 +66,7 @@ def read_javascript(
 # ==========================================================
 # Parse One File
 # ==========================================================
+
 
 def parse_file(
     filepath: str | Path,
@@ -81,13 +78,9 @@ def parse_file(
         dict | None
     """
 
-    debug(
-        f"Parsing {filepath}"
-    )
+    debug(f"Parsing {filepath}")
 
-    content = read_javascript(
-        filepath
-    )
+    content = read_javascript(filepath)
 
     if content is None:
 
@@ -99,15 +92,11 @@ def parse_file(
 
     try:
 
-        urls = extract_urls(
-            content
-        )
+        urls = extract_urls(content)
 
     except Exception as error:
 
-        warning(
-            f"{filepath}: URL extraction failed ({error})"
-        )
+        warning(f"{filepath}: URL extraction failed ({error})")
 
         urls = []
 
@@ -117,15 +106,11 @@ def parse_file(
 
     try:
 
-        comments = extract_comments(
-            content
-        )
+        comments = extract_comments(content)
 
     except Exception as error:
 
-        warning(
-            f"{filepath}: Comment extraction failed ({error})"
-        )
+        warning(f"{filepath}: Comment extraction failed ({error})")
 
         comments = []
 
@@ -135,15 +120,11 @@ def parse_file(
 
     try:
 
-        strings = extract_strings(
-            content
-        )
+        strings = extract_strings(content)
 
     except Exception as error:
 
-        warning(
-            f"{filepath}: String extraction failed ({error})"
-        )
+        warning(f"{filepath}: String extraction failed ({error})")
 
         strings = []
 
@@ -153,15 +134,11 @@ def parse_file(
 
     try:
 
-        source_maps = extract_source_maps(
-            content
-        )
+        source_maps = extract_source_maps(content)
 
     except Exception as error:
 
-        warning(
-            f"{filepath}: Source map extraction failed ({error})"
-        )
+        warning(f"{filepath}: Source map extraction failed ({error})")
 
         source_maps = []
 
@@ -171,15 +148,11 @@ def parse_file(
 
     try:
 
-        endpoints = extract_endpoints(
-            urls
-        )
+        endpoints = extract_endpoints(urls)
 
     except Exception as error:
 
-        warning(
-            f"{filepath}: Endpoint extraction failed ({error})"
-        )
+        warning(f"{filepath}: Endpoint extraction failed ({error})")
 
         endpoints = []
 
@@ -190,31 +163,23 @@ def parse_file(
         source_maps,
     )
 
-    statistics["endpoints"] = len(
-        endpoints
-    )
+    statistics["endpoints"] = len(endpoints)
 
     return {
-
         "file": str(filepath),
-
         "urls": urls,
-
         "comments": comments,
-
         "strings": strings,
-
         "source_maps": source_maps,
-
         "endpoints": endpoints,
-
         "statistics": statistics,
-
     }
+
 
 # ==========================================================
 # Parse Multiple Files
 # ==========================================================
+
 
 def parse_multiple(
     files: list[str | Path],
@@ -238,34 +203,26 @@ def parse_multiple(
 
     for filepath in files:
 
-        parsed = parse_file(
-            filepath
-        )
+        parsed = parse_file(filepath)
 
         if parsed is None:
 
-            failed.append(
-                filepath
-            )
+            failed.append(filepath)
 
             continue
 
-        results[
-            str(filepath)
-        ] = parsed
+        results[str(filepath)] = parsed
 
     return (
-
         results,
-
         failed,
-
     )
 
 
 # ==========================================================
 # Entry Point
 # ==========================================================
+
 
 def parse_javascript(
     files: list[str | Path],
@@ -283,9 +240,7 @@ def parse_javascript(
         )
     """
 
-    return parse_multiple(
-        files
-    )
+    return parse_multiple(files)
 
 
 # ==========================================================
@@ -293,13 +248,8 @@ def parse_javascript(
 # ==========================================================
 
 __all__ = [
-
     "read_javascript",
-
     "parse_file",
-
     "parse_multiple",
-
     "parse_javascript",
-
 ]

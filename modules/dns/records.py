@@ -17,10 +17,10 @@ from modules.dns.resolver import (
     resolve_aaaa,
 )
 
-
 # ==========================================================
 # Resolve MX
 # ==========================================================
+
 
 def resolve_mx(domain: str) -> list[str]:
     """
@@ -39,6 +39,7 @@ def resolve_mx(domain: str) -> list[str]:
 # Resolve NS
 # ==========================================================
 
+
 def resolve_ns(domain: str) -> list[str]:
     """
     Resolve NS records.
@@ -55,6 +56,7 @@ def resolve_ns(domain: str) -> list[str]:
 # ==========================================================
 # Resolve TXT
 # ==========================================================
+
 
 def resolve_txt(domain: str) -> list[str]:
     """
@@ -73,6 +75,7 @@ def resolve_txt(domain: str) -> list[str]:
 # Resolve SOA
 # ==========================================================
 
+
 def resolve_soa(domain: str) -> list[str]:
     """
     Resolve SOA records.
@@ -89,6 +92,7 @@ def resolve_soa(domain: str) -> list[str]:
 # ==========================================================
 # Resolve CNAME
 # ==========================================================
+
 
 def resolve_cname(domain: str) -> list[str]:
     """
@@ -107,25 +111,18 @@ def resolve_cname(domain: str) -> list[str]:
 # Resolve All DNS Records
 # ==========================================================
 
+
 def resolve_all_records(domain: str) -> dict:
     """
     Resolve all supported DNS records.
     """
 
     return {
-
         "A": resolve_a(domain),
-
         "AAAA": resolve_aaaa(domain),
-
         "MX": resolve_mx(domain),
-
         "NS": resolve_ns(domain),
-
         "TXT": resolve_txt(domain),
-
         "SOA": resolve_soa(domain),
-
         "CNAME": resolve_cname(domain),
-
     }

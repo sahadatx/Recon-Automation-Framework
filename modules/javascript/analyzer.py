@@ -12,7 +12,6 @@ from modules.javascript.statistics import (
     generate_statistics,
 )
 
-
 # ==========================================================
 # Analyze JavaScript Results
 # ==========================================================

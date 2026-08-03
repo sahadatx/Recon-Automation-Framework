@@ -8,10 +8,10 @@ from urllib.parse import urljoin
 
 from modules.crawler.helpers import download_page
 
-
 # ==========================================================
 # Download robots.txt
 # ==========================================================
+
 
 def download_robots(
     base_url: str,
@@ -25,9 +25,7 @@ def download_robots(
         "/robots.txt",
     )
 
-    response = download_page(
-        robots_url
-    )
+    response = download_page(robots_url)
 
     if response is None:
         return None
@@ -39,6 +37,7 @@ def download_robots(
 # Parse robots.txt
 # ==========================================================
 
+
 def parse_robots(
     content: str,
 ) -> dict:
@@ -47,19 +46,12 @@ def parse_robots(
     """
 
     result = {
-
         "allow": [],
-
         "disallow": [],
-
         "sitemaps": [],
-
         "user_agents": [],
-
         "crawl_delay": None,
-
         "host": None,
-
     }
 
     if not content:
@@ -101,35 +93,25 @@ def parse_robots(
 
         if key == "allow":
 
-            result["allow"].append(
-                value
-            )
+            result["allow"].append(value)
 
         elif key == "disallow":
 
-            result["disallow"].append(
-                value
-            )
+            result["disallow"].append(value)
 
         elif key == "sitemap":
 
-            result["sitemaps"].append(
-                value
-            )
+            result["sitemaps"].append(value)
 
         elif key == "user-agent":
 
-            result["user_agents"].append(
-                value
-            )
+            result["user_agents"].append(value)
 
         elif key == "crawl-delay":
 
             try:
 
-                result["crawl_delay"] = float(
-                    value
-                )
+                result["crawl_delay"] = float(value)
 
             except ValueError:
 
@@ -139,21 +121,13 @@ def parse_robots(
 
             result["host"] = value
 
-    result["allow"] = sorted(
-        set(result["allow"])
-    )
+    result["allow"] = sorted(set(result["allow"]))
 
-    result["disallow"] = sorted(
-        set(result["disallow"])
-    )
+    result["disallow"] = sorted(set(result["disallow"]))
 
-    result["sitemaps"] = sorted(
-        set(result["sitemaps"])
-    )
+    result["sitemaps"] = sorted(set(result["sitemaps"]))
 
-    result["user_agents"] = sorted(
-        set(result["user_agents"])
-    )
+    result["user_agents"] = sorted(set(result["user_agents"]))
 
     return result
 
@@ -162,6 +136,7 @@ def parse_robots(
 # Fetch robots.txt
 # ==========================================================
 
+
 def fetch_robots(
     base_url: str,
 ) -> dict:
@@ -169,33 +144,21 @@ def fetch_robots(
     Download and parse robots.txt.
     """
 
-    content = download_robots(
-        base_url
-    )
+    content = download_robots(base_url)
 
     if content is None:
 
         return {
-
             "robots": False,
-
             "allow": [],
-
             "disallow": [],
-
             "sitemaps": [],
-
             "user_agents": [],
-
             "crawl_delay": None,
-
             "host": None,
-
         }
 
-    result = parse_robots(
-        content
-    )
+    result = parse_robots(content)
 
     result["robots"] = True
 

@@ -8,7 +8,6 @@ from __future__ import annotations
 
 from time import perf_counter
 
-
 # ==========================================================
 # Performance Profiler
 # ==========================================================
@@ -49,14 +48,9 @@ class PerformanceProfiler:
 
         if self._start is None:
 
-            raise RuntimeError(
-                "Profiler has not been started."
-            )
+            raise RuntimeError("Profiler has not been started.")
 
-        self._elapsed = (
-            perf_counter()
-            - self._start
-        )
+        self._elapsed = perf_counter() - self._start
 
         self._start = None
 

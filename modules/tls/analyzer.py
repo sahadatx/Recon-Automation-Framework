@@ -12,7 +12,6 @@ from .statistics import (
     generate_statistics,
 )
 
-
 # ==========================================================
 # Analyze One Host
 # ==========================================================
@@ -107,36 +106,22 @@ def analyze_host(
         risk_level = "Safe"
 
     return {
-
         "host": certificate.get(
             "host",
             "",
         ),
-
         "risk_score": risk_score,
-
         "risk_level": risk_level,
-
         "expired": expired,
-
         "self_signed": self_signed,
-
         "hostname_match": hostname_match,
-
         "wildcard": wildcard,
-
         "weak_protocol": weak_protocol,
-
         "weak_cipher": weak_cipher,
-
         "forward_secrecy": forward_secrecy,
-
         "certificate": certificate,
-
         "protocols": protocols,
-
         "cipher": cipher,
-
     }
 
 
