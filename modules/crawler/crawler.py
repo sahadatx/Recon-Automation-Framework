@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import time
 from typing import Any
+import requests
 
 from config.config import CRAWLER_DEPTH, CRAWLER_MAX_URLS
 from core.context import ExecutionContext
@@ -422,8 +423,6 @@ def crawl_host(
         url = item["url"]
 
         depth = item["depth"]
-
-        parent = item["parent"]
 
         # --------------------------------------------------
         # Depth Control

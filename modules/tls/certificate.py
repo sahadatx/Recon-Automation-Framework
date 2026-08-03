@@ -7,7 +7,6 @@ analysis functions.
 
 from __future__ import annotations
 
-import ssl
 from copy import deepcopy
 from datetime import datetime, timezone
 

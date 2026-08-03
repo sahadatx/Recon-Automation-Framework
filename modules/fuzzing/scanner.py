@@ -10,7 +10,6 @@ import tempfile
 from pathlib import Path
 
 from config.config import (
-    FUZZ_AUTO_CALIBRATION,
     FUZZ_DEFAULT_WORDLIST,
     FUZZ_FILTER_CODES,
     FUZZ_MATCH_CODES,

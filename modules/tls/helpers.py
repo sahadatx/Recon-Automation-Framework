@@ -11,7 +11,6 @@ import socket
 import ssl
 from copy import deepcopy
 from datetime import datetime
-from typing import Any
 
 from config.config import HTTP_TIMEOUT
 

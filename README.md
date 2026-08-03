@@ -478,7 +478,7 @@ The framework includes dedicated modules for reconnaissance, discovery, infrastr
 | **Phase 2 — Discovery** | **4** | Crawler, JavaScript, Fuzzing, VHost |
 | **Phase 3 — Infrastructure** | **5** | TLS, WAF, CDN, Takeover, Email |
 | **Phase 4 — Reporting** | **2** | Report, Dashboard |
-| **Phase 5 — Framework** | **4 Core** | Command-Line Interface, Plugin System, Performance Monitoring, Dashboard Generation |
+| **Phase 5 — Framework** | **4** | Command-Line Interface, Plugin System, Performance Monitoring, Dashboard Generation |
 
 ---
 
