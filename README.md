@@ -16,7 +16,7 @@ Automated Reconnaissance • Plugin Architecture • Multi-threading • Profess
 
 <p align="center">
   <img
-    src="screenshots/banner.png"
+    src="images/banner.png"
     alt="Recon Automation Framework Banner"
     width="100%">
 </p>
@@ -179,7 +179,7 @@ The framework provides a clean and informative CLI with:
 - Automatic report generation
 
 <p align="center">
-  <img src="screenshots/01-cli-demo.png" alt="CLI Demo" width="100%">
+  <img src="images/01-cli-demo.png" alt="CLI Demo" width="100%">
 </p>
 
 Example Command:
@@ -1096,7 +1096,7 @@ The following screenshots showcase the framework interface, dashboard, reports, 
 ## Screenshot 01 — Command-Line Interface
 
 <p align="center">
-<img src="screenshots/01-cli-demo.png"
+<img src="images/01-cli-demo.png"
 alt="Command-Line Interface"
 width="100%">
 </p>
@@ -1106,7 +1106,7 @@ width="100%">
 ## Screenshot 02 — Dashboard Overview
 
 <p align="center">
-<img src="screenshots/02-dashboard-overview.png"
+<img src="images/02-dashboard-overview.png"
 alt="Dashboard Overview"
 width="100%">
 </p>
@@ -1116,7 +1116,7 @@ width="100%">
 ## Screenshot 03 — Dashboard: Module Status
 
 <p align="center">
-<img src="screenshots/03-dashboard-modules.png"
+<img src="images/03-dashboard-modules.png"
 alt="Dashboard Module Status"
 width="100%">
 </p>
@@ -1126,7 +1126,7 @@ width="100%">
 ## Screenshot 04 — Dashboard: Results Overview
 
 <p align="center">
-<img src="screenshots/04-dashboard-results.png"
+<img src="images/04-dashboard-results.png"
 alt="Dashboard Results Overview"
 width="100%">
 </p>
@@ -1136,7 +1136,7 @@ width="100%">
 ## Screenshot 05 — Generated Report
 
 <p align="center">
-<img src="screenshots/05-report-preview.png"
+<img src="images/05-report-preview.png"
 alt="Generated Report"
 width="100%">
 </p>
@@ -1146,7 +1146,7 @@ width="100%">
 ## Screenshot 06 — Performance Metrics
 
 <p align="center">
-<img src="screenshots/06-performance.png"
+<img src="images/06-performance.png"
 alt="Performance Metrics"
 width="100%">
 </p>
