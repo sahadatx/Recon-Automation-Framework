@@ -1,0 +1,70 @@
+name: Python CI
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        python-version:
+          - "3.11"
+          - "3.12"
+
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set Up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+
+      - name: Upgrade pip
+        run: |
+          python -m pip install --upgrade pip
+
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pip-audit
+
+      - name: Install Playwright Browsers
+        run: |
+          python -m playwright install --with-deps chromium
+
+      - name: Verify Python Syntax
+        run: |
+          python -m compileall .
+
+      - name: Verify CLI
+        run: |
+          python recon.py --help
+
+      - name: Security Audit
+        continue-on-error: true
+        run: |
+          pip-audit
+
+      - name: Upload Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: recon-output-python-${{ matrix.python-version }}
+          path: |
+            output/
+            logs/
+          if-no-files-found: ignore

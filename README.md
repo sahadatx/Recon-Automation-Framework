@@ -37,6 +37,7 @@ Automated Reconnaissance • Plugin Architecture • Multi-threading • Profess
 
 <p align="center">
 
+<img src="https://github.com/sahadatx/Recon-Automation-Framework/actions/workflows/python.yml/badge.svg" alt="Build Status" />
 <img src="https://img.shields.io/github/last-commit/sahadatx/Recon-Automation-Framework?style=for-the-badge" alt="Last Commit" />
 <img src="https://img.shields.io/github/stars/sahadatx/Recon-Automation-Framework?style=for-the-badge" alt="Stars" />
 <img src="https://img.shields.io/github/forks/sahadatx/Recon-Automation-Framework?style=for-the-badge" alt="Forks" />
