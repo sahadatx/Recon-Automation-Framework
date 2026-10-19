@@ -1,9 +1,3 @@
-#!/usr/bin/env python3
-
-"""
-Directory Fuzzing Plugin
-"""
-
 from __future__ import annotations
 
 from typing import Any
@@ -14,15 +8,9 @@ from core.plugins.base import BasePlugin
 from .exporter import export_all
 from .manager import run
 
-# ==========================================================
-# Directory Fuzzing Plugin
-# ==========================================================
-
 
 class FuzzingPlugin(BasePlugin):
-    """
-    Directory Fuzzing Plugin.
-    """
+
 
     name = "fuzzing"
 
@@ -50,9 +38,7 @@ class FuzzingPlugin(BasePlugin):
         *args: Any,
         **kwargs: Any,
     ) -> dict[str, Any]:
-        """
-        Execute the Directory Fuzzing plugin.
-        """
+
 
         return run(
             context,
@@ -64,25 +50,15 @@ class FuzzingPlugin(BasePlugin):
         self,
         result: dict[str, Any],
     ) -> None:
-        """
-        Export Directory Fuzzing reports.
-        """
+
 
         export_all(
             result,
         )
 
 
-# ==========================================================
-# Plugin Instance
-# ==========================================================
-
 plugin = FuzzingPlugin()
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "FuzzingPlugin",

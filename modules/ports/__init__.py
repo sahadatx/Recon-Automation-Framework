@@ -1,3 +1,0 @@
-"""
-Port Scanner Module
-"""

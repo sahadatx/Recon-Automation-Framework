@@ -1,10 +1,3 @@
-"""
-WAF Detection Exporter
-
-Export WAF Detection
-results into multiple formats.
-"""
-
 from __future__ import annotations
 
 import csv
@@ -15,18 +8,9 @@ from typing import Any
 from config.config import WAF_OUTPUT_DIR
 from core.logger import success, warning
 
-# ==========================================================
-# Create Output Directory
-# ==========================================================
-
 
 def create_output_directory() -> Path:
-    """
-    Create WAF Detection output directory.
 
-    Returns:
-        Output directory path.
-    """
 
     WAF_OUTPUT_DIR.mkdir(
         parents=True,
@@ -36,28 +20,11 @@ def create_output_directory() -> Path:
     return WAF_OUTPUT_DIR
 
 
-# ==========================================================
-# Write Text File
-# ==========================================================
-
-
 def write_text(
     output_file: Path,
     lines: list[str],
 ) -> Path:
-    """
-    Write text lines to a file.
 
-    Args:
-        output_file:
-            Destination file.
-
-        lines:
-            Text lines.
-
-    Returns:
-        Output file path.
-    """
 
     create_output_directory()
 
@@ -83,28 +50,11 @@ def write_text(
     return output_file
 
 
-# ==========================================================
-# Write JSON File
-# ==========================================================
-
-
 def write_json(
     output_file: Path,
     data: Any,
 ) -> Path:
-    """
-    Write JSON data.
 
-    Args:
-        output_file:
-            Destination file.
-
-        data:
-            JSON serializable object.
-
-    Returns:
-        Output file path.
-    """
 
     create_output_directory()
 
@@ -135,28 +85,11 @@ def write_json(
     return output_file
 
 
-# ==========================================================
-# Write CSV File
-# ==========================================================
-
-
 def write_csv(
     output_file: Path,
     rows: list[dict[str, Any]],
 ) -> Path:
-    """
-    Write CSV data.
 
-    Args:
-        output_file:
-            Destination file.
-
-        rows:
-            CSV rows.
-
-    Returns:
-        Output file path.
-    """
 
     create_output_directory()
 
@@ -203,24 +136,10 @@ def write_csv(
     return output_file
 
 
-# ==========================================================
-# Export JSON
-# ==========================================================
-
-
 def export_json(
     analysis: dict[str, Any],
 ) -> Path:
-    """
-    Export JSON report.
 
-    Args:
-        analysis:
-            WAF Detection analysis.
-
-    Returns:
-        Output file path.
-    """
 
     return write_json(
         WAF_OUTPUT_DIR / "results.json",
@@ -228,24 +147,10 @@ def export_json(
     )
 
 
-# ==========================================================
-# Export TXT
-# ==========================================================
-
-
 def export_txt(
     analysis: dict[str, Any],
 ) -> Path:
-    """
-    Export TXT report.
 
-    Args:
-        analysis:
-            WAF Detection analysis.
-
-    Returns:
-        Output file path.
-    """
 
     results = analysis["results"]
 
@@ -282,24 +187,10 @@ def export_txt(
     )
 
 
-# ==========================================================
-# Export CSV
-# ==========================================================
-
-
 def export_csv(
     analysis: dict[str, Any],
 ) -> Path:
-    """
-    Export CSV report.
 
-    Args:
-        analysis:
-            WAF Detection analysis.
-
-    Returns:
-        Output file path.
-    """
 
     return write_csv(
         WAF_OUTPUT_DIR / "results.csv",
@@ -307,24 +198,10 @@ def export_csv(
     )
 
 
-# ==========================================================
-# Export Detected Targets
-# ==========================================================
-
-
 def export_detected(
     analysis: dict[str, Any],
 ) -> Path:
-    """
-    Export detected WAF targets only.
 
-    Args:
-        analysis:
-            WAF Detection analysis.
-
-    Returns:
-        Output file path.
-    """
 
     results = analysis["results"]
 
@@ -352,24 +229,10 @@ def export_detected(
     )
 
 
-# ==========================================================
-# Export Summary
-# ==========================================================
-
-
 def export_summary(
     analysis: dict[str, Any],
 ) -> Path:
-    """
-    Export summary report.
 
-    Args:
-        analysis:
-            WAF Detection analysis.
-
-    Returns:
-        Output file path.
-    """
 
     statistics = analysis["statistics"]
 
@@ -431,17 +294,10 @@ def export_summary(
     )
 
 
-# ==========================================================
-# Show Summary
-# ==========================================================
-
-
 def show_summary(
     analysis: dict[str, Any],
 ) -> None:
-    """
-    Display WAF Detection summary.
-    """
+
 
     statistics = analysis["statistics"]
 
@@ -510,21 +366,10 @@ def show_summary(
     print("=" * 80)
 
 
-# ==========================================================
-# Export All
-# ==========================================================
-
-
 def export_all(
     analysis: dict[str, Any],
 ) -> None:
-    """
-    Export all WAF Detection reports.
 
-    Args:
-        analysis:
-            WAF Detection analysis.
-    """
 
     exporters = (
         export_json,
@@ -546,10 +391,6 @@ def export_all(
 
     success("WAF Detection reports exported successfully.")
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "export_all",

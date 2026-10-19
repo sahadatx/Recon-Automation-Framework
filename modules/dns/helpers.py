@@ -1,10 +1,3 @@
-"""
-DNS Helper Functions
-
-Shared helper functions used by the DNS
-Resolution module.
-"""
-
 from __future__ import annotations
 
 import dns.exception
@@ -13,18 +6,9 @@ import dns.resolver
 from config.config import DNS_LIFETIME, DNS_RETRIES, DNS_SERVERS, DNS_TIMEOUT
 from core.logger import info, warning
 
-# ==========================================================
-# Create Resolver
-# ==========================================================
-
 
 def create_resolver() -> dns.resolver.Resolver:
-    """
-    Create and configure a DNS resolver.
 
-    Returns:
-        Configured DNS resolver.
-    """
 
     resolver = dns.resolver.Resolver()
 
@@ -39,25 +23,11 @@ def create_resolver() -> dns.resolver.Resolver:
     return resolver
 
 
-# ==========================================================
-# Resolve Record
-# ==========================================================
-
-
 def resolve_record(
     domain: str,
     record_type: str,
 ) -> list[str]:
-    """
-    Resolve a DNS record.
 
-    Args:
-        domain: Target domain.
-        record_type: DNS record type.
-
-    Returns:
-        Resolved DNS records.
-    """
 
     resolver = create_resolver()
 
@@ -116,29 +86,14 @@ def resolve_record(
     return []
 
 
-# ==========================================================
-# Show Lookup
-# ==========================================================
-
-
 def show_lookup(
     domain: str,
     record_type: str,
 ) -> None:
-    """
-    Display DNS lookup information.
 
-    Args:
-        domain: Target domain.
-        record_type: DNS record type.
-    """
 
     info(f"Resolving {record_type} " f"records for {domain}")
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "create_resolver",

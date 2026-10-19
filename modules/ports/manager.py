@@ -1,12 +1,3 @@
-#!/usr/bin/env python3
-
-"""
-Port Scanner Manager
-
-Coordinate port scanning
-and analysis.
-"""
-
 from __future__ import annotations
 
 from concurrent.futures import as_completed
@@ -17,10 +8,6 @@ from core.logger import info, progress_status, success, warning
 from modules.ports.analyzer import analyze
 from modules.ports.scanner import scan_common_ports
 
-# ==========================================================
-# Scan One Host
-# ==========================================================
-
 
 def scan_one_host(
     context: ExecutionContext,
@@ -29,10 +16,7 @@ def scan_one_host(
     str,
     list[dict[str, Any]],
 ]:
-    """
-    Scan common TCP ports
-    for one host.
-    """
+
 
     return (
         host,
@@ -43,11 +27,6 @@ def scan_one_host(
     )
 
 
-# ==========================================================
-# Scan Hosts
-# ==========================================================
-
-
 def scan_hosts(
     context: ExecutionContext,
     hosts: list[str],
@@ -55,10 +34,7 @@ def scan_hosts(
     dict[str, list[dict[str, Any]]],
     list[str],
 ]:
-    """
-    Scan multiple hosts using
-    the shared thread pool.
-    """
+
 
     info("Starting Port Scan...")
 
@@ -155,27 +131,11 @@ def scan_hosts(
     )
 
 
-# ==========================================================
-# Run Port Scanner
-# ==========================================================
-
-
 def run(
     context: ExecutionContext,
     hosts: list[str],
 ) -> dict[str, Any]:
-    """
-    Execute the complete
-    port scanning workflow.
 
-        Scan
-            ↓
-        Analyze
-            ↓
-        Store Context
-            ↓
-        Return Analysis
-    """
 
     (
         results,
@@ -197,10 +157,6 @@ def run(
 
     return analysis
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "run",

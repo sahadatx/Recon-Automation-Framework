@@ -1,12 +1,3 @@
-#!/usr/bin/env python3
-
-"""
-HTTP Probe Engine
-
-Probe HTTP and HTTPS services
-using the shared HTTP session.
-"""
-
 from __future__ import annotations
 
 import time
@@ -17,29 +8,12 @@ import requests
 from core.logger import warning
 from modules.http.helpers import request_timeout, show_probe
 
-# ==========================================================
-# Probe URL
-# ==========================================================
-
 
 def probe_url(
     session: requests.Session,
     url: str,
 ) -> dict[str, Any] | None:
-    """
-    Probe a single URL.
 
-    Args:
-        session:
-            Shared HTTP session.
-
-        url:
-            Target URL.
-
-    Returns:
-        HTTP response information
-        or None when unreachable.
-    """
 
     show_probe(
         url,
@@ -65,9 +39,8 @@ def probe_url(
     )
 
     return {
-        # --------------------------------------------------
-        # General
-        # --------------------------------------------------
+
+
         "alive": True,
         "url": response.url,
         "scheme": response.url.split(
@@ -79,9 +52,8 @@ def probe_url(
         "redirect": bool(
             response.history,
         ),
-        # --------------------------------------------------
-        # Common Headers
-        # --------------------------------------------------
+
+
         "server": response.headers.get(
             "Server",
             "",
@@ -94,9 +66,8 @@ def probe_url(
             "Content-Length",
             "0",
         ),
-        # --------------------------------------------------
-        # Raw Data
-        # --------------------------------------------------
+
+
         "headers": dict(
             response.headers,
         ),
@@ -104,18 +75,11 @@ def probe_url(
     }
 
 
-# ==========================================================
-# Probe HTTP
-# ==========================================================
-
-
 def probe_http(
     session: requests.Session,
     host: str,
 ) -> dict[str, Any] | None:
-    """
-    Probe HTTP service.
-    """
+
 
     return probe_url(
         session=session,
@@ -123,18 +87,11 @@ def probe_http(
     )
 
 
-# ==========================================================
-# Probe HTTPS
-# ==========================================================
-
-
 def probe_https(
     session: requests.Session,
     host: str,
 ) -> dict[str, Any] | None:
-    """
-    Probe HTTPS service.
-    """
+
 
     return probe_url(
         session=session,
@@ -142,22 +99,11 @@ def probe_https(
     )
 
 
-# ==========================================================
-# Probe Host
-# ==========================================================
-
-
 def probe_host(
     session: requests.Session,
     host: str,
 ) -> dict[str, Any] | None:
-    """
-    Probe one host.
 
-    HTTPS is attempted first.
-    If HTTPS is unavailable,
-    HTTP is attempted.
-    """
 
     result = probe_https(
         session=session,
@@ -181,10 +127,6 @@ def probe_host(
 
     return None
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "probe_host",

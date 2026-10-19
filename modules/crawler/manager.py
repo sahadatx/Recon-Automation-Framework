@@ -1,11 +1,3 @@
-#!/usr/bin/env python3
-
-"""
-Crawler Manager
-
-Coordinate URL crawling and analysis.
-"""
-
 from __future__ import annotations
 
 from concurrent.futures import as_completed
@@ -16,18 +8,12 @@ from core.logger import info, progress_status, success, warning
 from modules.crawler.analyzer import analyze
 from modules.crawler.crawler import crawl_host
 
-# ==========================================================
-# Crawl One Host
-# ==========================================================
-
 
 def crawl_one_host(
     context: ExecutionContext,
     host: str,
 ) -> tuple[str, dict[str, Any] | None]:
-    """
-    Crawl a single host.
-    """
+
 
     return (
         host,
@@ -38,18 +24,11 @@ def crawl_one_host(
     )
 
 
-# ==========================================================
-# Crawl Hosts
-# ==========================================================
-
-
 def crawl_hosts(
     context: ExecutionContext,
     hosts: list[str],
 ) -> dict[str, dict[str, Any]]:
-    """
-    Crawl multiple hosts in parallel.
-    """
+
 
     info("Starting URL Crawling...")
 
@@ -133,26 +112,11 @@ def crawl_hosts(
     return results
 
 
-# ==========================================================
-# Run Crawler
-# ==========================================================
-
-
 def run(
     context: ExecutionContext,
     hosts: list[str],
 ) -> dict[str, Any]:
-    """
-    Execute the complete crawler workflow.
 
-        Crawl
-           ↓
-        Analyze
-           ↓
-        Store Context
-           ↓
-        Return Analysis
-    """
 
     results = crawl_hosts(
         context=context,
@@ -170,10 +134,6 @@ def run(
 
     return analysis
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "run",

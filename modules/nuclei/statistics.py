@@ -1,25 +1,12 @@
-"""
-Nuclei Statistics
-
-Generates statistics from
-Nuclei findings.
-"""
-
 from __future__ import annotations
 
 from collections import Counter
 
 from .constants import CRITICAL, HIGH, INFO, LOW, MEDIUM, UNKNOWN
 
-# ==========================================================
-# Empty Statistics
-# ==========================================================
-
 
 def empty_statistics() -> dict:
-    """
-    Return empty statistics.
-    """
+
 
     return {
         "total_targets": 0,
@@ -45,17 +32,10 @@ def empty_statistics() -> dict:
     }
 
 
-# ==========================================================
-# Generate Statistics
-# ==========================================================
-
-
 def generate_statistics(
     findings: list[dict],
 ) -> dict:
-    """
-    Generate statistics from findings.
-    """
+
 
     if not findings:
         return empty_statistics()
@@ -186,10 +166,6 @@ def generate_statistics(
         "average_findings_per_target": (average_findings_per_target),
     }
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "empty_statistics",

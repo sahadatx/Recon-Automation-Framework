@@ -1,10 +1,3 @@
-"""
-JavaScript Helper Functions
-
-Shared helper functions for the
-JavaScript Analysis module.
-"""
-
 from __future__ import annotations
 
 from pathlib import Path
@@ -24,9 +17,6 @@ from core.context import ExecutionContext
 from core.logger import debug
 from modules.javascript.constants import FILES_DIR
 
-# ==========================================================
-# Retryable HTTP Status Codes
-# ==========================================================
 
 RETRY_STATUS_CODES = {
     500,
@@ -36,18 +26,8 @@ RETRY_STATUS_CODES = {
 }
 
 
-# ==========================================================
-# Create Output Directory
-# ==========================================================
-
-
 def create_output_directory() -> Path:
-    """
-    Create JavaScript output directory.
 
-    Returns:
-        Path
-    """
 
     FILES_DIR.mkdir(
         parents=True,
@@ -57,17 +37,10 @@ def create_output_directory() -> Path:
     return FILES_DIR
 
 
-# ==========================================================
-# URL Validation
-# ==========================================================
-
-
 def is_valid_url(
     url: str,
 ) -> bool:
-    """
-    Validate JavaScript URL.
-    """
+
 
     if not url:
         return False
@@ -88,18 +61,10 @@ def is_valid_url(
     )
 
 
-# ==========================================================
-# Safe Filename
-# ==========================================================
-
-
 def safe_filename(
     url: str,
 ) -> str:
-    """
-    Convert JavaScript URL into
-    a filesystem-safe filename.
-    """
+
 
     filename = url.replace(
         "https://",
@@ -130,18 +95,11 @@ def safe_filename(
     return filename
 
 
-# ==========================================================
-# Save JavaScript
-# ==========================================================
-
-
 def save_javascript(
     filename: str,
     content: str,
 ) -> Path:
-    """
-    Save JavaScript file.
-    """
+
 
     filepath = create_output_directory() / filename
 
@@ -154,18 +112,10 @@ def save_javascript(
     return filepath
 
 
-# ==========================================================
-# Retry Policy
-# ==========================================================
-
-
 def should_retry(
     error: Exception,
 ) -> bool:
-    """
-    Decide whether a request
-    should be retried.
-    """
+
 
     if isinstance(
         error,
@@ -193,18 +143,11 @@ def should_retry(
     return False
 
 
-# ==========================================================
-# Make Request
-# ==========================================================
-
-
 def make_request(
     context: ExecutionContext,
     url: str,
 ) -> requests.Response:
-    """
-    Send HTTP GET request.
-    """
+
 
     session = context.get_http_session()
 
@@ -222,18 +165,11 @@ def make_request(
     return response
 
 
-# ==========================================================
-# Download File
-# ==========================================================
-
-
 def download_file(
     context: ExecutionContext,
     url: str,
 ) -> requests.Response | None:
-    """
-    Download a JavaScript file.
-    """
+
 
     if not is_valid_url(
         url,
@@ -311,10 +247,6 @@ def download_file(
 
     return None
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "RETRY_STATUS_CODES",

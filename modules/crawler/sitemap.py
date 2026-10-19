@@ -1,9 +1,3 @@
-"""
-Sitemap Parser
-
-Downloads and parses sitemap.xml files.
-"""
-
 import gzip
 from urllib.parse import urljoin
 from xml.etree import ElementTree
@@ -11,40 +5,21 @@ from xml.etree import ElementTree
 from core.logger import debug
 from modules.crawler.helpers import download_page
 
-# ==========================================================
-# XML Namespace
-# ==========================================================
 
 SITEMAP_NS = {
     "sm": "http://www.sitemaps.org/schemas/sitemap/0.9",
 }
 
 
-# ==========================================================
-# Limits
-# ==========================================================
-
 MAX_SITEMAP_DEPTH = 5
 
 MAX_SITEMAPS = 100
 
 
-# ==========================================================
-# Download Sitemap
-# ==========================================================
-
-
 def download_sitemap(
     sitemap_url: str,
 ) -> str | None:
-    """
-    Download sitemap XML.
 
-    Supports both:
-
-    - sitemap.xml
-    - sitemap.xml.gz
-    """
 
     response = download_page(sitemap_url)
 
@@ -72,20 +47,10 @@ def download_sitemap(
     )
 
 
-# ==========================================================
-# Parse URL Sitemap
-# ==========================================================
-
-
 def parse_urlset(
     root: ElementTree.Element,
 ) -> list[str]:
-    """
-    Extract URLs from <urlset>.
 
-    Returns:
-        list[str]
-    """
 
     urls = []
 
@@ -115,21 +80,10 @@ def parse_urlset(
     return list(dict.fromkeys(urls))
 
 
-# ==========================================================
-# Parse Sitemap Index
-# ==========================================================
-
-
 def parse_sitemap_index(
     root: ElementTree.Element,
 ) -> list[str]:
-    """
-    Extract sitemap URLs from
-    <sitemapindex>.
 
-    Returns:
-        list[str]
-    """
 
     sitemaps = []
 
@@ -159,31 +113,17 @@ def parse_sitemap_index(
     return list(dict.fromkeys(sitemaps))
 
 
-# ==========================================================
-# Crawl Sitemap
-# ==========================================================
-
-
 def crawl_sitemap(
     sitemap_url: str,
     visited: set[str] | None = None,
     depth: int = 0,
 ) -> list[str]:
-    """
-    Download and recursively parse
-    sitemap.xml.
 
-    Returns:
-        list[str]
-    """
 
     if visited is None:
 
         visited = set()
 
-    # ------------------------------------------
-    # Recursion Limit
-    # ------------------------------------------
 
     if depth > MAX_SITEMAP_DEPTH:
 
@@ -191,9 +131,6 @@ def crawl_sitemap(
 
         return []
 
-    # ------------------------------------------
-    # Sitemap Limit
-    # ------------------------------------------
 
     if len(visited) >= MAX_SITEMAPS:
 
@@ -201,9 +138,6 @@ def crawl_sitemap(
 
         return []
 
-    # ------------------------------------------
-    # Already Visited
-    # ------------------------------------------
 
     if sitemap_url in visited:
 
@@ -211,9 +145,6 @@ def crawl_sitemap(
 
     visited.add(sitemap_url)
 
-    # ------------------------------------------
-    # Download
-    # ------------------------------------------
 
     content = download_sitemap(sitemap_url)
 
@@ -221,9 +152,6 @@ def crawl_sitemap(
 
         return []
 
-    # ------------------------------------------
-    # Parse XML
-    # ------------------------------------------
 
     try:
 
@@ -237,17 +165,11 @@ def crawl_sitemap(
 
     tag = root.tag.lower()
 
-    # ------------------------------------------
-    # URLSET
-    # ------------------------------------------
 
     if tag.endswith("urlset"):
 
         return parse_urlset(root)
 
-    # ------------------------------------------
-    # SITEMAP INDEX
-    # ------------------------------------------
 
     if tag.endswith("sitemapindex"):
 
@@ -272,10 +194,6 @@ def crawl_sitemap(
     return []
 
 
-# ==========================================================
-# Fetch Sitemap
-# ==========================================================
-
 DEFAULT_SITEMAPS = (
     "/sitemap.xml",
     "/sitemap_index.xml",
@@ -286,16 +204,7 @@ DEFAULT_SITEMAPS = (
 def fetch_sitemap(
     base_url: str,
 ) -> dict:
-    """
-    Discover and crawl sitemap.
 
-    Returns:
-        {
-            "found": bool,
-            "count": int,
-            "urls": list[str],
-        }
-    """
 
     urls = []
 
@@ -324,10 +233,6 @@ def fetch_sitemap(
         "urls": urls,
     }
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "download_sitemap",

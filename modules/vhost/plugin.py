@@ -1,9 +1,3 @@
-#!/usr/bin/env python3
-
-"""
-Virtual Host Discovery Plugin
-"""
-
 from __future__ import annotations
 
 from typing import Any
@@ -14,15 +8,9 @@ from core.plugins.base import BasePlugin
 from .exporter import export_all, show_summary
 from .manager import run
 
-# ==========================================================
-# Virtual Host Discovery Plugin
-# ==========================================================
-
 
 class VHostPlugin(BasePlugin):
-    """
-    Virtual Host Discovery Plugin.
-    """
+
 
     name = "vhost"
 
@@ -52,9 +40,7 @@ class VHostPlugin(BasePlugin):
         *args: Any,
         **kwargs: Any,
     ) -> dict[str, Any]:
-        """
-        Execute the Virtual Host Discovery plugin.
-        """
+
 
         return run(
             context,
@@ -66,9 +52,7 @@ class VHostPlugin(BasePlugin):
         self,
         result: dict[str, Any],
     ) -> None:
-        """
-        Export Virtual Host Discovery reports.
-        """
+
 
         export_all(
             result,
@@ -79,16 +63,8 @@ class VHostPlugin(BasePlugin):
         )
 
 
-# ==========================================================
-# Plugin Instance
-# ==========================================================
-
 plugin = VHostPlugin()
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "VHostPlugin",

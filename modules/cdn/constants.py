@@ -1,18 +1,9 @@
-"""
-CDN Detection Constants
-
-Centralized constants used by the CDN Detection module.
-"""
-
 from __future__ import annotations
 
 from pathlib import Path
 
 from config.config import HTTP_TIMEOUT
 
-# ==========================================================
-# Output Directory
-# ==========================================================
 
 OUTPUT_DIR = Path("output/cdn")
 
@@ -31,9 +22,6 @@ SUMMARY_FILE = OUTPUT_DIR / "summary.txt"
 
 DETECTED_FILE = OUTPUT_DIR / "detected.txt"
 
-# ==========================================================
-# Network Defaults
-# ==========================================================
 
 DEFAULT_HTTP_PORT = 80
 
@@ -43,9 +31,6 @@ DEFAULT_TIMEOUT = HTTP_TIMEOUT
 
 MAX_REDIRECTS = 5
 
-# ==========================================================
-# Confidence Thresholds
-# ==========================================================
 
 HIGH_CONFIDENCE = 90
 
@@ -55,9 +40,6 @@ LOW_CONFIDENCE = 50
 
 UNKNOWN_CONFIDENCE = 0
 
-# ==========================================================
-# Detection Methods
-# ==========================================================
 
 METHOD_HEADER = "header"
 
@@ -73,9 +55,6 @@ METHOD_IP = "ip"
 
 METHOD_TLS = "tls"
 
-# ==========================================================
-# Default HTTP Headers
-# ==========================================================
 
 DEFAULT_HEADERS = {
     "User-Agent": ("ReconAutomationFramework/1.0 " "(CDN Detection)"),
@@ -84,9 +63,6 @@ DEFAULT_HEADERS = {
     "Connection": "close",
 }
 
-# ==========================================================
-# Common CDN Headers
-# ==========================================================
 
 COMMON_CDN_HEADERS = (
     "server",
@@ -115,9 +91,6 @@ COMMON_CDN_HEADERS = (
     "x-vercel-id",
 )
 
-# ==========================================================
-# Common Cache Headers
-# ==========================================================
 
 CACHE_HEADERS = (
     "cache-control",
@@ -129,9 +102,6 @@ CACHE_HEADERS = (
     "vary",
 )
 
-# ==========================================================
-# Default Analysis Result
-# ==========================================================
 
 EMPTY_RESULT = {
     "target": "",
@@ -147,9 +117,6 @@ EMPTY_RESULT = {
     "error": None,
 }
 
-# ==========================================================
-# CDN Providers
-# ==========================================================
 
 CDN_PROVIDERS = (
     "Cloudflare",
@@ -174,14 +141,10 @@ CDN_PROVIDERS = (
     "Oracle Cloud CDN",
 )
 
-# ==========================================================
-# Header Fingerprints
-# ==========================================================
 
 HEADER_FINGERPRINTS = {
-    # ------------------------------------------------------
-    # Cloudflare
-    # ------------------------------------------------------
+
+
     "Cloudflare": {
         "cf-ray",
         "cf-cache-status",
@@ -191,9 +154,8 @@ HEADER_FINGERPRINTS = {
         "nel",
         "report-to",
     },
-    # ------------------------------------------------------
-    # Akamai
-    # ------------------------------------------------------
+
+
     "Akamai": {
         "akamai-origin-hop",
         "akamai-cache-status",
@@ -201,9 +163,8 @@ HEADER_FINGERPRINTS = {
         "x-akamai-session-info",
         "x-akamai-transformed",
     },
-    # ------------------------------------------------------
-    # Fastly
-    # ------------------------------------------------------
+
+
     "Fastly": {
         "x-served-by",
         "x-cache-hits",
@@ -211,144 +172,124 @@ HEADER_FINGERPRINTS = {
         "fastly-debug-digest",
         "fastly-debug-path",
     },
-    # ------------------------------------------------------
-    # Amazon CloudFront
-    # ------------------------------------------------------
+
+
     "Amazon CloudFront": {
         "x-amz-cf-id",
         "x-amz-cf-pop",
         "x-cache",
     },
-    # ------------------------------------------------------
-    # Azure Front Door
-    # ------------------------------------------------------
+
+
     "Azure Front Door": {
         "x-azure-ref",
         "x-msedge-ref",
         "x-cache",
     },
-    # ------------------------------------------------------
-    # Google Cloud CDN
-    # ------------------------------------------------------
+
+
     "Google Cloud CDN": {
         "via",
         "x-cache",
         "age",
         "alt-svc",
     },
-    # ------------------------------------------------------
-    # Imperva
-    # ------------------------------------------------------
+
+
     "Imperva": {
         "x-iinfo",
         "x-cdn",
         "x-cdn-cache",
     },
-    # ------------------------------------------------------
-    # BunnyCDN
-    # ------------------------------------------------------
+
+
     "BunnyCDN": {
         "cdn-pullzone",
         "cdn-requestcountrycode",
         "cdn-requestid",
     },
-    # ------------------------------------------------------
-    # CDN77
-    # ------------------------------------------------------
+
+
     "CDN77": {
         "x-cdn",
         "x-cache",
         "x-cache-status",
         "x-edge-location",
     },
-    # ------------------------------------------------------
-    # KeyCDN
-    # ------------------------------------------------------
+
+
     "KeyCDN": {
         "x-edge-location",
         "x-cache",
         "x-shield",
     },
-    # ------------------------------------------------------
-    # StackPath
-    # ------------------------------------------------------
+
+
     "StackPath": {
         "x-sp-cache",
         "x-sp-edge",
         "x-cache",
     },
-    # ------------------------------------------------------
-    # Sucuri
-    # ------------------------------------------------------
+
+
     "Sucuri": {
         "x-sucuri-id",
         "x-sucuri-cache",
         "x-sucuri-block",
     },
-    # ------------------------------------------------------
-    # Vercel
-    # ------------------------------------------------------
+
+
     "Vercel": {
         "x-vercel-id",
         "x-vercel-cache",
         "x-vercel-ip-country",
     },
-    # ------------------------------------------------------
-    # Netlify
-    # ------------------------------------------------------
+
+
     "Netlify": {
         "x-nf-request-id",
         "server-timing",
     },
-    # ------------------------------------------------------
-    # QUIC.cloud
-    # ------------------------------------------------------
+
+
     "QUIC.cloud": {
         "x-qc-cache",
         "x-qc-pop",
         "x-qc-hit",
     },
-    # ------------------------------------------------------
-    # Leaseweb CDN
-    # ------------------------------------------------------
+
+
     "Leaseweb CDN": {
         "x-lsw-cache",
         "x-cache",
     },
-    # ------------------------------------------------------
-    # G-Core
-    # ------------------------------------------------------
+
+
     "G-Core": {
         "x-gcdn-cache",
         "x-gcore-cache",
     },
-    # ------------------------------------------------------
-    # Alibaba Cloud CDN
-    # ------------------------------------------------------
+
+
     "Alibaba Cloud CDN": {
         "x-swift-cachetime",
         "eagleid",
         "x-cache",
     },
-    # ------------------------------------------------------
-    # Tencent Cloud CDN
-    # ------------------------------------------------------
+
+
     "Tencent Cloud CDN": {
         "x-cache-lookup",
         "x-nws-log-uuid",
     },
-    # ------------------------------------------------------
-    # Oracle Cloud CDN
-    # ------------------------------------------------------
+
+
     "Oracle Cloud CDN": {
         "opc-request-id",
         "x-cache",
     },
 }
 
-# ==========================================================
-# Server Fingerprints
-# ==========================================================
 
 SERVER_FINGERPRINTS = {
     "cloudflare": "Cloudflare",
@@ -381,9 +322,6 @@ SERVER_FINGERPRINTS = {
     "oracle": "Oracle Cloud CDN",
 }
 
-# ==========================================================
-# CNAME Fingerprints
-# ==========================================================
 
 CNAME_FINGERPRINTS = {
     ".cloudflare.net": "Cloudflare",
@@ -419,9 +357,6 @@ CNAME_FINGERPRINTS = {
     ".oraclecloud.net": "Oracle Cloud CDN",
 }
 
-# ==========================================================
-# Cache Header Values
-# ==========================================================
 
 CACHE_PATTERNS = {
     "hit",
@@ -435,9 +370,6 @@ CACHE_PATTERNS = {
     "bypass",
 }
 
-# ==========================================================
-# IP Provider Hints
-# ==========================================================
 
 IP_PROVIDER_HINTS = {
     "Cloudflare": (
@@ -460,9 +392,6 @@ IP_PROVIDER_HINTS = {
     ),
 }
 
-# ==========================================================
-# Recommendations
-# ==========================================================
 
 RECOMMENDATIONS = {
     True: "A CDN was detected. Verify whether the provider "
@@ -471,9 +400,6 @@ RECOMMENDATIONS = {
     "The origin server may be directly exposed.",
 }
 
-# ==========================================================
-# Default Analysis
-# ==========================================================
 
 DEFAULT_ANALYSIS = {
     "target": "",
@@ -489,9 +415,6 @@ DEFAULT_ANALYSIS = {
     "error": None,
 }
 
-# ==========================================================
-# Export
-# ==========================================================
 
 __all__ = [
     "OUTPUT_DIR",

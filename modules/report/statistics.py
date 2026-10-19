@@ -1,24 +1,12 @@
-"""
-Report Statistics
-
-Generate summary statistics for the final report.
-"""
-
 from __future__ import annotations
 
 from typing import Any
-
-# ==========================================================
-# Helpers
-# ==========================================================
 
 
 def _count(
     value: Any,
 ) -> int:
-    """
-    Return the number of items in a collection.
-    """
+
 
     if value is None:
         return 0
@@ -36,9 +24,7 @@ def _module(
     modules: dict[str, Any],
     name: str,
 ) -> dict[str, Any]:
-    """
-    Safely return a module analysis.
-    """
+
 
     module = modules.get(
         name,
@@ -60,9 +46,7 @@ def _stat(
     key: str,
     default: int = 0,
 ) -> int:
-    """
-    Return one statistic from a module.
-    """
+
 
     return module.get(
         "statistics",
@@ -73,18 +57,10 @@ def _stat(
     )
 
 
-# ==========================================================
-# Statistics
-# ==========================================================
-
-
 def generate_statistics(
     report: dict[str, Any],
 ) -> dict[str, Any]:
-    """
-    Generate summary statistics from
-    all module analyses.
-    """
+
 
     analyses = report.get(
         "modules",
@@ -170,9 +146,8 @@ def generate_statistics(
     )
 
     statistics = {
-        # --------------------------------------------------
-        # Enumeration
-        # --------------------------------------------------
+
+
         "total_subdomains": _stat(
             passive,
             "total_subdomains",
@@ -195,9 +170,8 @@ def generate_statistics(
             ports,
             "total_open_ports",
         ),
-        # --------------------------------------------------
-        # Discovery
-        # --------------------------------------------------
+
+
         "technologies": _stat(
             tech,
             "technology_count",
@@ -222,9 +196,8 @@ def generate_statistics(
             screenshots,
             "captured",
         ),
-        # --------------------------------------------------
-        # Security
-        # --------------------------------------------------
+
+
         "tls_hosts": _stat(
             tls,
             "targets",
@@ -250,17 +223,10 @@ def generate_statistics(
     return statistics
 
 
-# ==========================================================
-# Summary
-# ==========================================================
-
-
 def generate_summary(
     statistics: dict[str, Any],
 ) -> str:
-    """
-    Generate a printable statistics summary.
-    """
+
 
     lines = [
         "=" * 80,
@@ -296,10 +262,6 @@ def generate_summary(
         lines,
     )
 
-
-# ==========================================================
-# Public API
-# ==========================================================
 
 __all__ = [
     "generate_statistics",

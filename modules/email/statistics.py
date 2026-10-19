@@ -1,30 +1,14 @@
-"""
-Email Security Statistics
-
-Generate statistics for
-Email Security.
-"""
-
 from __future__ import annotations
 
 from collections import Counter
 
 from .constants import CRITICAL_RISK, HIGH_RISK, LOW_RISK, MEDIUM_RISK
 
-# ==========================================================
-# Provider Statistics
-# ==========================================================
-
 
 def provider_statistics(
     results,
 ) -> dict:
-    """
-    Count mail providers.
 
-    Returns:
-        dict
-    """
 
     counter = Counter(
         result.get(
@@ -42,20 +26,10 @@ def provider_statistics(
     )
 
 
-# ==========================================================
-# Risk Statistics
-# ==========================================================
-
-
 def risk_statistics(
     results,
 ) -> dict:
-    """
-    Count risk levels.
 
-    Returns:
-        dict
-    """
 
     return {
         "low": sum(result.get("risk") == LOW_RISK for result in results),
@@ -65,20 +39,10 @@ def risk_statistics(
     }
 
 
-# ==========================================================
-# Generate Statistics
-# ==========================================================
-
-
 def generate_statistics(
     results,
 ) -> dict:
-    """
-    Generate email statistics.
 
-    Returns:
-        dict
-    """
 
     total = len(results)
 
@@ -150,17 +114,10 @@ def generate_statistics(
     }
 
 
-# ==========================================================
-# Print Summary
-# ==========================================================
-
-
 def print_summary(
     statistics,
 ) -> None:
-    """
-    Print email summary.
-    """
+
 
     print()
 
@@ -218,10 +175,6 @@ def print_summary(
 
     print("=" * 80)
 
-
-# ==========================================================
-# Export
-# ==========================================================
 
 __all__ = [
     "provider_statistics",

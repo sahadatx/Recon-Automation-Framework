@@ -1,10 +1,3 @@
-"""
-Virtual Host Discovery Exporter
-
-Export Virtual Host Discovery
-results into multiple formats.
-"""
-
 from __future__ import annotations
 
 import json
@@ -14,18 +7,9 @@ from typing import Any
 from config.config import VHOST_OUTPUT_DIR
 from core.logger import success, warning
 
-# ==========================================================
-# Create Output Directory
-# ==========================================================
-
 
 def create_output_directory() -> Path:
-    """
-    Create Virtual Host Discovery output directory.
 
-    Returns:
-        Output directory path.
-    """
 
     VHOST_OUTPUT_DIR.mkdir(
         parents=True,
@@ -35,28 +19,11 @@ def create_output_directory() -> Path:
     return VHOST_OUTPUT_DIR
 
 
-# ==========================================================
-# Write Text File
-# ==========================================================
-
-
 def write_text(
     output_file: Path,
     lines: list[str],
 ) -> Path:
-    """
-    Write text lines to a file.
 
-    Args:
-        output_file:
-            Destination file.
-
-        lines:
-            Text lines.
-
-    Returns:
-        Output file path.
-    """
 
     create_output_directory()
 
@@ -82,28 +49,11 @@ def write_text(
     return output_file
 
 
-# ==========================================================
-# Write JSON File
-# ==========================================================
-
-
 def write_json(
     output_file: Path,
     data: Any,
 ) -> Path:
-    """
-    Write JSON data.
 
-    Args:
-        output_file:
-            Destination file.
-
-        data:
-            JSON serializable object.
-
-    Returns:
-        Output file path.
-    """
 
     create_output_directory()
 
@@ -133,24 +83,10 @@ def write_json(
     return output_file
 
 
-# ==========================================================
-# Export JSON
-# ==========================================================
-
-
 def export_json(
     analysis: dict[str, Any],
 ) -> Path:
-    """
-    Export JSON report.
 
-    Args:
-        analysis:
-            Virtual Host Discovery analysis.
-
-    Returns:
-        Output file path.
-    """
 
     return write_json(
         VHOST_OUTPUT_DIR / "results.json",
@@ -158,24 +94,10 @@ def export_json(
     )
 
 
-# ==========================================================
-# Export TXT
-# ==========================================================
-
-
 def export_txt(
     analysis: dict[str, Any],
 ) -> Path:
-    """
-    Export discovered virtual hosts.
 
-    Args:
-        analysis:
-            Virtual Host Discovery analysis.
-
-    Returns:
-        Output file path.
-    """
 
     results = analysis["results"]
 
@@ -197,24 +119,10 @@ def export_txt(
     )
 
 
-# ==========================================================
-# Export Interesting Hosts
-# ==========================================================
-
-
 def export_interesting(
     analysis: dict[str, Any],
 ) -> Path:
-    """
-    Export interesting virtual hosts.
 
-    Args:
-        analysis:
-            Virtual Host Discovery analysis.
-
-    Returns:
-        Output file path.
-    """
 
     statistics = analysis["statistics"]
 
@@ -241,24 +149,10 @@ def export_interesting(
     )
 
 
-# ==========================================================
-# Export Summary
-# ==========================================================
-
-
 def export_summary(
     analysis: dict[str, Any],
 ) -> Path:
-    """
-    Export summary report.
 
-    Args:
-        analysis:
-            Virtual Host Discovery analysis.
-
-    Returns:
-        Output file path.
-    """
 
     statistics = analysis["statistics"]
 
@@ -284,21 +178,10 @@ def export_summary(
     )
 
 
-# ==========================================================
-# Export All
-# ==========================================================
-
-
 def export_all(
     analysis: dict[str, Any],
 ) -> None:
-    """
-    Export all Virtual Host Discovery reports.
 
-    Args:
-        analysis:
-            Virtual Host Discovery analysis.
-    """
 
     exporters = (
         export_json,
@@ -320,17 +203,10 @@ def export_all(
     success("Virtual Host Discovery reports exported successfully.")
 
 
-# ==========================================================
-# Show Summary
-# ==========================================================
-
-
 def show_summary(
     analysis: dict[str, Any],
 ) -> None:
-    """
-    Display Virtual Host Discovery summary.
-    """
+
 
     statistics = analysis["statistics"]
 
@@ -362,10 +238,6 @@ def show_summary(
 
     print("=" * 80)
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "export_all",

@@ -1,19 +1,9 @@
-"""
-Email Security Constants
-
-Centralized constants used by the
-Email Security module.
-"""
-
 from __future__ import annotations
 
 from pathlib import Path
 
 from config.config import DNS_TIMEOUT
 
-# ==========================================================
-# Output Directory
-# ==========================================================
 
 OUTPUT_DIR = Path(
     "output/email",
@@ -34,15 +24,9 @@ SUMMARY_FILE = OUTPUT_DIR / "summary.txt"
 
 HIGH_RISK_FILE = OUTPUT_DIR / "high_risk.txt"
 
-# ==========================================================
-# Network Defaults
-# ==========================================================
 
 DEFAULT_TIMEOUT = DNS_TIMEOUT
 
-# ==========================================================
-# Risk Levels
-# ==========================================================
 
 LOW_RISK = "Low"
 
@@ -52,9 +36,6 @@ HIGH_RISK = "High"
 
 CRITICAL_RISK = "Critical"
 
-# ==========================================================
-# Risk Score Thresholds
-# ==========================================================
 
 LOW_SCORE = 20
 
@@ -62,9 +43,6 @@ MEDIUM_SCORE = 40
 
 HIGH_SCORE = 60
 
-# ==========================================================
-# DNS Record Types
-# ==========================================================
 
 MX_RECORD = "MX"
 
@@ -72,9 +50,6 @@ TXT_RECORD = "TXT"
 
 DNSKEY_RECORD = "DNSKEY"
 
-# ==========================================================
-# Default Analysis Result
-# ==========================================================
 
 EMPTY_RESULT = {
     "target": "",
@@ -96,10 +71,6 @@ EMPTY_RESULT = {
     "error": None,
 }
 
-
-# ==========================================================
-# Mail Providers
-# ==========================================================
 
 MAIL_PROVIDERS = {
     "Google Workspace": (
@@ -126,9 +97,6 @@ MAIL_PROVIDERS = {
     "Barracuda": (".ess.barracudanetworks.com",),
 }
 
-# ==========================================================
-# Common DKIM Selectors
-# ==========================================================
 
 DKIM_SELECTORS = (
     "default",
@@ -139,9 +107,6 @@ DKIM_SELECTORS = (
     "mail",
 )
 
-# ==========================================================
-# DNS Prefixes
-# ==========================================================
 
 DMARC_PREFIX = "_dmarc"
 
@@ -151,9 +116,6 @@ TLS_RPT_PREFIX = "_smtp._tls"
 
 BIMI_PREFIX = "default._bimi"
 
-# ==========================================================
-# Recommendations
-# ==========================================================
 
 RECOMMENDATIONS = {
     True: [
@@ -167,9 +129,6 @@ RECOMMENDATIONS = {
     ],
 }
 
-# ==========================================================
-# Export Fields
-# ==========================================================
 
 EXPORT_FIELDS = (
     "target",
@@ -185,9 +144,6 @@ EXPORT_FIELDS = (
     "risk",
 )
 
-# ==========================================================
-# Default Analysis
-# ==========================================================
 
 DEFAULT_ANALYSIS = {
     "target": "",
@@ -209,9 +165,6 @@ DEFAULT_ANALYSIS = {
     "error": None,
 }
 
-# ==========================================================
-# Export
-# ==========================================================
 
 __all__ = [
     "OUTPUT_DIR",

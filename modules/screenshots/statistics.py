@@ -1,30 +1,10 @@
-"""
-Screenshot Statistics
-
-Generate statistics for screenshot
-capture results.
-"""
-
 from __future__ import annotations
-
-# ==========================================================
-# Generate Statistics
-# ==========================================================
 
 
 def generate_statistics(
     results: list[dict],
 ) -> dict:
-    """
-    Generate screenshot statistics.
 
-    Args:
-        results:
-            Screenshot capture results.
-
-    Returns:
-        dict
-    """
 
     total = len(results)
 
@@ -130,20 +110,10 @@ def generate_statistics(
     }
 
 
-# ==========================================================
-# Capture Summary
-# ==========================================================
-
-
 def generate_summary(
     results: list[dict],
 ) -> dict:
-    """
-    Generate human readable summary data.
 
-    Returns:
-        dict
-    """
 
     statistics = generate_statistics(results)
 
@@ -155,10 +125,6 @@ def generate_summary(
         "average_size": statistics["average_size"],
     }
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "generate_statistics",

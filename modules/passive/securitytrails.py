@@ -1,10 +1,3 @@
-"""
-SecurityTrails Module
-
-Passive subdomain enumeration using
-SecurityTrails API.
-"""
-
 from __future__ import annotations
 
 import requests
@@ -20,20 +13,7 @@ def run_securitytrails(
     context: ExecutionContext,
     domain: str,
 ) -> list[str]:
-    """
-    Query SecurityTrails API.
 
-    Args:
-        context:
-            Shared execution context.
-
-        domain:
-            Target domain.
-
-    Returns:
-        Normalized list of discovered
-        subdomains.
-    """
 
     info("Running SecurityTrails...")
 

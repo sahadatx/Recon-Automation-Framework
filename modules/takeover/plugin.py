@@ -1,9 +1,3 @@
-#!/usr/bin/env python3
-
-"""
-Subdomain Takeover Plugin
-"""
-
 from __future__ import annotations
 
 from typing import Any
@@ -14,15 +8,9 @@ from core.plugins.base import BasePlugin
 from .exporter import export_all
 from .manager import run
 
-# ==========================================================
-# Subdomain Takeover Plugin
-# ==========================================================
-
 
 class TakeoverPlugin(BasePlugin):
-    """
-    Subdomain Takeover Detection Plugin.
-    """
+
 
     name = "takeover"
 
@@ -56,9 +44,7 @@ class TakeoverPlugin(BasePlugin):
         *args: Any,
         **kwargs: Any,
     ) -> dict[str, Any]:
-        """
-        Execute the Subdomain Takeover plugin.
-        """
+
 
         return run(
             context,
@@ -70,25 +56,15 @@ class TakeoverPlugin(BasePlugin):
         self,
         result: dict[str, Any],
     ) -> None:
-        """
-        Export takeover reports.
-        """
+
 
         export_all(
             result,
         )
 
 
-# ==========================================================
-# Plugin Instance
-# ==========================================================
-
 plugin = TakeoverPlugin()
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "TakeoverPlugin",

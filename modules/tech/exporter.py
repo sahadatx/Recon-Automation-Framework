@@ -1,9 +1,3 @@
-"""
-Technology Detection Exporter
-
-Export technology detection results.
-"""
-
 from __future__ import annotations
 
 import csv
@@ -19,15 +13,9 @@ from modules.tech.constants import (
     TECHNOLOGIES_TXT,
 )
 
-# ==========================================================
-# Helpers
-# ==========================================================
-
 
 def create_output_directory() -> None:
-    """
-    Create output directory.
-    """
+
 
     TECH_OUTPUT_DIR.mkdir(
         parents=True,
@@ -35,17 +23,10 @@ def create_output_directory() -> None:
     )
 
 
-# ==========================================================
-# Results (TXT)
-# ==========================================================
-
-
 def export_results_txt(
     analysis: dict[str, Any],
 ) -> None:
-    """
-    Export technology detection results.
-    """
+
 
     create_output_directory()
 
@@ -106,17 +87,10 @@ def export_results_txt(
             file.write("\n")
 
 
-# ==========================================================
-# Results (JSON)
-# ==========================================================
-
-
 def export_results_json(
     analysis: dict[str, Any],
 ) -> None:
-    """
-    Export JSON results.
-    """
+
 
     create_output_directory()
 
@@ -133,17 +107,10 @@ def export_results_json(
         )
 
 
-# ==========================================================
-# Results (CSV)
-# ==========================================================
-
-
 def export_results_csv(
     analysis: dict[str, Any],
 ) -> None:
-    """
-    Export CSV results.
-    """
+
 
     create_output_directory()
 
@@ -188,17 +155,10 @@ def export_results_csv(
             )
 
 
-# ==========================================================
-# Summary
-# ==========================================================
-
-
 def export_summary(
     analysis: dict[str, Any],
 ) -> None:
-    """
-    Export summary.
-    """
+
 
     create_output_directory()
 
@@ -248,17 +208,10 @@ def export_summary(
             file.write(f"{header:<30}{count}\n")
 
 
-# ==========================================================
-# Technologies
-# ==========================================================
-
-
 def export_technologies(
     analysis: dict[str, Any],
 ) -> None:
-    """
-    Export unique technologies.
-    """
+
 
     create_output_directory()
 
@@ -274,17 +227,10 @@ def export_technologies(
             file.write(f"{technology}\n")
 
 
-# ==========================================================
-# Export Everything
-# ==========================================================
-
-
 def export_all(
     analysis: dict[str, Any],
 ) -> None:
-    """
-    Export all output files.
-    """
+
 
     export_results_txt(
         analysis,
@@ -306,10 +252,6 @@ def export_all(
         analysis,
     )
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "export_all",

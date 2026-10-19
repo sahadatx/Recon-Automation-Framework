@@ -1,9 +1,3 @@
-"""
-DNS Resolution Exporter
-
-Export DNS resolution results.
-"""
-
 from __future__ import annotations
 
 import json
@@ -17,15 +11,9 @@ from modules.dns.constants import (
     UNRESOLVED_TXT,
 )
 
-# ==========================================================
-# Helpers
-# ==========================================================
-
 
 def create_output_directory() -> None:
-    """
-    Create DNS output directory.
-    """
+
 
     DNS_OUTPUT_DIR.mkdir(
         parents=True,
@@ -33,17 +21,10 @@ def create_output_directory() -> None:
     )
 
 
-# ==========================================================
-# Results (TXT)
-# ==========================================================
-
-
 def export_results_txt(
     analysis: dict[str, Any],
 ) -> None:
-    """
-    Export DNS results as human-readable text.
-    """
+
 
     create_output_directory()
 
@@ -81,17 +62,10 @@ def export_results_txt(
             file.write("\n")
 
 
-# ==========================================================
-# Results (JSON)
-# ==========================================================
-
-
 def export_results_json(
     analysis: dict[str, Any],
 ) -> None:
-    """
-    Export DNS analysis as JSON.
-    """
+
 
     create_output_directory()
 
@@ -108,17 +82,10 @@ def export_results_json(
         )
 
 
-# ==========================================================
-# Summary
-# ==========================================================
-
-
 def export_summary(
     analysis: dict[str, Any],
 ) -> None:
-    """
-    Export DNS summary.
-    """
+
 
     create_output_directory()
 
@@ -166,17 +133,10 @@ def export_summary(
             file.write(f"{record_type:<10}{count}\n")
 
 
-# ==========================================================
-# Unresolved Hosts
-# ==========================================================
-
-
 def export_unresolved(
     analysis: dict[str, Any],
 ) -> None:
-    """
-    Export unresolved hosts.
-    """
+
 
     create_output_directory()
 
@@ -192,17 +152,10 @@ def export_unresolved(
             file.write(f"{host}\n")
 
 
-# ==========================================================
-# Export Everything
-# ==========================================================
-
-
 def export_all(
     analysis: dict[str, Any],
 ) -> None:
-    """
-    Export all DNS output files.
-    """
+
 
     export_results_txt(
         analysis,
@@ -220,10 +173,6 @@ def export_all(
         analysis,
     )
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "export_all",

@@ -1,16 +1,6 @@
-"""
-Passive Enumeration Analyzer
-
-Analyze passive enumeration results.
-"""
-
 from __future__ import annotations
 
 from typing import Any
-
-# ==========================================================
-# Analyze Results
-# ==========================================================
 
 
 def analyze(
@@ -20,9 +10,7 @@ def analyze(
     timings: dict[str, float],
     failed_sources: list[str],
 ) -> dict[str, Any]:
-    """
-    Analyze passive enumeration results.
-    """
+
 
     total_sources = len(
         results,
@@ -82,10 +70,6 @@ def analyze(
         ),
     }
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "analyze",

@@ -1,9 +1,3 @@
-"""
-Passive Enumeration Helper Functions
-
-Shared helper functions for passive reconnaissance modules.
-"""
-
 from __future__ import annotations
 
 import re
@@ -15,9 +9,6 @@ from typing import Any, TypeVar
 
 from core.logger import error, info, success, warning
 
-# ==========================================================
-# Constants
-# ==========================================================
 
 DOMAIN_RE = re.compile(r"^(?:[a-zA-Z0-9_-]+\.)+[a-zA-Z]{2,}$")
 
@@ -43,27 +34,12 @@ IGNORED_PREFIXES = (
 )
 
 
-# ==========================================================
-# Run External Command
-# ==========================================================
-
-
 def run_command(
     command: list[str],
     timeout: int = 60,
     env: Mapping[str, str] | None = None,
 ) -> list[str]:
-    """
-    Execute an external command.
 
-    Args:
-        command: Command and arguments.
-        timeout: Maximum execution time in seconds.
-        env: Optional environment variables.
-
-    Returns:
-        Command output as a list of non-empty lines.
-    """
 
     try:
 
@@ -107,36 +83,11 @@ def run_command(
     return [line.strip() for line in result.stdout.splitlines() if line.strip()]
 
 
-# ==========================================================
-# Normalize Subdomains
-# ==========================================================
-
-
 def normalize_subdomains(
     subdomains: list[str],
     domain: str,
 ) -> list[str]:
-    """
-    Normalize discovered subdomains.
 
-    Processing steps:
-        - Strip whitespace.
-        - Convert to lowercase.
-        - Remove wildcard prefix.
-        - Remove tool banners.
-        - Remove log messages.
-        - Validate domain format.
-        - Keep only the target domain.
-        - Remove duplicates.
-        - Return sorted results.
-
-    Args:
-        subdomains: Raw subdomains.
-        domain: Target domain.
-
-    Returns:
-        Sorted normalized subdomains.
-    """
 
     target_domain = domain.strip().lower()
 
@@ -175,11 +126,6 @@ def normalize_subdomains(
     return sorted(cleaned)
 
 
-# ==========================================================
-# Execute Enumeration Source
-# ==========================================================
-
-
 def execute_source(
     name: str,
     command: list[str],
@@ -187,19 +133,7 @@ def execute_source(
     timeout: int = 60,
     env: Mapping[str, str] | None = None,
 ) -> list[str]:
-    """
-    Execute a passive enumeration tool.
 
-    Args:
-        name: Tool name.
-        command: Command and arguments.
-        domain: Target domain.
-        timeout: Maximum execution time in seconds.
-        env: Optional environment variables.
-
-    Returns:
-        Normalized subdomains discovered by the tool.
-    """
 
     info(f"Running {name}...")
 
@@ -225,10 +159,6 @@ def execute_source(
     return normalized_results
 
 
-# ==========================================================
-# Retry Decorator
-# ==========================================================
-
 ReturnType = TypeVar(
     "ReturnType",
 )
@@ -241,16 +171,7 @@ def retry_request(
     [Callable[..., ReturnType]],
     Callable[..., ReturnType],
 ]:
-    """
-    Retry a function when it raises an exception.
 
-    Args:
-        max_attempts: Maximum retry attempts.
-        delay: Delay between retries in seconds.
-
-    Returns:
-        Decorated function.
-    """
 
     def decorator(
         function: Callable[..., ReturnType],
@@ -295,10 +216,6 @@ def retry_request(
 
     return decorator
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "run_command",

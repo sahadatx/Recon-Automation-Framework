@@ -1,9 +1,3 @@
-#!/usr/bin/env python3
-
-"""
-Execution Context
-"""
-
 from __future__ import annotations
 
 from typing import Any
@@ -14,55 +8,26 @@ Analysis = dict[str, Any]
 
 
 class ExecutionContext:
-    """
-    Shared execution context for the Recon Automation Framework.
 
-    Stores
-    ------
-    - Module analysis
-    - Performance manager
-    - DNS cache
-    - Shared HTTP session
-    - Shared thread pool
-    - Runtime statistics
-    """
 
     def __init__(self) -> None:
 
-        # --------------------------------------------------
-        # Module Analysis
-        # --------------------------------------------------
 
         self._analysis: dict[str, Analysis] = {}
 
-        # --------------------------------------------------
-        # Performance
-        # --------------------------------------------------
 
         self.performance = PerformanceManager()
 
-        # --------------------------------------------------
-        # DNS Cache
-        # --------------------------------------------------
 
         self._dns_cache: dict[str, list[str]] = {}
 
-        # --------------------------------------------------
-        # Shared Objects
-        # --------------------------------------------------
 
         self._http_session: Any = None
         self._thread_pool: Any = None
 
-        # --------------------------------------------------
-        # Statistics
-        # --------------------------------------------------
 
         self._statistics: dict[str, Any] = {}
 
-    # ======================================================
-    # Analysis
-    # ======================================================
 
     def set_analysis(
         self,
@@ -90,9 +55,6 @@ class ExecutionContext:
 
         return dict(self._analysis)
 
-    # ======================================================
-    # DNS Cache
-    # ======================================================
 
     def set_dns_cache(
         self,
@@ -120,9 +82,6 @@ class ExecutionContext:
 
         return dict(self._dns_cache)
 
-    # ======================================================
-    # HTTP Session
-    # ======================================================
 
     def set_http_session(
         self,
@@ -135,9 +94,6 @@ class ExecutionContext:
 
         return self._http_session
 
-    # ======================================================
-    # Thread Pool
-    # ======================================================
 
     def set_thread_pool(
         self,
@@ -150,9 +106,6 @@ class ExecutionContext:
 
         return self._thread_pool
 
-    # ======================================================
-    # Statistics
-    # ======================================================
 
     def set_statistic(
         self,
@@ -174,9 +127,6 @@ class ExecutionContext:
 
         return dict(self._statistics)
 
-    # ======================================================
-    # Utility
-    # ======================================================
 
     def clear(self) -> None:
 

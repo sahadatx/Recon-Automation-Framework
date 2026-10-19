@@ -1,17 +1,7 @@
-"""
-WAF Filters
-
-Filter and normalize
-WAF detection results.
-"""
-
 from __future__ import annotations
 
 from copy import deepcopy
 
-# ==========================================================
-# Constants
-# ==========================================================
 
 MAX_SCORE = 100
 
@@ -22,20 +12,11 @@ VALID_CONFIDENCE = {
     "Unknown",
 }
 
-# ==========================================================
-# Reset Detection
-# ==========================================================
-
 
 def reset_detection(
     result: dict,
 ):
-    """
-    Reset invalid detection.
 
-    Returns:
-        dict
-    """
 
     result["vendor"] = None
     result["detected"] = False
@@ -46,20 +27,10 @@ def reset_detection(
     return result
 
 
-# ==========================================================
-# Normalize Score
-# ==========================================================
-
-
 def normalize_score(
     score: int,
 ):
-    """
-    Normalize score.
 
-    Returns:
-        int
-    """
 
     return max(
         0,
@@ -70,38 +41,18 @@ def normalize_score(
     )
 
 
-# ==========================================================
-# Normalize Evidence
-# ==========================================================
-
-
 def normalize_evidence(
     evidence,
 ):
-    """
-    Normalize evidence.
 
-    Returns:
-        list
-    """
 
     return sorted({item.strip() for item in evidence if item})
-
-
-# ==========================================================
-# Validate Confidence
-# ==========================================================
 
 
 def validate_confidence(
     confidence,
 ):
-    """
-    Validate confidence level.
 
-    Returns:
-        str
-    """
 
     if confidence in VALID_CONFIDENCE:
 
@@ -110,39 +61,19 @@ def validate_confidence(
     return "Unknown"
 
 
-# ==========================================================
-# Has Evidence Type
-# ==========================================================
-
-
 def has_evidence(
     evidence,
     prefix,
 ):
-    """
-    Check evidence type.
 
-    Returns:
-        bool
-    """
 
     return any(item.startswith(prefix) for item in evidence)
-
-
-# ==========================================================
-# Validate Result
-# ==========================================================
 
 
 def validate_result(
     result,
 ):
-    """
-    Validate detection result.
 
-    Returns:
-        dict
-    """
 
     if not result.get("vendor"):
 
@@ -162,20 +93,10 @@ def validate_result(
     return result
 
 
-# ==========================================================
-# False Positive Filter
-# ==========================================================
-
-
 def remove_false_positive(
     result,
 ):
-    """
-    Remove weak detections.
 
-    Returns:
-        dict
-    """
 
     evidence = result.get(
         "evidence",
@@ -207,7 +128,6 @@ def remove_false_positive(
         "Status:",
     )
 
-    # Only body or only status
 
     if (body or status) and not (header or cookie or server):
 
@@ -216,20 +136,10 @@ def remove_false_positive(
     return result
 
 
-# ==========================================================
-# Filter Single Result
-# ==========================================================
-
-
 def filter_result(
     result,
 ):
-    """
-    Filter one result.
 
-    Returns:
-        dict
-    """
 
     filtered = deepcopy(result)
 
@@ -254,20 +164,10 @@ def filter_result(
     return filtered
 
 
-# ==========================================================
-# Filter Results
-# ==========================================================
-
-
 def filter_results(
     results,
 ):
-    """
-    Filter all results.
 
-    Returns:
-        list
-    """
 
     filtered = [filter_result(result) for result in results]
 
@@ -292,20 +192,10 @@ def filter_results(
     return filtered
 
 
-# ==========================================================
-# Detected Only
-# ==========================================================
-
-
 def detected_only(
     results,
 ):
-    """
-    Return detected results.
 
-    Returns:
-        list
-    """
 
     return [
         result
@@ -317,19 +207,9 @@ def detected_only(
     ]
 
 
-# ==========================================================
-# Remove Unknown
-# ==========================================================
-
-
 def remove_unknown(
     results,
 ):
-    """
-    Remove unknown vendors.
 
-    Returns:
-        list
-    """
 
     return [result for result in results if result.get("vendor")]

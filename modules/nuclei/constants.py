@@ -1,20 +1,10 @@
-"""
-Nuclei Constants
-"""
-
 from __future__ import annotations
 
 from pathlib import Path
 
-# ==========================================================
-# Module
-# ==========================================================
 
 MODULE_NAME = "nuclei"
 
-# ==========================================================
-# Output Directory
-# ==========================================================
 
 OUTPUT_DIR = Path("output") / MODULE_NAME
 
@@ -28,9 +18,6 @@ SUMMARY_FILE = OUTPUT_DIR / "summary.txt"
 HIGH_FILE = OUTPUT_DIR / "high.txt"
 CRITICAL_FILE = OUTPUT_DIR / "critical.txt"
 
-# ==========================================================
-# Risk Levels
-# ==========================================================
 
 CRITICAL = "critical"
 HIGH = "high"
@@ -48,9 +35,6 @@ RISK_LEVELS = (
     UNKNOWN,
 )
 
-# ==========================================================
-# Severity Order
-# ==========================================================
 
 SEVERITY_ORDER = {
     INFO: 0,
@@ -61,9 +45,6 @@ SEVERITY_ORDER = {
     UNKNOWN: 5,
 }
 
-# ==========================================================
-# Exports
-# ==========================================================
 
 __all__ = [
     "MODULE_NAME",

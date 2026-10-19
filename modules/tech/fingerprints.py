@@ -1,14 +1,3 @@
-"""
-Technology Fingerprints
-
-Technology fingerprint database used by
-the Technology Detection module.
-"""
-
-# ==========================================================
-# Server Fingerprints
-# ==========================================================
-
 SERVER_FINGERPRINTS = {
     "cloudflare": "Cloudflare",
     "nginx": "Nginx",
@@ -26,10 +15,6 @@ SERVER_FINGERPRINTS = {
     "awselb": "AWS Load Balancer",
 }
 
-
-# ==========================================================
-# Framework Fingerprints
-# ==========================================================
 
 FRAMEWORK_FINGERPRINTS = {
     "php": "PHP",
@@ -55,10 +40,6 @@ FRAMEWORK_FINGERPRINTS = {
 }
 
 
-# ==========================================================
-# CDN / WAF Fingerprints
-# ==========================================================
-
 CDN_FINGERPRINTS = {
     "cloudflare": "Cloudflare",
     "cf-cache-status": "Cloudflare",
@@ -75,10 +56,6 @@ CDN_FINGERPRINTS = {
 }
 
 
-# ==========================================================
-# CMS Fingerprints
-# ==========================================================
-
 CMS_FINGERPRINTS = {
     "wordpress": "WordPress",
     "wp-content": "WordPress",
@@ -93,10 +70,6 @@ CMS_FINGERPRINTS = {
     "ghost": "Ghost CMS",
 }
 
-
-# ==========================================================
-# HTML Keywords
-# ==========================================================
 
 HTML_KEYWORDS = {
     "WordPress": [
@@ -144,10 +117,6 @@ HTML_KEYWORDS = {
     ],
 }
 
-
-# ==========================================================
-# Hosting Platforms
-# ==========================================================
 
 HOSTING_FINGERPRINTS = {
     "github.io": "GitHub Pages",

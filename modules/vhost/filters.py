@@ -1,17 +1,7 @@
-"""
-Virtual Host Discovery Filters
-
-Filters false positives and
-normalizes ffuf results.
-"""
-
 from collections import Counter
 
 from config.config import VHOST_FILTER_DEFAULT_RESPONSES
 
-# ==========================================================
-# Default Status Codes
-# ==========================================================
 
 DEFAULT_STATUS_CODES = {
     200,
@@ -24,18 +14,10 @@ DEFAULT_STATUS_CODES = {
 }
 
 
-# ==========================================================
-# Remove Duplicate Hosts
-# ==========================================================
-
-
 def remove_duplicates(
     results: list,
 ):
-    """
-    Remove duplicate
-    virtual hosts.
-    """
+
 
     unique = {}
 
@@ -53,19 +35,11 @@ def remove_duplicates(
     return list(unique.values())
 
 
-# ==========================================================
-# Filter Status Codes
-# ==========================================================
-
-
 def filter_status_codes(
     results: list,
     allowed=None,
 ):
-    """
-    Keep allowed
-    HTTP status codes.
-    """
+
 
     if allowed is None:
 
@@ -82,17 +56,10 @@ def filter_status_codes(
     ]
 
 
-# ==========================================================
-# Remove Invalid Hosts
-# ==========================================================
-
-
 def remove_invalid(
     results: list,
 ):
-    """
-    Remove empty hosts.
-    """
+
 
     return [
         result
@@ -104,18 +71,10 @@ def remove_invalid(
     ]
 
 
-# ==========================================================
-# Remove Empty Responses
-# ==========================================================
-
-
 def remove_empty(
     results: list,
 ):
-    """
-    Remove zero-length
-    responses.
-    """
+
 
     return [
         result
@@ -128,17 +87,10 @@ def remove_empty(
     ]
 
 
-# ==========================================================
-# Remove Redirect Loops
-# ==========================================================
-
-
 def remove_redirect_loops(
     results: list,
 ):
-    """
-    Remove self redirects.
-    """
+
 
     filtered = []
 
@@ -163,22 +115,10 @@ def remove_redirect_loops(
     return filtered
 
 
-# ==========================================================
-# Remove Default Responses
-# ==========================================================
-
-
 def remove_default_responses(
     results: list,
 ):
-    """
-    Remove dominant default
-    responses.
 
-    A response length is removed
-    only if it represents at least
-    50% of all responses.
-    """
 
     if len(results) < 5:
 
@@ -209,17 +149,10 @@ def remove_default_responses(
     ]
 
 
-# ==========================================================
-# Apply Filters
-# ==========================================================
-
-
 def apply_filters(
     results: list,
 ):
-    """
-    Apply all filters.
-    """
+
 
     results = remove_duplicates(results)
 

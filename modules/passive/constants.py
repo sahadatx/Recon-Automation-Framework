@@ -1,20 +1,8 @@
-"""
-Passive Enumeration Constants
-
-Shared constants for the Passive Enumeration module.
-"""
-
 from pathlib import Path
 
-# ==========================================================
-# Output Directory
-# ==========================================================
 
 PASSIVE_OUTPUT_DIR = Path("output/passive")
 
-# ==========================================================
-# Output Files
-# ==========================================================
 
 RESULTS_TXT = PASSIVE_OUTPUT_DIR / "results.txt"
 

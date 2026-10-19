@@ -1,17 +1,7 @@
-"""
-JavaScript Endpoint Discovery
-
-Filters interesting endpoints extracted
-from JavaScript files.
-"""
-
 from __future__ import annotations
 
 import re
 
-# ==========================================================
-# Interesting Endpoint Keywords
-# ==========================================================
 
 INTERESTING_KEYWORDS = (
     "/api",
@@ -42,20 +32,10 @@ INTERESTING_KEYWORDS = (
 )
 
 
-# ==========================================================
-# Normalize Endpoint
-# ==========================================================
-
-
 def normalize_endpoint(
     endpoint: str,
 ) -> str:
-    """
-    Normalize an endpoint.
 
-    Returns:
-        str
-    """
 
     if not endpoint:
 
@@ -80,41 +60,20 @@ def normalize_endpoint(
     return endpoint.rstrip("/")
 
 
-# ==========================================================
-# Interesting Endpoint Check
-# ==========================================================
-
-
 def is_interesting(
     endpoint: str,
 ) -> bool:
-    """
-    Check whether an endpoint
-    is interesting.
 
-    Returns:
-        bool
-    """
 
     endpoint = endpoint.lower()
 
     return any(keyword in endpoint for keyword in INTERESTING_KEYWORDS)
 
 
-# ==========================================================
-# Filter Endpoints
-# ==========================================================
-
-
 def filter_endpoints(
     urls: list[str],
 ) -> list[str]:
-    """
-    Filter interesting endpoints.
 
-    Returns:
-        list[str]
-    """
 
     endpoints: set[str] = set()
 
@@ -133,20 +92,10 @@ def filter_endpoints(
     return sorted(endpoints)
 
 
-# ==========================================================
-# API Version Detection
-# ==========================================================
-
-
 def detect_api_versions(
     urls: list[str],
 ) -> list[str]:
-    """
-    Detect versioned API endpoints.
 
-    Returns:
-        list[str]
-    """
 
     pattern = re.compile(
         r"/v\d+(?:/|$)",
@@ -158,40 +107,20 @@ def detect_api_versions(
     return sorted(apis)
 
 
-# ==========================================================
-# GraphQL Detection
-# ==========================================================
-
-
 def detect_graphql(
     urls: list[str],
 ) -> list[str]:
-    """
-    Detect GraphQL endpoints.
 
-    Returns:
-        list[str]
-    """
 
     graphql = {normalize_endpoint(url) for url in urls if "graphql" in url.lower()}
 
     return sorted(graphql)
 
 
-# ==========================================================
-# Extract Endpoints
-# ==========================================================
-
-
 def extract_endpoints(
     urls: list[str],
 ) -> list[str]:
-    """
-    Extract interesting endpoints.
 
-    Returns:
-        list[str]
-    """
 
     endpoints: set[str] = set()
 
@@ -203,10 +132,6 @@ def extract_endpoints(
 
     return sorted(endpoints)
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "INTERESTING_KEYWORDS",

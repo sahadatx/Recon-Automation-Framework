@@ -1,9 +1,3 @@
-"""
-TLS Protocol Detection
-
-Active protocol probing.
-"""
-
 from __future__ import annotations
 
 import socket
@@ -12,9 +6,6 @@ from copy import deepcopy
 
 from config.config import HTTP_TIMEOUT
 
-# ==========================================================
-# Default Result
-# ==========================================================
 
 EMPTY_PROTOCOL = {
     "host": "",
@@ -31,21 +22,10 @@ EMPTY_PROTOCOL = {
 }
 
 
-# ==========================================================
-# Create SSL Context
-# ==========================================================
-
-
 def create_protocol_context(
     version: ssl.TLSVersion,
 ):
-    """
-    Create SSL context
-    for a specific TLS version.
 
-    Returns:
-        ssl.SSLContext
-    """
 
     context = ssl.SSLContext(
         ssl.PROTOCOL_TLS_CLIENT,
@@ -62,23 +42,12 @@ def create_protocol_context(
     return context
 
 
-# ==========================================================
-# Test TLS Version
-# ==========================================================
-
-
 def test_protocol(
     host: str,
     version: ssl.TLSVersion,
     port: int = 443,
 ):
-    """
-    Test a specific
-    TLS version.
 
-    Returns:
-        bool
-    """
 
     sock = None
 
@@ -135,21 +104,11 @@ def test_protocol(
             sock.close()
 
 
-# ==========================================================
-# TLS 1.3
-# ==========================================================
-
-
 def supports_tls13(
     host: str,
     port: int = 443,
 ):
-    """
-    Test TLS 1.3 support.
 
-    Returns:
-        bool
-    """
 
     return test_protocol(
         host,
@@ -158,21 +117,11 @@ def supports_tls13(
     )
 
 
-# ==========================================================
-# TLS 1.2
-# ==========================================================
-
-
 def supports_tls12(
     host: str,
     port: int = 443,
 ):
-    """
-    Test TLS 1.2 support.
 
-    Returns:
-        bool
-    """
 
     return test_protocol(
         host,
@@ -181,21 +130,11 @@ def supports_tls12(
     )
 
 
-# ==========================================================
-# TLS 1.1
-# ==========================================================
-
-
 def supports_tls11(
     host: str,
     port: int = 443,
 ):
-    """
-    Test TLS 1.1 support.
 
-    Returns:
-        bool
-    """
 
     return test_protocol(
         host,
@@ -204,21 +143,11 @@ def supports_tls11(
     )
 
 
-# ==========================================================
-# TLS 1.0
-# ==========================================================
-
-
 def supports_tls10(
     host: str,
     port: int = 443,
 ):
-    """
-    Test TLS 1.0 support.
 
-    Returns:
-        bool
-    """
 
     return test_protocol(
         host,
@@ -227,21 +156,11 @@ def supports_tls10(
     )
 
 
-# ==========================================================
-# SSL 3.0
-# ==========================================================
-
-
 def supports_ssl3(
     host: str,
     port: int = 443,
 ):
-    """
-    Test SSL 3.0 support.
 
-    Returns:
-        bool
-    """
 
     try:
 
@@ -258,41 +177,19 @@ def supports_ssl3(
     )
 
 
-# ==========================================================
-# SSL 2.0
-# ==========================================================
-
-
 def supports_ssl2(
     host: str,
     port: int = 443,
 ):
-    """
-    SSLv2 is not supported
-    by Python's ssl module.
 
-    Returns:
-        bool
-    """
 
     return False
-
-
-# ==========================================================
-# Highest Supported Protocol
-# ==========================================================
 
 
 def highest_protocol(
     result: dict,
 ):
-    """
-    Determine highest
-    supported protocol.
 
-    Returns:
-        str
-    """
 
     if result["tls13"]:
 
@@ -321,21 +218,10 @@ def highest_protocol(
     return ""
 
 
-# ==========================================================
-# Protocol Security Rating
-# ==========================================================
-
-
 def protocol_security(
     protocol: str,
 ):
-    """
-    Get protocol security
-    rating.
 
-    Returns:
-        str
-    """
 
     if protocol == "TLSv1.3":
 
@@ -364,22 +250,11 @@ def protocol_security(
     return "Unknown"
 
 
-# ==========================================================
-# Collect Protocols
-# ==========================================================
-
-
 def collect_protocols(
     host: str,
     port: int = 443,
 ):
-    """
-    Collect supported
-    TLS protocols.
 
-    Returns:
-        dict
-    """
 
     result = deepcopy(
         EMPTY_PROTOCOL,
@@ -438,20 +313,10 @@ def collect_protocols(
     return result
 
 
-# ==========================================================
-# Protocol Summary
-# ==========================================================
-
-
 def protocol_summary(
     protocol_data: dict,
 ):
-    """
-    Generate protocol summary.
 
-    Returns:
-        dict
-    """
 
     if not protocol_data:
 
@@ -480,10 +345,6 @@ def protocol_summary(
         ],
     }
 
-
-# ==========================================================
-# Export
-# ==========================================================
 
 __all__ = [
     "EMPTY_PROTOCOL",

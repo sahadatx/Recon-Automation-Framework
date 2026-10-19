@@ -1,12 +1,3 @@
-#!/usr/bin/env python3
-
-"""
-Crawler Helper Functions
-
-Shared helper functions used by the
-URL Discovery module.
-"""
-
 from __future__ import annotations
 
 import time
@@ -25,17 +16,11 @@ from requests.exceptions import (
 from config.config import CRAWLER_RETRIES, HTTP_TIMEOUT
 from core.logger import debug
 
-# ==========================================================
-# Disable SSL Warnings
-# ==========================================================
 
 urllib3.disable_warnings(
     urllib3.exceptions.InsecureRequestWarning,
 )
 
-# ==========================================================
-# Retryable HTTP Status Codes
-# ==========================================================
 
 RETRY_STATUS_CODES: set[int] = {
     500,
@@ -44,19 +29,12 @@ RETRY_STATUS_CODES: set[int] = {
     504,
 }
 
-# ==========================================================
-# Normalize URL
-# ==========================================================
-
 
 def normalize_url(
     base_url: str,
     link: str,
 ) -> str:
-    """
-    Convert a relative URL into
-    a canonical absolute URL.
-    """
+
 
     url = urljoin(
         base_url,
@@ -87,35 +65,19 @@ def normalize_url(
     )
 
 
-# ==========================================================
-# Same Domain
-# ==========================================================
-
-
 def same_domain(
     root_url: str,
     url: str,
 ) -> bool:
-    """
-    Check whether two URLs
-    belong to the same host.
-    """
+
 
     return urlparse(root_url).netloc == urlparse(url).netloc
-
-
-# ==========================================================
-# HTML Detection
-# ==========================================================
 
 
 def is_html(
     response: requests.Response | None,
 ) -> bool:
-    """
-    Determine whether the response
-    contains HTML content.
-    """
+
 
     if response is None:
 
@@ -129,18 +91,10 @@ def is_html(
     return "text/html" in content_type or "application/xhtml+xml" in content_type
 
 
-# ==========================================================
-# Retry Policy
-# ==========================================================
-
-
 def should_retry(
     error: Exception,
 ) -> bool:
-    """
-    Determine whether the failed
-    request should be retried.
-    """
+
 
     if isinstance(
         error,
@@ -174,19 +128,11 @@ def should_retry(
     return False
 
 
-# ==========================================================
-# Download Page
-# ==========================================================
-
-
 def download_page(
     session: requests.Session,
     url: str,
 ) -> requests.Response | None:
-    """
-    Download an HTML page using the
-    shared HTTP session.
-    """
+
 
     for attempt in range(
         CRAWLER_RETRIES,
@@ -272,27 +218,15 @@ def download_page(
     return None
 
 
-# ==========================================================
-# Extract Domain
-# ==========================================================
-
-
 def get_domain(
     url: str,
 ) -> str:
-    """
-    Return the hostname
-    from a URL.
-    """
+
 
     return urlparse(
         url,
     ).netloc
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "download_page",

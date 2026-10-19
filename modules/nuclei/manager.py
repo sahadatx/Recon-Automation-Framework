@@ -1,12 +1,3 @@
-#!/usr/bin/env python3
-
-"""
-Nuclei Manager
-
-Coordinate vulnerability
-scanning and analysis.
-"""
-
 from __future__ import annotations
 
 from concurrent.futures import as_completed
@@ -20,10 +11,6 @@ from .filters import apply_filters
 from .parser import parse_nuclei
 from .scanner import cleanup, scan_target
 
-# ==========================================================
-# Process Target
-# ==========================================================
-
 
 def process_target(
     target: str,
@@ -31,9 +18,7 @@ def process_target(
     str,
     list[dict[str, Any]] | None,
 ]:
-    """
-    Scan and process one target.
-    """
+
 
     scan = scan_target(
         target,
@@ -80,20 +65,13 @@ def process_target(
         )
 
 
-# ==========================================================
-# Collect Findings
-# ==========================================================
-
-
 def collect_findings(
     results: dict[
         str,
         list[dict[str, Any]],
     ],
 ) -> list[dict[str, Any]]:
-    """
-    Merge findings from all targets.
-    """
+
 
     findings: list[dict[str, Any]] = []
 
@@ -106,27 +84,11 @@ def collect_findings(
     return findings
 
 
-# ==========================================================
-# Run Nuclei
-# ==========================================================
-
-
 def run_nuclei(
     context: ExecutionContext,
     targets: list[str],
 ) -> dict[str, Any]:
-    """
-    Execute the complete
-    Nuclei workflow.
 
-        Scan
-            ↓
-        Analyze
-            ↓
-        Store Context
-            ↓
-        Return Analysis
-    """
 
     if not targets:
 
@@ -271,19 +233,11 @@ def run_nuclei(
     return analysis
 
 
-# ==========================================================
-# Public Entry Point
-# ==========================================================
-
-
 def run(
     context: ExecutionContext,
     targets: list[str],
 ) -> dict[str, Any]:
-    """
-    Public entry point for the
-    Nuclei module.
-    """
+
 
     return run_nuclei(
         context,
@@ -291,17 +245,10 @@ def run(
     )
 
 
-# ==========================================================
-# Successful Targets
-# ==========================================================
-
-
 def successful_targets(
     analysis: dict[str, Any],
 ) -> list[str]:
-    """
-    Return successful targets.
-    """
+
 
     target_statistics = analysis["statistics"].get(
         "target_statistics",
@@ -313,17 +260,10 @@ def successful_targets(
     )
 
 
-# ==========================================================
-# Failed Targets
-# ==========================================================
-
-
 def failed_targets(
     analysis: dict[str, Any],
 ) -> list[str]:
-    """
-    Return failed targets.
-    """
+
 
     return sorted(
         analysis.get(
@@ -332,10 +272,6 @@ def failed_targets(
         )
     )
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "run",

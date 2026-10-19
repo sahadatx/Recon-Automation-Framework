@@ -1,9 +1,3 @@
-#!/usr/bin/env python3
-
-"""
-Technology Detection Plugin
-"""
-
 from __future__ import annotations
 
 from typing import Any
@@ -14,15 +8,9 @@ from core.plugins.base import BasePlugin
 from .exporter import export_all
 from .manager import run
 
-# ==========================================================
-# Technology Detection Plugin
-# ==========================================================
-
 
 class TechnologyPlugin(BasePlugin):
-    """
-    Technology Detection Plugin.
-    """
+
 
     name = "tech"
 
@@ -51,9 +39,7 @@ class TechnologyPlugin(BasePlugin):
         *args: Any,
         **kwargs: Any,
     ) -> dict[str, Any]:
-        """
-        Execute the Technology Detection plugin.
-        """
+
 
         return run(
             context,
@@ -65,25 +51,15 @@ class TechnologyPlugin(BasePlugin):
         self,
         result: dict[str, Any],
     ) -> None:
-        """
-        Export Technology Detection reports.
-        """
+
 
         export_all(
             result,
         )
 
 
-# ==========================================================
-# Plugin Instance
-# ==========================================================
-
 plugin = TechnologyPlugin()
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "TechnologyPlugin",

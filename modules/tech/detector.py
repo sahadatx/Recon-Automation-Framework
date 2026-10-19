@@ -1,9 +1,3 @@
-"""
-Technology Detection Engine
-
-Core technology detection logic.
-"""
-
 from modules.tech.fingerprints import (
     CDN_FINGERPRINTS,
     CMS_FINGERPRINTS,
@@ -19,17 +13,11 @@ from modules.tech.helpers import (
     normalize_technologies,
 )
 
-# ==========================================================
-# Detect Server
-# ==========================================================
-
 
 def detect_server(
     headers: dict,
 ) -> list[str]:
-    """
-    Detect web server technology.
-    """
+
 
     technologies = []
 
@@ -44,17 +32,10 @@ def detect_server(
     return normalize_technologies(technologies)
 
 
-# ==========================================================
-# Detect Powered-By
-# ==========================================================
-
-
 def detect_powered_by(
     headers: dict,
 ) -> list[str]:
-    """
-    Detect framework/runtime from headers.
-    """
+
 
     technologies = []
 
@@ -69,17 +50,10 @@ def detect_powered_by(
     return normalize_technologies(technologies)
 
 
-# ==========================================================
-# Detect CDN
-# ==========================================================
-
-
 def detect_cdn(
     headers: dict,
 ) -> list[str]:
-    """
-    Detect CDN/WAF technologies.
-    """
+
 
     technologies = []
 
@@ -96,17 +70,10 @@ def detect_cdn(
     return normalize_technologies(technologies)
 
 
-# ==========================================================
-# Detect CMS
-# ==========================================================
-
-
 def detect_cms(
     html: str,
 ) -> list[str]:
-    """
-    Detect CMS technologies.
-    """
+
 
     technologies = []
 
@@ -121,17 +88,10 @@ def detect_cms(
     return normalize_technologies(technologies)
 
 
-# ==========================================================
-# Detect Hosting
-# ==========================================================
-
-
 def detect_hosting(
     response: dict,
 ) -> list[str]:
-    """
-    Detect hosting platform.
-    """
+
 
     technologies = []
 
@@ -151,20 +111,10 @@ def detect_hosting(
     return normalize_technologies(technologies)
 
 
-# ==========================================================
-# Detect Technologies
-# ==========================================================
-
-
 def detect_technologies(
     response: dict,
 ) -> dict:
-    """
-    Detect all supported technologies.
 
-    Returns:
-        dict
-    """
 
     headers = extract_headers(response)
 

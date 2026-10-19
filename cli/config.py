@@ -1,10 +1,3 @@
-"""
-CLI Configuration
-
-Build the framework configuration
-from CLI arguments.
-"""
-
 from __future__ import annotations
 
 import argparse
@@ -18,17 +11,11 @@ from .validation import (
     validate_timeout,
 )
 
-# ==========================================================
-# Build Configuration
-# ==========================================================
-
 
 def build_config(
     arguments: argparse.Namespace,
 ) -> dict[str, Any]:
-    """
-    Build the framework configuration.
-    """
+
 
     modules = {
         module: (
@@ -59,10 +46,6 @@ def build_config(
         "modules": modules,
     }
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "build_config",

@@ -1,9 +1,3 @@
-"""
-Port Scanner Exporter
-
-Export port scan results.
-"""
-
 from __future__ import annotations
 
 import csv
@@ -19,15 +13,9 @@ from modules.ports.constants import (
     SUMMARY_TXT,
 )
 
-# ==========================================================
-# Helpers
-# ==========================================================
-
 
 def create_output_directory() -> None:
-    """
-    Create output directory.
-    """
+
 
     PORT_OUTPUT_DIR.mkdir(
         parents=True,
@@ -35,17 +23,10 @@ def create_output_directory() -> None:
     )
 
 
-# ==========================================================
-# Results (TXT)
-# ==========================================================
-
-
 def export_results_txt(
     analysis: dict[str, Any],
 ) -> None:
-    """
-    Export detailed port scan results.
-    """
+
 
     create_output_directory()
 
@@ -73,17 +54,10 @@ def export_results_txt(
             file.write("\n")
 
 
-# ==========================================================
-# Results (JSON)
-# ==========================================================
-
-
 def export_results_json(
     analysis: dict[str, Any],
 ) -> None:
-    """
-    Export results as JSON.
-    """
+
 
     create_output_directory()
 
@@ -100,17 +74,10 @@ def export_results_json(
         )
 
 
-# ==========================================================
-# Results (CSV)
-# ==========================================================
-
-
 def export_results_csv(
     analysis: dict[str, Any],
 ) -> None:
-    """
-    Export results as CSV.
-    """
+
 
     create_output_directory()
 
@@ -147,17 +114,10 @@ def export_results_csv(
                 )
 
 
-# ==========================================================
-# Summary
-# ==========================================================
-
-
 def export_summary(
     analysis: dict[str, Any],
 ) -> None:
-    """
-    Export summary.
-    """
+
 
     create_output_directory()
 
@@ -200,17 +160,10 @@ def export_summary(
             file.write(f"{service:<20}{count}\n")
 
 
-# ==========================================================
-# Open Hosts
-# ==========================================================
-
-
 def export_open_ports(
     analysis: dict[str, Any],
 ) -> None:
-    """
-    Export hosts with open ports.
-    """
+
 
     create_output_directory()
 
@@ -226,17 +179,10 @@ def export_open_ports(
             file.write(f"{host}\n")
 
 
-# ==========================================================
-# Export Everything
-# ==========================================================
-
-
 def export_all(
     analysis: dict[str, Any],
 ) -> None:
-    """
-    Export all output files.
-    """
+
 
     export_results_txt(
         analysis,
@@ -258,10 +204,6 @@ def export_all(
         analysis,
     )
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "export_all",

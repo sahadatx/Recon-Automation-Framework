@@ -1,33 +1,13 @@
-"""
-WAF Detection Statistics
-
-Generate summary statistics
-for WAF Detection.
-"""
-
 from __future__ import annotations
 
 from collections import Counter
 from typing import Any
 
-# ==========================================================
-# Vendor Statistics
-# ==========================================================
-
 
 def vendor_statistics(
     results: list[dict[str, Any]],
 ) -> dict[str, int]:
-    """
-    Count detected WAF vendors.
 
-    Args:
-        results:
-            WAF detection results.
-
-    Returns:
-        Vendor counts.
-    """
 
     vendors = [result["vendor"] for result in results if result.get("vendor")]
 
@@ -42,24 +22,10 @@ def vendor_statistics(
     )
 
 
-# ==========================================================
-# Confidence Statistics
-# ==========================================================
-
-
 def confidence_statistics(
     results: list[dict[str, Any]],
 ) -> dict[str, int]:
-    """
-    Count confidence levels.
 
-    Args:
-        results:
-            WAF detection results.
-
-    Returns:
-        Confidence counts.
-    """
 
     order = [
         "High",
@@ -79,24 +45,10 @@ def confidence_statistics(
     return {level: counter[level] for level in order if counter[level]}
 
 
-# ==========================================================
-# Generate Statistics
-# ==========================================================
-
-
 def generate_statistics(
     results: list[dict[str, Any]],
 ) -> dict[str, Any]:
-    """
-    Generate summary statistics.
 
-    Args:
-        results:
-            WAF detection results.
-
-    Returns:
-        Summary statistics.
-    """
 
     total = len(results)
 
@@ -153,18 +105,8 @@ def generate_statistics(
     }
 
 
-# ==========================================================
-# Empty Statistics
-# ==========================================================
-
-
 def empty_statistics() -> dict[str, Any]:
-    """
-    Return empty statistics.
 
-    Returns:
-        Empty statistics dictionary.
-    """
 
     return {
         "targets": 0,
@@ -177,10 +119,6 @@ def empty_statistics() -> dict[str, Any]:
         "confidence": {},
     }
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "generate_statistics",

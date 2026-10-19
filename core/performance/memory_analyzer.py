@@ -1,41 +1,17 @@
-"""
-Memory Analyzer
-
-Analyze memory usage and generate
-optimization recommendations.
-"""
-
 from __future__ import annotations
 
 from typing import Any
 
-# ==========================================================
-# Memory Thresholds (MB)
-# ==========================================================
 
 LOW_MEMORY = 100.0
 MEDIUM_MEMORY = 250.0
 HIGH_MEMORY = 500.0
 
 
-# ==========================================================
-# Analyze Memory
-# ==========================================================
-
-
 def analyze_memory(
     snapshot: dict[str, float],
 ) -> dict[str, Any]:
-    """
-    Analyze memory usage.
 
-    Args:
-        snapshot:
-            Memory snapshot from MemoryProfiler.
-
-    Returns:
-        Memory analysis.
-    """
 
     current = snapshot.get(
         "current_mb",
@@ -117,17 +93,10 @@ def analyze_memory(
     }
 
 
-# ==========================================================
-# Summary
-# ==========================================================
-
-
 def summary(
     analysis: dict[str, Any],
 ) -> str:
-    """
-    Return a human-readable summary.
-    """
+
 
     memory = analysis["memory"]
 
@@ -140,10 +109,6 @@ def summary(
         f"Peak: {memory['peak_mb']:.2f} MB"
     )
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "analyze_memory",

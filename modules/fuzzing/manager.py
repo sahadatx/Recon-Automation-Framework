@@ -1,12 +1,3 @@
-#!/usr/bin/env python3
-
-"""
-Directory Fuzzing Manager
-
-Coordinate parallel directory
-fuzzing and analysis.
-"""
-
 from __future__ import annotations
 
 from concurrent.futures import as_completed
@@ -20,10 +11,6 @@ from modules.fuzzing.interesting import scan as detect_interesting
 from modules.fuzzing.parser import parse_ffuf
 from modules.fuzzing.scanner import cleanup, scan_target
 
-# ==========================================================
-# Process Target
-# ==========================================================
-
 
 def process_target(
     target: str,
@@ -31,9 +18,7 @@ def process_target(
     str,
     dict[str, Any] | None,
 ]:
-    """
-    Scan and analyze one target.
-    """
+
 
     scan = scan_target(
         target,
@@ -89,27 +74,11 @@ def process_target(
         )
 
 
-# ==========================================================
-# Run Directory Fuzzing
-# ==========================================================
-
-
 def run_fuzzing(
     context: ExecutionContext,
     targets: list[str],
 ) -> dict[str, Any]:
-    """
-    Execute the complete directory
-    fuzzing workflow.
 
-        Scan
-            ↓
-        Analyze
-            ↓
-        Store Context
-            ↓
-        Return Analysis
-    """
 
     info("Starting Directory Fuzzing...")
 
@@ -282,29 +251,17 @@ def run_fuzzing(
     return analysis
 
 
-# ==========================================================
-# Public Entry Point
-# ==========================================================
-
-
 def run(
     context: ExecutionContext,
     targets: list[str],
 ) -> dict[str, Any]:
-    """
-    Public entry point for the
-    Directory Fuzzing module.
-    """
+
 
     return run_fuzzing(
         context,
         targets,
     )
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "run",

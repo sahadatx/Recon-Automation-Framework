@@ -1,44 +1,16 @@
-"""
-Nuclei Helpers
-
-Shared helper functions for
-the Nuclei module.
-"""
-
 import shutil
 from pathlib import Path
 from urllib.parse import urlparse
 
-# ==========================================================
-# Check Installation
-# ==========================================================
-
 
 def is_nuclei_installed():
-    """
-    Check whether Nuclei is
-    installed.
 
-    Returns:
-        bool
-    """
 
     return shutil.which("nuclei") is not None
 
 
-# ==========================================================
-# Get Version
-# ==========================================================
-
-
 def get_nuclei_version():
-    """
-    Return installed Nuclei
-    version.
 
-    Returns:
-        str | None
-    """
 
     import subprocess
 
@@ -61,21 +33,10 @@ def get_nuclei_version():
         return None
 
 
-# ==========================================================
-# Ensure Directory
-# ==========================================================
-
-
 def ensure_directory(
     directory: str | Path,
 ):
-    """
-    Create directory if it
-    does not exist.
 
-    Returns:
-        Path
-    """
 
     path = Path(directory)
 
@@ -87,20 +48,10 @@ def ensure_directory(
     return path
 
 
-# ==========================================================
-# Cleanup File
-# ==========================================================
-
-
 def cleanup_file(
     filepath: str | Path,
 ):
-    """
-    Delete file safely.
 
-    Returns:
-        bool
-    """
 
     path = Path(filepath)
 
@@ -119,39 +70,18 @@ def cleanup_file(
         return False
 
 
-# ==========================================================
-# Remove Duplicates
-# ==========================================================
-
-
 def remove_duplicates(
     values: list,
 ):
-    """
-    Remove duplicate values
-    while preserving order.
 
-    Returns:
-        list
-    """
 
     return list(dict.fromkeys(values))
-
-
-# ==========================================================
-# Normalize Target
-# ==========================================================
 
 
 def normalize_target(
     target: str,
 ):
-    """
-    Normalize one target.
 
-    Returns:
-        str
-    """
 
     target = target.strip()
 
@@ -177,40 +107,20 @@ def normalize_target(
     return f"{scheme}://{host}"
 
 
-# ==========================================================
-# Normalize Targets
-# ==========================================================
-
-
 def normalize_targets(
     targets: list[str],
 ):
-    """
-    Normalize target list.
 
-    Returns:
-        list
-    """
 
     normalized = [normalize_target(target) for target in targets if target.strip()]
 
     return remove_duplicates(normalized)
 
 
-# ==========================================================
-# Validate Target
-# ==========================================================
-
-
 def validate_target(
     target: str,
 ):
-    """
-    Validate one target.
 
-    Returns:
-        bool
-    """
 
     target = normalize_target(target)
 
@@ -223,38 +133,18 @@ def validate_target(
     return bool(parsed.scheme and parsed.netloc)
 
 
-# ==========================================================
-# Validate Targets
-# ==========================================================
-
-
 def validate_targets(
     targets: list[str],
 ):
-    """
-    Validate target list.
 
-    Returns:
-        list
-    """
 
     return [target for target in normalize_targets(targets) if validate_target(target)]
-
-
-# ==========================================================
-# Read Lines
-# ==========================================================
 
 
 def read_lines(
     filepath: str | Path,
 ):
-    """
-    Read file lines.
 
-    Returns:
-        list
-    """
 
     path = Path(filepath)
 
@@ -276,21 +166,11 @@ def read_lines(
         return []
 
 
-# ==========================================================
-# Write Lines
-# ==========================================================
-
-
 def write_lines(
     filepath: str | Path,
     lines: list[str],
 ):
-    """
-    Write file lines.
 
-    Returns:
-        Path
-    """
 
     path = Path(filepath)
 
@@ -308,41 +188,21 @@ def write_lines(
     return path
 
 
-# ==========================================================
-# Load Targets
-# ==========================================================
-
-
 def load_targets(
     filepath: str | Path,
 ):
-    """
-    Load targets from file.
 
-    Returns:
-        list
-    """
 
     targets = read_lines(filepath)
 
     return validate_targets(targets)
 
 
-# ==========================================================
-# Save Targets
-# ==========================================================
-
-
 def save_targets(
     filepath: str | Path,
     targets: list[str],
 ):
-    """
-    Save normalized targets.
 
-    Returns:
-        Path
-    """
 
     targets = validate_targets(targets)
 
@@ -351,10 +211,6 @@ def save_targets(
         targets,
     )
 
-
-# ==========================================================
-# Self Test
-# ==========================================================
 
 if __name__ == "__main__":
 

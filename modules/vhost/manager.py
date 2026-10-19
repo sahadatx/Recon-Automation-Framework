@@ -1,12 +1,3 @@
-#!/usr/bin/env python3
-
-"""
-Virtual Host Discovery Manager
-
-Coordinate virtual host
-discovery and analysis.
-"""
-
 from __future__ import annotations
 
 from concurrent.futures import as_completed
@@ -21,10 +12,6 @@ from .interesting import scan as detect_interesting
 from .parser import parse_ffuf
 from .scanner import scan_target
 
-# ==========================================================
-# Process Target
-# ==========================================================
-
 
 def process_target(
     target: str,
@@ -32,9 +19,7 @@ def process_target(
     str,
     dict[str, Any] | None,
 ]:
-    """
-    Scan one target.
-    """
+
 
     scan = scan_target(
         target,
@@ -83,13 +68,8 @@ def process_target(
 
     finally:
 
-        # cleanup(output)
+
         pass
-
-
-# ==========================================================
-# Collect Results
-# ==========================================================
 
 
 def collect_results(
@@ -101,9 +81,7 @@ def collect_results(
     list[dict[str, Any]],
     list[dict[str, Any]],
 ]:
-    """
-    Merge scan results.
-    """
+
 
     findings: list[dict[str, Any]] = []
 
@@ -131,30 +109,11 @@ def collect_results(
     )
 
 
-# ==========================================================
-# Run Virtual Host Discovery
-# ==========================================================
-
-
 def run_vhosts(
     context: ExecutionContext,
     targets: list[str],
 ) -> dict[str, Any]:
-    """
-    Execute the complete
-    virtual host discovery
-    workflow.
 
-        Scan
-            ↓
-        Collect
-            ↓
-        Analyze
-            ↓
-        Store Context
-            ↓
-        Return Analysis
-    """
 
     if not targets:
 
@@ -324,19 +283,11 @@ def run_vhosts(
     return analysis
 
 
-# ==========================================================
-# Public Entry Point
-# ==========================================================
-
-
 def run(
     context: ExecutionContext,
     targets: list[str],
 ) -> dict[str, Any]:
-    """
-    Public entry point for the
-    Virtual Host Discovery module.
-    """
+
 
     return run_vhosts(
         context,
@@ -344,17 +295,10 @@ def run(
     )
 
 
-# ==========================================================
-# Successful Targets
-# ==========================================================
-
-
 def successful_targets(
     analysis: dict[str, Any],
 ) -> list[str]:
-    """
-    Return successful targets.
-    """
+
 
     return sorted(
         {
@@ -373,17 +317,10 @@ def successful_targets(
     )
 
 
-# ==========================================================
-# Failed Targets
-# ==========================================================
-
-
 def failed_targets(
     analysis: dict[str, Any],
 ) -> list[str]:
-    """
-    Return failed targets.
-    """
+
 
     return sorted(
         analysis.get(
@@ -392,10 +329,6 @@ def failed_targets(
         ),
     )
 
-
-# ==========================================================
-# Public API
-# ==========================================================
 
 __all__ = [
     "run",

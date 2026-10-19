@@ -1,10 +1,3 @@
-"""
-TLS Certificate
-
-Certificate collection and
-analysis functions.
-"""
-
 from __future__ import annotations
 
 from copy import deepcopy
@@ -24,9 +17,6 @@ from modules.tls.helpers import (
     get_subject,
 )
 
-# ==========================================================
-# Default Result
-# ==========================================================
 
 EMPTY_CERTIFICATE = {
     "host": "",
@@ -56,19 +46,11 @@ EMPTY_CERTIFICATE = {
 }
 
 
-# ==========================================================
-# Load X509 Certificate
-# ==========================================================
-
-
 def load_x509_certificate(
     host: str,
     port: int = 443,
 ):
-    """
-    Download and load
-    X509 certificate.
-    """
+
 
     tls = get_certificate(
         host,
@@ -103,11 +85,6 @@ def load_x509_certificate(
         )
 
 
-# ==========================================================
-# SHA1
-# ==========================================================
-
-
 def get_sha1(
     certificate: x509.Certificate,
 ):
@@ -125,11 +102,6 @@ def get_sha1(
     )
 
 
-# ==========================================================
-# SHA256
-# ==========================================================
-
-
 def get_sha256(
     certificate: x509.Certificate,
 ):
@@ -145,11 +117,6 @@ def get_sha256(
         .hex()
         .upper()
     )
-
-
-# ==========================================================
-# Certificate Version
-# ==========================================================
 
 
 def get_certificate_version(
@@ -173,11 +140,6 @@ def get_certificate_version(
     )
 
 
-# ==========================================================
-# Signature Algorithm
-# ==========================================================
-
-
 def get_signature_algorithm(
     certificate: x509.Certificate,
 ):
@@ -195,11 +157,6 @@ def get_signature_algorithm(
         return ""
 
 
-# ==========================================================
-# Public Key
-# ==========================================================
-
-
 def get_public_key(
     certificate: x509.Certificate,
 ):
@@ -215,11 +172,6 @@ def get_public_key(
     except Exception:
 
         return None
-
-
-# ==========================================================
-# Public Key Type
-# ==========================================================
 
 
 def get_public_key_type(
@@ -257,11 +209,6 @@ def get_public_key_type(
     return type(key).__name__
 
 
-# ==========================================================
-# Public Key Size
-# ==========================================================
-
-
 def get_public_key_size(
     certificate: x509.Certificate,
 ):
@@ -281,11 +228,6 @@ def get_public_key_size(
     )
 
 
-# ==========================================================
-# Certificate Expired
-# ==========================================================
-
-
 def is_expired(
     certificate: x509.Certificate,
 ):
@@ -301,11 +243,6 @@ def is_expired(
     except Exception:
 
         return False
-
-
-# ==========================================================
-# Days Remaining
-# ==========================================================
 
 
 def get_days_remaining(
@@ -330,11 +267,6 @@ def get_days_remaining(
         return 0
 
 
-# ==========================================================
-# Self Signed
-# ==========================================================
-
-
 def is_self_signed(
     certificate: x509.Certificate,
 ):
@@ -350,11 +282,6 @@ def is_self_signed(
     except Exception:
 
         return False
-
-
-# ==========================================================
-# Wildcard
-# ==========================================================
 
 
 def is_wildcard(
@@ -375,19 +302,11 @@ def is_wildcard(
     ).startswith("*.")
 
 
-# ==========================================================
-# Hostname Match
-# ==========================================================
-
-
 def hostname_matches(
     cert: dict,
     host: str,
 ):
-    """
-    Verify hostname
-    against SAN/CN.
-    """
+
 
     if not cert:
 
@@ -417,7 +336,7 @@ def hostname_matches(
 
         if name.startswith("*."):
 
-            suffix = name[1:]  # ".google.com"
+            suffix = name[1:]
 
             if host.endswith(suffix):
 
@@ -426,21 +345,10 @@ def hostname_matches(
     return False
 
 
-# ==========================================================
-# Certificate Summary
-# ==========================================================
-
-
 def certificate_summary(
     certificate: x509.Certificate,
 ):
-    """
-    Generate certificate
-    summary.
 
-    Returns:
-        dict
-    """
 
     if certificate is None:
 
@@ -477,23 +385,11 @@ def certificate_summary(
     }
 
 
-# ==========================================================
-# Collect Certificate
-# ==========================================================
-
-
 def collect_certificate(
     host: str,
     port: int = 443,
 ):
-    """
-    Collect TLS
-    certificate
-    information.
 
-    Returns:
-        dict
-    """
 
     result = deepcopy(
         EMPTY_CERTIFICATE,
@@ -575,10 +471,6 @@ def collect_certificate(
 
     return result
 
-
-# ==========================================================
-# Export
-# ==========================================================
 
 __all__ = [
     "EMPTY_CERTIFICATE",

@@ -1,9 +1,3 @@
-#!/usr/bin/env python3
-
-"""
-Report Generator Plugin
-"""
-
 from __future__ import annotations
 
 from typing import Any
@@ -15,15 +9,9 @@ from .exporter import export_all, show_summary
 from .manager import run
 from .statistics import generate_statistics
 
-# ==========================================================
-# Report Generator Plugin
-# ==========================================================
-
 
 class ReportPlugin(BasePlugin):
-    """
-    Report Generator Plugin.
-    """
+
 
     name = "report"
 
@@ -53,9 +41,7 @@ class ReportPlugin(BasePlugin):
         *args: Any,
         **kwargs: Any,
     ) -> dict[str, Any]:
-        """
-        Execute the Report Generator plugin.
-        """
+
 
         return run(
             context,
@@ -67,9 +53,7 @@ class ReportPlugin(BasePlugin):
         self,
         result: dict[str, Any],
     ) -> None:
-        """
-        Export the final report.
-        """
+
 
         statistics = result.get(
             "statistics",
@@ -86,16 +70,8 @@ class ReportPlugin(BasePlugin):
         )
 
 
-# ==========================================================
-# Plugin Instance
-# ==========================================================
-
 plugin = ReportPlugin()
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "ReportPlugin",

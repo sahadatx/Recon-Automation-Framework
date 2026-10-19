@@ -1,7 +1,3 @@
-<!-- ========================================================= -->
-<!-- Hero Banner -->
-<!-- ========================================================= -->
-
 <h1 align="center">
 🔍 Recon Automation Framework
 </h1>
@@ -20,11 +16,6 @@ Automated Reconnaissance • Plugin Architecture • Multi-threading • Profess
     alt="Recon Automation Framework Banner"
     width="100%">
 </p>
-
-
-<!-- ========================================================= -->
-<!-- GitHub Badges -->
-<!-- ========================================================= -->
 
 <p align="center">
 
@@ -58,10 +49,6 @@ Built around a modular plugin architecture, it integrates reconnaissance, web di
 
 ---
 
-<!-- ========================================================= -->
-<!-- Overview -->
-<!-- ========================================================= -->
-
 # 📖 Overview
 
 Recon Automation Framework provides a complete, phase-based reconnaissance workflow that automates the collection, analysis, and reporting of attack surface intelligence.
@@ -75,10 +62,6 @@ Whether performing penetration testing, bug bounty reconnaissance, or general se
 <p align="right">
 <a href="#recon-automation-framework">⬆️ Back to Top</a>
 </p>
-
-<!-- ========================================================= -->
-<!-- Design Principles -->
-<!-- ========================================================= -->
 
 # ⚙️ Design Principles
 
@@ -122,11 +105,6 @@ A consistent project structure, reusable components, and clear separation of res
 
 Every component is designed to be reusable, independent, and easy to extend without affecting existing functionality.
 
-
-<!-- ========================================================= -->
-<!-- Table of Contents -->
-<!-- ========================================================= -->
-
 # 📑 Table of Contents
 - [📖 Overview](#-overview)
 - [🎬 Demo](#-demo)
@@ -158,11 +136,6 @@ Every component is designed to be reusable, independent, and easy to extend with
 - [🤝 Contributing](#-contributing)
 - [📄 License](#-license)
 - [👨‍💻 Author](#-author)
-
-
-<!-- ========================================================= -->
-<!-- Demo -->
-<!-- ========================================================= -->
 
 # 🎬 Demo
 
@@ -196,11 +169,6 @@ python recon.py example.com --all
   <a href="#recon-automation-framework">⬆️ Back to Top</a>
 </p>
 
-
-<!-- ========================================================= -->
-<!-- Features -->
-<!-- ========================================================= -->
-
 # ✨ Features
 
 Recon Automation Framework provides a complete reconnaissance workflow through a modular, extensible, and plugin-based architecture.
@@ -210,7 +178,7 @@ Recon Automation Framework provides a complete reconnaissance workflow through a
 ## ⚙️ Framework Capabilities
 
 - Modular Plugin-Based Architecture
-- 17 Specialized Reconnaissance Modules
+- 18 Specialized Reconnaissance Modules
 - Automated Phase-Based Reconnaissance Pipeline
 - Multi-threaded Module Execution
 - Interactive HTML Dashboard
@@ -221,11 +189,6 @@ Recon Automation Framework provides a complete reconnaissance workflow through a
 <p align="right">
   <a href="#recon-automation-framework">⬆️ Back to Top</a>
 </p>
-
-
-<!-- ========================================================= -->
-<!-- Framework Architecture -->
-<!-- ========================================================= -->
 
 # 🏗️ Framework Architecture
 
@@ -301,11 +264,6 @@ TXT / JSON / CSV / HTML
   <a href="#recon-automation-framework">⬆️ Back to Top</a>
 </p>
 
-
-<!-- ========================================================= -->
-<!-- Plugin Architecture -->
-<!-- ========================================================= -->
-
 # 🔌 Plugin Architecture
 
 Each reconnaissance capability is packaged as an independent plugin that can be discovered, loaded, and executed by the framework.
@@ -341,11 +299,6 @@ flowchart TD
 <p align="right">
   <a href="#recon-automation-framework">⬆️ Back to Top</a>
 </p>
-
-
-<!-- ========================================================= -->
-<!-- Recon Pipeline -->
-<!-- ========================================================= -->
 
 # 🔄 Recon Pipeline
 
@@ -392,10 +345,6 @@ flowchart LR
 <p align="right">
 <a href="#recon-automation-framework">⬆️ Back to Top</a>
 </p>
-
-<!-- ========================================================= -->
-<!-- Project Structure -->
-<!-- ========================================================= -->
 
 # 📁 Project Structure
 
@@ -463,11 +412,6 @@ module/
 <p align="right">
 <a href="#recon-automation-framework">⬆️ Back to Top</a>
 </p>
-
-
-<!-- ========================================================= -->
-<!-- Supported Modules -->
-<!-- ========================================================= -->
 
 # 📦 Supported Modules
 
@@ -608,11 +552,6 @@ python recon.py example.com --tech
 <a href="#recon-automation-framework">⬆️ Back to Top</a>
 </p>
 
-
-<!-- ========================================================= -->
-<!-- Phase 2 — Discovery -->
-<!-- ========================================================= -->
-
 ## 🔍 Phase 2 — Discovery
 
 The Discovery phase expands the identified attack surface by analyzing web applications, extracting hidden resources, and discovering additional entry points for security assessment.
@@ -634,7 +573,7 @@ URL Discovery crawls target web applications to collect publicly accessible URLs
 #### Example
 
 ```bash
-python recon.py example.com --crawl
+python recon.py example.com --crawler
 ```
 
 ---
@@ -676,7 +615,7 @@ Directory Fuzzing discovers hidden files and directories by testing common paths
 #### Example
 
 ```bash
-python recon.py example.com --fuzz
+python recon.py example.com --fuzzing
 ```
 
 ---
@@ -700,10 +639,6 @@ python recon.py example.com --vhost
 ```
 
 ---
-
-<!-- ========================================================= -->
-<!-- Phase 3 — Infrastructure -->
-<!-- ========================================================= -->
 
 ## 🌐 Phase 3 — Infrastructure
 
@@ -837,10 +772,6 @@ python recon.py example.com --email
 
 ---
 
-<!-- ========================================================= -->
-<!-- Phase 4 — Reporting -->
-<!-- ========================================================= -->
-
 ## 📊 Phase 4 — Reporting
 
 The Reporting module consolidates reconnaissance results into structured reports and an interactive dashboard for easier analysis and documentation.
@@ -874,10 +805,6 @@ python recon.py example.com --report
 
 ---
 
-<!-- ========================================================= -->
-<!-- Phase 5 — Framework -->
-<!-- ========================================================= -->
-
 ## 🚀 Phase 5 — Framework
 
 The Framework phase provides the core services that coordinate module execution, plugin management, performance optimization, and dashboard generation.
@@ -902,11 +829,6 @@ The Framework phase provides the core services that coordinate module execution,
 <p align="right">
 <a href="#recon-automation-framework">⬆️ Back to Top</a>
 </p>
-
-
-<!-- ========================================================= -->
-<!-- Installation -->
-<!-- ========================================================= -->
 
 # 🛠️ Installation
 
@@ -969,10 +891,6 @@ python recon.py --help
 <a href="#recon-automation-framework">⬆️ Back to Top</a>
 </p>
 
-<!-- ========================================================= -->
-<!-- Configuration -->
-<!-- ========================================================= -->
-
 # ⚙️ Configuration
 
 Configure API keys and framework settings before running reconnaissance modules.
@@ -1009,10 +927,6 @@ config/
 <a href="#recon-automation-framework">⬆️ Back to Top</a>
 </p>
 
-<!-- ========================================================= -->
-<!-- Usage -->
-<!-- ========================================================= -->
-
 # 🚀 Usage
 
 Run individual modules or execute the complete reconnaissance pipeline.
@@ -1047,10 +961,6 @@ python recon.py --help
 <a href="#recon-automation-framework">⬆️ Back to Top</a>
 </p>
 
-<!-- ========================================================= -->
-<!-- Output -->
-<!-- ========================================================= -->
-
 # 📂 Output
 
 Reconnaissance artifacts are stored in a structured output directory, making results easy to review, analyze, and integrate into subsequent security workflows.
@@ -1083,11 +993,6 @@ output/
 <p align="right">
 <a href="#recon-automation-framework">⬆️ Back to Top</a>
 </p>
-
-
-<!-- ========================================================= -->
-<!-- Screenshots -->
-<!-- ========================================================= -->
 
 # 📸 Screenshots
 
@@ -1159,11 +1064,6 @@ width="100%">
 <a href="#recon-automation-framework">⬆️ Back to Top</a>
 </p>
 
-
-<!-- ========================================================= -->
-<!-- Roadmap -->
-<!-- ========================================================= -->
-
 # 🗺️ Roadmap
 
 The following enhancements are planned for future releases to improve functionality, scalability, and usability.
@@ -1184,10 +1084,6 @@ The following enhancements are planned for future releases to improve functional
 <p align="right">
 <a href="#recon-automation-framework">⬆️ Back to Top</a>
 </p>
-
-<!-- ========================================================= -->
-<!-- FAQ -->
-<!-- ========================================================= -->
 
 # ❓ Frequently Asked Questions
 
@@ -1221,14 +1117,9 @@ Yes. This framework is intended for educational purposes and authorized security
 
 ---
 
-
 <p align="right">
 <a href="#recon-automation-framework">⬆️ Back to Top</a>
 </p>
-
-<!-- ========================================================= -->
-<!-- Contributing -->
-<!-- ========================================================= -->
 
 # 🤝 Contributing
 
@@ -1255,10 +1146,6 @@ Contributions are welcome and appreciated. Whether you are fixing bugs, improvin
 <a href="#recon-automation-framework">⬆️ Back to Top</a>
 </p>
 
-<!-- ========================================================= -->
-<!-- License -->
-<!-- ========================================================= -->
-
 # 📄 License
 
 This project is licensed under the **MIT License**.
@@ -1270,10 +1157,6 @@ See the [LICENSE](LICENSE) file for complete license information.
 <p align="right">
 <a href="#recon-automation-framework">⬆️ Back to Top</a>
 </p>
-
-<!-- ========================================================= -->
-<!-- Acknowledgements -->
-<!-- ========================================================= -->
 
 # 🙏 Acknowledgements
 
@@ -1309,10 +1192,6 @@ Open-source software thrives through collaboration, knowledge sharing, and commu
 <p align="right">
 <a href="#recon-automation-framework">⬆️ Back to Top</a>
 </p>
-
-<!-- ========================================================= -->
-<!-- Author -->
-<!-- ========================================================= -->
 
 # 👨‍💻 Author
 

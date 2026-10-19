@@ -1,9 +1,3 @@
-"""
-HTTP Probe Exporter
-
-Export HTTP probe results.
-"""
-
 from __future__ import annotations
 
 import json
@@ -18,15 +12,9 @@ from modules.http.constants import (
     SUMMARY_TXT,
 )
 
-# ==========================================================
-# Helpers
-# ==========================================================
-
 
 def create_output_directory() -> None:
-    """
-    Create the HTTP output directory.
-    """
+
 
     HTTP_OUTPUT_DIR.mkdir(
         parents=True,
@@ -34,17 +22,10 @@ def create_output_directory() -> None:
     )
 
 
-# ==========================================================
-# Results (TXT)
-# ==========================================================
-
-
 def export_results_txt(
     analysis: dict[str, Any],
 ) -> None:
-    """
-    Export HTTP results as human-readable text.
-    """
+
 
     create_output_directory()
 
@@ -68,17 +49,10 @@ def export_results_txt(
             file.write("\n")
 
 
-# ==========================================================
-# Results (JSON)
-# ==========================================================
-
-
 def export_results_json(
     analysis: dict[str, Any],
 ) -> None:
-    """
-    Export HTTP analysis as JSON.
-    """
+
 
     create_output_directory()
 
@@ -95,17 +69,10 @@ def export_results_json(
         )
 
 
-# ==========================================================
-# Summary
-# ==========================================================
-
-
 def export_summary(
     analysis: dict[str, Any],
 ) -> None:
-    """
-    Export HTTP summary.
-    """
+
 
     create_output_directory()
 
@@ -144,17 +111,10 @@ def export_summary(
             file.write(f"{status:<10}{count}\n")
 
 
-# ==========================================================
-# Alive Hosts
-# ==========================================================
-
-
 def export_alive(
     analysis: dict[str, Any],
 ) -> None:
-    """
-    Export alive hosts.
-    """
+
 
     create_output_directory()
 
@@ -170,17 +130,10 @@ def export_alive(
             file.write(f"{host}\n")
 
 
-# ==========================================================
-# Dead Hosts
-# ==========================================================
-
-
 def export_dead(
     analysis: dict[str, Any],
 ) -> None:
-    """
-    Export dead hosts.
-    """
+
 
     create_output_directory()
 
@@ -196,17 +149,10 @@ def export_dead(
             file.write(f"{host}\n")
 
 
-# ==========================================================
-# Export Everything
-# ==========================================================
-
-
 def export_all(
     analysis: dict[str, Any],
 ) -> None:
-    """
-    Export all HTTP output files.
-    """
+
 
     export_results_txt(
         analysis,
@@ -228,10 +174,6 @@ def export_all(
         analysis,
     )
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "export_all",

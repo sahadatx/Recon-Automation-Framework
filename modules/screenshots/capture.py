@@ -1,9 +1,3 @@
-"""
-Screenshot Capture
-
-Production Async Screenshot Engine.
-"""
-
 from __future__ import annotations
 
 from pathlib import Path
@@ -19,18 +13,9 @@ from modules.screenshots.constants import (
     SCREENSHOT_TIMEOUT,
 )
 
-# ==========================================================
-# Ensure Image Directory
-# ==========================================================
-
 
 def ensure_output_directory() -> Path:
-    """
-    Create screenshot image directory.
 
-    Returns:
-        Path
-    """
 
     IMAGES_DIR.mkdir(
         parents=True,
@@ -40,20 +25,10 @@ def ensure_output_directory() -> Path:
     return IMAGES_DIR
 
 
-# ==========================================================
-# Safe Filename
-# ==========================================================
-
-
 def safe_filename(
     url: str,
 ) -> str:
-    """
-    Convert URL into safe filename.
 
-    Returns:
-        str
-    """
 
     filename = url
 
@@ -85,48 +60,21 @@ def safe_filename(
     return filename.strip("_")
 
 
-# ==========================================================
-# Build Screenshot Path
-# ==========================================================
-
-
 def screenshot_path(
     url: str,
 ) -> Path:
-    """
-    Generate screenshot path.
 
-    Returns:
-        Path
-    """
 
     directory = ensure_output_directory()
 
     return directory / f"{safe_filename(url)}.png"
 
 
-# ==========================================================
-# Capture One Host
-# ==========================================================
-
-
 async def capture_host(
     context: BrowserContext,
     target: dict,
 ) -> dict:
-    """
-    Capture screenshot for one target.
 
-    Args:
-        context:
-            BrowserContext
-
-        target:
-            HTTP probe result
-
-    Returns:
-        dict
-    """
 
     url = target.get("url")
 
@@ -149,9 +97,6 @@ async def capture_host(
 
         page = await context.new_page()
 
-        # --------------------------------------------------
-        # Load Page
-        # --------------------------------------------------
 
         response = await page.goto(
             url,
@@ -161,9 +106,6 @@ async def capture_host(
 
         await page.wait_for_timeout(1000)
 
-        # --------------------------------------------------
-        # Screenshot
-        # --------------------------------------------------
 
         await page.screenshot(
             path=str(output),
@@ -222,21 +164,11 @@ async def capture_host(
                 pass
 
 
-# ==========================================================
-# Capture Multiple
-# ==========================================================
-
-
 async def capture_multiple(
     context: BrowserContext,
     targets: list[dict],
 ) -> list[dict]:
-    """
-    Capture multiple screenshots.
 
-    Returns:
-        list[dict]
-    """
 
     results = []
 
@@ -251,10 +183,6 @@ async def capture_multiple(
 
     return results
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "ensure_output_directory",

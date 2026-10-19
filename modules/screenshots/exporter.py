@@ -1,9 +1,3 @@
-"""
-Screenshot Exporter
-
-Exports screenshot analysis results.
-"""
-
 from __future__ import annotations
 
 import csv
@@ -19,18 +13,9 @@ from modules.screenshots.constants import (
     SUMMARY_TXT,
 )
 
-# ==========================================================
-# Ensure Output Directory
-# ==========================================================
-
 
 def ensure_output_directory() -> Path:
-    """
-    Create screenshot output directory.
 
-    Returns:
-        Path
-    """
 
     SCREENSHOT_OUTPUT_DIR.mkdir(
         parents=True,
@@ -40,18 +25,11 @@ def ensure_output_directory() -> Path:
     return SCREENSHOT_OUTPUT_DIR
 
 
-# ==========================================================
-# Write Text
-# ==========================================================
-
-
 def write_text(
     path: Path,
     lines: list[str],
 ) -> Path:
-    """
-    Write text file.
-    """
+
 
     path.parent.mkdir(
         parents=True,
@@ -70,18 +48,11 @@ def write_text(
     return path
 
 
-# ==========================================================
-# Write JSON
-# ==========================================================
-
-
 def write_json(
     path: Path,
     data: Any,
 ) -> Path:
-    """
-    Write JSON file.
-    """
+
 
     path.parent.mkdir(
         parents=True,
@@ -105,18 +76,11 @@ def write_json(
     return path
 
 
-# ==========================================================
-# Write CSV
-# ==========================================================
-
-
 def write_csv(
     path: Path,
     results: list[dict],
 ) -> Path:
-    """
-    Write CSV file.
-    """
+
 
     path.parent.mkdir(
         parents=True,
@@ -162,17 +126,10 @@ def write_csv(
     return path
 
 
-# ==========================================================
-# Export Results TXT
-# ==========================================================
-
-
 def export_results(
     analysis: dict[str, Any],
 ) -> Path:
-    """
-    Export screenshot results.
-    """
+
 
     lines = []
 
@@ -202,17 +159,10 @@ def export_results(
     )
 
 
-# ==========================================================
-# Export JSON
-# ==========================================================
-
-
 def export_json(
     analysis: dict[str, Any],
 ) -> Path:
-    """
-    Export JSON report.
-    """
+
 
     return write_json(
         RESULTS_JSON,
@@ -220,17 +170,10 @@ def export_json(
     )
 
 
-# ==========================================================
-# Export Summary
-# ==========================================================
-
-
 def export_summary(
     analysis: dict[str, Any],
 ) -> Path:
-    """
-    Export summary file.
-    """
+
 
     statistics = analysis.get(
         "statistics",
@@ -257,17 +200,10 @@ def export_summary(
     )
 
 
-# ==========================================================
-# Export All
-# ==========================================================
-
-
 def export_all(
     analysis: dict[str, Any],
 ) -> None:
-    """
-    Export all screenshot reports.
-    """
+
 
     exporters = (
         export_results,
@@ -288,17 +224,10 @@ def export_all(
     success("Screenshot reports exported successfully.")
 
 
-# ==========================================================
-# Show Summary
-# ==========================================================
-
-
 def show_summary(
     analysis: dict[str, Any],
 ) -> None:
-    """
-    Display screenshot summary.
-    """
+
 
     statistics = analysis.get(
         "statistics",
@@ -323,10 +252,6 @@ def show_summary(
 
     print("=" * 80)
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "export_results",

@@ -1,17 +1,7 @@
-"""
-CLI Parser
-
-Command-line interface parser
-for the Recon Automation Framework.
-"""
-
 from __future__ import annotations
 
 import argparse
 
-# ==========================================================
-# Framework Modules
-# ==========================================================
 
 MODULES = (
     "passive",
@@ -35,15 +25,8 @@ MODULES = (
 )
 
 
-# ==========================================================
-# Create Parser
-# ==========================================================
-
-
 def create_parser() -> argparse.ArgumentParser:
-    """
-    Create the framework CLI parser.
-    """
+
 
     parser = argparse.ArgumentParser(
         prog="recon",
@@ -55,9 +38,6 @@ def create_parser() -> argparse.ArgumentParser:
         formatter_class=(argparse.ArgumentDefaultsHelpFormatter),
     )
 
-    # ------------------------------------------------------
-    # Target
-    # ------------------------------------------------------
 
     parser.add_argument(
         "target",
@@ -65,9 +45,6 @@ def create_parser() -> argparse.ArgumentParser:
         help=("Target domain, hostname, " "or IP address."),
     )
 
-    # ------------------------------------------------------
-    # Scan Options
-    # ------------------------------------------------------
 
     scan = parser.add_argument_group(
         "Scan Options",
@@ -79,9 +56,6 @@ def create_parser() -> argparse.ArgumentParser:
         help="Run all framework modules.",
     )
 
-    # ------------------------------------------------------
-    # Module Options
-    # ------------------------------------------------------
 
     modules = parser.add_argument_group(
         "Module Options",
@@ -95,9 +69,6 @@ def create_parser() -> argparse.ArgumentParser:
             help=f"Run the {module} module.",
         )
 
-    # ------------------------------------------------------
-    # Performance
-    # ------------------------------------------------------
 
     performance = parser.add_argument_group(
         "Performance",
@@ -127,9 +98,6 @@ def create_parser() -> argparse.ArgumentParser:
         help="Retry attempts.",
     )
 
-    # ------------------------------------------------------
-    # Logging
-    # ------------------------------------------------------
 
     logging = parser.add_argument_group(
         "Logging",
@@ -149,9 +117,6 @@ def create_parser() -> argparse.ArgumentParser:
         help="Suppress informational output.",
     )
 
-    # ------------------------------------------------------
-    # General
-    # ------------------------------------------------------
 
     general = parser.add_argument_group(
         "General",
@@ -166,24 +131,13 @@ def create_parser() -> argparse.ArgumentParser:
     return parser
 
 
-# ==========================================================
-# Parse Arguments
-# ==========================================================
-
-
 def parse_arguments() -> argparse.Namespace:
-    """
-    Parse command-line arguments.
-    """
+
 
     parser = create_parser()
 
     return parser.parse_args()
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "MODULES",

@@ -1,10 +1,3 @@
-"""
-Directory Fuzzing Scanner
-
-Builds and executes ffuf
-commands against target URLs.
-"""
-
 import subprocess
 import tempfile
 from pathlib import Path
@@ -20,24 +13,11 @@ from config.config import (
 )
 from core.logger import info, warning
 
-# ==========================================================
-# Validate Target
-# ==========================================================
-
 
 def validate_target(
     target: str,
 ) -> bool:
-    """
-    Validate target URL.
 
-    Args:
-        target:
-            Target URL.
-
-    Returns:
-        bool
-    """
 
     return bool(target) and target.startswith(
         (
@@ -45,11 +25,6 @@ def validate_target(
             "https://",
         )
     )
-
-
-# ==========================================================
-# Build ffuf Command
-# ==========================================================
 
 
 def build_command(
@@ -60,33 +35,7 @@ def build_command(
     match_codes: str = FUZZ_MATCH_CODES,
     filter_codes: str = FUZZ_FILTER_CODES,
 ) -> tuple[list[str], Path]:
-    """
-    Build ffuf command.
 
-    Args:
-        target:
-            Target URL.
-
-        wordlist:
-            Custom wordlist.
-
-        threads:
-            Worker threads.
-
-        timeout:
-            Maximum runtime.
-
-        match_codes:
-            HTTP status codes
-            to match.
-
-        filter_codes:
-            HTTP status codes
-            to filter.
-
-    Returns:
-        tuple
-    """
 
     if not validate_target(target):
 
@@ -150,11 +99,6 @@ def build_command(
     )
 
 
-# ==========================================================
-# Run ffuf
-# ==========================================================
-
-
 def run_ffuf(
     target: str,
     wordlist: Path | str | None = None,
@@ -163,12 +107,7 @@ def run_ffuf(
     match_codes: str = FUZZ_MATCH_CODES,
     filter_codes: str = FUZZ_FILTER_CODES,
 ) -> tuple[Path | None, str | None]:
-    """
-    Execute ffuf.
 
-    Returns:
-        tuple
-    """
 
     command, output_file = build_command(
         target=target,
@@ -225,21 +164,11 @@ def run_ffuf(
         )
 
 
-# ==========================================================
-# Scan Target
-# ==========================================================
-
-
 def scan_target(
     target: str,
     wordlist: Path | str | None = None,
 ) -> dict:
-    """
-    Scan one target.
 
-    Returns:
-        dict
-    """
 
     output_file, error = run_ffuf(
         target=target,
@@ -254,21 +183,10 @@ def scan_target(
     }
 
 
-# ==========================================================
-# Cleanup
-# ==========================================================
-
-
 def cleanup(
     output_file: Path | None,
 ) -> None:
-    """
-    Remove temporary
-    output file.
 
-    Returns:
-        None
-    """
 
     if output_file is None:
 
@@ -285,19 +203,8 @@ def cleanup(
         pass
 
 
-# ==========================================================
-# Check ffuf Installation
-# ==========================================================
-
-
 def is_ffuf_installed() -> bool:
-    """
-    Check whether ffuf
-    is installed.
 
-    Returns:
-        bool
-    """
 
     try:
 
@@ -318,19 +225,8 @@ def is_ffuf_installed() -> bool:
         return False
 
 
-# ==========================================================
-# ffuf Version
-# ==========================================================
-
-
 def get_ffuf_version() -> str:
-    """
-    Return installed
-    ffuf version.
 
-    Returns:
-        str
-    """
 
     try:
 
@@ -351,52 +247,19 @@ def get_ffuf_version() -> str:
         return "Unknown"
 
 
-# ==========================================================
-# JSON Support
-# ==========================================================
-
-
 def supports_json() -> bool:
-    """
-    Check whether ffuf
-    supports JSON output.
 
-    Returns:
-        bool
-    """
 
     return True
-
-
-# ==========================================================
-# Recursion Support
-# ==========================================================
 
 
 def supports_recursion() -> bool:
-    """
-    Check whether ffuf
-    supports recursion.
 
-    Returns:
-        bool
-    """
 
     return True
 
 
-# ==========================================================
-# Auto Calibration Support
-# ==========================================================
-
-
 def supports_auto_calibration() -> bool:
-    """
-    Check whether ffuf
-    supports auto calibration.
 
-    Returns:
-        bool
-    """
 
     return True

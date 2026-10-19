@@ -1,29 +1,10 @@
-"""
-Crawler Statistics
-
-Generate statistics for crawler results.
-"""
-
 from __future__ import annotations
-
-# ==========================================================
-# Generate Statistics
-# ==========================================================
 
 
 def generate_statistics(
     results: dict[str, dict],
 ) -> dict:
-    """
-    Generate crawler statistics.
 
-    Args:
-        results:
-            Crawled results grouped by host.
-
-    Returns:
-        Aggregated crawler statistics.
-    """
 
     hosts = len(results)
 
@@ -98,10 +79,6 @@ def generate_statistics(
         "urls_per_host": urls_per_host,
     }
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "generate_statistics",

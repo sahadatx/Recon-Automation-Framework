@@ -1,18 +1,8 @@
-"""
-TLS Security Analyzer
-
-Analyze TLS Security results.
-"""
-
 from __future__ import annotations
 
 from typing import Any
 
 from .statistics import generate_statistics
-
-# ==========================================================
-# Analyze One Host
-# ==========================================================
 
 
 def analyze_host(
@@ -20,12 +10,7 @@ def analyze_host(
     protocols: dict[str, Any],
     cipher: dict[str, Any],
 ) -> dict[str, Any]:
-    """
-    Analyze one TLS target.
 
-    Returns:
-        Per-host TLS analysis.
-    """
 
     expired = certificate.get(
         "expired",
@@ -123,24 +108,10 @@ def analyze_host(
     }
 
 
-# ==========================================================
-# Analyze Results
-# ==========================================================
-
-
 def analyze(
     results: list[dict[str, Any]],
 ) -> dict[str, Any]:
-    """
-    Analyze TLS Security results.
 
-    Args:
-        results:
-            TLS analysis results.
-
-    Returns:
-        TLS Security analysis.
-    """
 
     return {
         "results": results,
@@ -149,10 +120,6 @@ def analyze(
         ),
     }
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "analyze_host",

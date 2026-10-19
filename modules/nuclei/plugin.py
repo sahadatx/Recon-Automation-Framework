@@ -1,9 +1,3 @@
-#!/usr/bin/env python3
-
-"""
-Nuclei Plugin
-"""
-
 from __future__ import annotations
 
 from typing import Any
@@ -14,15 +8,9 @@ from core.plugins.base import BasePlugin
 from .exporter import export_all
 from .manager import run
 
-# ==========================================================
-# Nuclei Plugin
-# ==========================================================
-
 
 class NucleiPlugin(BasePlugin):
-    """
-    Nuclei Vulnerability Scanner Plugin.
-    """
+
 
     name = "nuclei"
 
@@ -51,9 +39,7 @@ class NucleiPlugin(BasePlugin):
         *args: Any,
         **kwargs: Any,
     ) -> dict[str, Any]:
-        """
-        Execute the Nuclei plugin.
-        """
+
 
         return run(
             context,
@@ -65,25 +51,15 @@ class NucleiPlugin(BasePlugin):
         self,
         result: dict[str, Any],
     ) -> None:
-        """
-        Export Nuclei reports.
-        """
+
 
         export_all(
             result,
         )
 
 
-# ==========================================================
-# Plugin Instance
-# ==========================================================
-
 plugin = NucleiPlugin()
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "NucleiPlugin",

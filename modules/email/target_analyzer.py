@@ -1,10 +1,3 @@
-"""
-Email Security Target Analyzer
-
-Core analysis logic for
-Email Security.
-"""
-
 from __future__ import annotations
 
 from typing import Any
@@ -21,18 +14,11 @@ from .constants import (
 )
 from .helpers import safe_lower
 
-# ==========================================================
-# Mail Provider
-# ==========================================================
-
 
 def detect_provider(
     mx_records: list[str],
 ) -> str:
-    """
-    Detect mail provider
-    using MX records.
-    """
+
 
     for record in mx_records:
 
@@ -49,18 +35,10 @@ def detect_provider(
     return ""
 
 
-# ==========================================================
-# Risk Score
-# ==========================================================
-
-
 def calculate_score(
     result: dict[str, Any],
 ) -> int:
-    """
-    Calculate email
-    security score.
-    """
+
 
     score = 0
 
@@ -91,17 +69,10 @@ def calculate_score(
     return score
 
 
-# ==========================================================
-# Risk Level
-# ==========================================================
-
-
 def calculate_risk(
     score: int,
 ) -> str:
-    """
-    Calculate risk level.
-    """
+
 
     if score <= LOW_SCORE:
         return LOW_RISK
@@ -115,17 +86,10 @@ def calculate_risk(
     return CRITICAL_RISK
 
 
-# ==========================================================
-# Recommendations
-# ==========================================================
-
-
 def build_recommendations(
     result: dict[str, Any],
 ) -> list[str]:
-    """
-    Build recommendations.
-    """
+
 
     recommendations: list[str] = []
 
@@ -157,18 +121,10 @@ def build_recommendations(
     return recommendations
 
 
-# ==========================================================
-# Analyze Target
-# ==========================================================
-
-
 def analyze_target(
     result: dict[str, Any],
 ) -> dict[str, Any]:
-    """
-    Analyze a single
-    email security result.
-    """
+
 
     result["provider"] = detect_provider(
         result["mx"],
@@ -188,10 +144,6 @@ def analyze_target(
 
     return result
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "detect_provider",

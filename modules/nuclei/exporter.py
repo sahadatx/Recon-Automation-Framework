@@ -1,7 +1,3 @@
-"""
-Nuclei Exporter
-"""
-
 from __future__ import annotations
 
 import csv
@@ -21,15 +17,9 @@ from .constants import (
     TXT_FILE,
 )
 
-# ==========================================================
-# Output Directory
-# ==========================================================
-
 
 def create_output_directory() -> Path:
-    """
-    Create output directory.
-    """
+
 
     OUTPUT_DIR.mkdir(
         parents=True,
@@ -39,18 +29,11 @@ def create_output_directory() -> Path:
     return OUTPUT_DIR
 
 
-# ==========================================================
-# Write Helpers
-# ==========================================================
-
-
 def write_text(
     path: Path,
     lines: list[str],
 ) -> Path:
-    """
-    Write text file.
-    """
+
 
     create_output_directory()
 
@@ -68,9 +51,7 @@ def write_json(
     path: Path,
     data: dict[str, Any],
 ) -> Path:
-    """
-    Write JSON file.
-    """
+
 
     create_output_directory()
 
@@ -96,9 +77,7 @@ def write_csv(
     path: Path,
     rows: list[list[Any]],
 ) -> Path:
-    """
-    Write CSV file.
-    """
+
 
     create_output_directory()
 
@@ -117,17 +96,10 @@ def write_csv(
     return path
 
 
-# ==========================================================
-# Export TXT
-# ==========================================================
-
-
 def export_txt(
     analysis: dict[str, Any],
 ) -> Path:
-    """
-    Export TXT report.
-    """
+
 
     results = analysis["results"]
 
@@ -193,17 +165,10 @@ def export_txt(
     )
 
 
-# ==========================================================
-# Export JSON
-# ==========================================================
-
-
 def export_json(
     analysis: dict[str, Any],
 ) -> Path:
-    """
-    Export JSON report.
-    """
+
 
     return write_json(
         JSON_FILE,
@@ -211,17 +176,10 @@ def export_json(
     )
 
 
-# ==========================================================
-# Export CSV
-# ==========================================================
-
-
 def export_csv(
     analysis: dict[str, Any],
 ) -> Path:
-    """
-    Export CSV report.
-    """
+
 
     results = analysis["results"]
 
@@ -264,17 +222,10 @@ def export_csv(
     )
 
 
-# ==========================================================
-# Export High
-# ==========================================================
-
-
 def export_high(
     analysis: dict[str, Any],
 ) -> Path:
-    """
-    Export high findings.
-    """
+
 
     results = analysis["results"]
 
@@ -293,17 +244,10 @@ def export_high(
     )
 
 
-# ==========================================================
-# Export Critical
-# ==========================================================
-
-
 def export_critical(
     analysis: dict[str, Any],
 ) -> Path:
-    """
-    Export critical findings.
-    """
+
 
     results = analysis["results"]
 
@@ -322,17 +266,10 @@ def export_critical(
     )
 
 
-# ==========================================================
-# Export Summary
-# ==========================================================
-
-
 def export_summary(
     analysis: dict[str, Any],
 ) -> Path:
-    """
-    Export summary.
-    """
+
 
     statistics = analysis["statistics"]
 
@@ -354,17 +291,10 @@ def export_summary(
     )
 
 
-# ==========================================================
-# Show Summary
-# ==========================================================
-
-
 def show_summary(
     analysis: dict[str, Any],
 ) -> None:
-    """
-    Display summary.
-    """
+
 
     statistics = analysis["statistics"]
 
@@ -391,17 +321,10 @@ def show_summary(
     print("=" * 60)
 
 
-# ==========================================================
-# Export All
-# ==========================================================
-
-
 def export_all(
     analysis: dict[str, Any],
 ) -> dict[str, Path]:
-    """
-    Export all reports.
-    """
+
 
     files = {
         "txt": export_txt(analysis),
@@ -418,10 +341,6 @@ def export_all(
 
     return files
 
-
-# ==========================================================
-# Exports
-# ==========================================================
 
 __all__ = [
     "export_all",

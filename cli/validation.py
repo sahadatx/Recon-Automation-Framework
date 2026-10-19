@@ -1,34 +1,17 @@
-"""
-CLI Validation
-
-Validate command-line arguments
-for the Recon Automation Framework.
-"""
-
 from __future__ import annotations
 
 import ipaddress
 import re
 
-# ==========================================================
-# Constants
-# ==========================================================
 
 DOMAIN_PATTERN = re.compile(r"^(?!-)" r"(?:[A-Za-z0-9-]{1,63}\.)+" r"[A-Za-z]{2,63}$")
-
-
-# ==========================================================
-# Internal Helpers
-# ==========================================================
 
 
 def _validate_positive(
     value: int,
     name: str,
 ) -> int:
-    """
-    Validate that a value is greater than zero.
-    """
+
 
     if value < 1:
 
@@ -37,24 +20,10 @@ def _validate_positive(
     return value
 
 
-# ==========================================================
-# Validate Target
-# ==========================================================
-
-
 def validate_target(
     target: str,
 ) -> str:
-    """
-    Validate a scan target.
 
-    Supports:
-
-        - Domain
-        - Hostname
-        - IPv4
-        - IPv6
-    """
 
     target = target.strip()
 
@@ -62,9 +31,6 @@ def validate_target(
 
         raise ValueError("Target cannot be empty.")
 
-    # ------------------------------------------------------
-    # IP Address
-    # ------------------------------------------------------
 
     try:
 
@@ -78,9 +44,6 @@ def validate_target(
 
         pass
 
-    # ------------------------------------------------------
-    # Domain / Hostname
-    # ------------------------------------------------------
 
     if DOMAIN_PATTERN.fullmatch(
         target,
@@ -91,17 +54,10 @@ def validate_target(
     raise ValueError(f"Invalid target: {target}")
 
 
-# ==========================================================
-# Validate Threads
-# ==========================================================
-
-
 def validate_threads(
     threads: int,
 ) -> int:
-    """
-    Validate worker thread count.
-    """
+
 
     return _validate_positive(
         threads,
@@ -109,17 +65,10 @@ def validate_threads(
     )
 
 
-# ==========================================================
-# Validate Timeout
-# ==========================================================
-
-
 def validate_timeout(
     timeout: int,
 ) -> int:
-    """
-    Validate request timeout.
-    """
+
 
     return _validate_positive(
         timeout,
@@ -127,17 +76,10 @@ def validate_timeout(
     )
 
 
-# ==========================================================
-# Validate Retries
-# ==========================================================
-
-
 def validate_retries(
     retries: int,
 ) -> int:
-    """
-    Validate retry attempts.
-    """
+
 
     if retries < 0:
 
@@ -145,10 +87,6 @@ def validate_retries(
 
     return retries
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "validate_target",

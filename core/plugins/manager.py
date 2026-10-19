@@ -1,12 +1,3 @@
-#!/usr/bin/env python3
-
-"""
-Plugin Manager
-
-Coordinates the complete lifecycle
-of framework plugins.
-"""
-
 from __future__ import annotations
 
 from collections.abc import Iterator
@@ -18,38 +9,12 @@ from .base import BasePlugin
 from .loader import loader
 from .registry import registry
 
-# ==========================================================
-# Plugin Manager
-# ==========================================================
-
 
 class PluginManager:
-    """
-    Coordinates the lifecycle of all plugins.
 
-        initialize()
-              ↓
-        before_run()
-              ↓
-            run()
-              ↓
-        after_run()
-              ↓
-        before_export()
-              ↓
-        after_export()
-              ↓
-          shutdown()
-    """
-
-    # ======================================================
-    # Initialization
-    # ======================================================
 
     def initialize(self) -> None:
-        """
-        Discover, register and initialize plugins.
-        """
+
 
         loader.load_plugins()
 
@@ -57,17 +22,12 @@ class PluginManager:
 
             plugin.initialize()
 
-    # ======================================================
-    # Lookup
-    # ======================================================
 
     def get(
         self,
         name: str,
     ) -> BasePlugin:
-        """
-        Return a registered plugin.
-        """
+
 
         return registry.get(name)
 
@@ -75,24 +35,17 @@ class PluginManager:
         self,
         name: str,
     ) -> bool:
-        """
-        Check whether a plugin exists.
-        """
+
 
         return registry.exists(name)
 
     def all(
         self,
     ) -> list[BasePlugin]:
-        """
-        Return all registered plugins.
-        """
+
 
         return registry.all()
 
-    # ======================================================
-    # Execution
-    # ======================================================
 
     def execute(
         self,
@@ -101,9 +54,7 @@ class PluginManager:
         *args: Any,
         **kwargs: Any,
     ) -> dict[str, Any]:
-        """
-        Execute a plugin lifecycle.
-        """
+
 
         plugin = self.get(name)
 
@@ -150,22 +101,14 @@ class PluginManager:
                 plugin.name,
             )
 
-    # ======================================================
-    # Shutdown
-    # ======================================================
 
     def shutdown(self) -> None:
-        """
-        Shutdown all initialized plugins.
-        """
+
 
         for plugin in self:
 
             plugin.shutdown()
 
-    # ======================================================
-    # Dunder Methods
-    # ======================================================
 
     def __contains__(
         self,
@@ -189,16 +132,8 @@ class PluginManager:
         )
 
 
-# ==========================================================
-# Global Manager
-# ==========================================================
-
 plugin_manager = PluginManager()
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "PluginManager",

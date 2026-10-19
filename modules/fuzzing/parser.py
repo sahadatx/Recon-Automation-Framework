@@ -1,31 +1,11 @@
-"""
-Directory Fuzzing Parser
-
-Parses ffuf JSON output into
-normalized Python objects.
-"""
-
 import json
 from pathlib import Path
-
-# ==========================================================
-# Read JSON
-# ==========================================================
 
 
 def read_json(
     filepath: str | Path,
 ):
-    """
-    Read ffuf JSON output.
 
-    Args:
-        filepath:
-            JSON output file.
-
-    Returns:
-        dict | None
-    """
 
     path = Path(filepath)
 
@@ -47,24 +27,10 @@ def read_json(
         return None
 
 
-# ==========================================================
-# Normalize Result
-# ==========================================================
-
-
 def normalize_result(
     result: dict,
 ):
-    """
-    Normalize one ffuf result.
 
-    Args:
-        result:
-            Raw ffuf result.
-
-    Returns:
-        dict
-    """
 
     return {
         "url": result.get(
@@ -98,24 +64,10 @@ def normalize_result(
     }
 
 
-# ==========================================================
-# Parse Results
-# ==========================================================
-
-
 def parse_results(
     data: dict,
 ):
-    """
-    Parse ffuf results.
 
-    Args:
-        data:
-            Loaded JSON.
-
-    Returns:
-        list
-    """
 
     return [
         normalize_result(item)
@@ -126,24 +78,10 @@ def parse_results(
     ]
 
 
-# ==========================================================
-# Parse File
-# ==========================================================
-
-
 def parse_file(
     filepath: str | Path,
 ):
-    """
-    Parse ffuf JSON file.
 
-    Args:
-        filepath:
-            JSON output file.
-
-    Returns:
-        dict | None
-    """
 
     data = read_json(filepath)
 
@@ -154,23 +92,9 @@ def parse_file(
     return {"results": parse_results(data)}
 
 
-# ==========================================================
-# Entry Point
-# ==========================================================
-
-
 def parse_ffuf(
     filepath: str | Path,
 ):
-    """
-    Entry point.
 
-    Args:
-        filepath:
-            ffuf JSON output.
-
-    Returns:
-        dict | None
-    """
 
     return parse_file(filepath)

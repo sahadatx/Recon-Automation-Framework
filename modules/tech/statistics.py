@@ -1,30 +1,11 @@
-"""
-Technology Detection Statistics
-
-Generate statistics for technology detection.
-"""
-
 from __future__ import annotations
-
-# ==========================================================
-# Generate Statistics
-# ==========================================================
 
 
 def generate_statistics(
     results: dict,
     failed_hosts: list[str],
 ) -> dict:
-    """
-    Generate technology detection statistics.
 
-    Args:
-        results: Successful detection results.
-        failed_hosts: Failed hosts.
-
-    Returns:
-        Statistics dictionary.
-    """
 
     hosts_analyzed = len(results) + len(failed_hosts)
 
@@ -105,10 +86,6 @@ def generate_statistics(
         ),
     }
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "generate_statistics",

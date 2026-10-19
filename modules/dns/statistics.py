@@ -1,33 +1,11 @@
-"""
-DNS Resolution Statistics
-
-Generate statistics for DNS resolution results.
-"""
-
 from __future__ import annotations
-
-# ==========================================================
-# Generate Statistics
-# ==========================================================
 
 
 def generate_statistics(
     results: dict[str, dict[str, list[str]]],
     failed_hosts: list[str],
 ) -> dict:
-    """
-    Generate DNS resolution statistics.
 
-    Args:
-        results:
-            DNS resolution results.
-
-        failed_hosts:
-            Hosts that failed to resolve.
-
-    Returns:
-        DNS statistics.
-    """
 
     record_types = (
         "A",
@@ -68,10 +46,6 @@ def generate_statistics(
         "enabled_hosts": enabled_hosts,
     }
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "generate_statistics",

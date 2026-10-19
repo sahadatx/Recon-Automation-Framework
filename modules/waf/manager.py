@@ -1,12 +1,3 @@
-#!/usr/bin/env python3
-
-"""
-WAF Manager
-
-Coordinate WAF detection
-and analysis.
-"""
-
 from __future__ import annotations
 
 from core.context import ExecutionContext
@@ -17,31 +8,12 @@ from .detector import detect_all
 from .filters import filter_results
 from .scanner import scan_targets
 
-# ==========================================================
-# Run WAF Detection
-# ==========================================================
-
 
 def run_waf_detection(
     context: ExecutionContext,
     targets: list[str],
 ) -> dict[str, object]:
-    """
-    Execute the complete
-    WAF detection workflow.
 
-        Scan
-            ↓
-        Detect
-            ↓
-        Filter
-            ↓
-        Analyze
-            ↓
-        Store Context
-            ↓
-        Return Analysis
-    """
 
     if not targets:
 
@@ -60,34 +32,22 @@ def run_waf_detection(
         "Starting WAF Detection...",
     )
 
-    # ------------------------------------------------------
-    # Scan Targets
-    # ------------------------------------------------------
 
     scans = scan_targets(
         context,
         targets,
     )
 
-    # ------------------------------------------------------
-    # Detect WAF
-    # ------------------------------------------------------
 
     results = detect_all(
         scans,
     )
 
-    # ------------------------------------------------------
-    # Filter Results
-    # ------------------------------------------------------
 
     results = filter_results(
         results,
     )
 
-    # ------------------------------------------------------
-    # Analyze
-    # ------------------------------------------------------
 
     analysis = analyze(
         results=results,
@@ -127,29 +87,17 @@ def run_waf_detection(
     return analysis
 
 
-# ==========================================================
-# Public Entry Point
-# ==========================================================
-
-
 def run(
     context: ExecutionContext,
     targets: list[str],
 ) -> dict[str, object]:
-    """
-    Public entry point for the
-    WAF module.
-    """
+
 
     return run_waf_detection(
         context,
         targets,
     )
 
-
-# ==========================================================
-# Public API
-# ==========================================================
 
 __all__ = [
     "run",

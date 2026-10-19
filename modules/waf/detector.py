@@ -1,10 +1,3 @@
-"""
-WAF Detector
-
-Detect WAF vendor using
-fingerprint matching.
-"""
-
 from __future__ import annotations
 
 from typing import Any
@@ -19,15 +12,9 @@ from modules.waf.helpers import (
     unique_evidence,
 )
 
-# ==========================================================
-# Confidence Level
-# ==========================================================
-
 
 def get_confidence_level(score: int) -> str:
-    """
-    Convert score into confidence level.
-    """
+
 
     for minimum, level in CONFIDENCE_LEVELS:
 
@@ -38,22 +25,10 @@ def get_confidence_level(score: int) -> str:
     return "Unknown"
 
 
-# ==========================================================
-# Evidence Builder
-# ==========================================================
-
-
 def build_evidence(category: str, matches: list[str]) -> list[str]:
-    """
-    Build evidence entries.
-    """
+
 
     return [f"{category}: {item}" for item in matches]
-
-
-# ==========================================================
-# Apply Score
-# ==========================================================
 
 
 def apply_score(
@@ -63,9 +38,7 @@ def apply_score(
     matches: list[str],
     weight: int,
 ) -> int:
-    """
-    Apply score for one category.
-    """
+
 
     if not matches:
 
@@ -83,15 +56,8 @@ def apply_score(
     return score
 
 
-# ==========================================================
-# Detect Single Target
-# ==========================================================
-
-
 def detect_waf(scan: dict[str, Any]) -> dict[str, Any]:
-    """
-    Detect WAF vendor.
-    """
+
 
     headers = normalize_headers(
         scan.get(
@@ -232,16 +198,9 @@ def detect_waf(scan: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-# ==========================================================
-# Detect Multiple Targets
-# ==========================================================
-
-
 def detect_all(
     scans: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
-    """
-    Detect WAF for multiple targets.
-    """
+
 
     return [detect_waf(scan) for scan in scans]

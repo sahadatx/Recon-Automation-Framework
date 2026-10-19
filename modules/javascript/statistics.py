@@ -1,29 +1,10 @@
-"""
-JavaScript Statistics
-
-Generate statistics for JavaScript analysis results.
-"""
-
 from __future__ import annotations
-
-# ==========================================================
-# Generate Statistics
-# ==========================================================
 
 
 def generate_statistics(
     results: dict[str, dict],
 ) -> dict:
-    """
-    Generate JavaScript statistics.
 
-    Args:
-        results:
-            JavaScript analysis results.
-
-    Returns:
-        Aggregated JavaScript statistics.
-    """
 
     processed_files = len(results)
 
@@ -152,10 +133,6 @@ def generate_statistics(
         "urls_per_file": urls_per_file,
     }
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "generate_statistics",

@@ -1,26 +1,13 @@
-"""
-TLS Security Statistics
-
-Generate summary statistics
-for TLS Security.
-"""
-
 from __future__ import annotations
 
 from collections import Counter
 from typing import Any
 
-# ==========================================================
-# Risk Level Statistics
-# ==========================================================
-
 
 def risk_level_statistics(
     results: list[dict[str, Any]],
 ) -> dict[str, int]:
-    """
-    Count risk levels.
-    """
+
 
     order = [
         "Critical",
@@ -41,17 +28,10 @@ def risk_level_statistics(
     return {level: counter[level] for level in order}
 
 
-# ==========================================================
-# Security Statistics
-# ==========================================================
-
-
 def security_statistics(
     results: list[dict[str, Any]],
 ) -> dict[str, int]:
-    """
-    Count security findings.
-    """
+
 
     return {
         "expired": sum(
@@ -106,17 +86,10 @@ def security_statistics(
     }
 
 
-# ==========================================================
-# Generate Statistics
-# ==========================================================
-
-
 def generate_statistics(
     results: list[dict[str, Any]],
 ) -> dict[str, Any]:
-    """
-    Generate TLS statistics.
-    """
+
 
     total = len(results)
 
@@ -159,15 +132,8 @@ def generate_statistics(
     }
 
 
-# ==========================================================
-# Empty Statistics
-# ==========================================================
-
-
 def empty_statistics() -> dict[str, Any]:
-    """
-    Return empty statistics.
-    """
+
 
     return {
         "targets": 0,
@@ -183,10 +149,6 @@ def empty_statistics() -> dict[str, Any]:
         "forward_secrecy": 0,
     }
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "risk_level_statistics",

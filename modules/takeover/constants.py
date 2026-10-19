@@ -1,19 +1,9 @@
-"""
-Subdomain Takeover Detection Constants
-
-Centralized constants used by the
-Subdomain Takeover Detection module.
-"""
-
 from __future__ import annotations
 
 from pathlib import Path
 
 from config.config import HTTP_TIMEOUT
 
-# ==========================================================
-# Output Directory
-# ==========================================================
 
 OUTPUT_DIR = Path(
     "output/takeover",
@@ -34,9 +24,6 @@ SUMMARY_FILE = OUTPUT_DIR / "summary.txt"
 
 VULNERABLE_FILE = OUTPUT_DIR / "vulnerable.txt"
 
-# ==========================================================
-# Network Defaults
-# ==========================================================
 
 DEFAULT_HTTP_PORT = 80
 
@@ -46,9 +33,6 @@ DEFAULT_TIMEOUT = HTTP_TIMEOUT
 
 MAX_REDIRECTS = 5
 
-# ==========================================================
-# Confidence Thresholds
-# ==========================================================
 
 HIGH_CONFIDENCE = 95
 
@@ -58,9 +42,6 @@ LOW_CONFIDENCE = 40
 
 UNKNOWN_CONFIDENCE = 0
 
-# ==========================================================
-# Detection Methods
-# ==========================================================
 
 METHOD_HTTP = "http"
 
@@ -70,9 +51,6 @@ METHOD_CNAME = "cname"
 
 METHOD_DNS = "dns"
 
-# ==========================================================
-# Interesting Status Codes
-# ==========================================================
 
 STATUS_CODES = {
     400,
@@ -83,9 +61,6 @@ STATUS_CODES = {
     451,
 }
 
-# ==========================================================
-# Default HTTP Headers
-# ==========================================================
 
 DEFAULT_HEADERS = {
     "User-Agent": ("ReconAutomationFramework/1.0 " "(Subdomain Takeover Detection)"),
@@ -94,9 +69,6 @@ DEFAULT_HEADERS = {
     "Connection": "close",
 }
 
-# ==========================================================
-# Default Analysis Result
-# ==========================================================
 
 EMPTY_RESULT = {
     "target": "",
@@ -113,9 +85,6 @@ EMPTY_RESULT = {
     "error": None,
 }
 
-# ==========================================================
-# Supported Takeover Providers
-# ==========================================================
 
 TAKEOVER_PROVIDERS = (
     "GitHub Pages",
@@ -135,9 +104,6 @@ TAKEOVER_PROVIDERS = (
     "Cargo",
 )
 
-# ==========================================================
-# HTTP Body Fingerprints
-# ==========================================================
 
 TAKEOVER_FINGERPRINTS = {
     "GitHub Pages": {
@@ -193,9 +159,6 @@ TAKEOVER_FINGERPRINTS = {
     },
 }
 
-# ==========================================================
-# CNAME Fingerprints
-# ==========================================================
 
 CNAME_FINGERPRINTS = {
     "GitHub Pages": {
@@ -249,9 +212,6 @@ CNAME_FINGERPRINTS = {
     },
 }
 
-# ==========================================================
-# Recommendations
-# ==========================================================
 
 RECOMMENDATIONS = {
     True: [
@@ -265,9 +225,6 @@ RECOMMENDATIONS = {
     ],
 }
 
-# ==========================================================
-# Export Fields
-# ==========================================================
 
 EXPORT_FIELDS = (
     "target",
@@ -282,9 +239,6 @@ EXPORT_FIELDS = (
     "http_title",
 )
 
-# ==========================================================
-# Default Analysis
-# ==========================================================
 
 DEFAULT_ANALYSIS = {
     "target": "",
@@ -301,9 +255,6 @@ DEFAULT_ANALYSIS = {
     "error": None,
 }
 
-# ==========================================================
-# Export
-# ==========================================================
 
 __all__ = [
     "OUTPUT_DIR",

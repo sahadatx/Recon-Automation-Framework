@@ -1,24 +1,10 @@
-"""
-Directory Fuzzing Constants
-
-Output paths and
-configuration.
-"""
-
 from __future__ import annotations
 
 from pathlib import Path
 
-# ==========================================================
-# Output Directory
-# ==========================================================
 
 OUTPUT_DIR = Path("output/fuzzing")
 
-
-# ==========================================================
-# Output Files
-# ==========================================================
 
 TXT_FILE = OUTPUT_DIR / "fuzzing.txt"
 
@@ -30,10 +16,6 @@ SUMMARY_FILE = OUTPUT_DIR / "summary.txt"
 
 INTERESTING_FILE = OUTPUT_DIR / "interesting.txt"
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "OUTPUT_DIR",

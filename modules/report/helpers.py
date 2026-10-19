@@ -1,9 +1,3 @@
-"""
-Report Helper Functions
-
-Reusable helper functions for the Report Generator module.
-"""
-
 from __future__ import annotations
 
 import json
@@ -13,15 +7,9 @@ from typing import Any
 
 from .constants import DEFAULT_ENCODING, REPORT_DIR, TIMESTAMP_FORMAT
 
-# ==========================================================
-# Directory
-# ==========================================================
-
 
 def ensure_output_directory() -> None:
-    """
-    Create the report output directory if it does not exist.
-    """
+
 
     REPORT_DIR.mkdir(
         parents=True,
@@ -29,18 +17,11 @@ def ensure_output_directory() -> None:
     )
 
 
-# ==========================================================
-# JSON
-# ==========================================================
-
-
 def save_json(
     data: dict[str, Any],
     file_path: Path,
 ) -> None:
-    """
-    Save a dictionary as JSON.
-    """
+
 
     with file_path.open(
         "w",
@@ -55,37 +36,23 @@ def save_json(
         )
 
 
-# ==========================================================
-# Text
-# ==========================================================
-
-
 def save_text(
     text: str,
     file_path: Path,
 ) -> None:
-    """
-    Save plain text.
-    """
+
 
     file_path.write_text(
         text,
         encoding=DEFAULT_ENCODING,
     )
-
-
-# ==========================================================
-# Markdown
-# ==========================================================
 
 
 def save_markdown(
     text: str,
     file_path: Path,
 ) -> None:
-    """
-    Save Markdown content.
-    """
+
 
     file_path.write_text(
         text,
@@ -93,32 +60,18 @@ def save_markdown(
     )
 
 
-# ==========================================================
-# Time
-# ==========================================================
-
-
 def current_timestamp() -> str:
-    """
-    Return the current timestamp.
-    """
+
 
     return datetime.now().strftime(
         TIMESTAMP_FORMAT,
     )
 
 
-# ==========================================================
-# Formatting
-# ==========================================================
-
-
 def format_value(
     value: Any,
 ) -> str:
-    """
-    Convert any value into a readable string.
-    """
+
 
     if value is None:
         return "-"
@@ -152,10 +105,6 @@ def format_value(
 
     return str(value)
 
-
-# ==========================================================
-# Public API
-# ==========================================================
 
 __all__ = [
     "ensure_output_directory",

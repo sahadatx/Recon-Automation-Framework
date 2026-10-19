@@ -1,10 +1,3 @@
-"""
-Email Security Helpers
-
-Reusable helper functions for
-Email Security.
-"""
-
 from __future__ import annotations
 
 from copy import deepcopy
@@ -25,28 +18,16 @@ from .constants import (
     TXT_RECORD,
 )
 
-# ==========================================================
-# Default Result
-# ==========================================================
 
 EMPTY_EMAIL_RESULT = deepcopy(
     DEFAULT_ANALYSIS,
 )
 
-# ==========================================================
-# Normalize Target
-# ==========================================================
-
 
 def normalize_target(
     target: str,
 ) -> str:
-    """
-    Normalize target.
 
-    Returns:
-        str
-    """
 
     target = target.strip().lower()
 
@@ -68,21 +49,11 @@ def normalize_target(
     return target
 
 
-# ==========================================================
-# DNS Lookup
-# ==========================================================
-
-
 def resolve_record(
     target: str,
     record_type: str,
 ) -> list[str]:
-    """
-    Resolve DNS record.
 
-    Returns:
-        list[str]
-    """
 
     try:
 
@@ -104,20 +75,10 @@ def resolve_record(
         return []
 
 
-# ==========================================================
-# MX Records
-# ==========================================================
-
-
 def resolve_mx(
     target: str,
 ) -> list[str]:
-    """
-    Resolve MX records.
 
-    Returns:
-        list[str]
-    """
 
     return resolve_record(
         target,
@@ -125,20 +86,10 @@ def resolve_mx(
     )
 
 
-# ==========================================================
-# TXT Records
-# ==========================================================
-
-
 def resolve_txt(
     target: str,
 ) -> list[str]:
-    """
-    Resolve TXT records.
 
-    Returns:
-        list[str]
-    """
 
     return resolve_record(
         target,
@@ -146,20 +97,10 @@ def resolve_txt(
     )
 
 
-# ==========================================================
-# DNSKEY Records
-# ==========================================================
-
-
 def resolve_dnskey(
     target: str,
 ) -> bool:
-    """
-    Resolve DNSKEY records.
 
-    Returns:
-        bool
-    """
 
     return bool(
         resolve_record(
@@ -169,21 +110,10 @@ def resolve_dnskey(
     )
 
 
-# ==========================================================
-# Safe Lower
-# ==========================================================
-
-
 def safe_lower(
     value: Any,
 ) -> str:
-    """
-    Safely convert a value
-    to lowercase string.
 
-    Returns:
-        str
-    """
 
     if value is None:
 
@@ -194,26 +124,13 @@ def safe_lower(
     ).lower()
 
 
-# ==========================================================
-# SPF Record
-# ==========================================================
-
-
 def resolve_spf(
     target: str,
 ) -> tuple[
     bool,
     str,
 ]:
-    """
-    Resolve SPF record.
 
-    Returns:
-        tuple(
-            enabled,
-            record,
-        )
-    """
 
     for record in resolve_txt(
         target,
@@ -236,26 +153,13 @@ def resolve_spf(
     )
 
 
-# ==========================================================
-# DMARC Record
-# ==========================================================
-
-
 def resolve_dmarc(
     target: str,
 ) -> tuple[
     bool,
     str,
 ]:
-    """
-    Resolve DMARC record.
 
-    Returns:
-        tuple(
-            enabled,
-            record,
-        )
-    """
 
     records = resolve_txt(
         f"{DMARC_PREFIX}.{target}",
@@ -274,26 +178,13 @@ def resolve_dmarc(
     )
 
 
-# ==========================================================
-# DKIM Record
-# ==========================================================
-
-
 def resolve_dkim(
     target: str,
 ) -> tuple[
     bool,
     str,
 ]:
-    """
-    Resolve DKIM record.
 
-    Returns:
-        tuple(
-            enabled,
-            selector,
-        )
-    """
 
     for selector in DKIM_SELECTORS:
 
@@ -314,20 +205,10 @@ def resolve_dkim(
     )
 
 
-# ==========================================================
-# MTA-STS Record
-# ==========================================================
-
-
 def resolve_mta_sts(
     target: str,
 ) -> bool:
-    """
-    Resolve MTA-STS record.
 
-    Returns:
-        bool
-    """
 
     return bool(
         resolve_txt(
@@ -336,20 +217,10 @@ def resolve_mta_sts(
     )
 
 
-# ==========================================================
-# TLS-RPT Record
-# ==========================================================
-
-
 def resolve_tls_rpt(
     target: str,
 ) -> bool:
-    """
-    Resolve TLS-RPT record.
 
-    Returns:
-        bool
-    """
 
     return bool(
         resolve_txt(
@@ -358,31 +229,16 @@ def resolve_tls_rpt(
     )
 
 
-# ==========================================================
-# BIMI Record
-# ==========================================================
-
-
 def resolve_bimi(
     target: str,
 ) -> bool:
-    """
-    Resolve BIMI record.
 
-    Returns:
-        bool
-    """
 
     return bool(
         resolve_txt(
             f"{BIMI_PREFIX}.{target}",
         )
     )
-
-
-# ==========================================================
-# Create Result
-# ==========================================================
 
 
 def create_result(
@@ -399,14 +255,7 @@ def create_result(
     bimi: bool,
     dnssec: bool,
 ) -> dict[str, Any]:
-    """
-    Create populated
-    email security
-    result.
 
-    Returns:
-        dict
-    """
 
     result = deepcopy(
         EMPTY_EMAIL_RESULT,
@@ -427,10 +276,6 @@ def create_result(
 
     return result
 
-
-# ==========================================================
-# Export
-# ==========================================================
 
 __all__ = [
     "EMPTY_EMAIL_RESULT",

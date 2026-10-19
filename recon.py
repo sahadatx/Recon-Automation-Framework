@@ -1,16 +1,14 @@
-#!/usr/bin/env python3
-
-"""
-Recon Automation Framework
-
-Main Entry Point
-"""
-
 from __future__ import annotations
 
 import sys
+import time
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any
+
+from rich import box
+from rich.panel import Panel
+from rich.table import Table
+from rich.text import Text
 
 from cli.config import build_config
 from cli.parser import parse_arguments
@@ -19,12 +17,8 @@ from core.banner import show_banner
 from core.context import ExecutionContext
 from core.executor import execute_module
 from core.http import create_http_session
-from core.logger import divider, error, info, success
+from core.logger import console, divider, error, success
 from core.plugins.manager import plugin_manager
-
-# ==========================================================
-# Context
-# ==========================================================
 
 
 def create_context(
@@ -34,9 +28,7 @@ def create_context(
     Any,
     ThreadPoolExecutor,
 ]:
-    """
-    Create the shared execution context.
-    """
+
 
     context = ExecutionContext()
 
@@ -68,11 +60,6 @@ def create_context(
     )
 
 
-# ==========================================================
-# Execute Module
-# ==========================================================
-
-
 def execute_pipeline_module(
     context: ExecutionContext,
     module: str,
@@ -80,39 +67,79 @@ def execute_pipeline_module(
     total: int,
     config: dict[str, Any],
 ) -> None:
-    """
-    Execute one framework module.
-    """
+
 
     if not config["quiet"]:
 
-        info(f"[{index}/{total}] " f"Running {module}...")
+        console.print()
+        stage = Table.grid(expand=True, padding=(0, 1))
+        stage.add_column(ratio=1)
+        stage.add_column(justify="right")
+        stage.add_row(
+            Text(f"{module.upper()}  ·  RUNNING", style="bold bright_cyan"),
+            Text(f"MODULE {index:02}/{total:02}", style="bold white"),
+        )
+
+        filled = round(24 * index / total) if total else 0
+        bar = Text("━" * filled, style="bright_cyan")
+        bar.append("━" * (24 - filled), style="grey30")
+        percent = f"  {index * 100 / total:.0f}%" if total else "  0%"
+        bar.append(percent, style="bold white")
+
+        stage.add_row(bar, Text("PIPELINE", style="dim"))
+        console.print(
+            Panel(
+                stage,
+                border_style="bright_blue",
+                box=box.ROUNDED,
+                padding=(0, 1),
+            )
+        )
 
     arguments: tuple[Any, ...] = ()
 
-    #
-    # Only Passive Enumeration
-    # needs the initial target.
-    #
 
     if module == "passive":
 
         arguments = (config["target"],)
 
-    execute_module(
+    started_at = time.perf_counter()
+    analysis = execute_module(
         context,
         module,
         *arguments,
     )
+    elapsed = time.perf_counter() - started_at
 
     if not config["quiet"]:
 
-        success(f"Completed {module}")
+        summary = Table(
+            box=box.ROUNDED,
+            header_style="bold bright_blue",
+            border_style="grey50",
+            padding=(0, 1),
+        )
+        summary.add_column("SCAN METRIC", style="bold white")
+        summary.add_column("VALUE", style="bright_cyan", justify="right")
+        summary.add_row("Runtime", f"{elapsed:.2f} sec")
 
+        results = analysis.get("results")
+        if isinstance(results, (dict, list, tuple, set)):
+            summary.add_row("Results collected", str(len(results)))
 
-# ==========================================================
-# Framework Summary
-# ==========================================================
+        failed = analysis.get("failed_hosts")
+        if isinstance(failed, (dict, list, tuple, set)):
+            summary.add_row("Failed targets", str(len(failed)))
+
+        console.print(
+            Panel(
+                summary,
+                title=f"[bold green]✓ {module.upper()} COMPLETE[/bold green]",
+                border_style="green",
+                box=box.ROUNDED,
+                padding=(0, 2),
+            )
+        )
 
 
 def print_summary(
@@ -120,47 +147,34 @@ def print_summary(
     elapsed: float,
     quiet: bool,
 ) -> None:
-    """
-    Display framework summary.
-    """
+
 
     if quiet:
 
         return
 
-    divider()
+    summary = Table.grid(padding=(0, 2))
+    summary.add_column(style="bold bright_blue", justify="right")
+    summary.add_column(style="white")
+    summary.add_row("Modules", str(len(pipeline)))
+    summary.add_row("Runtime", f"{elapsed:.2f} sec")
+    summary.add_row("Output", "output/")
 
-    success(
-        "Recon Completed",
+    console.print(
+        Panel(
+            summary,
+            title="[bold green]✓ RECON COMPLETE[/bold green]",
+            border_style="green",
+            padding=(1, 2),
+        )
     )
-
-    info(
-        f"Modules Executed : {len(pipeline)}",
-    )
-
-    info(
-        f"Elapsed Time     : {elapsed:.2f} sec",
-    )
-
-    info(
-        "Output Directory : output/",
-    )
-
-    divider()
-
-
-# ==========================================================
-# Performance Summary
-# ==========================================================
 
 
 def print_performance_summary(
     context: ExecutionContext,
     quiet: bool,
 ) -> None:
-    """
-    Display framework performance summary.
-    """
+
 
     if quiet:
 
@@ -185,19 +199,12 @@ def print_performance_summary(
     divider()
 
 
-# ==========================================================
-# Cleanup
-# ==========================================================
-
-
 def cleanup(
     context: ExecutionContext,
     session: Any,
     thread_pool: ThreadPoolExecutor,
 ) -> None:
-    """
-    Release framework resources.
-    """
+
 
     plugin_manager.shutdown()
 
@@ -210,15 +217,8 @@ def cleanup(
     context.clear()
 
 
-# ==========================================================
-# Main
-# ==========================================================
-
-
 def main() -> None:
-    """
-    Framework entry point.
-    """
+
 
     arguments = parse_arguments()
 
@@ -232,7 +232,10 @@ def main() -> None:
 
     if not config["quiet"]:
 
-        show_banner()
+        show_banner(
+            target=config["target"],
+            module_count=len(pipeline),
+        )
 
     (
         context,
@@ -242,15 +245,9 @@ def main() -> None:
         config,
     )
 
-    #
-    # Start framework timer
-    #
 
     context.performance.start()
 
-    #
-    # Discover and initialize plugins
-    #
 
     plugin_manager.initialize()
 
@@ -276,15 +273,9 @@ def main() -> None:
                 config=config,
             )
 
-        #
-        # Stop framework timer
-        #
 
         framework_elapsed = context.performance.stop()
 
-        #
-        # Store statistics
-        #
 
         context.set_statistic(
             "framework_time",
@@ -306,15 +297,9 @@ def main() -> None:
             context.performance.summary(),
         )
 
-        #
-        # Generate reports
-        #
 
         context.performance.generate_report()
 
-        #
-        # Print summaries
-        #
 
         print_summary(
             pipeline=pipeline,
@@ -327,10 +312,6 @@ def main() -> None:
             quiet=config["quiet"],
         )
 
-        if not config["quiet"]:
-
-            success("Framework completed in " f"{framework_elapsed:.2f} sec.")
-
     finally:
 
         cleanup(
@@ -338,11 +319,6 @@ def main() -> None:
             session=session,
             thread_pool=thread_pool,
         )
-
-
-# ==========================================================
-# Entry Point
-# ==========================================================
 
 
 if __name__ == "__main__":
@@ -385,10 +361,6 @@ if __name__ == "__main__":
             1,
         )
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "main",

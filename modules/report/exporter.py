@@ -1,9 +1,3 @@
-"""
-Report Exporter
-
-Export the final report to multiple formats.
-"""
-
 from __future__ import annotations
 
 import json
@@ -15,17 +9,11 @@ from .constants import REPORT_JSON, REPORT_MD, REPORT_TXT, SUMMARY_TXT
 from .helpers import ensure_output_directory
 from .statistics import generate_summary
 
-# ==========================================================
-# JSON
-# ==========================================================
-
 
 def export_json(
     report: dict[str, Any],
 ) -> None:
-    """
-    Export report as JSON.
-    """
+
 
     with REPORT_JSON.open(
         "w",
@@ -42,17 +30,10 @@ def export_json(
     success(f"Saved {REPORT_JSON}")
 
 
-# ==========================================================
-# Text
-# ==========================================================
-
-
 def export_text(
     report: dict[str, Any],
 ) -> None:
-    """
-    Export report as plain text.
-    """
+
 
     with REPORT_TXT.open(
         "w",
@@ -70,17 +51,10 @@ def export_text(
     success(f"Saved {REPORT_TXT}")
 
 
-# ==========================================================
-# Markdown
-# ==========================================================
-
-
 def export_markdown(
     report: dict[str, Any],
 ) -> None:
-    """
-    Export report as Markdown.
-    """
+
 
     lines = [
         "# Recon Automation Framework Report",
@@ -115,17 +89,10 @@ def export_markdown(
     success(f"Saved {REPORT_MD}")
 
 
-# ==========================================================
-# Summary
-# ==========================================================
-
-
 def export_summary(
     statistics: dict[str, Any],
 ) -> None:
-    """
-    Export report summary.
-    """
+
 
     SUMMARY_TXT.write_text(
         generate_summary(statistics),
@@ -135,18 +102,11 @@ def export_summary(
     success(f"Saved {SUMMARY_TXT}")
 
 
-# ==========================================================
-# Export All
-# ==========================================================
-
-
 def export_all(
     report: dict[str, Any],
     statistics: dict[str, Any],
 ) -> None:
-    """
-    Export every report.
-    """
+
 
     ensure_output_directory()
 
@@ -167,17 +127,10 @@ def export_all(
     )
 
 
-# ==========================================================
-# Summary
-# ==========================================================
-
-
 def show_summary(
     statistics: dict[str, Any],
 ) -> None:
-    """
-    Print report summary.
-    """
+
 
     print()
 
@@ -193,10 +146,6 @@ def show_summary(
 
     print("=" * 80)
 
-
-# ==========================================================
-# Public API
-# ==========================================================
 
 __all__ = [
     "export_json",

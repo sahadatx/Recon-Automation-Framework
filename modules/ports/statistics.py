@@ -1,33 +1,11 @@
-"""
-Port Scanner Statistics
-
-Generate statistics for port scan results.
-"""
-
 from __future__ import annotations
-
-# ==========================================================
-# Generate Statistics
-# ==========================================================
 
 
 def generate_statistics(
     results: dict,
     failed_hosts: list[str],
 ) -> dict:
-    """
-    Generate statistics from port scan results.
 
-    Args:
-        results:
-            Successful scan results.
-
-        failed_hosts:
-            Hosts without open ports.
-
-    Returns:
-        Statistics dictionary.
-    """
 
     hosts_with_open_ports = len(results)
 
@@ -80,10 +58,6 @@ def generate_statistics(
         ),
     }
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "generate_statistics",

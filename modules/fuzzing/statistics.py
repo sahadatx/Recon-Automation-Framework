@@ -1,23 +1,10 @@
-"""
-Directory Fuzzing Statistics
-
-Generate statistics for
-Directory Fuzzing results.
-"""
-
 from __future__ import annotations
 
 from typing import Any
 
-# ==========================================================
-# Empty Statistics
-# ==========================================================
-
 
 def empty_statistics() -> dict[str, Any]:
-    """
-    Return empty statistics.
-    """
+
 
     return {
         "total_results": 0,
@@ -33,17 +20,10 @@ def empty_statistics() -> dict[str, Any]:
     }
 
 
-# ==========================================================
-# Status Code Statistics
-# ==========================================================
-
-
 def status_statistics(
     results: list[dict[str, Any]],
 ) -> dict[str, int]:
-    """
-    Count HTTP status codes.
-    """
+
 
     statistics: dict[str, int] = {}
 
@@ -65,17 +45,10 @@ def status_statistics(
     )
 
 
-# ==========================================================
-# Response Statistics
-# ==========================================================
-
-
 def response_statistics(
     results: list[dict[str, Any]],
 ) -> dict[str, float]:
-    """
-    Generate response size statistics.
-    """
+
 
     if not results:
 
@@ -103,18 +76,11 @@ def response_statistics(
     }
 
 
-# ==========================================================
-# Generate Statistics
-# ==========================================================
-
-
 def generate_statistics(
     results: list[dict[str, Any]],
     interesting: dict[str, Any],
 ) -> dict[str, Any]:
-    """
-    Generate Directory Fuzzing statistics.
-    """
+
 
     statistics = empty_statistics()
 
@@ -145,10 +111,6 @@ def generate_statistics(
 
     return statistics
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "empty_statistics",

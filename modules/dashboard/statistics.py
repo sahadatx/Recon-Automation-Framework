@@ -1,22 +1,10 @@
-"""
-Dashboard Statistics
-
-Generate dashboard statistics.
-"""
-
 from __future__ import annotations
 
 from typing import Any
 
-# ==========================================================
-# Empty Statistics
-# ==========================================================
-
 
 def empty_statistics() -> dict[str, Any]:
-    """
-    Return empty dashboard statistics.
-    """
+
 
     return {
         "target": "",
@@ -27,40 +15,14 @@ def empty_statistics() -> dict[str, Any]:
     }
 
 
-# ==========================================================
-# Generate Statistics
-# ==========================================================
-
-
 def generate_statistics(
     report: dict[str, Any],
 ) -> dict[str, Any]:
-    """
-    Generate dashboard statistics.
 
-    Args:
-        report:
-            Complete report data.
-
-    Returns:
-        Dashboard statistics.
-    """
 
     if not report:
         return empty_statistics()
 
-    # ======================================================
-    # Report Structure
-    #
-    # report
-    #   └── modules
-    #         ├── analysis
-    #         ├── statistics
-    #         └── performance
-    #
-    # Dashboard statistics are generated from the
-    # analysis section only.
-    # ======================================================
 
     report_modules = report.get(
         "modules",
@@ -160,10 +122,6 @@ def generate_statistics(
         "findings": findings,
     }
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "empty_statistics",

@@ -1,10 +1,3 @@
-"""
-CDN Filters
-
-Filter and normalize
-CDN analysis results.
-"""
-
 from __future__ import annotations
 
 from copy import deepcopy
@@ -17,9 +10,6 @@ from .constants import (
     UNKNOWN_CONFIDENCE,
 )
 
-# ==========================================================
-# Constants
-# ==========================================================
 
 VALID_PROVIDERS = set(CDN_PROVIDERS)
 
@@ -31,20 +21,10 @@ VALID_CONFIDENCE = {
 }
 
 
-# ==========================================================
-# Reset Analysis
-# ==========================================================
-
-
 def reset_analysis(
     result: dict,
 ) -> dict:
-    """
-    Reset invalid analysis.
 
-    Returns:
-        dict
-    """
 
     result["cdn"] = False
 
@@ -59,20 +39,10 @@ def reset_analysis(
     return result
 
 
-# ==========================================================
-# Normalize Confidence
-# ==========================================================
-
-
 def normalize_confidence(
     confidence,
 ) -> int:
-    """
-    Normalize confidence.
 
-    Returns:
-        int
-    """
 
     try:
 
@@ -95,20 +65,10 @@ def normalize_confidence(
     return confidence
 
 
-# ==========================================================
-# Normalize Provider
-# ==========================================================
-
-
 def normalize_provider(
     provider,
 ) -> str:
-    """
-    Normalize provider.
 
-    Returns:
-        str
-    """
 
     if not provider:
 
@@ -125,20 +85,10 @@ def normalize_provider(
     return ""
 
 
-# ==========================================================
-# Normalize Methods
-# ==========================================================
-
-
 def normalize_methods(
     methods,
 ) -> list[str]:
-    """
-    Normalize detection methods.
 
-    Returns:
-        list[str]
-    """
 
     if not methods:
 
@@ -171,20 +121,10 @@ def normalize_methods(
     )
 
 
-# ==========================================================
-# Normalize Recommendations
-# ==========================================================
-
-
 def normalize_recommendations(
     recommendations,
 ) -> list[str]:
-    """
-    Normalize recommendations.
 
-    Returns:
-        list[str]
-    """
 
     if not recommendations:
 
@@ -193,20 +133,10 @@ def normalize_recommendations(
     return sorted({item.strip() for item in recommendations if item and item.strip()})
 
 
-# ==========================================================
-# Validate Analysis
-# ==========================================================
-
-
 def validate_analysis(
     result,
 ) -> dict:
-    """
-    Validate analysis result.
 
-    Returns:
-        dict
-    """
 
     result["confidence"] = normalize_confidence(
         result.get(
@@ -245,20 +175,10 @@ def validate_analysis(
     return result
 
 
-# ==========================================================
-# Filter Single Result
-# ==========================================================
-
-
 def filter_result(
     result,
 ) -> dict:
-    """
-    Filter one analysis result.
 
-    Returns:
-        dict
-    """
 
     filtered = deepcopy(
         result,
@@ -269,20 +189,10 @@ def filter_result(
     )
 
 
-# ==========================================================
-# Filter Results
-# ==========================================================
-
-
 def filter_results(
     results,
 ) -> list[dict]:
-    """
-    Filter all analysis results.
 
-    Returns:
-        list[dict]
-    """
 
     filtered = [
         filter_result(
@@ -308,20 +218,10 @@ def filter_results(
     return filtered
 
 
-# ==========================================================
-# Detected Only
-# ==========================================================
-
-
 def detected_only(
     results,
 ) -> list[dict]:
-    """
-    Return detected CDN results.
 
-    Returns:
-        list[dict]
-    """
 
     return [
         result
@@ -330,22 +230,12 @@ def detected_only(
             "cdn",
         )
     ]
-
-
-# ==========================================================
-# Undetected Only
-# ==========================================================
 
 
 def undetected_only(
     results,
 ) -> list[dict]:
-    """
-    Return non-CDN results.
 
-    Returns:
-        list[dict]
-    """
 
     return [
         result
@@ -356,20 +246,10 @@ def undetected_only(
     ]
 
 
-# ==========================================================
-# Failed Only
-# ==========================================================
-
-
 def failed_only(
     results,
 ) -> list[dict]:
-    """
-    Return failed scans.
 
-    Returns:
-        list[dict]
-    """
 
     return [
         result
@@ -380,20 +260,10 @@ def failed_only(
     ]
 
 
-# ==========================================================
-# Remove Failed
-# ==========================================================
-
-
 def remove_failed(
     results,
 ) -> list[dict]:
-    """
-    Remove failed scans.
 
-    Returns:
-        list[dict]
-    """
 
     return [
         result
@@ -403,10 +273,6 @@ def remove_failed(
         )
     ]
 
-
-# ==========================================================
-# Export
-# ==========================================================
 
 __all__ = [
     "VALID_PROVIDERS",

@@ -1,14 +1,4 @@
-"""
-Passive Enumeration Statistics
-
-Generate passive enumeration statistics.
-"""
-
 from typing import Any
-
-# ==========================================================
-# Generate Statistics
-# ==========================================================
 
 
 def generate_statistics(
@@ -16,22 +6,7 @@ def generate_statistics(
     timings: dict[str, float],
     failed_sources: list[str],
 ) -> dict[str, Any]:
-    """
-    Generate passive enumeration statistics.
 
-    Args:
-        results:
-            Raw results grouped by source.
-
-        timings:
-            Execution time per source.
-
-        failed_sources:
-            List of failed sources.
-
-    Returns:
-        Statistics dictionary.
-    """
 
     statistics: dict[str, dict[str, Any]] = {}
 
@@ -74,10 +49,6 @@ def generate_statistics(
         "statistics": statistics,
     }
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "generate_statistics",

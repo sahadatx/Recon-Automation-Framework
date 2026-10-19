@@ -1,12 +1,3 @@
-#!/usr/bin/env python3
-
-"""
-HTTP Probe Manager
-
-Coordinate HTTP probing
-and analysis.
-"""
-
 from __future__ import annotations
 
 from concurrent.futures import as_completed
@@ -17,10 +8,6 @@ from core.logger import info, progress_status, success, warning
 from modules.http.analyzer import analyze
 from modules.http.probe import probe_host
 
-# ==========================================================
-# Probe One Host
-# ==========================================================
-
 
 def probe_one_host(
     context: ExecutionContext,
@@ -29,12 +16,7 @@ def probe_one_host(
     str,
     dict[str, Any] | None,
 ]:
-    """
-    Probe one host.
 
-    Shared HTTP session is reused
-    across every request.
-    """
 
     session = context.get_http_session()
 
@@ -51,11 +33,6 @@ def probe_one_host(
     )
 
 
-# ==========================================================
-# Probe Hosts
-# ==========================================================
-
-
 def probe_hosts(
     context: ExecutionContext,
     hosts: list[str],
@@ -63,9 +40,7 @@ def probe_hosts(
     dict[str, dict[str, Any]],
     list[str],
 ]:
-    """
-    Probe all hosts in parallel.
-    """
+
 
     info("Starting HTTP Probe...")
 
@@ -166,27 +141,11 @@ def probe_hosts(
     )
 
 
-# ==========================================================
-# Run HTTP Probe
-# ==========================================================
-
-
 def run(
     context: ExecutionContext,
     hosts: list[str],
 ) -> dict[str, Any]:
-    """
-    Execute the complete HTTP
-    probing workflow.
 
-        Probe
-          ↓
-        Analyze
-          ↓
-        Store Context
-          ↓
-        Return Analysis
-    """
 
     (
         results,
@@ -208,10 +167,6 @@ def run(
 
     return analysis
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "run",

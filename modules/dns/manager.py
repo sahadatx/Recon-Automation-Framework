@@ -1,11 +1,3 @@
-#!/usr/bin/env python3
-
-"""
-DNS Resolution Manager
-
-Coordinate DNS resolution and analysis.
-"""
-
 from __future__ import annotations
 
 from concurrent.futures import as_completed
@@ -16,22 +8,12 @@ from core.logger import info, progress_status, success, warning
 from modules.dns.analyzer import analyze
 from modules.dns.records import resolve_all_records
 
-# ==========================================================
-# Resolve One Subdomain
-# ==========================================================
-
 
 def resolve_subdomain(
     context: ExecutionContext,
     subdomain: str,
 ) -> tuple[str, dict[str, list[str]]]:
-    """
-    Resolve every supported DNS record
-    for a single subdomain.
 
-    Cached results are reused whenever
-    available.
-    """
 
     if context.has_dns_cache(subdomain):
 
@@ -57,11 +39,6 @@ def resolve_subdomain(
     )
 
 
-# ==========================================================
-# Resolve All Subdomains
-# ==========================================================
-
-
 def resolve_subdomains(
     context: ExecutionContext,
     subdomains: list[str],
@@ -69,10 +46,7 @@ def resolve_subdomains(
     dict[str, dict[str, list[str]]],
     list[str],
 ]:
-    """
-    Resolve DNS records for every
-    discovered subdomain.
-    """
+
 
     info("Starting DNS Resolution...")
 
@@ -111,6 +85,7 @@ def resolve_subdomains(
         subdomain = futures[future]
 
         completed += 1
+        failed = False
 
         try:
 
@@ -123,16 +98,24 @@ def resolve_subdomains(
 
         except Exception as error:
 
+            failed = True
+
             warning(f"{subdomain}: {error}")
 
             failed_hosts.append(
                 subdomain,
             )
 
+        status = (
+            f"✗ {subdomain} failed"
+            if failed
+            else f"✓ {subdomain} resolved"
+        )
+
         progress_status(
             completed,
             total,
-            f"✓ {subdomain} resolved",
+            status,
         )
 
     success(f"Resolved {len(results)} hosts.")
@@ -145,27 +128,11 @@ def resolve_subdomains(
     )
 
 
-# ==========================================================
-# Run DNS Resolution
-# ==========================================================
-
-
 def run(
     context: ExecutionContext,
     subdomains: list[str],
 ) -> dict[str, Any]:
-    """
-    Execute the complete DNS
-    resolution workflow.
 
-        Resolve
-            ↓
-        Analyze
-            ↓
-        Store Context
-            ↓
-        Return Analysis
-    """
 
     (
         results,
@@ -187,10 +154,6 @@ def run(
 
     return analysis
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "run",

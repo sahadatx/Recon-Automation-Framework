@@ -1,10 +1,3 @@
-"""
-JavaScript Downloader
-
-Downloads JavaScript files discovered
-by the URL Discovery module.
-"""
-
 from __future__ import annotations
 
 from typing import Any
@@ -18,21 +11,12 @@ from modules.javascript.helpers import (
     save_javascript,
 )
 
-# ==========================================================
-# Download One JavaScript File
-# ==========================================================
-
 
 def download_one(
     context: ExecutionContext,
     url: str,
 ) -> dict[str, Any] | None:
-    """
-    Download a single JavaScript file.
 
-    Returns:
-        Metadata dictionary or None.
-    """
 
     if not is_valid_url(
         url,
@@ -97,11 +81,6 @@ def download_one(
     }
 
 
-# ==========================================================
-# Download Multiple JavaScript Files
-# ==========================================================
-
-
 def download_multiple(
     context: ExecutionContext,
     urls: list[str],
@@ -109,9 +88,7 @@ def download_multiple(
     list[dict[str, Any]],
     list[str],
 ]:
-    """
-    Download multiple JavaScript files.
-    """
+
 
     info("Downloading JavaScript files...")
 
@@ -160,11 +137,6 @@ def download_multiple(
     )
 
 
-# ==========================================================
-# Entry Point
-# ==========================================================
-
-
 def download_javascript(
     context: ExecutionContext,
     javascript_urls: list[str],
@@ -172,19 +144,13 @@ def download_javascript(
     list[dict[str, Any]],
     list[str],
 ]:
-    """
-    JavaScript downloader entry point.
-    """
+
 
     return download_multiple(
         context,
         javascript_urls,
     )
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "download_one",

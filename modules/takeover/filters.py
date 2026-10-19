@@ -1,11 +1,3 @@
-"""
-Takeover Filters
-
-Filter and normalize
-Subdomain Takeover
-analysis results.
-"""
-
 from __future__ import annotations
 
 from copy import deepcopy
@@ -18,9 +10,6 @@ from .constants import (
     UNKNOWN_CONFIDENCE,
 )
 
-# ==========================================================
-# Constants
-# ==========================================================
 
 VALID_PROVIDERS = set(
     TAKEOVER_PROVIDERS,
@@ -34,20 +23,10 @@ VALID_CONFIDENCE = {
 }
 
 
-# ==========================================================
-# Reset Analysis
-# ==========================================================
-
-
 def reset_analysis(
     result: dict,
 ) -> dict:
-    """
-    Reset invalid analysis.
 
-    Returns:
-        dict
-    """
 
     result["vulnerable"] = False
 
@@ -64,20 +43,10 @@ def reset_analysis(
     return result
 
 
-# ==========================================================
-# Normalize Confidence
-# ==========================================================
-
-
 def normalize_confidence(
     confidence,
 ) -> int:
-    """
-    Normalize confidence.
 
-    Returns:
-        int
-    """
 
     try:
 
@@ -100,20 +69,10 @@ def normalize_confidence(
     return confidence
 
 
-# ==========================================================
-# Normalize Provider
-# ==========================================================
-
-
 def normalize_provider(
     provider,
 ) -> str:
-    """
-    Normalize provider.
 
-    Returns:
-        str
-    """
 
     if not provider:
 
@@ -130,21 +89,10 @@ def normalize_provider(
     return ""
 
 
-# ==========================================================
-# Normalize Methods
-# ==========================================================
-
-
 def normalize_methods(
     methods,
 ) -> list[str]:
-    """
-    Normalize detection
-    methods.
 
-    Returns:
-        list[str]
-    """
 
     if not methods:
 
@@ -177,21 +125,10 @@ def normalize_methods(
     )
 
 
-# ==========================================================
-# Normalize Recommendations
-# ==========================================================
-
-
 def normalize_recommendations(
     recommendations,
 ) -> list[str]:
-    """
-    Normalize
-    recommendations.
 
-    Returns:
-        list[str]
-    """
 
     if not recommendations:
 
@@ -200,20 +137,10 @@ def normalize_recommendations(
     return sorted({item.strip() for item in recommendations if (item and item.strip())})
 
 
-# ==========================================================
-# Validate Analysis
-# ==========================================================
-
-
 def validate_analysis(
     result,
 ) -> dict:
-    """
-    Validate analysis result.
 
-    Returns:
-        dict
-    """
 
     result["confidence"] = normalize_confidence(
         result.get(
@@ -252,21 +179,10 @@ def validate_analysis(
     return result
 
 
-# ==========================================================
-# Filter Single Result
-# ==========================================================
-
-
 def filter_result(
     result,
 ) -> dict:
-    """
-    Filter one analysis
-    result.
 
-    Returns:
-        dict
-    """
 
     filtered = deepcopy(
         result,
@@ -277,21 +193,10 @@ def filter_result(
     )
 
 
-# ==========================================================
-# Filter Results
-# ==========================================================
-
-
 def filter_results(
     results,
 ) -> list[dict]:
-    """
-    Filter all analysis
-    results.
 
-    Returns:
-        list[dict]
-    """
 
     filtered = [
         filter_result(
@@ -317,21 +222,10 @@ def filter_results(
     return filtered
 
 
-# ==========================================================
-# Vulnerable Only
-# ==========================================================
-
-
 def vulnerable_only(
     results,
 ) -> list[dict]:
-    """
-    Return vulnerable
-    results.
 
-    Returns:
-        list[dict]
-    """
 
     return [
         result
@@ -340,23 +234,12 @@ def vulnerable_only(
             "vulnerable",
         )
     ]
-
-
-# ==========================================================
-# Safe Only
-# ==========================================================
 
 
 def safe_only(
     results,
 ) -> list[dict]:
-    """
-    Return safe
-    results.
 
-    Returns:
-        list[dict]
-    """
 
     return [
         result
@@ -367,20 +250,10 @@ def safe_only(
     ]
 
 
-# ==========================================================
-# Failed Only
-# ==========================================================
-
-
 def failed_only(
     results,
 ) -> list[dict]:
-    """
-    Return failed scans.
 
-    Returns:
-        list[dict]
-    """
 
     return [
         result
@@ -391,20 +264,10 @@ def failed_only(
     ]
 
 
-# ==========================================================
-# Remove Failed
-# ==========================================================
-
-
 def remove_failed(
     results,
 ) -> list[dict]:
-    """
-    Remove failed scans.
 
-    Returns:
-        list[dict]
-    """
 
     return [
         result
@@ -414,10 +277,6 @@ def remove_failed(
         )
     ]
 
-
-# ==========================================================
-# Export
-# ==========================================================
 
 __all__ = [
     "VALID_PROVIDERS",

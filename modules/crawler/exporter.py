@@ -1,9 +1,3 @@
-"""
-Crawler Exporter
-
-Export crawler results.
-"""
-
 from __future__ import annotations
 
 import csv
@@ -18,15 +12,9 @@ from modules.crawler.constants import (
     SUMMARY_TXT,
 )
 
-# ==========================================================
-# Helpers
-# ==========================================================
-
 
 def create_output_directory() -> None:
-    """
-    Create the crawler output directory.
-    """
+
 
     CRAWLER_OUTPUT_DIR.mkdir(
         parents=True,
@@ -34,17 +22,10 @@ def create_output_directory() -> None:
     )
 
 
-# ==========================================================
-# Export Results (TXT)
-# ==========================================================
-
-
 def export_results_txt(
     analysis: dict[str, Any],
 ) -> None:
-    """
-    Export crawler results as text.
-    """
+
 
     create_output_directory()
 
@@ -73,17 +54,10 @@ def export_results_txt(
             file.write("\n")
 
 
-# ==========================================================
-# Export Results (JSON)
-# ==========================================================
-
-
 def export_results_json(
     analysis: dict[str, Any],
 ) -> None:
-    """
-    Export crawler results as JSON.
-    """
+
 
     create_output_directory()
 
@@ -107,17 +81,10 @@ def export_results_json(
         )
 
 
-# ==========================================================
-# Export Results (CSV)
-# ==========================================================
-
-
 def export_results_csv(
     analysis: dict[str, Any],
 ) -> None:
-    """
-    Export crawler results as CSV.
-    """
+
 
     create_output_directory()
 
@@ -164,17 +131,10 @@ def export_results_csv(
                 )
 
 
-# ==========================================================
-# Export Summary
-# ==========================================================
-
-
 def export_summary(
     analysis: dict[str, Any],
 ) -> None:
-    """
-    Export crawler summary.
-    """
+
 
     create_output_directory()
 
@@ -221,17 +181,10 @@ def export_summary(
             file.write(f"{host:<40}{count}\n")
 
 
-# ==========================================================
-# Export All
-# ==========================================================
-
-
 def export_all(
     analysis: dict[str, Any],
 ) -> None:
-    """
-    Export all crawler output files.
-    """
+
 
     export_results_txt(
         analysis,
@@ -249,10 +202,6 @@ def export_all(
         analysis,
     )
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "export_all",

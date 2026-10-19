@@ -1,12 +1,3 @@
-#!/usr/bin/env python3
-
-"""
-CDN Manager
-
-Coordinates the complete
-CDN Detection pipeline.
-"""
-
 from __future__ import annotations
 
 from typing import Any
@@ -26,18 +17,12 @@ from .helpers import (
 )
 from .target_analyzer import analyze_target
 
-# ==========================================================
-# Run CDN Detection
-# ==========================================================
-
 
 def run_cdn_detection(
     context: ExecutionContext,
     targets: list[str],
 ) -> dict[str, Any]:
-    """
-    Run the complete CDN detection workflow.
-    """
+
 
     if not targets:
 
@@ -120,28 +105,17 @@ def run_cdn_detection(
     return analysis
 
 
-# ==========================================================
-# Public Entry Point
-# ==========================================================
-
-
 def run(
     context: ExecutionContext,
     targets: list[str],
 ) -> dict[str, Any]:
-    """
-    Public entry point for the CDN module.
-    """
+
 
     return run_cdn_detection(
         context,
         targets,
     )
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "run",

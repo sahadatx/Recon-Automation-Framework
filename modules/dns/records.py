@@ -1,24 +1,9 @@
-"""
-DNS Records
-
-Resolve common DNS records.
-
-Author : Sahadat Hossain
-Project : Recon Automation Framework
-"""
-
 from modules.dns.helpers import resolve_record, show_lookup
 from modules.dns.resolver import resolve_a, resolve_aaaa
 
-# ==========================================================
-# Resolve MX
-# ==========================================================
-
 
 def resolve_mx(domain: str) -> list[str]:
-    """
-    Resolve MX records.
-    """
+
 
     show_lookup(domain, "MX")
 
@@ -28,15 +13,8 @@ def resolve_mx(domain: str) -> list[str]:
     )
 
 
-# ==========================================================
-# Resolve NS
-# ==========================================================
-
-
 def resolve_ns(domain: str) -> list[str]:
-    """
-    Resolve NS records.
-    """
+
 
     show_lookup(domain, "NS")
 
@@ -46,15 +24,8 @@ def resolve_ns(domain: str) -> list[str]:
     )
 
 
-# ==========================================================
-# Resolve TXT
-# ==========================================================
-
-
 def resolve_txt(domain: str) -> list[str]:
-    """
-    Resolve TXT records.
-    """
+
 
     show_lookup(domain, "TXT")
 
@@ -64,15 +35,8 @@ def resolve_txt(domain: str) -> list[str]:
     )
 
 
-# ==========================================================
-# Resolve SOA
-# ==========================================================
-
-
 def resolve_soa(domain: str) -> list[str]:
-    """
-    Resolve SOA records.
-    """
+
 
     show_lookup(domain, "SOA")
 
@@ -82,15 +46,8 @@ def resolve_soa(domain: str) -> list[str]:
     )
 
 
-# ==========================================================
-# Resolve CNAME
-# ==========================================================
-
-
 def resolve_cname(domain: str) -> list[str]:
-    """
-    Resolve CNAME records.
-    """
+
 
     show_lookup(domain, "CNAME")
 
@@ -100,15 +57,8 @@ def resolve_cname(domain: str) -> list[str]:
     )
 
 
-# ==========================================================
-# Resolve All DNS Records
-# ==========================================================
-
-
 def resolve_all_records(domain: str) -> dict:
-    """
-    Resolve all supported DNS records.
-    """
+
 
     return {
         "A": resolve_a(domain),

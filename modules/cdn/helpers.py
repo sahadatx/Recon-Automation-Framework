@@ -1,10 +1,3 @@
-"""
-CDN Helpers
-
-Reusable helper functions for
-CDN Detection.
-"""
-
 from __future__ import annotations
 
 import socket
@@ -19,28 +12,14 @@ from core.context import ExecutionContext
 
 from .constants import DEFAULT_ANALYSIS, DEFAULT_HEADERS
 
-# ==========================================================
-# Default Result
-# ==========================================================
 
 EMPTY_CDN_RESULT = deepcopy(DEFAULT_ANALYSIS)
-
-
-# ==========================================================
-# Normalize Target
-# ==========================================================
 
 
 def normalize_target(
     target: str,
 ):
-    """
-    Normalize target into
-    hostname.
 
-    Returns:
-        str
-    """
 
     if not target:
 
@@ -59,20 +38,10 @@ def normalize_target(
     return parsed.hostname or ""
 
 
-# ==========================================================
-# Resolve IPv4
-# ==========================================================
-
-
 def resolve_ipv4(
     host: str,
 ):
-    """
-    Resolve IPv4 address.
 
-    Returns:
-        str | None
-    """
 
     try:
 
@@ -85,22 +54,11 @@ def resolve_ipv4(
         return None
 
 
-# ==========================================================
-# HTTP Request
-# ==========================================================
-
-
 def request_headers(
     context: ExecutionContext,
     target: str,
 ):
-    """
-    Send HTTP request using the
-    shared HTTP session.
 
-    Returns:
-        requests.Response | None
-    """
 
     session = context.get_http_session()
 
@@ -123,20 +81,10 @@ def request_headers(
         return None
 
 
-# ==========================================================
-# Response Headers
-# ==========================================================
-
-
 def extract_headers(
     response,
 ):
-    """
-    Extract response headers.
 
-    Returns:
-        dict
-    """
 
     if response is None:
 
@@ -145,20 +93,10 @@ def extract_headers(
     return dict(response.headers)
 
 
-# ==========================================================
-# DNS CNAME
-# ==========================================================
-
-
 def resolve_cname(
     host: str,
 ):
-    """
-    Resolve CNAME record.
 
-    Returns:
-        str | None
-    """
 
     try:
 
@@ -174,40 +112,19 @@ def resolve_cname(
         return None
 
 
-# ==========================================================
-# Header Exists
-# ==========================================================
-
-
 def header_exists(
     headers: dict[str, Any],
     header: str,
 ):
-    """
-    Check whether a header
-    exists.
 
-    Returns:
-        bool
-    """
 
     return header.lower() in {key.lower() for key in headers}
-
-
-# ==========================================================
-# Server Header
-# ==========================================================
 
 
 def get_server_header(
     headers: dict[str, Any],
 ):
-    """
-    Extract Server header.
 
-    Returns:
-        str
-    """
 
     for key, value in headers.items():
 
@@ -220,21 +137,10 @@ def get_server_header(
     return ""
 
 
-# ==========================================================
-# Cache Headers
-# ==========================================================
-
-
 def get_cache_headers(
     headers: dict[str, Any],
 ):
-    """
-    Extract cache-related
-    headers.
 
-    Returns:
-        dict
-    """
 
     cache_headers = {}
 
@@ -249,21 +155,10 @@ def get_cache_headers(
     return cache_headers
 
 
-# ==========================================================
-# Safe Lower
-# ==========================================================
-
-
 def safe_lower(
     value: Any,
 ):
-    """
-    Safely convert value
-    to lowercase string.
 
-    Returns:
-        str
-    """
 
     if value is None:
 
@@ -274,21 +169,10 @@ def safe_lower(
     ).lower()
 
 
-# ==========================================================
-# Merge Detection Methods
-# ==========================================================
-
-
 def merge_methods(
     *methods,
 ):
-    """
-    Merge detection methods
-    without duplicates.
 
-    Returns:
-        list[str]
-    """
 
     merged = []
 
@@ -309,25 +193,11 @@ def merge_methods(
     return merged
 
 
-# ==========================================================
-# Deep Copy Result
-# ==========================================================
-
-
 def create_result():
-    """
-    Create empty CDN result.
 
-    Returns:
-        dict
-    """
 
     return deepcopy(EMPTY_CDN_RESULT)
 
-
-# ==========================================================
-# Export
-# ==========================================================
 
 __all__ = [
     "EMPTY_CDN_RESULT",

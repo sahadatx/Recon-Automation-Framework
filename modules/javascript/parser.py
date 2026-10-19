@@ -1,10 +1,3 @@
-"""
-JavaScript Parser
-
-Reads downloaded JavaScript files and
-coordinates the extraction pipeline.
-"""
-
 from __future__ import annotations
 
 from pathlib import Path
@@ -19,20 +12,11 @@ from modules.javascript.extractors import (
     generate_statistics,
 )
 
-# ==========================================================
-# Read JavaScript File
-# ==========================================================
-
 
 def read_javascript(
     filepath: str | Path,
 ) -> str | None:
-    """
-    Read a JavaScript file.
 
-    Returns:
-        str | None
-    """
 
     path = Path(filepath)
 
@@ -56,20 +40,10 @@ def read_javascript(
         return None
 
 
-# ==========================================================
-# Parse One File
-# ==========================================================
-
-
 def parse_file(
     filepath: str | Path,
 ) -> dict | None:
-    """
-    Parse one JavaScript file.
 
-    Returns:
-        dict | None
-    """
 
     debug(f"Parsing {filepath}")
 
@@ -79,9 +53,6 @@ def parse_file(
 
         return None
 
-    # ------------------------------------------------------
-    # URL Extraction
-    # ------------------------------------------------------
 
     try:
 
@@ -93,9 +64,6 @@ def parse_file(
 
         urls = []
 
-    # ------------------------------------------------------
-    # Comment Extraction
-    # ------------------------------------------------------
 
     try:
 
@@ -107,9 +75,6 @@ def parse_file(
 
         comments = []
 
-    # ------------------------------------------------------
-    # String Extraction
-    # ------------------------------------------------------
 
     try:
 
@@ -121,9 +86,6 @@ def parse_file(
 
         strings = []
 
-    # ------------------------------------------------------
-    # Source Map Extraction
-    # ------------------------------------------------------
 
     try:
 
@@ -135,9 +97,6 @@ def parse_file(
 
         source_maps = []
 
-    # ------------------------------------------------------
-    # Endpoint Extraction
-    # ------------------------------------------------------
 
     try:
 
@@ -169,26 +128,13 @@ def parse_file(
     }
 
 
-# ==========================================================
-# Parse Multiple Files
-# ==========================================================
-
-
 def parse_multiple(
     files: list[str | Path],
 ) -> tuple[
     dict[str, dict],
     list[str | Path],
 ]:
-    """
-    Parse multiple JavaScript files.
 
-    Returns:
-        tuple(
-            results,
-            failed,
-        )
-    """
 
     results: dict[str, dict] = {}
 
@@ -212,33 +158,16 @@ def parse_multiple(
     )
 
 
-# ==========================================================
-# Entry Point
-# ==========================================================
-
-
 def parse_javascript(
     files: list[str | Path],
 ) -> tuple[
     dict[str, dict],
     list[str | Path],
 ]:
-    """
-    JavaScript parser entry point.
 
-    Returns:
-        tuple(
-            results,
-            failed,
-        )
-    """
 
     return parse_multiple(files)
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "read_javascript",

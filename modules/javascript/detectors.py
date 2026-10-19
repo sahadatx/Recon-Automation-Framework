@@ -1,19 +1,9 @@
-"""
-JavaScript Secret Detector
-
-Detects secrets from JavaScript source code
-using the configured regex database.
-"""
-
 from __future__ import annotations
 
 from core.logger import warning
 from modules.javascript.filters import filter_findings
 from modules.javascript.secrets import SECRET_PATTERNS
 
-# ==========================================================
-# Empty Result
-# ==========================================================
 
 EMPTY_RESULT = {
     "findings": {},
@@ -24,20 +14,10 @@ EMPTY_RESULT = {
 }
 
 
-# ==========================================================
-# Normalize Matches
-# ==========================================================
-
-
 def normalize_matches(
     matches,
 ) -> list[str]:
-    """
-    Normalize regex matches.
 
-    Returns:
-        list[str]
-    """
 
     normalized: set[str] = set()
 
@@ -64,21 +44,11 @@ def normalize_matches(
     return sorted(normalized)
 
 
-# ==========================================================
-# Detect Pattern
-# ==========================================================
-
-
 def detect_pattern(
     content: str,
     pattern,
 ) -> list[str]:
-    """
-    Detect one regex pattern.
 
-    Returns:
-        list[str]
-    """
 
     try:
 
@@ -91,21 +61,10 @@ def detect_pattern(
         return []
 
 
-# ==========================================================
-# Detect Secrets
-# ==========================================================
-
-
 def detect_secrets(
     content: str,
 ) -> dict[str, list[str]]:
-    """
-    Detect every supported
-    secret type.
 
-    Returns:
-        dict[str, list[str]]
-    """
 
     findings: dict[str, list[str]] = {}
 
@@ -123,20 +82,10 @@ def detect_secrets(
     return findings
 
 
-# ==========================================================
-# Generate Statistics
-# ==========================================================
-
-
 def generate_statistics(
     findings: dict[str, list[str]],
 ) -> dict[str, int]:
-    """
-    Generate secret detection statistics.
 
-    Returns:
-        dict[str, int]
-    """
 
     return {
         "secret_types": len(findings),
@@ -144,56 +93,20 @@ def generate_statistics(
     }
 
 
-# ==========================================================
-# Process Findings
-# ==========================================================
-
-
 def process_findings(
     content: str,
 ) -> dict[str, list[str]]:
-    """
-    Secret detection pipeline.
 
-        Regex
-           ↓
-        Normalize
-           ↓
-        False Positive Filter
-
-    Returns:
-        dict[str, list[str]]
-    """
 
     findings = detect_secrets(content)
 
     return filter_findings(findings)
 
 
-# ==========================================================
-# Scan Content
-# ==========================================================
-
-
 def scan_content(
     content: str,
 ) -> dict:
-    """
-    Scan JavaScript content.
 
-    Workflow
-
-        Detect Secrets
-              ↓
-        Normalize
-              ↓
-        False Positive Filter
-              ↓
-        Statistics
-
-    Returns:
-        dict
-    """
 
     if not content:
 
@@ -214,10 +127,6 @@ def scan_content(
         "statistics": generate_statistics(findings),
     }
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "EMPTY_RESULT",

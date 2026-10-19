@@ -1,28 +1,10 @@
-"""
-Crawler Filters
-
-Filtering and normalization utilities used by the
-URL Discovery module.
-"""
-
 from urllib.parse import urlparse, urlunparse
-
-# ==========================================================
-# Remove Fragment
-# ==========================================================
 
 
 def remove_fragment(
     url: str,
 ):
-    """
-    Remove URL fragment.
 
-    Example:
-        https://site.com/page#about
-            ->
-        https://site.com/page
-    """
 
     parsed = urlparse(url)
 
@@ -31,22 +13,10 @@ def remove_fragment(
     return urlunparse(parsed)
 
 
-# ==========================================================
-# Remove Trailing Slash
-# ==========================================================
-
-
 def remove_trailing_slash(
     url: str,
 ):
-    """
-    Remove trailing slash.
 
-    Example:
-        https://site.com/page/
-            ->
-        https://site.com/page
-    """
 
     parsed = urlparse(url)
 
@@ -61,25 +31,10 @@ def remove_trailing_slash(
     return urlunparse(parsed)
 
 
-# ==========================================================
-# Normalize URL
-# ==========================================================
-
-
 def normalize_url(
     url: str,
 ):
-    """
-    Normalize URL.
 
-    Steps:
-
-        • Remove fragment
-        • Remove trailing slash
-
-    Returns:
-        str
-    """
 
     url = remove_fragment(url)
 
@@ -88,41 +43,19 @@ def normalize_url(
     return url
 
 
-# ==========================================================
-# Same Domain
-# ==========================================================
-
-
 def same_domain(
     root_url: str,
     url: str,
 ):
-    """
-    Check whether URL belongs
-    to the same domain.
 
-    Returns:
-        bool
-    """
 
     return urlparse(root_url).netloc == urlparse(url).netloc
-
-
-# ==========================================================
-# Is HTTP URL
-# ==========================================================
 
 
 def is_http_url(
     url: str,
 ):
-    """
-    Check whether URL uses
-    HTTP or HTTPS.
 
-    Returns:
-        bool
-    """
 
     scheme = urlparse(url).scheme.lower()
 
@@ -131,10 +64,6 @@ def is_http_url(
         "https",
     )
 
-
-# ==========================================================
-# Ignored Extensions
-# ==========================================================
 
 IGNORED_EXTENSIONS = {
     ".jpg",
@@ -166,41 +95,21 @@ IGNORED_EXTENSIONS = {
 }
 
 
-# ==========================================================
-# Extension Filter
-# ==========================================================
-
-
 def extension_filter(
     url: str,
 ):
-    """
-    Skip unwanted file extensions.
 
-    Returns:
-        bool
-    """
 
     path = urlparse(url).path.lower()
 
     return not any(path.endswith(extension) for extension in IGNORED_EXTENSIONS)
 
 
-# ==========================================================
-# Robots Filter
-# ==========================================================
-
-
 def robots_filter(
     url: str,
     rules: list[str],
 ):
-    """
-    Check robots.txt disallow rules.
 
-    Returns:
-        bool
-    """
 
     if not rules:
 
@@ -217,47 +126,22 @@ def robots_filter(
     return True
 
 
-# ==========================================================
-# Duplicate Filter
-# ==========================================================
-
-
 def duplicate_filter(
     url: str,
     visited: set,
 ):
-    """
-    Skip visited URLs.
 
-    Returns:
-        bool
-    """
 
     return url not in visited
-
-
-# ==========================================================
-# Depth Filter
-# ==========================================================
 
 
 def depth_filter(
     depth: int,
     max_depth: int,
 ):
-    """
-    Check crawl depth.
 
-    Returns:
-        bool
-    """
 
     return depth <= max_depth
-
-
-# ==========================================================
-# Should Enqueue
-# ==========================================================
 
 
 def should_enqueue(
@@ -268,13 +152,7 @@ def should_enqueue(
     depth: int,
     max_depth: int,
 ):
-    """
-    Decide whether URL should be
-    added into crawl queue.
 
-    Returns:
-        bool
-    """
 
     url = normalize_url(url)
 
@@ -321,22 +199,11 @@ def should_enqueue(
     return True
 
 
-# ==========================================================
-# Should Crawl
-# ==========================================================
-
-
 def should_crawl(
     url: str,
     visited: set,
 ):
-    """
-    Check whether URL should
-    be crawled.
 
-    Returns:
-        bool
-    """
 
     url = normalize_url(url)
 
@@ -356,20 +223,10 @@ def should_crawl(
     return True
 
 
-# ==========================================================
-# Normalize URL List
-# ==========================================================
-
-
 def normalize_urls(
     urls: list[str],
 ):
-    """
-    Normalize and deduplicate URLs.
 
-    Returns:
-        list[str]
-    """
 
     normalized = {normalize_url(url) for url in urls if is_http_url(url)}
 

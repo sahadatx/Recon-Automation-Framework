@@ -1,10 +1,3 @@
-"""
-Chaos Module
-
-Passive subdomain enumeration using
-ProjectDiscovery Chaos.
-"""
-
 from __future__ import annotations
 
 import os
@@ -19,21 +12,8 @@ def run_chaos(
     context: ExecutionContext,
     domain: str,
 ) -> list[str]:
-    """
-    Run ProjectDiscovery Chaos.
 
-    Args:
-        context:
-            Shared execution context.
 
-        domain:
-            Target domain.
-
-    Returns:
-        List of discovered subdomains.
-    """
-
-    # Reserved for future use.
     _ = context
 
     if not PDCP_API_KEY:

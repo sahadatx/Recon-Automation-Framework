@@ -1,12 +1,3 @@
-#!/usr/bin/env python3
-
-"""
-Plugin Base Class
-
-Defines the common interface for all
-Recon Automation Framework plugins.
-"""
-
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
@@ -14,35 +5,9 @@ from typing import Any, ClassVar
 
 from core.context import ExecutionContext
 
-# ==========================================================
-# Base Plugin
-# ==========================================================
-
 
 class BasePlugin(ABC):
-    """
-    Abstract base class for all framework plugins.
 
-    Plugin Lifecycle
-
-        initialize()
-              ↓
-        before_run()
-              ↓
-            run()
-              ↓
-        after_run()
-              ↓
-        before_export()
-              ↓
-        after_export()
-              ↓
-          shutdown()
-    """
-
-    # ------------------------------------------------------
-    # Metadata
-    # ------------------------------------------------------
 
     name: ClassVar[str] = ""
 
@@ -52,9 +17,6 @@ class BasePlugin(ABC):
 
     description: ClassVar[str] = ""
 
-    # ------------------------------------------------------
-    # Configuration
-    # ------------------------------------------------------
 
     enabled: ClassVar[bool] = True
 
@@ -62,15 +24,9 @@ class BasePlugin(ABC):
 
     config: ClassVar[dict[str, Any]] = {}
 
-    # ======================================================
-    # Lifecycle Hooks
-    # ======================================================
 
     def initialize(self) -> None:
-        """
-        Called once after the plugin
-        is registered.
-        """
+
 
         pass
 
@@ -78,10 +34,7 @@ class BasePlugin(ABC):
         self,
         context: ExecutionContext,
     ) -> None:
-        """
-        Called immediately before
-        plugin execution.
-        """
+
 
         pass
 
@@ -92,12 +45,7 @@ class BasePlugin(ABC):
         *args: Any,
         **kwargs: Any,
     ) -> dict[str, Any]:
-        """
-        Execute the plugin.
 
-        Returns:
-            Analysis dictionary.
-        """
 
         raise NotImplementedError
 
@@ -106,10 +54,7 @@ class BasePlugin(ABC):
         context: ExecutionContext,
         result: dict[str, Any],
     ) -> None:
-        """
-        Called immediately after
-        plugin execution.
-        """
+
 
         pass
 
@@ -117,10 +62,7 @@ class BasePlugin(ABC):
         self,
         result: dict[str, Any],
     ) -> None:
-        """
-        Called immediately before
-        exporting analysis.
-        """
+
 
         pass
 
@@ -128,25 +70,15 @@ class BasePlugin(ABC):
         self,
         result: dict[str, Any],
     ) -> None:
-        """
-        Called immediately after
-        exporting analysis.
-        """
+
 
         pass
 
     def shutdown(self) -> None:
-        """
-        Called once before the
-        framework exits.
-        """
+
 
         pass
 
-
-# ==========================================================
-# Public API
-# ==========================================================
 
 __all__ = [
     "BasePlugin",

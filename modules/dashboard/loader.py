@@ -1,9 +1,3 @@
-"""
-Dashboard Loader
-
-Load the generated report for the Dashboard module.
-"""
-
 from __future__ import annotations
 
 import json
@@ -13,18 +7,9 @@ from core.logger import warning
 
 from .constants import REPORT_FILE
 
-# ==========================================================
-# Load Report
-# ==========================================================
-
 
 def load_report() -> dict[str, Any]:
-    """
-    Load the generated report.
 
-    Returns:
-        Parsed report data.
-    """
 
     if not REPORT_FILE.exists():
 
@@ -54,10 +39,6 @@ def load_report() -> dict[str, Any]:
 
         return {}
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "load_report",

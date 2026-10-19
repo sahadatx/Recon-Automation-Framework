@@ -1,15 +1,5 @@
-"""
-Nuclei Template Manager
-
-Manages built-in and custom
-Nuclei template profiles.
-"""
-
 from pathlib import Path
 
-# ==========================================================
-# Built-in Profiles
-# ==========================================================
 
 DEFAULT = [
     "http/exposures",
@@ -65,10 +55,6 @@ FULL = [
 ]
 
 
-# ==========================================================
-# Available Profiles
-# ==========================================================
-
 AVAILABLE_PROFILES = {
     "default": DEFAULT,
     "fast": FAST,
@@ -86,17 +72,10 @@ AVAILABLE_PROFILES = {
 }
 
 
-# ==========================================================
-# Validation
-# ==========================================================
-
-
 def validate_directory(
     path: Path,
 ):
-    """
-    Validate directory.
-    """
+
 
     return path.exists() and path.is_dir()
 
@@ -104,9 +83,7 @@ def validate_directory(
 def validate_file(
     path: Path,
 ):
-    """
-    Validate file.
-    """
+
 
     return path.exists() and path.is_file()
 
@@ -114,58 +91,24 @@ def validate_file(
 def validate_profile(
     profile: str,
 ):
-    """
-    Validate profile.
-    """
+
 
     return profile.lower() in AVAILABLE_PROFILES
-
-
-# ==========================================================
-# Resolve Templates
-# ==========================================================
 
 
 def resolve_templates(
     templates: list[str],
 ):
-    """
-    Return template list.
 
-    Nuclei resolves built-in
-    template paths itself.
-    """
 
     return list(templates)
-
-
-# ==========================================================
-# Get Templates
-# ==========================================================
 
 
 def get_templates(
     profile: str = "default",
     custom: str | None = None,
 ):
-    """
-    Return template list.
 
-    Args:
-        profile:
-            Built-in profile.
-
-        custom:
-            Custom template file
-            or directory.
-
-    Returns:
-        list[str | Path]
-    """
-
-    # ------------------------------------------------------
-    # Custom Template
-    # ------------------------------------------------------
 
     if custom:
 
@@ -185,9 +128,6 @@ def get_templates(
 
         raise FileNotFoundError(f"Template not found: {path}")
 
-    # ------------------------------------------------------
-    # Built-in Profile
-    # ------------------------------------------------------
 
     profile = profile.lower()
 
@@ -198,31 +138,16 @@ def get_templates(
     return resolve_templates(AVAILABLE_PROFILES[profile])
 
 
-# ==========================================================
-# List Profiles
-# ==========================================================
-
-
 def list_profiles():
-    """
-    Return available profiles.
-    """
+
 
     return sorted(AVAILABLE_PROFILES.keys())
-
-
-# ==========================================================
-# List Templates
-# ==========================================================
 
 
 def list_templates(
     profile: str = "default",
 ):
-    """
-    Return templates for
-    one profile.
-    """
+
 
     if not validate_profile(profile):
 
@@ -231,16 +156,8 @@ def list_templates(
     return list(AVAILABLE_PROFILES[profile.lower()])
 
 
-# ==========================================================
-# List Categories
-# ==========================================================
-
-
 def list_categories():
-    """
-    Return all unique
-    template categories.
-    """
+
 
     categories = set()
 
@@ -251,37 +168,19 @@ def list_categories():
     return sorted(categories)
 
 
-# ==========================================================
-# Template Exists
-# ==========================================================
-
-
 def template_exists(
     profile: str = "default",
 ):
-    """
-    Check profile exists.
-    """
+
 
     return validate_profile(profile)
 
 
-# ==========================================================
-# Default Profile
-# ==========================================================
-
-
 def default_profile():
-    """
-    Return default profile.
-    """
+
 
     return "default"
 
-
-# ==========================================================
-# Self Test
-# ==========================================================
 
 if __name__ == "__main__":
 

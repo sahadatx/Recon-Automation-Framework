@@ -1,18 +1,9 @@
-"""
-TLS Cipher Analysis
-
-Cipher suite detection and analysis.
-"""
-
 from __future__ import annotations
 
 from copy import deepcopy
 
 from .helpers import connect_tls
 
-# ==========================================================
-# Default Result
-# ==========================================================
 
 EMPTY_CIPHER = {
     "host": "",
@@ -32,10 +23,6 @@ EMPTY_CIPHER = {
     "error": None,
 }
 
-
-# ==========================================================
-# Cipher Keyword Database
-# ==========================================================
 
 WEAK_KEYWORDS = (
     "RC4",
@@ -59,10 +46,6 @@ AEAD_KEYWORDS = (
 )
 
 
-# ==========================================================
-# TLS Version Mapping
-# ==========================================================
-
 TLS_VERSION_MAP = {
     "TLSv1": "TLS 1.0",
     "TLSv1.1": "TLS 1.1",
@@ -71,18 +54,11 @@ TLS_VERSION_MAP = {
 }
 
 
-# ==========================================================
-# Helper Functions
-# ==========================================================
-
-
 def contains_keyword(
     text: str,
     keywords,
 ):
-    """
-    Case-insensitive keyword search.
-    """
+
 
     if not text:
 
@@ -96,20 +72,7 @@ def contains_keyword(
 def split_cipher(
     cipher_name: str,
 ):
-    """
-    Split cipher suite into parts.
 
-    Example
-
-    TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-
-    ->
-    (
-        ECDHE_RSA,
-        AES_256_GCM,
-        SHA384,
-    )
-    """
 
     if "_WITH_" not in cipher_name:
 
@@ -157,22 +120,11 @@ def split_cipher(
     )
 
 
-# ==========================================================
-# Detect Cipher
-# ==========================================================
-
-
 def detect_cipher(
     host: str,
     port: int = 443,
 ):
-    """
-    Perform TLS handshake
-    and return negotiated cipher.
 
-    Returns:
-        tuple | None
-    """
 
     tls = None
 
@@ -192,17 +144,10 @@ def detect_cipher(
             tls.close()
 
 
-# ==========================================================
-# Cipher Name
-# ==========================================================
-
-
 def cipher_name(
     cipher,
 ):
-    """
-    Return cipher name.
-    """
+
 
     if not cipher:
 
@@ -211,17 +156,10 @@ def cipher_name(
     return cipher[0]
 
 
-# ==========================================================
-# Cipher Protocol
-# ==========================================================
-
-
 def cipher_protocol(
     cipher,
 ):
-    """
-    Return TLS protocol.
-    """
+
 
     if not cipher:
 
@@ -235,17 +173,10 @@ def cipher_protocol(
     )
 
 
-# ==========================================================
-# Cipher Bits
-# ==========================================================
-
-
 def cipher_bits(
     cipher,
 ):
-    """
-    Return key length.
-    """
+
 
     if not cipher:
 
@@ -262,17 +193,10 @@ def cipher_bits(
         return 0
 
 
-# ==========================================================
-# Key Exchange
-# ==========================================================
-
-
 def key_exchange(
     cipher_name: str,
 ):
-    """
-    Detect key exchange algorithm.
-    """
+
 
     exchange, _, _ = split_cipher(
         cipher_name,
@@ -285,17 +209,10 @@ def key_exchange(
     return exchange
 
 
-# ==========================================================
-# Authentication
-# ==========================================================
-
-
 def authentication(
     cipher_name: str,
 ):
-    """
-    Detect authentication algorithm.
-    """
+
 
     exchange = key_exchange(
         cipher_name,
@@ -318,17 +235,10 @@ def authentication(
     return "Unknown"
 
 
-# ==========================================================
-# Encryption Algorithm
-# ==========================================================
-
-
 def encryption_algorithm(
     cipher_name: str,
 ):
-    """
-    Detect encryption algorithm.
-    """
+
 
     _, encryption, _ = split_cipher(
         cipher_name,
@@ -341,17 +251,10 @@ def encryption_algorithm(
     return encryption
 
 
-# ==========================================================
-# Hash Algorithm
-# ==========================================================
-
-
 def hash_algorithm(
     cipher_name: str,
 ):
-    """
-    Detect hash algorithm.
-    """
+
 
     _, _, digest = split_cipher(
         cipher_name,
@@ -364,18 +267,11 @@ def hash_algorithm(
     return digest
 
 
-# ==========================================================
-# Forward Secrecy
-# ==========================================================
-
-
 def forward_secrecy(
     cipher_name: str,
     protocol: str,
 ):
-    """
-    Detect Forward Secrecy.
-    """
+
 
     if protocol in (
         "TLS 1.3",
@@ -390,17 +286,10 @@ def forward_secrecy(
     )
 
 
-# ==========================================================
-# AEAD Cipher
-# ==========================================================
-
-
 def is_aead_cipher(
     cipher_name: str,
 ):
-    """
-    Detect AEAD cipher.
-    """
+
 
     return contains_keyword(
         cipher_name,
@@ -408,17 +297,10 @@ def is_aead_cipher(
     )
 
 
-# ==========================================================
-# Weak Cipher
-# ==========================================================
-
-
 def is_weak_cipher(
     cipher_name: str,
 ):
-    """
-    Detect weak cipher.
-    """
+
 
     return contains_keyword(
         cipher_name,
@@ -426,18 +308,11 @@ def is_weak_cipher(
     )
 
 
-# ==========================================================
-# Cipher Strength
-# ==========================================================
-
-
 def cipher_strength(
     cipher_name: str,
     bits: int,
 ):
-    """
-    Determine cipher strength.
-    """
+
 
     if is_weak_cipher(
         cipher_name,
@@ -464,21 +339,11 @@ def cipher_strength(
     return "Unknown"
 
 
-# ==========================================================
-# Collect Cipher
-# ==========================================================
-
-
 def collect_cipher(
     host: str,
     port: int = 443,
 ):
-    """
-    Collect negotiated cipher information.
 
-    Returns:
-        dict
-    """
 
     result = deepcopy(
         EMPTY_CIPHER,
@@ -562,20 +427,10 @@ def collect_cipher(
     return result
 
 
-# ==========================================================
-# Cipher Summary
-# ==========================================================
-
-
 def cipher_summary(
     cipher_data: dict,
 ):
-    """
-    Generate cipher summary.
 
-    Returns:
-        dict
-    """
 
     if not cipher_data:
 
@@ -612,10 +467,6 @@ def cipher_summary(
         ),
     }
 
-
-# ==========================================================
-# Export
-# ==========================================================
 
 __all__ = [
     "EMPTY_CIPHER",

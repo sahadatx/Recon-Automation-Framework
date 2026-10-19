@@ -1,17 +1,7 @@
-"""
-JavaScript Secret Filters
-
-Removes false positives from
-detected JavaScript secrets.
-"""
-
 from __future__ import annotations
 
 import re
 
-# ==========================================================
-# Placeholder Values
-# ==========================================================
 
 PLACEHOLDERS = {
     "",
@@ -34,84 +24,37 @@ PLACEHOLDERS = {
 }
 
 
-# ==========================================================
-# Minimum Secret Length
-# ==========================================================
-
 MIN_SECRET_LENGTH = 20
-
-
-# ==========================================================
-# Empty Value
-# ==========================================================
 
 
 def is_empty(
     value: str,
 ) -> bool:
-    """
-    Check whether a value is empty.
 
-    Returns:
-        bool
-    """
 
     return not value.strip()
-
-
-# ==========================================================
-# Placeholder Value
-# ==========================================================
 
 
 def is_placeholder(
     value: str,
 ) -> bool:
-    """
-    Check whether a value is
-    a known placeholder.
 
-    Returns:
-        bool
-    """
 
     return value.strip().lower() in PLACEHOLDERS
-
-
-# ==========================================================
-# Too Short
-# ==========================================================
 
 
 def is_short(
     value: str,
 ) -> bool:
-    """
-    Check whether a value is
-    shorter than the minimum
-    secret length.
 
-    Returns:
-        bool
-    """
 
     return len(value.strip()) < MIN_SECRET_LENGTH
-
-
-# ==========================================================
-# Base64 Noise
-# ==========================================================
 
 
 def is_base64_noise(
     value: str,
 ) -> bool:
-    """
-    Ignore generic Base64 strings.
 
-    Returns:
-        bool
-    """
 
     return (
         re.fullmatch(
@@ -122,42 +65,18 @@ def is_base64_noise(
     )
 
 
-# ==========================================================
-# Repeated Characters
-# ==========================================================
-
-
 def is_repeated(
     value: str,
 ) -> bool:
-    """
-    Detect repeated characters.
 
-    Examples:
-        aaaaaaaaaaaaa
-        111111111111
-
-    Returns:
-        bool
-    """
 
     return len(set(value)) <= 2
-
-
-# ==========================================================
-# Generic API Key Validation
-# ==========================================================
 
 
 def is_generic_noise(
     value: str,
 ) -> bool:
-    """
-    Detect weak generic API keys.
 
-    Returns:
-        bool
-    """
 
     has_letter = any(char.isalpha() for char in value)
 
@@ -166,41 +85,19 @@ def is_generic_noise(
     return not (has_letter and has_digit)
 
 
-# ==========================================================
-# JWT Validation
-# ==========================================================
-
-
 def is_valid_jwt(
     value: str,
 ) -> bool:
-    """
-    JWT must contain
-    three sections.
 
-    Returns:
-        bool
-    """
 
     return value.count(".") == 2
-
-
-# ==========================================================
-# Keep Secret
-# ==========================================================
 
 
 def keep_secret(
     secret_type: str,
     value: str,
 ) -> bool:
-    """
-    Decide whether a detected
-    secret should be kept.
 
-    Returns:
-        bool
-    """
 
     if is_empty(value):
 
@@ -233,21 +130,10 @@ def keep_secret(
     return True
 
 
-# ==========================================================
-# Filter Findings
-# ==========================================================
-
-
 def filter_findings(
     findings: dict[str, list[str]],
 ) -> dict[str, list[str]]:
-    """
-    Remove false positives from
-    detected secrets.
 
-    Returns:
-        dict[str, list[str]]
-    """
 
     filtered: dict[str, list[str]] = {}
 
@@ -270,10 +156,6 @@ def filter_findings(
 
     return filtered
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "MIN_SECRET_LENGTH",

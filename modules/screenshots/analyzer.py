@@ -1,34 +1,14 @@
-"""
-Screenshot Analyzer
-
-Analyze screenshot capture results
-and generate final analysis report.
-"""
-
 from __future__ import annotations
 
 from typing import Any
 
 from modules.screenshots.statistics import generate_statistics
 
-# ==========================================================
-# Analyze Screenshot Results
-# ==========================================================
-
 
 def analyze(
     results: list[dict[str, Any]],
 ) -> dict[str, Any]:
-    """
-    Analyze screenshot results.
 
-    Args:
-        results:
-            Screenshot capture results.
-
-    Returns:
-        Screenshot analysis.
-    """
 
     return {
         "results": results,
@@ -38,24 +18,10 @@ def analyze(
     }
 
 
-# ==========================================================
-# Filter Successful Screenshots
-# ==========================================================
-
-
 def get_successful_screenshots(
     analysis: dict[str, Any],
 ) -> list[dict[str, Any]]:
-    """
-    Return successfully captured screenshots.
 
-    Args:
-        analysis:
-            Screenshot analysis.
-
-    Returns:
-        List of successful captures.
-    """
 
     return [
         result
@@ -70,24 +36,10 @@ def get_successful_screenshots(
     ]
 
 
-# ==========================================================
-# Filter Failed Screenshots
-# ==========================================================
-
-
 def get_failed_screenshots(
     analysis: dict[str, Any],
 ) -> list[dict[str, Any]]:
-    """
-    Return failed screenshot captures.
 
-    Args:
-        analysis:
-            Screenshot analysis.
-
-    Returns:
-        List of failed captures.
-    """
 
     return [
         result
@@ -102,24 +54,10 @@ def get_failed_screenshots(
     ]
 
 
-# ==========================================================
-# Build Dashboard Data
-# ==========================================================
-
-
 def dashboard_data(
     analysis: dict[str, Any],
 ) -> dict[str, Any]:
-    """
-    Prepare dashboard-friendly data.
 
-    Args:
-        analysis:
-            Screenshot analysis.
-
-    Returns:
-        Dashboard data.
-    """
 
     statistics = analysis.get(
         "statistics",
@@ -161,10 +99,6 @@ def dashboard_data(
         ),
     }
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "analyze",

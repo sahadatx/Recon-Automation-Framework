@@ -1,27 +1,12 @@
-#!/usr/bin/env python3
-
-"""
-Plugin Registry
-
-Stores and manages all registered
-framework plugins.
-"""
-
 from __future__ import annotations
 
 from collections.abc import Iterator
 
 from .base import BasePlugin
 
-# ==========================================================
-# Plugin Registry
-# ==========================================================
-
 
 class PluginRegistry:
-    """
-    Registry for framework plugins.
-    """
+
 
     def __init__(
         self,
@@ -32,17 +17,12 @@ class PluginRegistry:
             BasePlugin,
         ] = {}
 
-    # ======================================================
-    # Registration
-    # ======================================================
 
     def register(
         self,
         plugin: BasePlugin,
     ) -> None:
-        """
-        Register a plugin.
-        """
+
 
         name = plugin.name.strip().lower()
 
@@ -60,26 +40,19 @@ class PluginRegistry:
         self,
         name: str,
     ) -> None:
-        """
-        Unregister a plugin.
-        """
+
 
         self._plugins.pop(
             name.strip().lower(),
             None,
         )
 
-    # ======================================================
-    # Lookup
-    # ======================================================
 
     def get(
         self,
         name: str,
     ) -> BasePlugin:
-        """
-        Return a registered plugin.
-        """
+
 
         plugin = self._plugins.get(
             name.strip().lower(),
@@ -95,22 +68,15 @@ class PluginRegistry:
         self,
         name: str,
     ) -> bool:
-        """
-        Check whether a plugin exists.
-        """
+
 
         return name.strip().lower() in self._plugins
 
-    # ======================================================
-    # Collection
-    # ======================================================
 
     def all(
         self,
     ) -> list[BasePlugin]:
-        """
-        Return all registered plugins.
-        """
+
 
         return list(
             self._plugins.values(),
@@ -119,9 +85,7 @@ class PluginRegistry:
     def names(
         self,
     ) -> list[str]:
-        """
-        Return registered plugin names.
-        """
+
 
         return sorted(
             self._plugins,
@@ -130,15 +94,10 @@ class PluginRegistry:
     def clear(
         self,
     ) -> None:
-        """
-        Remove all plugins.
-        """
+
 
         self._plugins.clear()
 
-    # ======================================================
-    # Dunder Methods
-    # ======================================================
 
     def __contains__(
         self,
@@ -175,16 +134,8 @@ class PluginRegistry:
         )
 
 
-# ==========================================================
-# Global Registry
-# ==========================================================
-
 registry = PluginRegistry()
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "PluginRegistry",

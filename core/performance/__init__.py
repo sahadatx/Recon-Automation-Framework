@@ -1,9 +1,3 @@
-"""
-Performance Package
-
-Performance monitoring and benchmarking.
-"""
-
 from __future__ import annotations
 
 from .benchmark import Benchmark
@@ -20,23 +14,23 @@ from .performance_report import generate_markdown, generate_report, generate_tex
 from .profiler import PerformanceProfiler
 
 __all__ = [
-    # Profilers
+
     "PerformanceManager",
     "PerformanceProfiler",
     "MemoryProfiler",
-    # Analysis
+
     "analyze_memory",
     "memory_summary",
-    # Bottleneck
+
     "detect_bottlenecks",
     "bottleneck_summary",
-    # Benchmarks
+
     "Benchmark",
     "MemoryBenchmark",
-    # Memory Report
+
     "generate_memory_report",
     "generate_memory_markdown",
-    # Performance Report
+
     "generate_report",
     "generate_markdown",
     "generate_text",

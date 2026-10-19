@@ -1,9 +1,3 @@
-#!/usr/bin/env python3
-
-"""
-Dashboard Plugin
-"""
-
 from __future__ import annotations
 
 from typing import Any
@@ -13,15 +7,9 @@ from core.plugins.base import BasePlugin
 
 from .manager import run
 
-# ==========================================================
-# Dashboard Plugin
-# ==========================================================
-
 
 class DashboardPlugin(BasePlugin):
-    """
-    Dashboard Plugin.
-    """
+
 
     name = "dashboard"
 
@@ -45,9 +33,7 @@ class DashboardPlugin(BasePlugin):
         *args: Any,
         **kwargs: Any,
     ) -> dict[str, Any]:
-        """
-        Execute the Dashboard plugin.
-        """
+
 
         return run(
             context,
@@ -56,16 +42,8 @@ class DashboardPlugin(BasePlugin):
         )
 
 
-# ==========================================================
-# Plugin Instance
-# ==========================================================
-
 plugin = DashboardPlugin()
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "DashboardPlugin",

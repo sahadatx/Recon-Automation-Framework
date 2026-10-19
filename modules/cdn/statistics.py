@@ -1,28 +1,12 @@
-"""
-CDN Statistics
-
-Generate statistics for
-CDN Detection.
-"""
-
 from __future__ import annotations
 
 from collections import Counter
-
-# ==========================================================
-# Provider Statistics
-# ==========================================================
 
 
 def provider_statistics(
     results,
 ) -> dict:
-    """
-    Count CDN providers.
 
-    Returns:
-        dict
-    """
 
     counter = Counter(
         result.get(
@@ -36,20 +20,10 @@ def provider_statistics(
     return dict(sorted(counter.items()))
 
 
-# ==========================================================
-# Confidence Statistics
-# ==========================================================
-
-
 def confidence_statistics(
     results,
 ) -> dict:
-    """
-    Count confidence levels.
 
-    Returns:
-        dict
-    """
 
     return {
         "high": sum(
@@ -89,20 +63,10 @@ def confidence_statistics(
     }
 
 
-# ==========================================================
-# Generate Statistics
-# ==========================================================
-
-
 def generate_statistics(
     results,
 ) -> dict:
-    """
-    Generate CDN statistics.
 
-    Returns:
-        dict
-    """
 
     total = len(results)
 
@@ -153,17 +117,10 @@ def generate_statistics(
     }
 
 
-# ==========================================================
-# Print Summary
-# ==========================================================
-
-
 def print_summary(
     statistics,
 ) -> None:
-    """
-    Print CDN summary.
-    """
+
 
     print()
 
@@ -216,10 +173,6 @@ def print_summary(
 
     print("=" * 80)
 
-
-# ==========================================================
-# Export
-# ==========================================================
 
 __all__ = [
     "provider_statistics",

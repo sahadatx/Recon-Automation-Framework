@@ -1,14 +1,4 @@
-"""
-Dashboard Charts
-
-ASCII charts for the Dashboard module.
-"""
-
 from __future__ import annotations
-
-# ==========================================================
-# ASCII Bar
-# ==========================================================
 
 
 def ascii_bar(
@@ -16,22 +6,7 @@ def ascii_bar(
     maximum: int,
     width: int = 40,
 ) -> str:
-    """
-    Generate an ASCII bar.
 
-    Args:
-        value:
-            Current value.
-
-        maximum:
-            Maximum value.
-
-        width:
-            Maximum bar width.
-
-    Returns:
-        ASCII bar.
-    """
 
     if maximum <= 0:
         return ""
@@ -41,28 +16,11 @@ def ascii_bar(
     return "█" * filled
 
 
-# ==========================================================
-# Build Chart
-# ==========================================================
-
-
 def build_chart(
     values: dict[str, int],
     width: int = 40,
 ) -> list[str]:
-    """
-    Build an ASCII chart.
 
-    Args:
-        values:
-            Dashboard values.
-
-        width:
-            Maximum bar width.
-
-    Returns:
-        Chart lines.
-    """
 
     if not values:
         return []
@@ -86,10 +44,6 @@ def build_chart(
 
     return lines
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "ascii_bar",

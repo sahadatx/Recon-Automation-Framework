@@ -1,14 +1,3 @@
-"""
-WAF Fingerprints
-
-Fingerprint database used by the
-WAF Detection module.
-"""
-
-# ==========================================================
-# WAF Fingerprints
-# ==========================================================
-
 WAF_FINGERPRINTS = {
     "Cloudflare": {
         "headers": {
@@ -281,9 +270,6 @@ WAF_FINGERPRINTS = {
     },
 }
 
-# ==========================================================
-# Confidence Score
-# ==========================================================
 
 CONFIDENCE = {
     "header": 40,
@@ -293,9 +279,6 @@ CONFIDENCE = {
     "status": 5,
 }
 
-# ==========================================================
-# Confidence Levels
-# ==========================================================
 
 CONFIDENCE_LEVELS = (
     (80, "High"),

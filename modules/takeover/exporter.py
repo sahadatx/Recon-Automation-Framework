@@ -1,11 +1,3 @@
-"""
-Takeover Exporter
-
-Export Subdomain
-Takeover analysis
-results.
-"""
-
 from __future__ import annotations
 
 import csv
@@ -24,15 +16,9 @@ from .constants import (
     VULNERABLE_FILE,
 )
 
-# ==========================================================
-# Output Directory
-# ==========================================================
-
 
 def create_output_directory() -> None:
-    """
-    Create output directory.
-    """
+
 
     OUTPUT_DIR.mkdir(
         parents=True,
@@ -40,28 +26,11 @@ def create_output_directory() -> None:
     )
 
 
-# ==========================================================
-# Write Text
-# ==========================================================
-
-
 def write_text(
     output_file: Path,
     lines: list[str],
 ) -> Path:
-    """
-    Write text file.
 
-    Args:
-        output_file:
-            Destination file.
-
-        lines:
-            File content.
-
-    Returns:
-        Output file path.
-    """
 
     try:
 
@@ -79,28 +48,11 @@ def write_text(
     return output_file
 
 
-# ==========================================================
-# Write JSON
-# ==========================================================
-
-
 def write_json(
     output_file: Path,
     data: Any,
 ) -> Path:
-    """
-    Write JSON file.
 
-    Args:
-        output_file:
-            Destination file.
-
-        data:
-            JSON data.
-
-    Returns:
-        Output file path.
-    """
 
     try:
 
@@ -127,28 +79,11 @@ def write_json(
     return output_file
 
 
-# ==========================================================
-# Write CSV
-# ==========================================================
-
-
 def write_csv(
     output_file: Path,
     results: list[dict[str, Any]],
 ) -> Path:
-    """
-    Write CSV report.
 
-    Args:
-        output_file:
-            Destination file.
-
-        results:
-            Takeover results.
-
-    Returns:
-        Output file path.
-    """
 
     try:
 
@@ -206,17 +141,10 @@ def write_csv(
     return output_file
 
 
-# ==========================================================
-# Export JSON
-# ==========================================================
-
-
 def export_json(
     analysis: dict[str, Any],
 ) -> Path:
-    """
-    Export JSON report.
-    """
+
 
     return write_json(
         JSON_FILE,
@@ -224,17 +152,10 @@ def export_json(
     )
 
 
-# ==========================================================
-# Export TXT
-# ==========================================================
-
-
 def export_txt(
     analysis: dict[str, Any],
 ) -> Path:
-    """
-    Export TXT report.
-    """
+
 
     results = analysis["results"]
 
@@ -289,17 +210,10 @@ def export_txt(
     )
 
 
-# ==========================================================
-# Export CSV
-# ==========================================================
-
-
 def export_csv(
     analysis: dict[str, Any],
 ) -> Path:
-    """
-    Export CSV report.
-    """
+
 
     return write_csv(
         CSV_FILE,
@@ -307,17 +221,10 @@ def export_csv(
     )
 
 
-# ==========================================================
-# Export Vulnerable
-# ==========================================================
-
-
 def export_vulnerable(
     analysis: dict[str, Any],
 ) -> Path:
-    """
-    Export vulnerable targets.
-    """
+
 
     results = analysis["results"]
 
@@ -344,17 +251,10 @@ def export_vulnerable(
     )
 
 
-# ==========================================================
-# Export Summary
-# ==========================================================
-
-
 def export_summary(
     analysis: dict[str, Any],
 ) -> Path:
-    """
-    Export summary report.
-    """
+
 
     statistics = analysis["statistics"]
 
@@ -393,17 +293,10 @@ def export_summary(
     )
 
 
-# ==========================================================
-# Show Summary
-# ==========================================================
-
-
 def show_summary(
     analysis: dict[str, Any],
 ) -> None:
-    """
-    Display summary.
-    """
+
 
     statistics = analysis["statistics"]
 
@@ -444,17 +337,10 @@ def show_summary(
     print("=" * 80)
 
 
-# ==========================================================
-# Export All
-# ==========================================================
-
-
 def export_all(
     analysis: dict[str, Any],
 ) -> None:
-    """
-    Export all reports.
-    """
+
 
     create_output_directory()
 
@@ -470,10 +356,6 @@ def export_all(
 
     show_summary(analysis)
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "export_all",

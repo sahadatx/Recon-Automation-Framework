@@ -1,10 +1,3 @@
-"""
-TLS Helpers
-
-Reusable helper functions for
-TLS Analysis.
-"""
-
 from __future__ import annotations
 
 import socket
@@ -14,9 +7,6 @@ from datetime import datetime
 
 from config.config import HTTP_TIMEOUT
 
-# ==========================================================
-# Default Result
-# ==========================================================
 
 EMPTY_CERTIFICATE = {
     "host": "",
@@ -29,18 +19,8 @@ EMPTY_CERTIFICATE = {
 }
 
 
-# ==========================================================
-# SSL Context
-# ==========================================================
-
-
 def create_ssl_context():
-    """
-    Create SSL context.
 
-    Returns:
-        ssl.SSLContext
-    """
 
     context = ssl.create_default_context()
 
@@ -51,22 +31,12 @@ def create_ssl_context():
     return context
 
 
-# ==========================================================
-# TCP Connection
-# ==========================================================
-
-
 def create_socket(
     host: str,
     port: int = 443,
     timeout: int = HTTP_TIMEOUT,
 ):
-    """
-    Create TCP socket.
 
-    Returns:
-        socket.socket
-    """
 
     return socket.create_connection(
         (host, port),
@@ -74,21 +44,11 @@ def create_socket(
     )
 
 
-# ==========================================================
-# TLS Connection
-# ==========================================================
-
-
 def connect_tls(
     host: str,
     port: int = 443,
 ):
-    """
-    Create TLS connection.
 
-    Returns:
-        ssl.SSLSocket
-    """
 
     context = create_ssl_context()
 
@@ -105,21 +65,11 @@ def connect_tls(
     return tls_socket
 
 
-# ==========================================================
-# Download Certificate
-# ==========================================================
-
-
 def get_certificate(
     host: str,
     port: int = 443,
 ):
-    """
-    Download peer certificate.
 
-    Returns:
-        dict
-    """
 
     result = deepcopy(EMPTY_CERTIFICATE)
 
@@ -165,21 +115,10 @@ def get_certificate(
     return result
 
 
-# ==========================================================
-# Parse X509 Name
-# ==========================================================
-
-
 def parse_name(
     name,
 ):
-    """
-    Convert X509 name tuple
-    into dictionary.
 
-    Returns:
-        dict
-    """
 
     result = {}
 
@@ -196,20 +135,10 @@ def parse_name(
     return result
 
 
-# ==========================================================
-# Subject
-# ==========================================================
-
-
 def get_subject(
     certificate,
 ):
-    """
-    Extract certificate subject.
 
-    Returns:
-        dict
-    """
 
     if not certificate:
 
@@ -223,20 +152,10 @@ def get_subject(
     )
 
 
-# ==========================================================
-# Issuer
-# ==========================================================
-
-
 def get_issuer(
     certificate,
 ):
-    """
-    Extract certificate issuer.
 
-    Returns:
-        dict
-    """
 
     if not certificate:
 
@@ -250,21 +169,10 @@ def get_issuer(
     )
 
 
-# ==========================================================
-# Subject Alternative Names
-# ==========================================================
-
-
 def get_san(
     certificate,
 ):
-    """
-    Extract Subject
-    Alternative Names.
 
-    Returns:
-        list
-    """
 
     if not certificate:
 
@@ -284,20 +192,10 @@ def get_san(
     return sorted(set(san))
 
 
-# ==========================================================
-# Serial Number
-# ==========================================================
-
-
 def get_serial_number(
     certificate,
 ):
-    """
-    Extract serial number.
 
-    Returns:
-        str
-    """
 
     if not certificate:
 
@@ -309,20 +207,10 @@ def get_serial_number(
     )
 
 
-# ==========================================================
-# Not Before
-# ==========================================================
-
-
 def get_not_before(
     certificate,
 ):
-    """
-    Extract notBefore.
 
-    Returns:
-        str
-    """
 
     if not certificate:
 
@@ -334,20 +222,10 @@ def get_not_before(
     )
 
 
-# ==========================================================
-# Not After
-# ==========================================================
-
-
 def get_not_after(
     certificate,
 ):
-    """
-    Extract notAfter.
 
-    Returns:
-        str
-    """
 
     if not certificate:
 
@@ -359,21 +237,10 @@ def get_not_after(
     )
 
 
-# ==========================================================
-# Parse Datetime
-# ==========================================================
-
-
 def parse_datetime(
     value: str,
 ):
-    """
-    Convert certificate datetime
-    string into datetime object.
 
-    Returns:
-        datetime | None
-    """
 
     if not value:
 
@@ -391,21 +258,10 @@ def parse_datetime(
         return None
 
 
-# ==========================================================
-# Days Remaining
-# ==========================================================
-
-
 def days_remaining(
     certificate,
 ):
-    """
-    Calculate certificate
-    remaining days.
 
-    Returns:
-        int | None
-    """
 
     expires = parse_datetime(
         get_not_after(
@@ -420,21 +276,10 @@ def days_remaining(
     return (expires - datetime.utcnow()).days
 
 
-# ==========================================================
-# Expired
-# ==========================================================
-
-
 def is_expired(
     certificate,
 ):
-    """
-    Check whether certificate
-    is expired.
 
-    Returns:
-        bool
-    """
 
     remaining = days_remaining(
         certificate,
@@ -447,20 +292,10 @@ def is_expired(
     return remaining < 0
 
 
-# ==========================================================
-# Self Signed
-# ==========================================================
-
-
 def is_self_signed(
     certificate,
 ):
-    """
-    Check self-signed certificate.
 
-    Returns:
-        bool
-    """
 
     return get_subject(
         certificate,
@@ -469,20 +304,10 @@ def is_self_signed(
     )
 
 
-# ==========================================================
-# Wildcard
-# ==========================================================
-
-
 def is_wildcard(
     certificate,
 ):
-    """
-    Check wildcard certificate.
 
-    Returns:
-        bool
-    """
 
     subject = get_subject(
         certificate,
@@ -498,21 +323,11 @@ def is_wildcard(
     )
 
 
-# ==========================================================
-# Hostname Match
-# ==========================================================
-
-
 def hostname_match(
     host: str,
     certificate,
 ):
-    """
-    Verify hostname.
 
-    Returns:
-        bool
-    """
 
     if not certificate:
 
@@ -543,10 +358,6 @@ def hostname_match(
 
     return host == common_name
 
-
-# ==========================================================
-# Export
-# ==========================================================
 
 __all__ = [
     "EMPTY_CERTIFICATE",

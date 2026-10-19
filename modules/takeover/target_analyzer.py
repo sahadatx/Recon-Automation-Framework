@@ -1,10 +1,3 @@
-"""
-Subdomain Takeover Target Analyzer
-
-Core analysis logic for
-Subdomain Takeover Detection.
-"""
-
 from __future__ import annotations
 
 from typing import Any
@@ -22,10 +15,6 @@ from .constants import (
     TAKEOVER_FINGERPRINTS,
 )
 from .helpers import contains_fingerprint, create_result, merge_methods, safe_lower
-
-# ==========================================================
-# HTTP Body Detection
-# ==========================================================
 
 
 def detect_http_provider(
@@ -53,11 +42,6 @@ def detect_http_provider(
     return None, None, []
 
 
-# ==========================================================
-# Status Detection
-# ==========================================================
-
-
 def detect_status(
     status_code: int,
 ) -> list[str]:
@@ -66,11 +50,6 @@ def detect_status(
         return [METHOD_STATUS]
 
     return []
-
-
-# ==========================================================
-# CNAME Detection
-# ==========================================================
 
 
 def detect_cname_provider(
@@ -96,11 +75,6 @@ def detect_cname_provider(
     return None, []
 
 
-# ==========================================================
-# DNS Detection
-# ==========================================================
-
-
 def detect_dns(
     ip: str | None,
 ) -> list[str]:
@@ -109,11 +83,6 @@ def detect_dns(
         return [METHOD_DNS]
 
     return []
-
-
-# ==========================================================
-# Confidence
-# ==========================================================
 
 
 def calculate_confidence(
@@ -134,11 +103,6 @@ def calculate_confidence(
     return 0
 
 
-# ==========================================================
-# Recommendations
-# ==========================================================
-
-
 def build_recommendations(
     vulnerable: bool,
 ) -> list[str]:
@@ -155,11 +119,6 @@ def build_recommendations(
         "No takeover fingerprints detected.",
         "Manual verification is recommended.",
     ]
-
-
-# ==========================================================
-# Analyze Target
-# ==========================================================
 
 
 def analyze_target(
@@ -217,10 +176,6 @@ def analyze_target(
 
     return result
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "detect_http_provider",

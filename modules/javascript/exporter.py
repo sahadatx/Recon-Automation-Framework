@@ -1,9 +1,3 @@
-"""
-JavaScript Exporter
-
-Export JavaScript analysis results.
-"""
-
 from __future__ import annotations
 
 import csv
@@ -28,18 +22,9 @@ from modules.javascript.constants import (
     URLS_TXT,
 )
 
-# ==========================================================
-# Ensure Output Directory
-# ==========================================================
-
 
 def ensure_output_directory() -> Path:
-    """
-    Create JavaScript output directory.
 
-    Returns:
-        Output directory path.
-    """
 
     JAVASCRIPT_OUTPUT_DIR.mkdir(
         parents=True,
@@ -54,28 +39,11 @@ def ensure_output_directory() -> Path:
     return JAVASCRIPT_OUTPUT_DIR
 
 
-# ==========================================================
-# Write Text File
-# ==========================================================
-
-
 def write_text(
     output_file: Path,
     lines: list[str],
 ) -> Path:
-    """
-    Write text lines to a file.
 
-    Args:
-        output_file:
-            Destination file.
-
-        lines:
-            Text lines.
-
-    Returns:
-        Output file path.
-    """
 
     ensure_output_directory()
 
@@ -101,28 +69,11 @@ def write_text(
     return output_file
 
 
-# ==========================================================
-# Write JSON File
-# ==========================================================
-
-
 def write_json(
     output_file: Path,
     data: Any,
 ) -> Path:
-    """
-    Write JSON data.
 
-    Args:
-        output_file:
-            Destination file.
-
-        data:
-            JSON serializable object.
-
-    Returns:
-        Output file path.
-    """
 
     ensure_output_directory()
 
@@ -152,32 +103,12 @@ def write_json(
     return output_file
 
 
-# ==========================================================
-# Write CSV File
-# ==========================================================
-
-
 def write_csv(
     output_file: Path,
     headers: list[str],
     rows: list[list[Any]],
 ) -> Path:
-    """
-    Write CSV file.
 
-    Args:
-        output_file:
-            Destination file.
-
-        headers:
-            CSV headers.
-
-        rows:
-            CSV rows.
-
-    Returns:
-        Output file path.
-    """
 
     ensure_output_directory()
 
@@ -206,17 +137,10 @@ def write_csv(
     return output_file
 
 
-# ==========================================================
-# Helper Functions
-# ==========================================================
-
-
 def unique_sorted(
     values: list[str],
 ) -> list[str]:
-    """
-    Return unique sorted values.
-    """
+
 
     return sorted({value for value in values if value})
 
@@ -224,9 +148,7 @@ def unique_sorted(
 def flatten(
     values: list[list[str]],
 ) -> list[str]:
-    """
-    Flatten nested lists.
-    """
+
 
     flattened: list[str] = []
 
@@ -241,10 +163,7 @@ def collect_analysis(
     results: dict,
     field: str,
 ) -> list[str]:
-    """
-    Collect one analysis field
-    from every JavaScript file.
-    """
+
 
     collected: list[str] = []
 
@@ -269,9 +188,7 @@ def collect_interesting(
     results: dict,
     field: str,
 ) -> list[str]:
-    """
-    Collect interesting findings.
-    """
+
 
     collected: list[str] = []
 
@@ -295,9 +212,7 @@ def collect_interesting(
 def collect_secrets(
     results: dict,
 ) -> dict[str, list[str]]:
-    """
-    Collect detected secrets.
-    """
+
 
     secrets: dict[
         str,
@@ -333,17 +248,10 @@ def collect_secrets(
     }
 
 
-# ==========================================================
-# Export Results (TXT)
-# ==========================================================
-
-
 def export_results(
     analysis: dict,
 ) -> Path:
-    """
-    Export human-readable results.
-    """
+
 
     lines: list[str] = []
 
@@ -411,17 +319,10 @@ def export_results(
     )
 
 
-# ==========================================================
-# Export JSON
-# ==========================================================
-
-
 def export_json(
     analysis: dict,
 ) -> Path:
-    """
-    Export JSON report.
-    """
+
 
     return write_json(
         RESULTS_JSON,
@@ -429,17 +330,10 @@ def export_json(
     )
 
 
-# ==========================================================
-# Export CSV
-# ==========================================================
-
-
 def export_csv(
     analysis: dict,
 ) -> Path:
-    """
-    Export CSV report.
-    """
+
 
     headers = [
         "javascript",
@@ -544,17 +438,10 @@ def export_csv(
     )
 
 
-# ==========================================================
-# Export Summary
-# ==========================================================
-
-
 def export_summary(
     analysis: dict[str, Any],
 ) -> Path:
-    """
-    Export summary report.
-    """
+
 
     statistics = analysis["statistics"]
 
@@ -580,17 +467,10 @@ def export_summary(
     )
 
 
-# ==========================================================
-# Export JavaScript Files
-# ==========================================================
-
-
 def export_javascript(
     analysis: dict,
 ) -> Path:
-    """
-    Export downloaded JavaScript URLs.
-    """
+
 
     javascript = sorted(analysis["results"].keys())
 
@@ -600,17 +480,10 @@ def export_javascript(
     )
 
 
-# ==========================================================
-# Export URLs
-# ==========================================================
-
-
 def export_urls(
     analysis: dict,
 ) -> Path:
-    """
-    Export discovered URLs.
-    """
+
 
     urls = collect_analysis(
         analysis["results"],
@@ -623,17 +496,10 @@ def export_urls(
     )
 
 
-# ==========================================================
-# Export Endpoints
-# ==========================================================
-
-
 def export_endpoints(
     analysis: dict,
 ) -> Path:
-    """
-    Export discovered endpoints.
-    """
+
 
     endpoints = collect_analysis(
         analysis["results"],
@@ -646,17 +512,10 @@ def export_endpoints(
     )
 
 
-# ==========================================================
-# Export Source Maps
-# ==========================================================
-
-
 def export_source_maps(
     analysis: dict,
 ) -> Path:
-    """
-    Export discovered source maps.
-    """
+
 
     source_maps = collect_analysis(
         analysis["results"],
@@ -669,17 +528,10 @@ def export_source_maps(
     )
 
 
-# ==========================================================
-# Export Interesting Files
-# ==========================================================
-
-
 def export_interesting_files(
     analysis: dict,
 ) -> Path:
-    """
-    Export interesting files.
-    """
+
 
     interesting = collect_interesting(
         analysis["results"],
@@ -692,17 +544,10 @@ def export_interesting_files(
     )
 
 
-# ==========================================================
-# Export Interesting Directories
-# ==========================================================
-
-
 def export_interesting_directories(
     analysis: dict,
 ) -> Path:
-    """
-    Export interesting directories.
-    """
+
 
     directories = collect_interesting(
         analysis["results"],
@@ -715,17 +560,10 @@ def export_interesting_directories(
     )
 
 
-# ==========================================================
-# Export Secrets
-# ==========================================================
-
-
 def export_secrets(
     analysis: dict,
 ) -> Path:
-    """
-    Export detected secrets.
-    """
+
 
     findings = collect_secrets(analysis["results"])
 
@@ -758,17 +596,10 @@ def export_secrets(
     )
 
 
-# ==========================================================
-# Export All
-# ==========================================================
-
-
 def export_all(
     analysis: dict,
 ) -> None:
-    """
-    Export all JavaScript reports.
-    """
+
 
     exporters = (
         export_results,
@@ -797,17 +628,10 @@ def export_all(
     success("JavaScript reports exported successfully.")
 
 
-# ==========================================================
-# Show Summary
-# ==========================================================
-
-
 def show_summary(
     analysis: dict[str, Any],
 ) -> None:
-    """
-    Display JavaScript analysis summary.
-    """
+
 
     statistics = analysis["statistics"]
 
@@ -843,10 +667,6 @@ def show_summary(
 
     print("=" * 80)
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "export_results",

@@ -1,72 +1,30 @@
-"""
-Nuclei Updater
-
-Handles template installation,
-updates and version checking.
-"""
-
 import subprocess
 from pathlib import Path
 
 from modules.nuclei.helpers import ensure_directory
 
-# ==========================================================
-# Default Template Directory
-# ==========================================================
 
 DEFAULT_TEMPLATE_DIRECTORY = Path.home() / "nuclei-templates"
 
 
-# ==========================================================
-# Get Template Directory
-# ==========================================================
-
-
 def get_templates_directory():
-    """
-    Return template directory.
 
-    Returns:
-        Path
-    """
 
     ensure_directory(DEFAULT_TEMPLATE_DIRECTORY)
 
     return DEFAULT_TEMPLATE_DIRECTORY
 
 
-# ==========================================================
-# Check Templates
-# ==========================================================
-
-
 def is_templates_installed():
-    """
-    Check whether templates
-    exist.
 
-    Returns:
-        bool
-    """
 
     directory = get_templates_directory()
 
     return any(directory.iterdir())
 
 
-# ==========================================================
-# Get Template Version
-# ==========================================================
-
-
 def get_templates_version():
-    """
-    Return installed template
-    version.
 
-    Returns:
-        str | None
-    """
 
     version_file = get_templates_directory() / ".version"
 
@@ -85,18 +43,8 @@ def get_templates_version():
         return None
 
 
-# ==========================================================
-# Install Templates
-# ==========================================================
-
-
 def install_templates():
-    """
-    Install templates.
 
-    Returns:
-        bool
-    """
 
     try:
 
@@ -117,45 +65,14 @@ def install_templates():
         return False
 
 
-# ==========================================================
-# Update Templates
-# ==========================================================
-
-
 def update_templates():
-    """
-    Update installed
-    templates.
 
-    Returns:
-        bool
-    """
 
     return install_templates()
 
 
-# ==========================================================
-# Check For Updates
-# ==========================================================
-
-
 def check_for_updates():
-    """
-    Check whether template
-    updates are available.
 
-    Returns:
-        bool | None
-
-        True:
-            Update available.
-
-        False:
-            Already up-to-date.
-
-        None:
-            Check failed.
-    """
 
     try:
 
@@ -186,19 +103,8 @@ def check_for_updates():
         return None
 
 
-# ==========================================================
-# Auto Update
-# ==========================================================
-
-
 def auto_update():
-    """
-    Install templates if
-    missing, otherwise update.
 
-    Returns:
-        bool
-    """
 
     if not is_templates_installed():
 
@@ -207,18 +113,8 @@ def auto_update():
     return update_templates()
 
 
-# ==========================================================
-# Show Status
-# ==========================================================
-
-
 def show_status():
-    """
-    Display template status.
 
-    Returns:
-        dict
-    """
 
     status = {
         "installed": is_templates_installed(),
@@ -244,10 +140,6 @@ def show_status():
 
     return status
 
-
-# ==========================================================
-# Self Test
-# ==========================================================
 
 if __name__ == "__main__":
 

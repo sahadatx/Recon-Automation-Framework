@@ -1,9 +1,3 @@
-"""
-Screenshot Helper Functions
-
-Production Async Playwright Browser Engine.
-"""
-
 from __future__ import annotations
 
 from playwright.async_api import (
@@ -17,18 +11,9 @@ from playwright.async_api import (
 from core.logger import debug, warning
 from modules.screenshots.constants import HEADLESS, SCREENSHOT_HEIGHT, SCREENSHOT_WIDTH
 
-# ==========================================================
-# Start Playwright
-# ==========================================================
-
 
 async def start_playwright() -> Playwright:
-    """
-    Initialize Playwright engine.
 
-    Returns:
-        Playwright instance
-    """
 
     debug("Starting Playwright engine...")
 
@@ -45,24 +30,10 @@ async def start_playwright() -> Playwright:
         raise
 
 
-# ==========================================================
-# Launch Browser
-# ==========================================================
-
-
 async def launch_browser(
     playwright: Playwright,
 ) -> Browser:
-    """
-    Launch Chromium browser.
 
-    Args:
-        playwright:
-            Playwright instance.
-
-    Returns:
-        Browser instance
-    """
 
     debug("Launching Chromium browser...")
 
@@ -87,20 +58,10 @@ async def launch_browser(
         raise
 
 
-# ==========================================================
-# Create Context
-# ==========================================================
-
-
 async def create_context(
     browser: Browser,
 ) -> BrowserContext:
-    """
-    Create isolated browser context.
 
-    Returns:
-        BrowserContext
-    """
 
     debug("Creating browser context...")
 
@@ -116,37 +77,20 @@ async def create_context(
     return context
 
 
-# ==========================================================
-# Create Page
-# ==========================================================
-
-
 async def create_page(
     context: BrowserContext,
 ) -> Page:
-    """
-    Create browser page.
 
-    Returns:
-        Page
-    """
 
     page = await context.new_page()
 
     return page
 
 
-# ==========================================================
-# Close Page
-# ==========================================================
-
-
 async def close_page(
     page: Page | None,
 ) -> None:
-    """
-    Close browser page.
-    """
+
 
     if page is None:
 
@@ -161,17 +105,10 @@ async def close_page(
         debug(f"Page close failed: {error}")
 
 
-# ==========================================================
-# Close Context
-# ==========================================================
-
-
 async def close_context(
     context: BrowserContext | None,
 ) -> None:
-    """
-    Close browser context.
-    """
+
 
     if context is None:
 
@@ -186,17 +123,10 @@ async def close_context(
         debug(f"Context close failed: {error}")
 
 
-# ==========================================================
-# Close Browser
-# ==========================================================
-
-
 async def close_browser(
     browser: Browser | None,
 ) -> None:
-    """
-    Close browser instance.
-    """
+
 
     if browser is None:
 
@@ -211,17 +141,10 @@ async def close_browser(
         debug(f"Browser close failed: {error}")
 
 
-# ==========================================================
-# Stop Playwright
-# ==========================================================
-
-
 async def stop_playwright(
     playwright: Playwright | None,
 ) -> None:
-    """
-    Stop Playwright engine.
-    """
+
 
     if playwright is None:
 
@@ -236,30 +159,16 @@ async def stop_playwright(
         debug(f"Playwright stop failed: {error}")
 
 
-# ==========================================================
-# Cleanup
-# ==========================================================
-
-
 async def cleanup(
     playwright: Playwright | None,
     browser: Browser | None,
 ) -> None:
-    """
-    Cleanup Playwright resources.
 
-    Context and page cleanup should
-    happen inside capture workflow.
-    """
 
     await close_browser(browser)
 
     await stop_playwright(playwright)
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "start_playwright",

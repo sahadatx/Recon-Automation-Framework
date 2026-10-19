@@ -1,25 +1,11 @@
-"""
-Global Configuration
-
-Central configuration for the
-Recon Automation Framework.
-"""
-
 import os
 from pathlib import Path
 
 from dotenv import load_dotenv
 
-# ==========================================================
-# Load Environment
-# ==========================================================
 
 load_dotenv()
 
-
-# ==========================================================
-# Application
-# ==========================================================
 
 APP_NAME = "Recon Automation Framework"
 
@@ -27,10 +13,6 @@ VERSION = "1.0.0"
 
 AUTHOR = "Sahadat Hossain"
 
-
-# ==========================================================
-# Framework
-# ==========================================================
 
 DEFAULT_TIMEOUT = 60
 
@@ -42,10 +24,6 @@ DEFAULT_ENCODING = "utf-8"
 
 DEFAULT_SCHEME = "https"
 
-
-# ==========================================================
-# Project Paths
-# ==========================================================
 
 PROJECT_ROOT = Path.cwd()
 
@@ -79,10 +57,6 @@ NUCLEI_OUTPUT_DIR = OUTPUT_DIR / "nuclei"
 VHOST_OUTPUT_DIR = OUTPUT_DIR / "vhost"
 
 
-# ==========================================================
-# Shared Wordlists
-# ==========================================================
-
 WORDLISTS_DIR = PROJECT_ROOT / "wordlists"
 
 DIRECTORY_WORDLIST_DIR = WORDLISTS_DIR / "directories"
@@ -99,9 +73,6 @@ CUSTOM_WORDLIST_DIR = WORDLISTS_DIR / "custom"
 
 WAF_OUTPUT_DIR = OUTPUT_DIR / "waf"
 
-# ==========================================================
-# Default Wordlists
-# ==========================================================
 
 DEFAULT_DIRECTORY_WORDLIST = DIRECTORY_WORDLIST_DIR / "common.txt"
 
@@ -111,10 +82,6 @@ DEFAULT_SUBDOMAIN_WORDLIST = SUBDOMAIN_WORDLIST_DIR / "common.txt"
 
 DEFAULT_PARAMETER_WORDLIST = PARAMETER_WORDLIST_DIR / "common.txt"
 
-
-# ==========================================================
-# API Keys
-# ==========================================================
 
 PDCP_API_KEY = os.getenv(
     "PDCP_API_KEY",
@@ -137,10 +104,6 @@ SHODAN_API_KEY = os.getenv(
 )
 
 
-# ==========================================================
-# DNS Configuration
-# ==========================================================
-
 DNS_TIMEOUT = 5
 
 DNS_LIFETIME = 8
@@ -154,10 +117,6 @@ DNS_SERVERS = [
     "8.8.4.4",
 ]
 
-
-# ==========================================================
-# HTTP Configuration
-# ==========================================================
 
 HTTP_TIMEOUT = 8
 
@@ -174,10 +133,6 @@ HTTP_FOLLOW_REDIRECTS = True
 HTTP_USER_AGENT = USER_AGENT
 
 
-# ==========================================================
-# Port Scanner Configuration
-# ==========================================================
-
 PORT_SCAN_TIMEOUT = 1
 
 PORT_SCAN_RETRIES = 2
@@ -190,10 +145,6 @@ ENABLE_BANNER_GRAB = False
 
 DEFAULT_PORTS = "common"
 
-
-# ==========================================================
-# URL Discovery (Crawler)
-# ==========================================================
 
 CRAWLER_DEPTH = 1
 
@@ -209,10 +160,6 @@ CRAWLER_RETRIES = 3
 
 CRAWLER_FOLLOW_REDIRECTS = True
 
-
-# ==========================================================
-# Screenshot Configuration
-# ==========================================================
 
 SCREENSHOT_WIDTH = 1440
 
@@ -232,10 +179,6 @@ SCREENSHOT_FORMAT = "png"
 
 SCREENSHOT_QUALITY = 100
 
-
-# ==========================================================
-# Directory Fuzzing
-# ==========================================================
 
 FUZZ_THREADS = 40
 
@@ -262,10 +205,6 @@ FUZZ_MATCH_SIZE = ""
 FUZZ_FILTER_SIZE = "0"
 
 
-# ==========================================================
-# Nuclei Configuration
-# ==========================================================
-
 NUCLEI_THREADS = 25
 
 NUCLEI_TIMEOUT = 600
@@ -280,10 +219,6 @@ NUCLEI_SEVERITY = "critical,high,medium,low,info"
 
 NUCLEI_FOLLOW_REDIRECTS = False
 
-
-# ==========================================================
-# Virtual Host Discovery
-# ==========================================================
 
 VHOST_THREADS = 40
 
@@ -314,10 +249,6 @@ VHOST_MATCH_SIZE = ""
 VHOST_FILTER_SIZE = "0"
 
 
-# ==========================================================
-# Logging Configuration
-# ==========================================================
-
 VERBOSE = False
 
 LOG_LEVEL = "INFO"
@@ -336,10 +267,6 @@ DNS_TIMEOUT = 5
 PORT_SCAN_TIMEOUT = 1
 
 
-# ==========================================================
-# WAF Detection
-# ==========================================================
-
 WAF_TIMEOUT = HTTP_TIMEOUT
 
 WAF_THREADS = HTTP_THREADS
@@ -349,10 +276,6 @@ WAF_VERIFY_SSL = HTTP_VERIFY_SSL
 WAF_MAX_BODY_SIZE = 8192
 
 
-# ==========================================================
-# Debug Configuration
-# ==========================================================
-
 DEBUG = False
 
 SAVE_RAW_OUTPUT = False
@@ -361,10 +284,6 @@ KEEP_TEMP_FILES = False
 
 SHOW_TOOL_COMMANDS = False
 
-
-# ==========================================================
-# Export Configuration
-# ==========================================================
 
 DEFAULT_OUTPUT_FORMATS = (
     "txt",

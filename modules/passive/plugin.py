@@ -1,9 +1,3 @@
-#!/usr/bin/env python3
-
-"""
-Passive Enumeration Plugin
-"""
-
 from __future__ import annotations
 
 from typing import Any
@@ -14,15 +8,9 @@ from core.plugins.base import BasePlugin
 from .exporter import export_all
 from .manager import run
 
-# ==========================================================
-# Passive Enumeration Plugin
-# ==========================================================
-
 
 class PassivePlugin(BasePlugin):
-    """
-    Passive Enumeration Plugin.
-    """
+
 
     name = "passive"
 
@@ -53,9 +41,7 @@ class PassivePlugin(BasePlugin):
         *args: Any,
         **kwargs: Any,
     ) -> dict[str, Any]:
-        """
-        Execute the Passive Enumeration plugin.
-        """
+
 
         return run(
             context,
@@ -67,25 +53,15 @@ class PassivePlugin(BasePlugin):
         self,
         result: dict[str, Any],
     ) -> None:
-        """
-        Export Passive Enumeration reports.
-        """
+
 
         export_all(
             result,
         )
 
 
-# ==========================================================
-# Plugin Instance
-# ==========================================================
-
 plugin = PassivePlugin()
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "PassivePlugin",

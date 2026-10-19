@@ -1,9 +1,3 @@
-#!/usr/bin/env python3
-
-"""
-Module Input Resolvers
-"""
-
 from __future__ import annotations
 
 from typing import Any, Callable
@@ -18,17 +12,10 @@ Resolver = Callable[
 ]
 
 
-# ==========================================================
-# Helpers
-# ==========================================================
-
-
 def _http_results(
     context: ExecutionContext,
 ) -> Analysis:
-    """
-    Return HTTP analysis results.
-    """
+
 
     http = context.get_analysis(
         "http",
@@ -43,9 +30,7 @@ def _http_results(
 def _live_urls(
     context: ExecutionContext,
 ) -> list[str]:
-    """
-    Return all live URLs.
-    """
+
 
     return sorted(
         {
@@ -60,17 +45,10 @@ def _live_urls(
     )
 
 
-# ==========================================================
-# Resolver Functions
-# ==========================================================
-
-
 def resolve_dns(
     context: ExecutionContext,
 ) -> tuple[Any, ...]:
-    """
-    Passive → DNS
-    """
+
 
     passive = context.get_analysis(
         "passive",
@@ -87,9 +65,7 @@ def resolve_dns(
 def resolve_http(
     context: ExecutionContext,
 ) -> tuple[Any, ...]:
-    """
-    DNS → HTTP
-    """
+
 
     dns = context.get_analysis(
         "dns",
@@ -108,9 +84,7 @@ def resolve_http(
 def resolve_ports(
     context: ExecutionContext,
 ) -> tuple[Any, ...]:
-    """
-    HTTP → Ports
-    """
+
 
     return (
         list(
@@ -124,9 +98,7 @@ def resolve_ports(
 def resolve_tech(
     context: ExecutionContext,
 ) -> tuple[Any, ...]:
-    """
-    HTTP → Technology Detection
-    """
+
 
     return (
         _http_results(
@@ -138,9 +110,7 @@ def resolve_tech(
 def resolve_live_urls(
     context: ExecutionContext,
 ) -> tuple[Any, ...]:
-    """
-    HTTP → Live URL list
-    """
+
 
     return (
         _live_urls(
@@ -152,9 +122,7 @@ def resolve_live_urls(
 def resolve_javascript(
     context: ExecutionContext,
 ) -> tuple[Any, ...]:
-    """
-    Crawler → JavaScript URLs
-    """
+
 
     crawler = context.get_analysis(
         "crawler",
@@ -187,9 +155,7 @@ def resolve_javascript(
 def resolve_screenshots(
     context: ExecutionContext,
 ) -> tuple[Any, ...]:
-    """
-    HTTP → Screenshot module
-    """
+
 
     return (
         _http_results(
@@ -201,9 +167,7 @@ def resolve_screenshots(
 def resolve_report(
     context: ExecutionContext,
 ) -> tuple[Any, ...]:
-    """
-    All analyses → Report
-    """
+
 
     return (context.to_dict(),)
 
@@ -211,16 +175,9 @@ def resolve_report(
 def resolve_dashboard(
     context: ExecutionContext,
 ) -> tuple[Any, ...]:
-    """
-    Dashboard takes no arguments.
-    """
+
 
     return ()
-
-
-# ==========================================================
-# Resolver Registry
-# ==========================================================
 
 
 RESOLVERS: dict[str, Resolver] = {
@@ -248,9 +205,7 @@ def resolve_inputs(
     module: str,
     context: ExecutionContext,
 ) -> tuple[Any, ...]:
-    """
-    Resolve input arguments for a module.
-    """
+
 
     try:
         resolver = RESOLVERS[module]
@@ -265,9 +220,7 @@ def resolve_inputs(
 
 
 def resolved_modules() -> set[str]:
-    """
-    Return all modules that have resolvers.
-    """
+
 
     return set(
         RESOLVERS.keys(),

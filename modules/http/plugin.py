@@ -1,9 +1,3 @@
-#!/usr/bin/env python3
-
-"""
-HTTP Probe Plugin
-"""
-
 from __future__ import annotations
 
 from typing import Any
@@ -14,15 +8,9 @@ from core.plugins.base import BasePlugin
 from .exporter import export_all
 from .manager import run
 
-# ==========================================================
-# HTTP Probe Plugin
-# ==========================================================
-
 
 class HTTPPlugin(BasePlugin):
-    """
-    HTTP Probe Plugin.
-    """
+
 
     name = "http"
 
@@ -50,9 +38,7 @@ class HTTPPlugin(BasePlugin):
         *args: Any,
         **kwargs: Any,
     ) -> dict[str, Any]:
-        """
-        Execute the HTTP Probe plugin.
-        """
+
 
         return run(
             context,
@@ -64,25 +50,15 @@ class HTTPPlugin(BasePlugin):
         self,
         result: dict[str, Any],
     ) -> None:
-        """
-        Export HTTP Probe reports.
-        """
+
 
         export_all(
             result,
         )
 
 
-# ==========================================================
-# Plugin Instance
-# ==========================================================
-
 plugin = HTTPPlugin()
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "HTTPPlugin",

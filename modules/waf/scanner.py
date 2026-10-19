@@ -1,10 +1,3 @@
-"""
-WAF Scanner
-
-Collect HTTP response data for
-WAF fingerprint detection.
-"""
-
 from __future__ import annotations
 
 from copy import deepcopy
@@ -15,9 +8,6 @@ from requests.exceptions import ConnectionError, RequestException, Timeout
 from config.config import HTTP_TIMEOUT, HTTP_VERIFY_SSL
 from core.context import ExecutionContext
 
-# ==========================================================
-# Empty Result
-# ==========================================================
 
 EMPTY_RESULT = {
     "url": "",
@@ -31,21 +21,11 @@ EMPTY_RESULT = {
 }
 
 
-# ==========================================================
-# Scan Target
-# ==========================================================
-
-
 def scan_target(
     context: ExecutionContext,
     url: str,
 ) -> dict[str, Any]:
-    """
-    Collect HTTP response data.
 
-    Returns:
-        HTTP response information.
-    """
 
     session = context.get_http_session()
 
@@ -113,21 +93,11 @@ def scan_target(
     return result
 
 
-# ==========================================================
-# Scan Multiple Targets
-# ==========================================================
-
-
 def scan_targets(
     context: ExecutionContext,
     targets: list[str],
 ) -> list[dict[str, Any]]:
-    """
-    Scan multiple targets.
 
-    Returns:
-        List of scan results.
-    """
 
     results: list[dict[str, Any]] = []
 
@@ -153,10 +123,6 @@ def scan_targets(
 
     return results
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "scan_target",

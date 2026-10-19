@@ -1,17 +1,7 @@
-"""
-TLS Filters
-
-Filter and normalize
-TLS analysis results.
-"""
-
 from __future__ import annotations
 
 from copy import deepcopy
 
-# ==========================================================
-# Constants
-# ==========================================================
 
 MAX_RISK_SCORE = 100
 
@@ -24,20 +14,10 @@ VALID_RISK_LEVELS = {
 }
 
 
-# ==========================================================
-# Reset Analysis
-# ==========================================================
-
-
 def reset_analysis(
     result: dict,
 ):
-    """
-    Reset invalid analysis.
 
-    Returns:
-        dict
-    """
 
     result["risk_score"] = 0
 
@@ -48,20 +28,10 @@ def reset_analysis(
     return result
 
 
-# ==========================================================
-# Normalize Risk Score
-# ==========================================================
-
-
 def normalize_risk_score(
     score,
 ):
-    """
-    Normalize risk score.
 
-    Returns:
-        int
-    """
 
     try:
 
@@ -80,20 +50,10 @@ def normalize_risk_score(
     )
 
 
-# ==========================================================
-# Normalize Recommendations
-# ==========================================================
-
-
 def normalize_recommendations(
     recommendations,
 ):
-    """
-    Normalize recommendations.
 
-    Returns:
-        list
-    """
 
     if not recommendations:
 
@@ -102,20 +62,10 @@ def normalize_recommendations(
     return sorted({item.strip() for item in recommendations if item and item.strip()})
 
 
-# ==========================================================
-# Validate Risk Level
-# ==========================================================
-
-
 def validate_risk_level(
     level,
 ):
-    """
-    Validate risk level.
 
-    Returns:
-        str
-    """
 
     if level in VALID_RISK_LEVELS:
 
@@ -124,20 +74,10 @@ def validate_risk_level(
     return "Safe"
 
 
-# ==========================================================
-# Validate Analysis
-# ==========================================================
-
-
 def validate_analysis(
     result,
 ):
-    """
-    Validate analysis result.
 
-    Returns:
-        dict
-    """
 
     result["risk_score"] = normalize_risk_score(
         result.get(
@@ -163,20 +103,10 @@ def validate_analysis(
     return result
 
 
-# ==========================================================
-# Filter Single Result
-# ==========================================================
-
-
 def filter_result(
     result,
 ):
-    """
-    Filter one analysis result.
 
-    Returns:
-        dict
-    """
 
     filtered = deepcopy(
         result,
@@ -189,20 +119,10 @@ def filter_result(
     return filtered
 
 
-# ==========================================================
-# Filter Results
-# ==========================================================
-
-
 def filter_results(
     results,
 ):
-    """
-    Filter all analysis results.
 
-    Returns:
-        list
-    """
 
     filtered = [
         filter_result(
@@ -228,21 +148,10 @@ def filter_results(
     return filtered
 
 
-# ==========================================================
-# High Risk Only
-# ==========================================================
-
-
 def high_risk_only(
     results,
 ):
-    """
-    Return High/Critical
-    risk results.
 
-    Returns:
-        list
-    """
 
     return [
         result
@@ -257,20 +166,10 @@ def high_risk_only(
     ]
 
 
-# ==========================================================
-# Safe Only
-# ==========================================================
-
-
 def safe_only(
     results,
 ):
-    """
-    Return Safe results.
 
-    Returns:
-        list
-    """
 
     return [
         result
@@ -282,20 +181,10 @@ def safe_only(
     ]
 
 
-# ==========================================================
-# Failed Only
-# ==========================================================
-
-
 def failed_only(
     results,
 ):
-    """
-    Return failed scans.
 
-    Returns:
-        list
-    """
 
     return [
         result
@@ -306,20 +195,10 @@ def failed_only(
     ]
 
 
-# ==========================================================
-# Remove Failed
-# ==========================================================
-
-
 def remove_failed(
     results,
 ):
-    """
-    Remove failed scans.
 
-    Returns:
-        list
-    """
 
     return [
         result
@@ -329,10 +208,6 @@ def remove_failed(
         )
     ]
 
-
-# ==========================================================
-# Export
-# ==========================================================
 
 __all__ = [
     "MAX_RISK_SCORE",

@@ -1,9 +1,3 @@
-#!/usr/bin/env python3
-
-"""
-Module Registry
-"""
-
 from __future__ import annotations
 
 from typing import Any, Callable
@@ -55,9 +49,7 @@ RUNNERS: dict[str, Runner] = {
 def get_runner(
     module: str,
 ) -> Runner:
-    """
-    Return the registered runner.
-    """
+
 
     try:
         return RUNNERS[module]
@@ -67,9 +59,7 @@ def get_runner(
 
 
 def registered_modules() -> set[str]:
-    """
-    Return all registered module names.
-    """
+
 
     return set(
         RUNNERS.keys(),

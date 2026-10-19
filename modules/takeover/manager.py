@@ -1,12 +1,3 @@
-#!/usr/bin/env python3
-
-"""
-Takeover Manager
-
-Coordinate subdomain takeover
-detection and analysis.
-"""
-
 from __future__ import annotations
 
 from concurrent.futures import as_completed
@@ -28,10 +19,6 @@ from .helpers import (
 )
 from .target_analyzer import analyze_target
 
-# ==========================================================
-# Process Target
-# ==========================================================
-
 
 def process_target(
     target: str,
@@ -39,9 +26,7 @@ def process_target(
     str,
     dict[str, Any] | None,
 ]:
-    """
-    Analyze one target.
-    """
+
 
     host = normalize_target(
         target,
@@ -93,29 +78,11 @@ def process_target(
     )
 
 
-# ==========================================================
-# Run Takeover Detection
-# ==========================================================
-
-
 def run_takeover_detection(
     context: ExecutionContext,
     targets: list[str],
 ) -> dict[str, Any]:
-    """
-    Execute the complete
-    takeover detection workflow.
 
-        Scan
-            ↓
-        Filter
-            ↓
-        Analyze
-            ↓
-        Store Context
-            ↓
-        Return Analysis
-    """
 
     if not targets:
 
@@ -233,29 +200,17 @@ def run_takeover_detection(
     return analysis
 
 
-# ==========================================================
-# Public Entry Point
-# ==========================================================
-
-
 def run(
     context: ExecutionContext,
     targets: list[str],
 ) -> dict[str, Any]:
-    """
-    Public entry point for the
-    Takeover module.
-    """
+
 
     return run_takeover_detection(
         context,
         targets,
     )
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "run",

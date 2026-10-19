@@ -1,11 +1,3 @@
-#!/usr/bin/env python3
-
-"""
-JavaScript Manager
-
-Coordinate JavaScript analysis.
-"""
-
 from __future__ import annotations
 
 from concurrent.futures import as_completed
@@ -20,19 +12,12 @@ from modules.javascript.helpers import is_valid_url
 from modules.javascript.interesting import detect_interesting
 from modules.javascript.parser import parse_file
 
-# ==========================================================
-# Process One JavaScript
-# ==========================================================
-
 
 def process_javascript(
     context: ExecutionContext,
     url: str,
 ) -> tuple[str, dict[str, Any] | None]:
-    """
-    Download and analyze one
-    JavaScript file.
-    """
+
 
     if not is_valid_url(url):
 
@@ -74,9 +59,6 @@ def process_javascript(
             metadata,
         )
 
-    # ------------------------------------------------------
-    # Parse JavaScript
-    # ------------------------------------------------------
 
     try:
 
@@ -92,9 +74,6 @@ def process_javascript(
 
     metadata["analysis"] = analysis
 
-    # ------------------------------------------------------
-    # Interesting Detection
-    # ------------------------------------------------------
 
     try:
 
@@ -115,9 +94,6 @@ def process_javascript(
 
         metadata["interesting"] = None
 
-    # ------------------------------------------------------
-    # Secret Detection
-    # ------------------------------------------------------
 
     try:
 
@@ -158,11 +134,6 @@ def process_javascript(
     )
 
 
-# ==========================================================
-# Collect Results
-# ==========================================================
-
-
 def collect_results(
     context: ExecutionContext,
     javascript_urls: list[str],
@@ -170,10 +141,7 @@ def collect_results(
     dict[str, dict[str, Any]],
     list[str],
 ]:
-    """
-    Download and analyze all
-    JavaScript files.
-    """
+
 
     info("Starting JavaScript analysis...")
 
@@ -287,27 +255,11 @@ def collect_results(
     )
 
 
-# ==========================================================
-# Run JavaScript Analysis
-# ==========================================================
-
-
 def run(
     context: ExecutionContext,
     javascript_urls: list[str],
 ) -> dict[str, Any]:
-    """
-    Execute the complete
-    JavaScript workflow.
 
-        Collect
-            ↓
-        Analyze
-            ↓
-        Store Context
-            ↓
-        Return Analysis
-    """
 
     (
         results,
@@ -334,10 +286,6 @@ def run(
 
     return analysis
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "process_javascript",

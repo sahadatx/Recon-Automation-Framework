@@ -1,10 +1,3 @@
-"""
-Nuclei Scanner
-
-Runs Nuclei against one or
-multiple targets.
-"""
-
 import subprocess
 import tempfile
 from pathlib import Path
@@ -12,9 +5,6 @@ from pathlib import Path
 from config.config import NUCLEI_RATE_LIMIT, NUCLEI_THREADS, NUCLEI_TIMEOUT
 from modules.nuclei.templates import get_templates
 
-# ==========================================================
-# Default Configuration
-# ==========================================================
 
 DEFAULT_SEVERITY = "critical,high,medium,low,info"
 
@@ -23,20 +13,10 @@ DEFAULT_RETRIES = 2
 DEFAULT_JSONL = True
 
 
-# ==========================================================
-# Validate Target
-# ==========================================================
-
-
 def validate_target(
     target: str,
 ) -> bool:
-    """
-    Validate target.
 
-    Returns:
-        bool
-    """
 
     return isinstance(
         target,
@@ -49,23 +29,13 @@ def validate_target(
     )
 
 
-# ==========================================================
-# Build Command
-# ==========================================================
-
-
 def build_command(
     output_file: Path,
     profile: str = "default",
     custom_template: str | None = None,
     severity: str = DEFAULT_SEVERITY,
 ):
-    """
-    Build nuclei command.
 
-    Returns:
-        list
-    """
 
     command = [
         "nuclei",
@@ -97,29 +67,14 @@ def build_command(
     return command
 
 
-# ==========================================================
-# Create Output File
-# ==========================================================
-
-
 def create_output_file():
-    """
-    Create temporary JSONL file.
 
-    Returns:
-        Path
-    """
 
     return Path(
         tempfile.mkstemp(
             suffix=".jsonl",
         )[1]
     )
-
-
-# ==========================================================
-# Build Single Target
-# ==========================================================
 
 
 def build_single_target(
@@ -129,9 +84,7 @@ def build_single_target(
     custom_template: str | None = None,
     severity: str = DEFAULT_SEVERITY,
 ):
-    """
-    Build command for one target.
-    """
+
 
     command = build_command(
         output_file,
@@ -150,11 +103,6 @@ def build_single_target(
     return command
 
 
-# ==========================================================
-# Build Multiple Targets
-# ==========================================================
-
-
 def build_multiple_targets(
     target_file: Path,
     output_file: Path,
@@ -162,10 +110,7 @@ def build_multiple_targets(
     custom_template: str | None = None,
     severity: str = DEFAULT_SEVERITY,
 ):
-    """
-    Build command for
-    multiple targets.
-    """
+
 
     command = build_command(
         output_file,
@@ -184,11 +129,6 @@ def build_multiple_targets(
     return command
 
 
-# ==========================================================
-# Run Single Target
-# ==========================================================
-
-
 def run_single_target(
     target: str,
     profile: str = "default",
@@ -196,9 +136,7 @@ def run_single_target(
     severity: str = DEFAULT_SEVERITY,
     retries: int = DEFAULT_RETRIES,
 ):
-    """
-    Run Nuclei against one target.
-    """
+
 
     if not validate_target(target):
 
@@ -257,11 +195,6 @@ def run_single_target(
     )
 
 
-# ==========================================================
-# Run Multiple Targets
-# ==========================================================
-
-
 def run_multiple_targets(
     targets: list[str],
     profile: str = "default",
@@ -269,10 +202,7 @@ def run_multiple_targets(
     severity: str = DEFAULT_SEVERITY,
     retries: int = DEFAULT_RETRIES,
 ):
-    """
-    Run Nuclei against
-    multiple targets.
-    """
+
 
     if not targets:
 
@@ -348,17 +278,10 @@ def run_multiple_targets(
     )
 
 
-# ==========================================================
-# Cleanup
-# ==========================================================
-
-
 def cleanup(
     filepath,
 ):
-    """
-    Delete temporary file.
-    """
+
 
     if not filepath:
 
@@ -375,15 +298,8 @@ def cleanup(
         pass
 
 
-# ==========================================================
-# Installation Helpers
-# ==========================================================
-
-
 def is_nuclei_installed():
-    """
-    Check installation.
-    """
+
 
     try:
 
@@ -405,9 +321,7 @@ def is_nuclei_installed():
 
 
 def get_nuclei_version():
-    """
-    Return version.
-    """
+
 
     try:
 
@@ -428,20 +342,13 @@ def get_nuclei_version():
         return "Unknown"
 
 
-# ==========================================================
-# Public Wrappers
-# ==========================================================
-
-
 def scan_target(
     target: str,
     profile: str = "default",
     custom_template: str | None = None,
     severity: str = DEFAULT_SEVERITY,
 ):
-    """
-    Scan one target.
-    """
+
 
     output, error = run_single_target(
         target,
@@ -463,9 +370,7 @@ def scan_targets(
     custom_template: str | None = None,
     severity: str = DEFAULT_SEVERITY,
 ):
-    """
-    Scan multiple targets.
-    """
+
 
     output, error = run_multiple_targets(
         targets,
@@ -481,11 +386,6 @@ def scan_targets(
     }
 
 
-# ==========================================================
-# Capabilities
-# ==========================================================
-
-
 def supports_multiple_targets():
 
     return True
@@ -495,10 +395,6 @@ def supports_jsonl():
 
     return DEFAULT_JSONL
 
-
-# ==========================================================
-# Self Test
-# ==========================================================
 
 if __name__ == "__main__":
 

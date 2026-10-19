@@ -1,10 +1,3 @@
-"""
-CDN Target Analyzer
-
-Analyze a single target
-to detect CDN provider.
-"""
-
 from __future__ import annotations
 
 from typing import Any
@@ -23,10 +16,6 @@ from .constants import (
     SERVER_FINGERPRINTS,
 )
 from .helpers import create_result, merge_methods, safe_lower
-
-# ==========================================================
-# Header Detection
-# ==========================================================
 
 
 def detect_header_provider(
@@ -54,11 +43,6 @@ def detect_header_provider(
     return None, []
 
 
-# ==========================================================
-# Server Detection
-# ==========================================================
-
-
 def detect_server_provider(
     server: str,
 ) -> tuple[str | None, list[str]]:
@@ -80,11 +64,6 @@ def detect_server_provider(
     return None, []
 
 
-# ==========================================================
-# CNAME Detection
-# ==========================================================
-
-
 def detect_cname_provider(
     cname: str | None,
 ) -> tuple[str | None, list[str]]:
@@ -104,11 +83,6 @@ def detect_cname_provider(
             )
 
     return None, []
-
-
-# ==========================================================
-# IP Detection
-# ==========================================================
 
 
 def detect_ip_provider(
@@ -134,11 +108,6 @@ def detect_ip_provider(
     return None, []
 
 
-# ==========================================================
-# Confidence
-# ==========================================================
-
-
 def calculate_confidence(
     methods: list[str],
 ) -> int:
@@ -157,11 +126,6 @@ def calculate_confidence(
     return 0
 
 
-# ==========================================================
-# Recommendations
-# ==========================================================
-
-
 def build_recommendations(
     provider: str | None,
 ) -> list[str]:
@@ -178,11 +142,6 @@ def build_recommendations(
         "No CDN detected.",
         "Verify manually.",
     ]
-
-
-# ==========================================================
-# Analyze Target
-# ==========================================================
 
 
 def analyze_target(
@@ -248,10 +207,6 @@ def analyze_target(
 
     return result
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "detect_header_provider",

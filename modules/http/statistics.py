@@ -1,33 +1,11 @@
-"""
-HTTP Probe Statistics
-
-Generate statistics for HTTP probe results.
-"""
-
 from __future__ import annotations
-
-# ==========================================================
-# Generate Statistics
-# ==========================================================
 
 
 def generate_statistics(
     results: dict[str, dict],
     failed_hosts: list[str],
 ) -> dict:
-    """
-    Generate HTTP probe statistics.
 
-    Args:
-        results:
-            Successful HTTP probe results.
-
-        failed_hosts:
-            Hosts that failed to respond.
-
-    Returns:
-        HTTP statistics.
-    """
 
     http_hosts = 0
     https_hosts = 0
@@ -89,10 +67,6 @@ def generate_statistics(
         "average_response_time": average_response_time,
     }
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "generate_statistics",

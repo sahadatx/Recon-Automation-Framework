@@ -1,12 +1,3 @@
-#!/usr/bin/env python3
-
-"""
-Screenshot Manager
-
-Coordinate asynchronous
-screenshot capture and analysis.
-"""
-
 from __future__ import annotations
 
 import asyncio
@@ -25,10 +16,6 @@ from modules.screenshots.helpers import (
     start_playwright,
 )
 
-# ==========================================================
-# Capture One Host
-# ==========================================================
-
 
 async def capture_one(
     semaphore: asyncio.Semaphore,
@@ -36,13 +23,7 @@ async def capture_one(
     host: str,
     response: dict[str, Any],
 ) -> tuple[str, dict[str, Any]]:
-    """
-    Capture a screenshot
-    for one host.
 
-    Each target receives
-    its own BrowserContext.
-    """
 
     async with semaphore:
 
@@ -69,11 +50,6 @@ async def capture_one(
             )
 
 
-# ==========================================================
-# Capture Hosts
-# ==========================================================
-
-
 async def capture_hosts(
     context: ExecutionContext,
     http_results: dict[str, dict[str, Any]],
@@ -81,10 +57,7 @@ async def capture_hosts(
     dict[str, dict[str, Any]],
     list[str],
 ]:
-    """
-    Capture screenshots for
-    HTTP probe results.
-    """
+
 
     _ = context
 
@@ -200,27 +173,11 @@ async def capture_hosts(
     )
 
 
-# ==========================================================
-# Run Screenshot Pipeline
-# ==========================================================
-
-
 async def run_async(
     context: ExecutionContext,
     http_results: dict[str, dict[str, Any]],
 ) -> dict[str, Any]:
-    """
-    Execute the complete
-    screenshot workflow.
 
-        Capture
-            ↓
-        Analyze
-            ↓
-        Store Context
-            ↓
-        Return Analysis
-    """
 
     (
         results,
@@ -246,19 +203,11 @@ async def run_async(
     return analysis
 
 
-# ==========================================================
-# Public Entry Point
-# ==========================================================
-
-
 def run(
     context: ExecutionContext,
     http_results: dict[str, dict[str, Any]],
 ) -> dict[str, Any]:
-    """
-    Public entry point for the
-    Screenshot module.
-    """
+
 
     return asyncio.run(
         run_async(
@@ -267,10 +216,6 @@ def run(
         )
     )
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "capture_one",

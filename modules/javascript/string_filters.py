@@ -1,15 +1,5 @@
-"""
-JavaScript String Filters
-
-Filters extracted JavaScript strings
-to remove noise and false positives.
-"""
-
 import re
 
-# ==========================================================
-# Configuration
-# ==========================================================
 
 MIN_STRING_LENGTH = 3
 
@@ -33,62 +23,34 @@ PLACEHOLDERS = {
 }
 
 
-# ==========================================================
-# Too Short
-# ==========================================================
-
-
 def is_short(
     value: str,
 ):
-    """
-    Ignore very short strings.
-    """
+
 
     return len(value.strip()) < MIN_STRING_LENGTH
-
-
-# ==========================================================
-# Numeric
-# ==========================================================
 
 
 def is_numeric(
     value: str,
 ):
-    """
-    Ignore numbers.
-    """
+
 
     return value.isdigit()
-
-
-# ==========================================================
-# Placeholder
-# ==========================================================
 
 
 def is_placeholder(
     value: str,
 ):
-    """
-    Ignore placeholder values.
-    """
+
 
     return value.lower().strip() in PLACEHOLDERS
-
-
-# ==========================================================
-# Hex String
-# ==========================================================
 
 
 def is_hex(
     value: str,
 ):
-    """
-    Ignore long hexadecimal strings.
-    """
+
 
     return (
         len(value) >= 16
@@ -100,17 +62,10 @@ def is_hex(
     )
 
 
-# ==========================================================
-# Base64
-# ==========================================================
-
-
 def is_base64(
     value: str,
 ):
-    """
-    Ignore generic Base64 strings.
-    """
+
 
     return (
         len(value) >= 16
@@ -122,38 +77,18 @@ def is_base64(
     )
 
 
-# ==========================================================
-# Repeated Characters
-# ==========================================================
-
-
 def is_repeated(
     value: str,
 ):
-    """
-    Ignore repeated characters.
 
-    Example:
-
-        aaaaaaaaaaaa
-
-        111111111111
-    """
 
     return len(set(value)) <= 2
-
-
-# ==========================================================
-# Junk Characters
-# ==========================================================
 
 
 def is_junk(
     value: str,
 ):
-    """
-    Ignore punctuation-only strings.
-    """
+
 
     return (
         re.fullmatch(
@@ -164,18 +99,10 @@ def is_junk(
     )
 
 
-# ==========================================================
-# Keep String
-# ==========================================================
-
-
 def keep_string(
     value: str,
 ):
-    """
-    Decide whether the string
-    should be kept.
-    """
+
 
     value = value.strip()
 
@@ -214,20 +141,10 @@ def keep_string(
     return True
 
 
-# ==========================================================
-# Filter Strings
-# ==========================================================
-
-
 def filter_strings(
     strings,
 ):
-    """
-    Remove noisy strings.
 
-    Returns:
-        list
-    """
 
     filtered = {string.strip() for string in strings if keep_string(string)}
 

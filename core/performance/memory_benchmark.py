@@ -1,39 +1,22 @@
-"""
-Memory Benchmark
-
-Memory benchmark utilities.
-"""
-
 from __future__ import annotations
 
 from typing import Any
 
-# ==========================================================
-# Memory Benchmark
-# ==========================================================
-
 
 class MemoryBenchmark:
-    """
-    Memory benchmark manager.
-    """
+
 
     def __init__(self) -> None:
 
         self._results: list[dict[str, Any]] = []
 
-    # ------------------------------------------------------
-    # Add Result
-    # ------------------------------------------------------
 
     def add_result(
         self,
         name: str,
         snapshot: dict[str, float],
     ) -> None:
-        """
-        Add a benchmark result.
-        """
+
 
         self._results.append(
             {
@@ -53,33 +36,22 @@ class MemoryBenchmark:
             }
         )
 
-    # ------------------------------------------------------
-    # Results
-    # ------------------------------------------------------
 
     @property
     def results(
         self,
     ) -> list[dict[str, Any]]:
-        """
-        Return all benchmark results.
-        """
+
 
         return list(
             self._results,
         )
 
-    # ------------------------------------------------------
-    # Best Run
-    # ------------------------------------------------------
 
     def best_run(
         self,
     ) -> dict[str, Any] | None:
-        """
-        Return the run with the
-        lowest peak memory.
-        """
+
 
         if not self._results:
 
@@ -90,17 +62,11 @@ class MemoryBenchmark:
             key=lambda item: item["peak_mb"],
         )
 
-    # ------------------------------------------------------
-    # Worst Run
-    # ------------------------------------------------------
 
     def worst_run(
         self,
     ) -> dict[str, Any] | None:
-        """
-        Return the run with the
-        highest peak memory.
-        """
+
 
         if not self._results:
 
@@ -111,16 +77,11 @@ class MemoryBenchmark:
             key=lambda item: item["peak_mb"],
         )
 
-    # ------------------------------------------------------
-    # Summary
-    # ------------------------------------------------------
 
     def summary(
         self,
     ) -> dict[str, Any]:
-        """
-        Generate benchmark summary.
-        """
+
 
         if not self._results:
 
@@ -158,18 +119,13 @@ class MemoryBenchmark:
             ),
         }
 
-    # ------------------------------------------------------
-    # Compare
-    # ------------------------------------------------------
 
     def compare(
         self,
         first: str,
         second: str,
     ) -> dict[str, float] | None:
-        """
-        Compare two benchmark runs.
-        """
+
 
         left = next(
             (item for item in self._results if item["name"] == first),
@@ -200,23 +156,14 @@ class MemoryBenchmark:
             ),
         }
 
-    # ------------------------------------------------------
-    # Reset
-    # ------------------------------------------------------
 
     def reset(
         self,
     ) -> None:
-        """
-        Clear benchmark results.
-        """
+
 
         self._results.clear()
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "MemoryBenchmark",

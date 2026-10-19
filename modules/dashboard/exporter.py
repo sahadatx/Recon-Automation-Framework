@@ -1,9 +1,3 @@
-"""
-Dashboard Exporter
-
-Export dashboard analysis results.
-"""
-
 from __future__ import annotations
 
 import json
@@ -21,15 +15,9 @@ from .constants import (
     DASHBOARD_TXT,
 )
 
-# ==========================================================
-# Output Directory
-# ==========================================================
-
 
 def create_output_directory() -> None:
-    """
-    Create dashboard output directory.
-    """
+
 
     DASHBOARD_DIR.mkdir(
         parents=True,
@@ -37,28 +25,11 @@ def create_output_directory() -> None:
     )
 
 
-# ==========================================================
-# Write Text
-# ==========================================================
-
-
 def write_text(
     output_file: Path,
     lines: list[str],
 ) -> Path:
-    """
-    Write text report.
 
-    Args:
-        output_file:
-            Destination file.
-
-        lines:
-            Report lines.
-
-    Returns:
-        Output file path.
-    """
 
     try:
 
@@ -76,28 +47,11 @@ def write_text(
     return output_file
 
 
-# ==========================================================
-# Write JSON
-# ==========================================================
-
-
 def write_json(
     output_file: Path,
     data: Any,
 ) -> Path:
-    """
-    Write JSON report.
 
-    Args:
-        output_file:
-            Destination file.
-
-        data:
-            Serializable object.
-
-    Returns:
-        Output file path.
-    """
 
     try:
 
@@ -124,28 +78,11 @@ def write_json(
     return output_file
 
 
-# ==========================================================
-# Write HTML
-# ==========================================================
-
-
 def write_html(
     output_file: Path,
     html: str,
 ) -> Path:
-    """
-    Write HTML dashboard.
 
-    Args:
-        output_file:
-            Destination file.
-
-        html:
-            HTML content.
-
-    Returns:
-        Output file path.
-    """
 
     try:
 
@@ -163,17 +100,10 @@ def write_html(
     return output_file
 
 
-# ==========================================================
-# Export JSON
-# ==========================================================
-
-
 def export_json(
     analysis: dict[str, Any],
 ) -> Path:
-    """
-    Export JSON report.
-    """
+
 
     return write_json(
         DASHBOARD_JSON,
@@ -181,17 +111,10 @@ def export_json(
     )
 
 
-# ==========================================================
-# Export TXT
-# ==========================================================
-
-
 def export_txt(
     analysis: dict[str, Any],
 ) -> Path:
-    """
-    Export text report.
-    """
+
 
     statistics = analysis["statistics"]
 
@@ -224,17 +147,10 @@ def export_txt(
     )
 
 
-# ==========================================================
-# Export Summary
-# ==========================================================
-
-
 def export_summary(
     analysis: dict[str, Any],
 ) -> Path:
-    """
-    Export summary report.
-    """
+
 
     statistics = analysis["statistics"]
 
@@ -254,18 +170,8 @@ def export_summary(
     )
 
 
-# ==========================================================
-# Build CSS
-# ==========================================================
-
-
 def _build_css() -> str:
-    """
-    Build dashboard CSS.
 
-    Returns:
-        CSS stylesheet.
-    """
 
     return """
 <style>
@@ -530,24 +436,10 @@ footer{
 """
 
 
-# ==========================================================
-# Build Header
-# ==========================================================
-
-
 def _build_header(
     statistics: dict,
 ) -> str:
-    """
-    Build dashboard header.
 
-    Args:
-        statistics:
-            Dashboard statistics.
-
-    Returns:
-        HTML header.
-    """
 
     return f"""
 <div class="container">
@@ -649,24 +541,10 @@ v1.0.0
 """
 
 
-# ==========================================================
-# Build Summary Cards
-# ==========================================================
-
-
 def _build_summary_cards(
     statistics: dict,
 ) -> str:
-    """
-    Build dashboard summary cards.
 
-    Args:
-        statistics:
-            Dashboard statistics.
-
-    Returns:
-        Summary card section.
-    """
 
     return f"""
 <div class="grid">
@@ -759,24 +637,10 @@ def _build_summary_cards(
 """
 
 
-# ==========================================================
-# Build Execution Summary
-# ==========================================================
-
-
 def _build_execution_summary(
     statistics: dict,
 ) -> str:
-    """
-    Build execution summary section.
 
-    Args:
-        statistics:
-            Dashboard statistics.
-
-    Returns:
-        HTML execution summary.
-    """
 
     success_rate = round(
         (
@@ -957,24 +821,10 @@ style="width:{failure_rate}%;">
 """
 
 
-# ==========================================================
-# Build Module Status
-# ==========================================================
-
-
 def _build_module_status(
     modules: list[str],
 ) -> str:
-    """
-    Build module status table.
 
-    Args:
-        modules:
-            Executed module names.
-
-    Returns:
-        HTML module status table.
-    """
 
     rows = []
 
@@ -1041,24 +891,10 @@ Status
 """
 
 
-# ==========================================================
-# Build Findings Breakdown
-# ==========================================================
-
-
 def _build_findings_breakdown(
     analysis: dict,
 ) -> str:
-    """
-    Build findings breakdown table.
 
-    Args:
-        analysis:
-            Dashboard analysis results.
-
-    Returns:
-        HTML findings table.
-    """
 
     statistics = analysis["statistics"]
 
@@ -1196,24 +1032,10 @@ Count
 """
 
 
-# ==========================================================
-# Build Results Overview
-# ==========================================================
-
-
 def _build_results_overview(
     statistics: dict,
 ) -> str:
-    """
-    Build results overview section.
 
-    Args:
-        statistics:
-            Dashboard statistics.
-
-    Returns:
-        HTML overview cards.
-    """
 
     total_modules = max(
         statistics["modules"],
@@ -1360,24 +1182,10 @@ color:#94a3b8;
 """
 
 
-# ==========================================================
-# Build Framework Information
-# ==========================================================
-
-
 def _build_framework_information(
     analysis: dict,
 ) -> str:
-    """
-    Build framework information section.
 
-    Args:
-        analysis:
-            Dashboard analysis.
-
-    Returns:
-        HTML framework information.
-    """
 
     statistics = analysis["statistics"]
 
@@ -1462,18 +1270,8 @@ Value
 """
 
 
-# ==========================================================
-# Build Footer
-# ==========================================================
-
-
 def _build_footer() -> str:
-    """
-    Build dashboard footer.
 
-    Returns:
-        HTML footer.
-    """
 
     return f"""
 <footer>
@@ -1573,24 +1371,10 @@ Recon Automation Framework
 """
 
 
-# ==========================================================
-# Export HTML Dashboard
-# ==========================================================
-
-
 def export_html(
     analysis: dict,
 ) -> Path:
-    """
-    Export HTML dashboard.
 
-    Args:
-        analysis:
-            Dashboard analysis.
-
-    Returns:
-        HTML file path.
-    """
 
     create_output_directory()
 
@@ -1688,17 +1472,10 @@ Recon Automation Framework Dashboard
     )
 
 
-# ==========================================================
-# Show Summary
-# ==========================================================
-
-
 def show_summary(
     analysis: dict,
 ) -> None:
-    """
-    Display dashboard summary.
-    """
+
 
     statistics = analysis["statistics"]
 
@@ -1723,20 +1500,10 @@ def show_summary(
     print("=" * 80)
 
 
-# ==========================================================
-# Export All
-# ==========================================================
-
-
 def export_all(
     analysis: dict,
 ) -> dict:
-    """
-    Export every dashboard report.
 
-    Returns:
-        Exported files.
-    """
 
     create_output_directory()
 
@@ -1751,10 +1518,6 @@ def export_all(
 
     return exported
 
-
-# ==========================================================
-# Public API
-# ==========================================================
 
 __all__ = [
     "export_json",

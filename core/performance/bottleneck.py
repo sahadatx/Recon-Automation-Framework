@@ -1,48 +1,22 @@
-"""
-Bottleneck Detection
-
-Analyze performance metrics and identify
-potential bottlenecks.
-"""
-
 from __future__ import annotations
 
 from typing import Any
 
-# ==========================================================
-# Thresholds
-# ==========================================================
 
-TIME_WARNING = 5.0  # seconds
+TIME_WARNING = 5.0
 TIME_CRITICAL = 15.0
 
-MEMORY_WARNING = 250.0  # MB
+MEMORY_WARNING = 250.0
 MEMORY_CRITICAL = 500.0
 
-CPU_WARNING = 70.0  # %
+CPU_WARNING = 70.0
 CPU_CRITICAL = 90.0
-
-
-# ==========================================================
-# Detect Bottlenecks
-# ==========================================================
 
 
 def detect_bottlenecks(
     metrics: dict[str, Any],
 ) -> list[dict[str, Any]]:
-    """
-    Analyze collected metrics and detect
-    performance bottlenecks.
 
-    Expected metrics:
-
-    {
-        "execution_time": float,
-        "memory_peak_mb": float,
-        "cpu_percent": float,
-    }
-    """
 
     bottlenecks: list[dict[str, Any]] = []
 
@@ -61,9 +35,6 @@ def detect_bottlenecks(
         0.0,
     )
 
-    # ------------------------------------------------------
-    # Execution Time
-    # ------------------------------------------------------
 
     if execution >= TIME_CRITICAL:
 
@@ -89,9 +60,6 @@ def detect_bottlenecks(
             }
         )
 
-    # ------------------------------------------------------
-    # Memory
-    # ------------------------------------------------------
 
     if memory >= MEMORY_CRITICAL:
 
@@ -117,9 +85,6 @@ def detect_bottlenecks(
             }
         )
 
-    # ------------------------------------------------------
-    # CPU
-    # ------------------------------------------------------
 
     if cpu >= CPU_CRITICAL:
 
@@ -148,17 +113,10 @@ def detect_bottlenecks(
     return bottlenecks
 
 
-# ==========================================================
-# Summary
-# ==========================================================
-
-
 def summary(
     bottlenecks: list[dict[str, Any]],
 ) -> str:
-    """
-    Generate a human-readable summary.
-    """
+
 
     if not bottlenecks:
 
@@ -184,10 +142,6 @@ def summary(
         lines,
     )
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "detect_bottlenecks",

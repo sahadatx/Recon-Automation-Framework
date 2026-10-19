@@ -1,10 +1,3 @@
-"""
-Subdomain Takeover Helpers
-
-Reusable helper functions for
-Subdomain Takeover Detection.
-"""
-
 from __future__ import annotations
 
 import socket
@@ -20,30 +13,16 @@ from config.config import HTTP_TIMEOUT
 
 from .constants import DEFAULT_ANALYSIS, DEFAULT_HEADERS
 
-# ==========================================================
-# Default Result
-# ==========================================================
 
 EMPTY_TAKEOVER_RESULT = deepcopy(
     DEFAULT_ANALYSIS,
 )
 
 
-# ==========================================================
-# Normalize Target
-# ==========================================================
-
-
 def normalize_target(
     target: str,
 ):
-    """
-    Normalize target into
-    hostname.
 
-    Returns:
-        str
-    """
 
     if not target:
 
@@ -62,20 +41,10 @@ def normalize_target(
     return parsed.hostname or ""
 
 
-# ==========================================================
-# Resolve IPv4
-# ==========================================================
-
-
 def resolve_ipv4(
     host: str,
 ):
-    """
-    Resolve IPv4 address.
 
-    Returns:
-        str | None
-    """
 
     try:
 
@@ -88,20 +57,10 @@ def resolve_ipv4(
         return None
 
 
-# ==========================================================
-# HTTP Request
-# ==========================================================
-
-
 def request_page(
     target: str,
 ):
-    """
-    Send HTTP request.
 
-    Returns:
-        requests.Response | None
-    """
 
     try:
 
@@ -119,20 +78,10 @@ def request_page(
         return None
 
 
-# ==========================================================
-# Status Code
-# ==========================================================
-
-
 def extract_status_code(
     response,
 ):
-    """
-    Extract HTTP status code.
 
-    Returns:
-        int
-    """
 
     if response is None:
 
@@ -141,20 +90,10 @@ def extract_status_code(
     return response.status_code
 
 
-# ==========================================================
-# Response Body
-# ==========================================================
-
-
 def extract_body(
     response,
 ):
-    """
-    Extract response body.
 
-    Returns:
-        str
-    """
 
     if response is None:
 
@@ -163,20 +102,10 @@ def extract_body(
     return response.text
 
 
-# ==========================================================
-# HTML Title
-# ==========================================================
-
-
 def extract_title(
     response,
 ):
-    """
-    Extract HTML title.
 
-    Returns:
-        str
-    """
 
     if response is None:
 
@@ -202,20 +131,10 @@ def extract_title(
     return ""
 
 
-# ==========================================================
-# DNS CNAME
-# ==========================================================
-
-
 def resolve_cname(
     host: str,
 ):
-    """
-    Resolve CNAME record.
 
-    Returns:
-        str | None
-    """
 
     try:
 
@@ -233,21 +152,10 @@ def resolve_cname(
         return None
 
 
-# ==========================================================
-# Safe Lower
-# ==========================================================
-
-
 def safe_lower(
     value: Any,
 ):
-    """
-    Safely convert a value
-    to lowercase string.
 
-    Returns:
-        str
-    """
 
     if value is None:
 
@@ -258,22 +166,11 @@ def safe_lower(
     ).lower()
 
 
-# ==========================================================
-# Fingerprint Detection
-# ==========================================================
-
-
 def contains_fingerprint(
     content: str,
     fingerprints: set[str],
 ):
-    """
-    Check whether any
-    fingerprint exists.
 
-    Returns:
-        str | None
-    """
 
     content = safe_lower(
         content,
@@ -293,21 +190,10 @@ def contains_fingerprint(
     return None
 
 
-# ==========================================================
-# Merge Detection Methods
-# ==========================================================
-
-
 def merge_methods(
     *methods,
 ):
-    """
-    Merge detection methods
-    without duplicates.
 
-    Returns:
-        list[str]
-    """
 
     merged = []
 
@@ -328,28 +214,13 @@ def merge_methods(
     return merged
 
 
-# ==========================================================
-# Deep Copy Result
-# ==========================================================
-
-
 def create_result():
-    """
-    Create empty takeover
-    result.
 
-    Returns:
-        dict
-    """
 
     return deepcopy(
         EMPTY_TAKEOVER_RESULT,
     )
 
-
-# ==========================================================
-# Export
-# ==========================================================
 
 __all__ = [
     "EMPTY_TAKEOVER_RESULT",

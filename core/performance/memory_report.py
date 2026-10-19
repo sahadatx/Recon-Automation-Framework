@@ -1,32 +1,12 @@
-"""
-Memory Report
-
-Generate structured memory reports.
-"""
-
 from __future__ import annotations
 
 from typing import Any
-
-# ==========================================================
-# Generate Report
-# ==========================================================
 
 
 def generate_report(
     analysis: dict[str, Any],
 ) -> dict[str, Any]:
-    """
-    Generate a structured memory report.
 
-    Args:
-        analysis:
-            Memory analysis produced by
-            memory_analyzer.py
-
-    Returns:
-        Structured memory report.
-    """
 
     memory = analysis.get(
         "memory",
@@ -90,17 +70,10 @@ def generate_report(
     }
 
 
-# ==========================================================
-# Markdown Report
-# ==========================================================
-
-
 def generate_markdown(
     report: dict[str, Any],
 ) -> str:
-    """
-    Generate a Markdown memory report.
-    """
+
 
     memory = report["memory"]
 
@@ -134,10 +107,6 @@ def generate_markdown(
         lines,
     )
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "generate_report",

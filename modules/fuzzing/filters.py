@@ -1,14 +1,3 @@
-"""
-Directory Fuzzing Filters
-
-Filters false positives and
-normalizes ffuf results.
-"""
-
-# ==========================================================
-# Default Status Codes
-# ==========================================================
-
 DEFAULT_STATUS_CODES = {
     200,
     201,
@@ -25,20 +14,10 @@ DEFAULT_STATUS_CODES = {
 }
 
 
-# ==========================================================
-# Remove Duplicate URLs
-# ==========================================================
-
-
 def remove_duplicates(
     results: list,
 ):
-    """
-    Remove duplicate URLs.
 
-    Returns:
-        list
-    """
 
     unique = {}
 
@@ -56,22 +35,11 @@ def remove_duplicates(
     return list(unique.values())
 
 
-# ==========================================================
-# Filter Status Codes
-# ==========================================================
-
-
 def filter_status_codes(
     results: list,
     allowed=None,
 ):
-    """
-    Keep allowed HTTP
-    status codes.
 
-    Returns:
-        list
-    """
 
     if allowed is None:
 
@@ -88,26 +56,10 @@ def filter_status_codes(
     ]
 
 
-# ==========================================================
-# Remove Invalid Responses
-# ==========================================================
-
-
 def remove_invalid(
     results: list,
 ):
-    """
-    Remove invalid
-    ffuf responses.
 
-    Responses with a valid
-    HTTP status are kept,
-    even if response size
-    is zero.
-
-    Returns:
-        list
-    """
 
     filtered = []
 
@@ -128,22 +80,11 @@ def remove_invalid(
     return filtered
 
 
-# ==========================================================
-# Filter Extensions
-# ==========================================================
-
-
 def filter_extensions(
     results: list,
     blocked=None,
 ):
-    """
-    Remove unwanted
-    file extensions.
 
-    Returns:
-        list
-    """
 
     if blocked is None:
 
@@ -179,20 +120,10 @@ def filter_extensions(
     return filtered
 
 
-# ==========================================================
-# Apply Filters
-# ==========================================================
-
-
 def apply_filters(
     results: list,
 ):
-    """
-    Apply all filters.
 
-    Returns:
-        list
-    """
 
     results = remove_duplicates(results)
 

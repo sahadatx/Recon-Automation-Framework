@@ -1,15 +1,5 @@
-"""
-Directory Fuzzing Interesting Detection
-
-Detects high-value files and directories
-from directory fuzzing results.
-"""
-
 from pathlib import PurePosixPath
 
-# ==========================================================
-# Interesting Directories
-# ==========================================================
 
 INTERESTING_DIRECTORIES = {
     "admin",
@@ -38,10 +28,6 @@ INTERESTING_DIRECTORIES = {
 }
 
 
-# ==========================================================
-# Interesting Files
-# ==========================================================
-
 INTERESTING_FILES = {
     ".env",
     ".env.local",
@@ -68,20 +54,10 @@ INTERESTING_FILES = {
 }
 
 
-# ==========================================================
-# Normalize Path
-# ==========================================================
-
-
 def normalize_path(
     url: str,
 ) -> str:
-    """
-    Normalize URL path.
 
-    Returns:
-        str
-    """
 
     if not url:
 
@@ -108,40 +84,20 @@ def normalize_path(
     return url.strip("/")
 
 
-# ==========================================================
-# Interesting File
-# ==========================================================
-
-
 def is_interesting_file(
     path: str,
 ) -> bool:
-    """
-    Check whether a file is interesting.
 
-    Returns:
-        bool
-    """
 
     filename = PurePosixPath(path).name.lower()
 
     return filename in INTERESTING_FILES
 
 
-# ==========================================================
-# Interesting Directory
-# ==========================================================
-
-
 def is_interesting_directory(
     path: str,
 ) -> bool:
-    """
-    Check whether a directory is interesting.
 
-    Returns:
-        bool
-    """
 
     path = path.lower()
 
@@ -156,24 +112,10 @@ def is_interesting_directory(
     return False
 
 
-# ==========================================================
-# Detect Interesting Results
-# ==========================================================
-
-
 def detect_interesting(
     results: list,
 ):
-    """
-    Detect interesting paths.
 
-    Args:
-        results:
-            Filtered ffuf results.
-
-    Returns:
-        dict
-    """
 
     files = []
 
@@ -213,23 +155,9 @@ def detect_interesting(
     }
 
 
-# ==========================================================
-# Entry Point
-# ==========================================================
-
-
 def scan(
     results: list,
 ):
-    """
-    Entry point.
 
-    Args:
-        results:
-            Filtered ffuf results.
-
-    Returns:
-        dict
-    """
 
     return detect_interesting(results)

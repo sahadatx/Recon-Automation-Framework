@@ -1,12 +1,3 @@
-#!/usr/bin/env python3
-
-"""
-Technology Detection Manager
-
-Coordinate technology
-detection and analysis.
-"""
-
 from __future__ import annotations
 
 from concurrent.futures import as_completed
@@ -17,10 +8,6 @@ from core.logger import info, progress_status, success, warning
 from modules.tech.analyzer import analyze
 from modules.tech.detector import detect_technologies
 
-# ==========================================================
-# Detect One Host
-# ==========================================================
-
 
 def detect_one_host(
     host: str,
@@ -29,10 +16,7 @@ def detect_one_host(
     str,
     dict[str, Any],
 ]:
-    """
-    Detect technologies
-    for one host.
-    """
+
 
     return (
         host,
@@ -42,11 +26,6 @@ def detect_one_host(
     )
 
 
-# ==========================================================
-# Detect Hosts
-# ==========================================================
-
-
 def detect_hosts(
     context: ExecutionContext,
     http_results: dict[str, dict[str, Any]],
@@ -54,10 +33,7 @@ def detect_hosts(
     dict[str, dict[str, Any]],
     list[str],
 ]:
-    """
-    Detect technologies
-    for all hosts.
-    """
+
 
     info("Starting Technology Detection...")
 
@@ -144,27 +120,11 @@ def detect_hosts(
     )
 
 
-# ==========================================================
-# Run Technology Detection
-# ==========================================================
-
-
 def run(
     context: ExecutionContext,
     http_results: dict[str, dict[str, Any]],
 ) -> dict[str, Any]:
-    """
-    Execute the complete
-    technology detection workflow.
 
-        Detect
-            ↓
-        Analyze
-            ↓
-        Store Context
-            ↓
-        Return Analysis
-    """
 
     (
         results,
@@ -186,10 +146,6 @@ def run(
 
     return analysis
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "run",

@@ -1,11 +1,3 @@
-#!/usr/bin/env python3
-
-"""
-Passive Enumeration Manager
-
-Coordinate passive enumeration.
-"""
-
 from __future__ import annotations
 
 import re
@@ -23,9 +15,6 @@ from modules.passive.findomain import run_findomain
 from modules.passive.securitytrails import run_securitytrails
 from modules.passive.subfinder import run_subfinder
 
-# ==========================================================
-# Type Definitions
-# ==========================================================
 
 PassiveSource = Callable[
     [
@@ -35,10 +24,6 @@ PassiveSource = Callable[
     list[str],
 ]
 
-
-# ==========================================================
-# Tool Registry
-# ==========================================================
 
 PASSIVE_SOURCES: list[
     tuple[
@@ -81,11 +66,6 @@ RETRYABLE_TOOLS: frozenset[str] = frozenset(
 DOMAIN_RE = re.compile(r"^(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$")
 
 
-# ==========================================================
-# Timed Runner
-# ==========================================================
-
-
 def timed_runner(
     context: ExecutionContext,
     function: PassiveSource,
@@ -94,10 +74,7 @@ def timed_runner(
     list[str],
     float,
 ]:
-    """
-    Execute one passive source and
-    measure execution time.
-    """
+
 
     start_time = time.perf_counter()
 
@@ -117,11 +94,6 @@ def timed_runner(
     )
 
 
-# ==========================================================
-# Collect Passive Enumeration
-# ==========================================================
-
-
 def collect_subdomains(
     context: ExecutionContext,
     domain: str,
@@ -130,10 +102,7 @@ def collect_subdomains(
     dict[str, float],
     list[str],
 ]:
-    """
-    Run all passive sources
-    concurrently.
-    """
+
 
     info("Starting Passive Enumeration...")
 
@@ -268,19 +237,11 @@ def collect_subdomains(
     )
 
 
-# ==========================================================
-# Merge Results
-# ==========================================================
-
-
 def merge_results(
     results: dict[str, list[str]],
     domain: str,
 ) -> list[str]:
-    """
-    Merge, normalize and validate
-    discovered subdomains.
-    """
+
 
     target_domain = domain.lower()
 
@@ -319,29 +280,11 @@ def merge_results(
     )
 
 
-# ==========================================================
-# Run Passive Enumeration
-# ==========================================================
-
-
 def run(
     context: ExecutionContext,
     domain: str,
 ) -> dict[str, Any]:
-    """
-    Execute the complete passive
-    enumeration workflow.
 
-        Collect
-            ↓
-        Merge
-            ↓
-        Analyze
-            ↓
-        Store Context
-            ↓
-        Return Analysis
-    """
 
     (
         results,
@@ -372,10 +315,6 @@ def run(
 
     return analysis
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "run",

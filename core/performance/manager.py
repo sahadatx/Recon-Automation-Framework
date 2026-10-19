@@ -1,12 +1,3 @@
-#!/usr/bin/env python3
-
-"""
-Performance Manager
-
-Central orchestration layer for profiling, benchmarking,
-memory analysis and performance reporting.
-"""
-
 from __future__ import annotations
 
 from typing import Any
@@ -21,37 +12,26 @@ from .profiler import PerformanceProfiler
 
 
 class PerformanceManager:
-    """
-    Central performance management system.
 
-    Responsibilities
-    ----------------
-    - Framework execution timing
-    - Per-module timing
-    - Memory profiling
-    - Benchmark collection
-    - Bottleneck detection
-    - Report generation
-    """
 
     def __init__(self) -> None:
-        # Framework timer
+
         self._framework_profiler = PerformanceProfiler()
 
-        # Module timers
+
         self._module_profilers: dict[
             str,
             PerformanceProfiler,
         ] = {}
 
-        # Memory
+
         self._memory_profiler = MemoryProfiler()
 
-        # Benchmarks
+
         self._benchmark = Benchmark()
         self._memory_benchmark = MemoryBenchmark()
 
-        # Cached data
+
         self._memory_snapshot: dict[
             str,
             float,
@@ -76,14 +56,9 @@ class PerformanceManager:
 
         self._running = False
 
-    # ==========================================================
-    # Framework
-    # ==========================================================
 
     def start(self) -> None:
-        """
-        Start framework performance monitoring.
-        """
+
 
         if self._running:
             return
@@ -108,14 +83,7 @@ class PerformanceManager:
         self._running = True
 
     def stop(self) -> float:
-        """
-        Stop framework profiling.
 
-        Returns
-        -------
-        float
-            Total execution time.
-        """
 
         if not self._running:
             return 0.0
@@ -139,17 +107,12 @@ class PerformanceManager:
 
         return execution_time
 
-    # ==========================================================
-    # Module Profiling
-    # ==========================================================
 
     def start_module(
         self,
         module: str,
     ) -> None:
-        """
-        Start profiling a module.
-        """
+
 
         profiler = PerformanceProfiler()
 
@@ -161,15 +124,7 @@ class PerformanceManager:
         self,
         module: str,
     ) -> float:
-        """
-        Stop profiling a module and
-        store benchmark results.
 
-        Returns
-        -------
-        float
-            Module execution time.
-        """
 
         profiler = self._module_profilers.get(
             module,
@@ -200,17 +155,12 @@ class PerformanceManager:
 
         return elapsed
 
-    # ==========================================================
-    # Benchmark
-    # ==========================================================
 
     def set_target_count(
         self,
         count: int,
     ) -> None:
-        """
-        Store processed target count.
-        """
+
 
         self._benchmark.set_targets(count)
 
@@ -218,9 +168,7 @@ class PerformanceManager:
     def benchmark(
         self,
     ) -> Benchmark:
-        """
-        Return framework benchmark object.
-        """
+
 
         return self._benchmark
 
@@ -228,9 +176,7 @@ class PerformanceManager:
     def memory_benchmark(
         self,
     ) -> MemoryBenchmark:
-        """
-        Return memory benchmark object.
-        """
+
 
         return self._memory_benchmark
 
@@ -238,9 +184,7 @@ class PerformanceManager:
     def module_results(
         self,
     ) -> list[dict[str, Any]]:
-        """
-        Return module benchmark results.
-        """
+
 
         return self._benchmark.results
 
@@ -248,23 +192,16 @@ class PerformanceManager:
     def execution_time(
         self,
     ) -> float:
-        """
-        Return framework execution time.
-        """
+
 
         return self._framework_profiler.elapsed
 
-    # ==========================================================
-    # Memory
-    # ==========================================================
 
     @property
     def memory_snapshot(
         self,
     ) -> dict[str, float]:
-        """
-        Return the latest memory snapshot.
-        """
+
 
         return dict(self._memory_snapshot)
 
@@ -272,16 +209,12 @@ class PerformanceManager:
     def memory_analysis(
         self,
     ) -> dict[str, Any]:
-        """
-        Return the latest memory analysis.
-        """
+
 
         return dict(self._memory_analysis)
 
     def analyze_memory(self) -> dict[str, Any]:
-        """
-        Analyze collected memory statistics.
-        """
+
 
         if not self._memory_snapshot:
             self._memory_snapshot = self._memory_profiler.snapshot()
@@ -292,16 +225,11 @@ class PerformanceManager:
 
         return self._memory_analysis
 
-    # ==========================================================
-    # Bottlenecks
-    # ==========================================================
 
     def detect_bottlenecks(
         self,
     ) -> list[dict[str, Any]]:
-        """
-        Detect framework bottlenecks.
-        """
+
 
         metrics = {
             "execution_time": (self.execution_time),
@@ -311,8 +239,8 @@ class PerformanceManager:
                     0.0,
                 )
             ),
-            # CPU profiling will be added
-            # in a future lesson.
+
+
             "cpu_percent": 0.0,
         }
 
@@ -324,23 +252,15 @@ class PerformanceManager:
     def bottlenecks(
         self,
     ) -> list[dict[str, Any]]:
-        """
-        Return detected bottlenecks.
-        """
+
 
         return list(self._bottlenecks)
 
-    # ==========================================================
-    # Report
-    # ==========================================================
 
     def generate_report(
         self,
     ) -> dict[str, Any]:
-        """
-        Generate the complete
-        performance report.
-        """
+
 
         if not self._memory_analysis:
             self.analyze_memory()
@@ -363,23 +283,16 @@ class PerformanceManager:
     def report(
         self,
     ) -> dict[str, Any]:
-        """
-        Return cached report.
-        """
+
 
         if not self._report:
             return self.generate_report()
 
         return dict(self._report)
 
-    # ==========================================================
-    # Output
-    # ==========================================================
 
     def markdown(self) -> str:
-        """
-        Return the performance report as Markdown.
-        """
+
 
         if not self._report:
             self.generate_report()
@@ -389,9 +302,7 @@ class PerformanceManager:
         )
 
     def text(self) -> str:
-        """
-        Return the performance report as plain text.
-        """
+
 
         if not self._report:
             self.generate_report()
@@ -403,9 +314,7 @@ class PerformanceManager:
     def summary(
         self,
     ) -> dict[str, Any]:
-        """
-        Return a compact performance summary.
-        """
+
 
         return {
             "execution_time": self.execution_time,
@@ -415,14 +324,9 @@ class PerformanceManager:
             "bottlenecks": list(self._bottlenecks),
         }
 
-    # ==========================================================
-    # Utility
-    # ==========================================================
 
     def reset(self) -> None:
-        """
-        Reset all collected performance data.
-        """
+
 
         self._framework_profiler.reset()
 
@@ -446,18 +350,12 @@ class PerformanceManager:
 
         self._running = False
 
-    # ==========================================================
-    # Properties
-    # ==========================================================
 
     @property
     def is_running(
         self,
     ) -> bool:
-        """
-        Return True if performance monitoring
-        is currently active.
-        """
+
 
         return self._running
 

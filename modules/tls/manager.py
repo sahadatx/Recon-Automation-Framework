@@ -1,11 +1,3 @@
-#!/usr/bin/env python3
-
-"""
-TLS Manager
-
-Coordinate TLS analysis.
-"""
-
 from __future__ import annotations
 
 from typing import Any
@@ -19,29 +11,12 @@ from .ciphers import collect_cipher
 from .filters import filter_results
 from .protocols import collect_protocols
 
-# ==========================================================
-# Run TLS Analysis
-# ==========================================================
-
 
 def run_tls_analysis(
     context: ExecutionContext,
     targets: list[str],
 ) -> dict[str, Any]:
-    """
-    Execute the complete
-    TLS analysis workflow.
 
-        Collect
-            ↓
-        Filter
-            ↓
-        Analyze
-            ↓
-        Store Context
-            ↓
-        Return Analysis
-    """
 
     if not targets:
 
@@ -124,29 +99,17 @@ def run_tls_analysis(
     return analysis
 
 
-# ==========================================================
-# Public Entry Point
-# ==========================================================
-
-
 def run(
     context: ExecutionContext,
     targets: list[str],
 ) -> dict[str, Any]:
-    """
-    Public entry point for the
-    TLS module.
-    """
+
 
     return run_tls_analysis(
         context,
         targets,
     )
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "run",

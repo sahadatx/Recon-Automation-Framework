@@ -1,16 +1,6 @@
-"""
-Performance Report
-
-Generate comprehensive performance reports.
-"""
-
 from __future__ import annotations
 
 from typing import Any
-
-# ==========================================================
-# Generate Performance Report
-# ==========================================================
 
 
 def generate_report(
@@ -20,9 +10,7 @@ def generate_report(
     bottlenecks: list[dict[str, Any]],
     benchmark: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """
-    Generate a comprehensive performance report.
-    """
+
 
     report = {
         "execution": {
@@ -48,17 +36,10 @@ def generate_report(
     return report
 
 
-# ==========================================================
-# Markdown Report
-# ==========================================================
-
-
 def generate_markdown(
     report: dict[str, Any],
 ) -> str:
-    """
-    Convert report to Markdown.
-    """
+
 
     execution = report["execution"]
 
@@ -133,17 +114,10 @@ def generate_markdown(
     )
 
 
-# ==========================================================
-# Text Report
-# ==========================================================
-
-
 def generate_text(
     report: dict[str, Any],
 ) -> str:
-    """
-    Generate a plain-text report.
-    """
+
 
     lines = [
         "=" * 60,
@@ -182,10 +156,6 @@ def generate_text(
         lines,
     )
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "generate_report",

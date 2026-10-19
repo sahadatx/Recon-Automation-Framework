@@ -1,14 +1,3 @@
-"""
-Nuclei Filters
-
-Filters and normalizes
-Nuclei findings.
-"""
-
-# ==========================================================
-# Default Configuration
-# ==========================================================
-
 DEFAULT_SEVERITIES = {
     "critical",
     "high",
@@ -17,20 +6,11 @@ DEFAULT_SEVERITIES = {
     "info",
 }
 
-# ==========================================================
-# Remove Duplicates
-# ==========================================================
-
 
 def remove_duplicates(
     findings: list,
 ):
-    """
-    Remove duplicate findings.
 
-    Returns:
-        list
-    """
 
     unique = {}
 
@@ -52,21 +32,11 @@ def remove_duplicates(
     return list(unique.values())
 
 
-# ==========================================================
-# Filter Severity
-# ==========================================================
-
-
 def filter_severity(
     findings: list,
     severities=None,
 ):
-    """
-    Filter by severity.
 
-    Returns:
-        list
-    """
 
     if severities is None:
 
@@ -85,21 +55,11 @@ def filter_severity(
     ]
 
 
-# ==========================================================
-# Filter Templates
-# ==========================================================
-
-
 def filter_templates(
     findings: list,
     templates: list | None = None,
 ):
-    """
-    Include only selected templates.
 
-    Returns:
-        list
-    """
 
     if not templates:
 
@@ -118,22 +78,11 @@ def filter_templates(
     ]
 
 
-# ==========================================================
-# Filter Tags
-# ==========================================================
-
-
 def filter_tags(
     findings: list,
     tags: list | None = None,
 ):
-    """
-    Include findings containing
-    selected tags.
 
-    Returns:
-        list
-    """
 
     if not tags:
 
@@ -160,21 +109,10 @@ def filter_tags(
     return filtered
 
 
-# ==========================================================
-# CVE Only
-# ==========================================================
-
-
 def filter_cves(
     findings: list,
 ):
-    """
-    Keep findings that contain
-    at least one CVE.
 
-    Returns:
-        list
-    """
 
     filtered = []
 
@@ -197,21 +135,11 @@ def filter_cves(
     return filtered
 
 
-# ==========================================================
-# Exclude Templates
-# ==========================================================
-
-
 def exclude_templates(
     findings: list,
     templates: list | None = None,
 ):
-    """
-    Exclude selected templates.
 
-    Returns:
-        list
-    """
 
     if not templates:
 
@@ -230,22 +158,11 @@ def exclude_templates(
     ]
 
 
-# ==========================================================
-# Exclude Tags
-# ==========================================================
-
-
 def exclude_tags(
     findings: list,
     tags: list | None = None,
 ):
-    """
-    Exclude findings containing
-    selected tags.
 
-    Returns:
-        list
-    """
 
     if not tags:
 
@@ -272,20 +189,10 @@ def exclude_tags(
     return filtered
 
 
-# ==========================================================
-# Remove Informational Findings
-# ==========================================================
-
-
 def remove_informational(
     findings: list,
 ):
-    """
-    Remove informational findings.
 
-    Returns:
-        list
-    """
 
     return [
         finding
@@ -298,11 +205,6 @@ def remove_informational(
     ]
 
 
-# ==========================================================
-# Apply Filters
-# ==========================================================
-
-
 def apply_filters(
     findings: list,
     severities=None,
@@ -313,56 +215,16 @@ def apply_filters(
     cves_only: bool = False,
     remove_info: bool = False,
 ):
-    """
-    Apply filter pipeline.
 
-    Args:
-        findings:
-            Parsed findings.
-
-        severities:
-            Allowed severities.
-
-        templates:
-            Included templates.
-
-        tags:
-            Included tags.
-
-        exclude_template_list:
-            Excluded templates.
-
-        exclude_tag_list:
-            Excluded tags.
-
-        cves_only:
-            Keep only CVE findings.
-
-        remove_info:
-            Remove informational findings.
-
-    Returns:
-        list
-    """
-
-    # ------------------------------------------------------
-    # Remove Duplicates
-    # ------------------------------------------------------
 
     findings = remove_duplicates(findings)
 
-    # ------------------------------------------------------
-    # Severity
-    # ------------------------------------------------------
 
     findings = filter_severity(
         findings,
         severities,
     )
 
-    # ------------------------------------------------------
-    # Templates
-    # ------------------------------------------------------
 
     findings = filter_templates(
         findings,
@@ -374,9 +236,6 @@ def apply_filters(
         exclude_template_list,
     )
 
-    # ------------------------------------------------------
-    # Tags
-    # ------------------------------------------------------
 
     findings = filter_tags(
         findings,
@@ -388,17 +247,11 @@ def apply_filters(
         exclude_tag_list,
     )
 
-    # ------------------------------------------------------
-    # CVEs
-    # ------------------------------------------------------
 
     if cves_only:
 
         findings = filter_cves(findings)
 
-    # ------------------------------------------------------
-    # Remove Info
-    # ------------------------------------------------------
 
     if remove_info:
 
@@ -407,20 +260,10 @@ def apply_filters(
     return findings
 
 
-# ==========================================================
-# Helpers
-# ==========================================================
-
-
 def count_findings(
     findings: list,
 ):
-    """
-    Return total findings.
 
-    Returns:
-        int
-    """
 
     return len(findings)
 
@@ -428,19 +271,10 @@ def count_findings(
 def has_findings(
     findings: list,
 ):
-    """
-    Check findings exist.
 
-    Returns:
-        bool
-    """
 
     return bool(findings)
 
-
-# ==========================================================
-# Self Test
-# ==========================================================
 
 if __name__ == "__main__":
 

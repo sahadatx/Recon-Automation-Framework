@@ -1,17 +1,7 @@
-"""
-CLI Pipeline
-
-Build the execution pipeline
-for the Recon Automation Framework.
-"""
-
 from __future__ import annotations
 
 from typing import Any
 
-# ==========================================================
-# Pipeline Order
-# ==========================================================
 
 PIPELINE = (
     "passive",
@@ -34,10 +24,6 @@ PIPELINE = (
     "dashboard",
 )
 
-
-# ==========================================================
-# Module Dependencies
-# ==========================================================
 
 DEPENDENCIES: dict[str, tuple[str, ...]] = {
     "passive": (),
@@ -78,18 +64,11 @@ DEPENDENCIES: dict[str, tuple[str, ...]] = {
 }
 
 
-# ==========================================================
-# Resolve Dependencies
-# ==========================================================
-
-
 def _resolve_dependencies(
     module: str,
     selected: set[str],
 ) -> None:
-    """
-    Resolve dependencies recursively.
-    """
+
 
     for dependency in DEPENDENCIES.get(
         module,
@@ -108,17 +87,10 @@ def _resolve_dependencies(
     )
 
 
-# ==========================================================
-# Build Pipeline
-# ==========================================================
-
-
 def build_pipeline(
     config: dict[str, Any],
 ) -> list[str]:
-    """
-    Build the ordered execution pipeline.
-    """
+
 
     selected: set[str] = set()
 
@@ -150,10 +122,6 @@ def build_pipeline(
 
     return pipeline
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "PIPELINE",

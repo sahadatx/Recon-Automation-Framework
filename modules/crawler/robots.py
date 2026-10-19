@@ -1,24 +1,12 @@
-"""
-robots.txt Parser
-
-Downloads and parses robots.txt.
-"""
-
 from urllib.parse import urljoin
 
 from modules.crawler.helpers import download_page
-
-# ==========================================================
-# Download robots.txt
-# ==========================================================
 
 
 def download_robots(
     base_url: str,
 ) -> str | None:
-    """
-    Download robots.txt.
-    """
+
 
     robots_url = urljoin(
         base_url,
@@ -33,17 +21,10 @@ def download_robots(
     return response.text
 
 
-# ==========================================================
-# Parse robots.txt
-# ==========================================================
-
-
 def parse_robots(
     content: str,
 ) -> dict:
-    """
-    Parse robots.txt.
-    """
+
 
     result = {
         "allow": [],
@@ -132,17 +113,10 @@ def parse_robots(
     return result
 
 
-# ==========================================================
-# Fetch robots.txt
-# ==========================================================
-
-
 def fetch_robots(
     base_url: str,
 ) -> dict:
-    """
-    Download and parse robots.txt.
-    """
+
 
     content = download_robots(base_url)
 

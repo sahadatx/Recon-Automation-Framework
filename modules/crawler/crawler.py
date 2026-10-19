@@ -1,9 +1,3 @@
-"""
-URL Discovery Engine
-
-Core crawler for discovering URLs.
-"""
-
 from __future__ import annotations
 
 import time
@@ -21,15 +15,9 @@ from modules.crawler.queue import CrawlQueue
 from modules.crawler.robots import fetch_robots
 from modules.crawler.sitemap import fetch_sitemap
 
-# ==========================================================
-# Create Statistics
-# ==========================================================
-
 
 def create_statistics() -> dict:
-    """
-    Initialize crawler statistics.
-    """
+
 
     return {
         "pages": 0,
@@ -49,17 +37,10 @@ def create_statistics() -> dict:
     }
 
 
-# ==========================================================
-# Create Result
-# ==========================================================
-
-
 def create_result(
     host: str,
 ) -> dict:
-    """
-    Create crawler result object.
-    """
+
 
     return {
         "host": host,
@@ -68,25 +49,11 @@ def create_result(
     }
 
 
-# ==========================================================
-# Crawl URL
-# ==========================================================
-
-
 def crawl_url(
     session: requests.Session,
     url: str,
 ) -> dict[str, Any] | None:
-    """
-    Crawl a single URL.
 
-    Args:
-        url:
-            Target URL.
-
-    Returns:
-        Parsed page information.
-    """
 
     debug(f"Crawling {url}")
 
@@ -126,17 +93,10 @@ def crawl_url(
         return None
 
 
-# ==========================================================
-# Initialize Queue
-# ==========================================================
-
-
 def initialize_queue(
     host: str,
 ) -> CrawlQueue:
-    """
-    Create crawl queue with seed URL.
-    """
+
 
     queue = CrawlQueue()
 
@@ -149,17 +109,10 @@ def initialize_queue(
     return queue
 
 
-# ==========================================================
-# Load Robots Rules
-# ==========================================================
-
-
 def load_robots(
     host: str,
 ) -> list[str]:
-    """
-    Load robots.txt rules.
-    """
+
 
     try:
 
@@ -177,18 +130,11 @@ def load_robots(
         return []
 
 
-# ==========================================================
-# Load Sitemap
-# ==========================================================
-
-
 def load_sitemap(
     queue: CrawlQueue,
     host: str,
 ) -> None:
-    """
-    Seed queue using sitemap URLs.
-    """
+
 
     try:
 
@@ -214,19 +160,12 @@ def load_sitemap(
         warning(f"Sitemap: {error}")
 
 
-# ==========================================================
-# Update Statistics
-# ==========================================================
-
-
 def update_statistics(
     result: dict,
     queue: CrawlQueue,
     parsed: dict,
 ) -> None:
-    """
-    Update crawler statistics.
-    """
+
 
     statistics = result["statistics"]
 
@@ -283,11 +222,6 @@ def update_statistics(
     statistics["emails"] += len(emails)
 
 
-# ==========================================================
-# Enqueue Internal Links
-# ==========================================================
-
-
 def enqueue_links(
     queue: CrawlQueue,
     host: str,
@@ -296,9 +230,7 @@ def enqueue_links(
     links: list[str],
     robots_rules: list[str],
 ) -> None:
-    """
-    Add internal links into the queue.
-    """
+
 
     for url in links:
 
@@ -320,19 +252,12 @@ def enqueue_links(
         )
 
 
-# ==========================================================
-# Finalize Statistics
-# ==========================================================
-
-
 def finalize_statistics(
     result: dict,
     queue: CrawlQueue,
     start_time: float,
 ) -> None:
-    """
-    Finalize crawler statistics.
-    """
+
 
     statistics = result["statistics"]
 
@@ -350,29 +275,12 @@ def finalize_statistics(
     )
 
 
-# ==========================================================
-# Crawl Host
-# ==========================================================
-
-
 def crawl_host(
     context: ExecutionContext,
     host: str,
     use_sitemap: bool = False,
 ) -> dict[str, Any]:
-    """
-    Crawl one host using Breadth-First Search.
 
-    Args:
-        host:
-            Target host.
-
-        use_sitemap:
-            Seed the queue from sitemap.xml.
-
-    Returns:
-        Crawl result.
-    """
 
     info(f"Starting crawl: {host}")
 
@@ -405,9 +313,6 @@ def crawl_host(
 
     while not queue.empty():
 
-        # --------------------------------------------------
-        # Maximum URL Limit
-        # --------------------------------------------------
 
         if queue.visited_count() >= CRAWLER_MAX_URLS:
 
@@ -425,17 +330,11 @@ def crawl_host(
 
         depth = item["depth"]
 
-        # --------------------------------------------------
-        # Depth Control
-        # --------------------------------------------------
 
         if depth > CRAWLER_DEPTH:
 
             continue
 
-        # --------------------------------------------------
-        # Duplicate Check
-        # --------------------------------------------------
 
         if queue.visited(
             url,
@@ -498,10 +397,6 @@ def crawl_host(
 
     return result
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "crawl_host",

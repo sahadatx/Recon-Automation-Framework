@@ -1,31 +1,11 @@
-"""
-Nuclei Parser
-
-Parses Nuclei JSONL output into
-normalized Python objects.
-"""
-
 import json
 from pathlib import Path
-
-# ==========================================================
-# Read JSONL
-# ==========================================================
 
 
 def read_jsonl(
     filepath: str | Path,
 ):
-    """
-    Read Nuclei JSONL output.
 
-    Args:
-        filepath:
-            JSONL output file.
-
-    Returns:
-        list
-    """
 
     path = Path(filepath)
 
@@ -65,24 +45,10 @@ def read_jsonl(
     return findings
 
 
-# ==========================================================
-# Extract Info
-# ==========================================================
-
-
 def extract_info(
     finding: dict,
 ):
-    """
-    Extract info section.
 
-    Args:
-        finding:
-            Raw finding.
-
-    Returns:
-        dict
-    """
 
     return finding.get(
         "info",
@@ -90,20 +56,10 @@ def extract_info(
     )
 
 
-# ==========================================================
-# Extract References
-# ==========================================================
-
-
 def extract_references(
     finding: dict,
 ):
-    """
-    Extract references.
 
-    Returns:
-        list
-    """
 
     return extract_info(finding).get(
         "reference",
@@ -111,20 +67,10 @@ def extract_references(
     )
 
 
-# ==========================================================
-# Extract Tags
-# ==========================================================
-
-
 def extract_tags(
     finding: dict,
 ):
-    """
-    Extract tags.
 
-    Returns:
-        list
-    """
 
     return extract_info(finding).get(
         "tags",
@@ -132,21 +78,10 @@ def extract_tags(
     )
 
 
-# ==========================================================
-# Extract Classification
-# ==========================================================
-
-
 def extract_classification(
     finding: dict,
 ):
-    """
-    Extract vulnerability
-    classification.
 
-    Returns:
-        dict
-    """
 
     classification = extract_info(finding).get(
         "classification",
@@ -191,20 +126,10 @@ def extract_classification(
     }
 
 
-# ==========================================================
-# Extract Metadata
-# ==========================================================
-
-
 def extract_metadata(
     finding: dict,
 ):
-    """
-    Extract metadata.
 
-    Returns:
-        dict
-    """
 
     return finding.get(
         "meta",
@@ -212,31 +137,16 @@ def extract_metadata(
     )
 
 
-# ==========================================================
-# Normalize Finding
-# ==========================================================
-
-
 def normalize_finding(
     finding: dict,
 ):
-    """
-    Normalize one finding.
 
-    Args:
-        finding:
-            Raw Nuclei finding.
-
-    Returns:
-        dict
-    """
 
     info = extract_info(finding)
 
     return {
-        # --------------------------------------------------
-        # Target
-        # --------------------------------------------------
+
+
         "target": finding.get(
             "host",
             "",
@@ -265,9 +175,8 @@ def normalize_finding(
             "timestamp",
             "",
         ),
-        # --------------------------------------------------
-        # Template
-        # --------------------------------------------------
+
+
         "template_id": finding.get(
             "template-id",
             "",
@@ -280,9 +189,8 @@ def normalize_finding(
             "template",
             "",
         ),
-        # --------------------------------------------------
-        # Finding
-        # --------------------------------------------------
+
+
         "severity": info.get(
             "severity",
             "info",
@@ -299,9 +207,8 @@ def normalize_finding(
             "type",
             "",
         ),
-        # --------------------------------------------------
-        # Extra
-        # --------------------------------------------------
+
+
         "tags": extract_tags(finding),
         "references": extract_references(finding),
         "classification": extract_classification(finding),
@@ -309,24 +216,10 @@ def normalize_finding(
     }
 
 
-# ==========================================================
-# Parse Findings
-# ==========================================================
-
-
 def parse_findings(
     findings: list[dict],
 ):
-    """
-    Normalize all findings.
 
-    Args:
-        findings:
-            Raw findings.
-
-    Returns:
-        list
-    """
 
     parsed = []
 
@@ -337,24 +230,10 @@ def parse_findings(
     return parsed
 
 
-# ==========================================================
-# Parse File
-# ==========================================================
-
-
 def parse_file(
     filepath: str | Path,
 ):
-    """
-    Parse Nuclei JSONL file.
 
-    Args:
-        filepath:
-            JSONL output file.
-
-    Returns:
-        dict | None
-    """
 
     raw_findings = read_jsonl(filepath)
 
@@ -369,46 +248,18 @@ def parse_file(
     }
 
 
-# ==========================================================
-# Entry Point
-# ==========================================================
-
-
 def parse_nuclei(
     filepath: str | Path,
 ):
-    """
-    Parse Nuclei JSONL output.
 
-    Args:
-        filepath:
-            JSONL file.
-
-    Returns:
-        dict | None
-    """
 
     return parse_file(filepath)
-
-
-# ==========================================================
-# Helpers
-# ==========================================================
 
 
 def total_findings(
     parsed: dict | None,
 ):
-    """
-    Return total findings.
 
-    Args:
-        parsed:
-            Parsed output.
-
-    Returns:
-        int
-    """
 
     if parsed is None:
 
@@ -425,23 +276,10 @@ def total_findings(
 def is_empty(
     parsed: dict | None,
 ):
-    """
-    Check whether findings exist.
 
-    Args:
-        parsed:
-            Parsed output.
-
-    Returns:
-        bool
-    """
 
     return total_findings(parsed) == 0
 
-
-# ==========================================================
-# Self Test
-# ==========================================================
 
 if __name__ == "__main__":
 

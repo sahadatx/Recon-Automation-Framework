@@ -1,11 +1,3 @@
-#!/usr/bin/env python3
-
-"""
-Email Security Manager
-
-Coordinate Email Security analysis.
-"""
-
 from __future__ import annotations
 
 from typing import Any
@@ -29,26 +21,12 @@ from .helpers import (
 )
 from .target_analyzer import analyze_target
 
-# ==========================================================
-# Run Email Security Analysis
-# ==========================================================
-
 
 def run_email_security(
     context: ExecutionContext,
     targets: list[str],
 ) -> dict[str, Any]:
-    """
-    Execute the complete Email Security workflow.
 
-        Collect
-            ↓
-        Analyze
-            ↓
-        Store Context
-            ↓
-        Return Analysis
-    """
 
     if not targets:
 
@@ -143,29 +121,17 @@ def run_email_security(
     return analysis
 
 
-# ==========================================================
-# Public Entry Point
-# ==========================================================
-
-
 def run(
     context: ExecutionContext,
     targets: list[str],
 ) -> dict[str, Any]:
-    """
-    Public entry point for the
-    Email Security module.
-    """
+
 
     return run_email_security(
         context,
         targets,
     )
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "run",

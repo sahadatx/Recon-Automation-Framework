@@ -1,9 +1,3 @@
-"""
-Memory Profiler
-
-Memory usage profiling utilities.
-"""
-
 from __future__ import annotations
 
 import os
@@ -30,28 +24,16 @@ except ImportError:
     HAS_RESOURCE = False
 
 
-# ==========================================================
-# Memory Profiler
-# ==========================================================
-
-
 class MemoryProfiler:
-    """
-    Memory usage profiler.
-    """
+
 
     def __init__(self) -> None:
 
         self._started = False
 
-    # ------------------------------------------------------
-    # Start
-    # ------------------------------------------------------
 
     def start(self) -> None:
-        """
-        Start memory profiling.
-        """
+
 
         if not tracemalloc.is_tracing():
 
@@ -59,14 +41,9 @@ class MemoryProfiler:
 
         self._started = True
 
-    # ------------------------------------------------------
-    # Stop
-    # ------------------------------------------------------
 
     def stop(self) -> None:
-        """
-        Stop memory profiling.
-        """
+
 
         if tracemalloc.is_tracing():
 
@@ -74,15 +51,10 @@ class MemoryProfiler:
 
         self._started = False
 
-    # ------------------------------------------------------
-    # Current Memory
-    # ------------------------------------------------------
 
     @staticmethod
     def current_memory() -> float:
-        """
-        Return current process memory usage (MB).
-        """
+
 
         if HAS_PSUTIL:
 
@@ -100,8 +72,6 @@ class MemoryProfiler:
 
             memory = usage.ru_maxrss
 
-            # Linux: KB
-            # macOS: bytes
 
             if os.name == "posix":
 
@@ -113,15 +83,10 @@ class MemoryProfiler:
 
         return current / 1024 / 1024
 
-    # ------------------------------------------------------
-    # Peak Memory
-    # ------------------------------------------------------
 
     @staticmethod
     def peak_memory() -> float:
-        """
-        Return peak memory usage (MB).
-        """
+
 
         if tracemalloc.is_tracing():
 
@@ -131,14 +96,9 @@ class MemoryProfiler:
 
         return MemoryProfiler.current_memory()
 
-    # ------------------------------------------------------
-    # Snapshot
-    # ------------------------------------------------------
 
     def snapshot(self) -> dict[str, float]:
-        """
-        Return a memory snapshot.
-        """
+
 
         return {
             "current_mb": round(
@@ -155,33 +115,19 @@ class MemoryProfiler:
             ),
         }
 
-    # ------------------------------------------------------
-    # Reset
-    # ------------------------------------------------------
 
     def reset(self) -> None:
-        """
-        Reset profiler state.
-        """
+
 
         self.stop()
 
-    # ------------------------------------------------------
-    # Is Running
-    # ------------------------------------------------------
 
     @property
     def is_running(self) -> bool:
-        """
-        Return profiler status.
-        """
+
 
         return self._started
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "MemoryProfiler",

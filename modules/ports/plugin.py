@@ -1,9 +1,3 @@
-#!/usr/bin/env python3
-
-"""
-Port Scanner Plugin
-"""
-
 from __future__ import annotations
 
 from typing import Any
@@ -14,15 +8,9 @@ from core.plugins.base import BasePlugin
 from .exporter import export_all
 from .manager import run
 
-# ==========================================================
-# Port Scanner Plugin
-# ==========================================================
-
 
 class PortScannerPlugin(BasePlugin):
-    """
-    Port Scanner Plugin.
-    """
+
 
     name = "ports"
 
@@ -51,9 +39,7 @@ class PortScannerPlugin(BasePlugin):
         *args: Any,
         **kwargs: Any,
     ) -> dict[str, Any]:
-        """
-        Execute the Port Scanner plugin.
-        """
+
 
         return run(
             context,
@@ -65,25 +51,15 @@ class PortScannerPlugin(BasePlugin):
         self,
         result: dict[str, Any],
     ) -> None:
-        """
-        Export Port Scanner reports.
-        """
+
 
         export_all(
             result,
         )
 
 
-# ==========================================================
-# Plugin Instance
-# ==========================================================
-
 plugin = PortScannerPlugin()
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "PortScannerPlugin",

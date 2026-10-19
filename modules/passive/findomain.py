@@ -1,9 +1,3 @@
-"""
-Findomain Module
-
-Passive subdomain enumeration using Findomain.
-"""
-
 from __future__ import annotations
 
 from core.context import ExecutionContext
@@ -14,21 +8,8 @@ def run_findomain(
     context: ExecutionContext,
     domain: str,
 ) -> list[str]:
-    """
-    Run Findomain.
 
-    Args:
-        context:
-            Shared execution context.
 
-        domain:
-            Target domain.
-
-    Returns:
-        List of discovered subdomains.
-    """
-
-    # Reserved for future use.
     _ = context
 
     command = [

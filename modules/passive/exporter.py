@@ -1,9 +1,3 @@
-"""
-Passive Enumeration Exporter
-
-Export passive enumeration results.
-"""
-
 from __future__ import annotations
 
 import json
@@ -18,15 +12,9 @@ from .constants import (
     SUMMARY_TXT,
 )
 
-# ==========================================================
-# Helpers
-# ==========================================================
-
 
 def create_output_directory() -> None:
-    """
-    Create output directory.
-    """
+
 
     PASSIVE_OUTPUT_DIR.mkdir(
         parents=True,
@@ -34,17 +22,10 @@ def create_output_directory() -> None:
     )
 
 
-# ==========================================================
-# Human Readable Results
-# ==========================================================
-
-
 def export_results_txt(
     analysis: dict[str, Any],
 ) -> None:
-    """
-    Export human-readable results.
-    """
+
 
     create_output_directory()
 
@@ -73,17 +54,10 @@ def export_results_txt(
             file.write(f"{subdomain}\n")
 
 
-# ==========================================================
-# JSON Export
-# ==========================================================
-
-
 def export_results_json(
     analysis: dict[str, Any],
 ) -> None:
-    """
-    Export JSON results.
-    """
+
 
     create_output_directory()
 
@@ -99,17 +73,10 @@ def export_results_json(
         )
 
 
-# ==========================================================
-# Summary
-# ==========================================================
-
-
 def export_summary(
     analysis: dict[str, Any],
 ) -> None:
-    """
-    Export summary.
-    """
+
 
     create_output_directory()
 
@@ -137,17 +104,10 @@ def export_summary(
         file.write(f"Unique Subdomains   : {statistics['total_subdomains']}\n")
 
 
-# ==========================================================
-# Subdomains
-# ==========================================================
-
-
 def export_subdomains(
     subdomains: list[str],
 ) -> None:
-    """
-    Export merged subdomains.
-    """
+
 
     create_output_directory()
 
@@ -161,17 +121,10 @@ def export_subdomains(
             file.write(f"{subdomain}\n")
 
 
-# ==========================================================
-# Raw Results
-# ==========================================================
-
-
 def export_raw_results(
     sources: dict[str, list[str]],
 ) -> None:
-    """
-    Export raw source results.
-    """
+
 
     create_output_directory()
 
@@ -195,18 +148,10 @@ def export_raw_results(
             file.write("\n")
 
 
-# ==========================================================
-# Export All
-# ==========================================================
-
-
 def export_all(
     analysis: dict[str, Any],
 ) -> None:
-    """
-    Export all passive
-    enumeration outputs.
-    """
+
 
     export_results_txt(
         analysis,
@@ -228,10 +173,6 @@ def export_all(
         analysis["sources"],
     )
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "export_all",

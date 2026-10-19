@@ -1,11 +1,3 @@
-#!/usr/bin/env python3
-
-"""
-Plugin Discovery
-
-Automatically discovers framework plugins.
-"""
-
 from __future__ import annotations
 
 from importlib import import_module
@@ -13,25 +5,9 @@ from pathlib import Path
 
 from .base import BasePlugin
 
-# ==========================================================
-# Plugin Discovery
-# ==========================================================
-
 
 class PluginDiscovery:
-    """
-    Discover plugins from framework packages.
 
-    Expected layout:
-
-        modules/
-            passive/
-                plugin.py
-
-        plugins/
-            custom/
-                plugin.py
-    """
 
     def __init__(
         self,
@@ -42,16 +18,11 @@ class PluginDiscovery:
             "plugins",
         )
 
-    # ======================================================
-    # Discovery
-    # ======================================================
 
     def discover(
         self,
     ) -> list[BasePlugin]:
-        """
-        Discover all enabled plugins.
-        """
+
 
         discovered: dict[
             str,
@@ -74,17 +45,12 @@ class PluginDiscovery:
             key=lambda plugin: plugin.name,
         )
 
-    # ======================================================
-    # Package Discovery
-    # ======================================================
 
     def _discover_package(
         self,
         package: str,
     ) -> list[BasePlugin]:
-        """
-        Discover plugins from one package.
-        """
+
 
         plugins: list[BasePlugin] = []
 
@@ -147,16 +113,8 @@ class PluginDiscovery:
         return plugins
 
 
-# ==========================================================
-# Global Discovery
-# ==========================================================
-
 discovery = PluginDiscovery()
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "PluginDiscovery",

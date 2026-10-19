@@ -1,9 +1,3 @@
-#!/usr/bin/env python3
-
-"""
-Screenshot Plugin
-"""
-
 from __future__ import annotations
 
 from typing import Any
@@ -14,15 +8,9 @@ from core.plugins.base import BasePlugin
 from .exporter import export_all, show_summary
 from .manager import run
 
-# ==========================================================
-# Screenshot Plugin
-# ==========================================================
-
 
 class ScreenshotPlugin(BasePlugin):
-    """
-    Screenshot Capture Plugin.
-    """
+
 
     name = "screenshots"
 
@@ -52,9 +40,7 @@ class ScreenshotPlugin(BasePlugin):
         *args: Any,
         **kwargs: Any,
     ) -> dict[str, Any]:
-        """
-        Execute the Screenshot plugin.
-        """
+
 
         return run(
             context,
@@ -66,9 +52,7 @@ class ScreenshotPlugin(BasePlugin):
         self,
         result: dict[str, Any],
     ) -> None:
-        """
-        Export screenshot reports.
-        """
+
 
         export_all(
             result,
@@ -79,16 +63,8 @@ class ScreenshotPlugin(BasePlugin):
         )
 
 
-# ==========================================================
-# Plugin Instance
-# ==========================================================
-
 plugin = ScreenshotPlugin()
 
-
-# ==========================================================
-# Public Exports
-# ==========================================================
 
 __all__ = [
     "ScreenshotPlugin",

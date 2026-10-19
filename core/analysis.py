@@ -1,16 +1,10 @@
-"""
-Analysis Helpers
-"""
-
 from __future__ import annotations
 
 from typing import Any
 
 
 def empty_analysis() -> dict[str, Any]:
-    """
-    Empty analysis object.
-    """
+
 
     return {
         "results": {},
@@ -19,10 +13,7 @@ def empty_analysis() -> dict[str, Any]:
 
 
 def empty_list_analysis() -> dict[str, Any]:
-    """
-    Empty analysis object
-    for list results.
-    """
+
 
     return {
         "results": [],

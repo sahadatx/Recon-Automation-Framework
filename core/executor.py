@@ -1,11 +1,3 @@
-#!/usr/bin/env python3
-
-"""
-Framework Executor
-
-Coordinates framework execution.
-"""
-
 from __future__ import annotations
 
 from typing import Any
@@ -25,21 +17,7 @@ def execute_module(
     *args: Any,
     **kwargs: Any,
 ) -> Analysis:
-    """
-    Execute one framework module.
 
-    Workflow
-
-        Resolve Inputs
-              ↓
-        Execute Plugin
-              ↓
-        Validate Result
-              ↓
-        Store Context
-              ↓
-        Return Analysis
-    """
 
     if not args:
 
