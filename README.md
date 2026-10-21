@@ -3,11 +3,17 @@
 </h1>
 
 <p align="center">
-<strong>A Modular, Plugin-Based Reconnaissance Framework for Automated Attack Surface Discovery</strong>
+<strong>A modular toolkit for authorized attack surface reconnaissance</strong>
 </p>
 
 <p align="center">
 Automated Reconnaissance • Plugin Architecture • Multi-threading • Professional Reporting
+</p>
+
+<p align="center">
+  <a href="#️-installation">Install</a> ·
+  <a href="#-usage">Usage</a> ·
+  <a href="#-supported-modules">Modules</a>
 </p>
 
 <p align="center">
@@ -18,402 +24,248 @@ Automated Reconnaissance • Plugin Architecture • Multi-threading • Profess
 </p>
 
 <p align="center">
-
-<img src="https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" />
-<img src="https://img.shields.io/badge/Platform-Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black" alt="Platform" />
-<img src="https://img.shields.io/badge/License-MIT-success?style=for-the-badge" alt="License" />
-<img src="https://img.shields.io/badge/Status-Active-brightgreen?style=for-the-badge" alt="Status" />
-
+  <img src="https://img.shields.io/badge/Python-3.11+-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python 3.11+" />
+  <img src="https://img.shields.io/badge/Platform-Linux-FCC624?style=flat-square&logo=linux&logoColor=black" alt="Linux" />
+  <img src="https://img.shields.io/badge/License-MIT-success?style=flat-square" alt="MIT License" />
+  <img src="https://img.shields.io/github/actions/workflow/status/sahadatx/Recon-Automation-Framework/python.yml?branch=main&style=flat-square&label=Build" alt="Build Status" />
+  <img src="https://img.shields.io/github/v/release/sahadatx/Recon-Automation-Framework?style=flat-square&label=Latest%20Release" alt="Latest Release" />
 </p>
 
-<p align="center">
+## 📖 Overview
 
-<img src="https://img.shields.io/github/actions/workflow/status/sahadatx/Recon-Automation-Framework/python.yml?branch=main&style=for-the-badge&label=Build" alt="Build Status" />
-<img src="https://img.shields.io/github/v/release/sahadatx/Recon-Automation-Framework?style=for-the-badge&label=Latest%20Release" alt="Latest Release" />
-<img src="https://img.shields.io/github/last-commit/sahadatx/Recon-Automation-Framework?style=for-the-badge" alt="Last Commit" />
-<img src="https://img.shields.io/github/stars/sahadatx/Recon-Automation-Framework?style=for-the-badge" alt="Stars" />
-<img src="https://img.shields.io/github/forks/sahadatx/Recon-Automation-Framework?style=for-the-badge" alt="Forks" />
-<img src="https://img.shields.io/github/issues/sahadatx/Recon-Automation-Framework?style=for-the-badge" alt="Issues" />
+An extensible reconnaissance toolkit for authorized security assessments. Run modules individually or as a dependency-aware workflow, then review results in structured reports and an interactive dashboard.
 
-</p>
+## 📑 Table of Contents
 
----
-
-<p align="center">
-
-Recon Automation Framework is an open-source, modular, and plugin-based reconnaissance framework designed to automate attack surface discovery for penetration testing, bug bounty hunting, and security assessments.
-
-Built around a modular plugin architecture, it integrates reconnaissance, web discovery, infrastructure analysis, and professional reporting into a unified and extensible workflow.
-
-</p>
-
----
-
-# 📖 Overview
-
-Recon Automation Framework provides a complete, phase-based reconnaissance workflow that automates the collection, analysis, and reporting of attack surface intelligence.
-
-The framework combines passive enumeration, infrastructure analysis, web application discovery, and professional reporting through a modular plugin architecture. Each module operates independently while sharing a common execution context, enabling reliable automation, easy extensibility, and consistent data flow across the entire reconnaissance pipeline.
-
-Whether performing penetration testing, bug bounty reconnaissance, or general security assessments, the framework streamlines repetitive reconnaissance tasks and produces structured, actionable results in multiple output formats.
-
----
-
-<p align="right">
-<a href="#recon-automation-framework">⬆️ Back to Top</a>
-</p>
-
-# ⚙️ Design Principles
-
-Recon Automation Framework is built on a set of core engineering principles that ensure the framework remains modular, scalable, and easy to maintain as new reconnaissance capabilities are added.
-
----
-
-## 🧩 Modular Architecture
-
-Each reconnaissance capability is implemented as an independent module with a single responsibility, making the framework easier to develop, test, and maintain.
-
----
-
-## 🔌 Plugin-Based Design
-
-New modules can be integrated without modifying the core framework, allowing the project to grow while keeping the codebase clean and stable.
-
----
-
-## ⚡ Performance
-
-The framework leverages multi-threading and optimized execution pipelines to improve scan speed while maintaining reliable results.
-
----
-
-## 📈 Scalability
-
-Supports both local execution and future distributed deployments.
-
----
-
-## 🛠️ Maintainability
-
-A consistent project structure, reusable components, and clear separation of responsibilities simplify long-term maintenance and future development.
-
----
-
-## 💡 Design Philosophy
-
-> **Build once. Extend forever.**
-
-Every component is designed to be reusable, independent, and easy to extend without affecting existing functionality.
-
-# 📑 Table of Contents
-- [📖 Overview](#-overview)
-- [🎬 Demo](#-demo)
-
-- [✨ Features](#-features)
-- [⚙️ Design Principles](#️-design-principles)
-
-- [🏗️ Framework Architecture](#️-framework-architecture)
-- [🔌 Plugin Architecture](#-plugin-architecture)
-- [🔄 Recon Pipeline](#-recon-pipeline)
-
-- [📦 Supported Modules](#-supported-modules)
+- [Overview](#-overview)
+- [Features](#-features)
+- Framework design
+  - [Architecture](#️-framework-architecture)
+  - [Plugin architecture](#-plugin-architecture)
+  - [Recon pipeline](#-recon-pipeline)
+- [Supported modules](#-supported-modules)
   - [Phase 1 — Core Recon](#phase-1--core-recon)
   - [Phase 2 — Discovery](#-phase-2--discovery)
   - [Phase 3 — Infrastructure](#-phase-3--infrastructure)
   - [Phase 4 — Reporting](#-phase-4--reporting)
-  - [Phase 5 — Framework](#-phase-5--framework)
+  - [Framework services](#-framework-services)
+- [Project structure](#-project-structure)
+- Setup and usage
+  - [Installation](#️-installation)
+  - [Configuration](#️-configuration)
+  - [CLI usage](#-usage)
+  - [Output](#-output)
+- Project information
+  - [Roadmap](#️-roadmap)
+  - [FAQ](#-frequently-asked-questions)
+  - [Contributing](#-contributing)
+  - [License](#-license)
+  - [Acknowledgements](#-acknowledgements)
+  - [Author](#-author)
 
-- [📁 Project Structure](#-project-structure)
-
-- [🛠️ Installation](#️-installation)
-- [⚙️ Configuration](#️-configuration)
-- [🚀 Usage](#-usage)
-
-- [📂 Output](#-output)
-- [📸 Screenshots](#-screenshots)
-
-- [🗺️ Roadmap](#️-roadmap)
-- [🤝 Contributing](#-contributing)
-- [📄 License](#-license)
-- [👨‍💻 Author](#-author)
-
-# 🎬 Demo
-
-The following screenshot demonstrates the framework's command-line interface during a reconnaissance workflow.
-
----
-
-## 💻 Command-Line Interface
-
-The framework provides a clean and informative CLI with:
-
-- Real-time module execution
-- Colored logging
-- Progress tracking
-- Execution statistics
-- Automatic report generation
-
-<p align="center">
-  <img src="images/01-cli-demo.png" alt="CLI Demo" width="100%">
-</p>
-
-Example Command:
-
-```bash
-python recon.py example.com --all
-```
-
----
-
-<p align="right">
-  <a href="#recon-automation-framework">⬆️ Back to Top</a>
-</p>
-
-# ✨ Features
+## ✨ Features
 
 Recon Automation Framework provides a complete reconnaissance workflow through a modular, extensible, and plugin-based architecture.
 
----
+### ⚙️ Framework Capabilities
 
-## ⚙️ Framework Capabilities
+- Modular, plugin-based architecture
+- 18 specialized reconnaissance modules
+- Automated, phase-based workflow
+- Multi-threaded execution
+- Interactive HTML dashboard
+- Reports in JSON, TXT, and Markdown formats, plus an HTML dashboard
 
-- Modular Plugin-Based Architecture
-- 18 Specialized Reconnaissance Modules
-- Automated Phase-Based Reconnaissance Pipeline
-- Multi-threaded Module Execution
-- Interactive HTML Dashboard
-- Multi-format Report Generation (HTML, JSON, CSV, TXT, Markdown)
+<div align="left">
+  <img src="images/02-dashboard-overview.png" alt="Recon dashboard overview" width="85%">
+</div>
 
----
-
-<p align="right">
-  <a href="#recon-automation-framework">⬆️ Back to Top</a>
-</p>
-
-# 🏗️ Framework Architecture
+## 🏗️ Framework Architecture
 
 Recon Automation Framework organizes reconnaissance tasks into independent modules coordinated through a shared execution context.
 
----
-
-```mermaid
-flowchart TD
-
-    U[User]
-        --> CLI[Recon CLI]
-
-    CLI --> MANAGER[Execution Manager]
-    MANAGER --> LOADER[Module Loader]
-
-    LOADER --> P1[Phase 1<br/>Core Recon]
-    LOADER --> P2[Phase 2<br/>Discovery]
-    LOADER --> P3[Phase 3<br/>Infrastructure]
-    LOADER --> P4[Phase 4<br/>Reporting]
-    LOADER --> P5[Phase 5<br/>Framework]
-
-    P1 --> CONTEXT[Shared Execution Context]
-    P2 --> CONTEXT
-    P3 --> CONTEXT
-    P4 --> CONTEXT
-    P5 --> CONTEXT
-
-    CONTEXT --> REPORT[Report Generator]
-
-    REPORT --> TXT[TXT]
-    REPORT --> JSON[JSON]
-    REPORT --> CSV[CSV]
-    REPORT --> HTML[HTML Dashboard]
-```
-
-The following diagram illustrates how requests flow through the framework from execution to reporting.
-
----
-
-## 🔄 Execution Flow
-
-Every module follows the same execution pipeline.
-
-```text
-User
-   │
-   ▼
-CLI
-   │
-   ▼
-Execution Manager
-   │
-   ▼
-Module Loader
-   │
-   ▼
-Selected Module
-   │
-   ▼
-Shared Context
-   │
-   ▼
-Report Generator
-   │
-   ▼
-TXT / JSON / CSV / HTML
-```
-
----
-
-<p align="right">
-  <a href="#recon-automation-framework">⬆️ Back to Top</a>
-</p>
-
-# 🔌 Plugin Architecture
-
-Each reconnaissance capability is packaged as an independent plugin that can be discovered, loaded, and executed by the framework.
-
----
-
-## Plugin Lifecycle
-
-```mermaid
-flowchart TD
-
-    CLI[Recon CLI]
-        --> MANAGER[Execution Manager]
-
-    MANAGER --> LOADER[Plugin Loader]
-    LOADER --> REGISTRY[Plugin Registry]
-
-    REGISTRY --> CORE[Core Recon]
-    REGISTRY --> DISCOVERY[Discovery]
-    REGISTRY --> INFRA[Infrastructure]
-    REGISTRY --> REPORTING[Reporting]
-
-    CORE --> CONTEXT[Shared Execution Context]
-    DISCOVERY --> CONTEXT
-    INFRA --> CONTEXT
-    REPORTING --> CONTEXT
-
-    CONTEXT --> OUTPUT[Reports & Dashboard]
-```
-
----
-
-<p align="right">
-  <a href="#recon-automation-framework">⬆️ Back to Top</a>
-</p>
-
-# 🔄 Recon Pipeline
-
-Recon Automation Framework executes reconnaissance through a structured, phase-based pipeline. Each phase consumes the output of the previous stage and produces structured results for the next, enabling a consistent and automated reconnaissance workflow.
-
-## Pipeline Overview
-
 ```mermaid
 flowchart LR
+    User([User]) --> CLI[Recon CLI]
+    CLI --> Manager[Execution Manager]
+    Manager --> Loader[Plugin Loader]
 
-    Target["🎯 Target Domain"]
-        --> Core["Phase 1<br/>Core Recon"]
+    subgraph Plugins[Recon Modules]
+        direction TB
+        Core["Phase 1 · Core Recon"]
+        Discovery["Phase 2 · Discovery"]
+        Infrastructure["Phase 3 · Infrastructure"]
+    end
 
-    Core --> Discovery["Phase 2<br/>Discovery"]
+    Loader --> Core
+    Loader --> Discovery
+    Loader --> Infrastructure
 
-    Discovery --> Infrastructure["Phase 3<br/>Infrastructure"]
+    Core --> Context[(Shared Execution Context)]
+    Discovery --> Context
+    Infrastructure --> Context
 
-    Infrastructure --> Reporting["Phase 4<br/>Reporting"]
+    Context --> Report["Phase 4 · Reporting"]
+    Report --> Files["JSON · TXT · Markdown"]
+    Report --> Dashboard["HTML Dashboard"]
 
-    Reporting --> Framework["Phase 5<br/>Framework"]
+    classDef control fill:#EAF2FF,stroke:#3973B9,color:#152642,stroke-width:1.5px;
+    classDef phase fill:#E8F7F2,stroke:#2E8B72,color:#183D32,stroke-width:1.5px;
+    classDef context fill:#F2EBFF,stroke:#7656A8,color:#33204E,stroke-width:1.5px;
+    classDef output fill:#FFF3E1,stroke:#C88724,color:#50330D,stroke-width:1.5px;
+
+    class User,CLI,Manager,Loader control;
+    class Core,Discovery,Infrastructure phase;
+    class Context context;
+    class Report,Files,Dashboard output;
 ```
 
-## Phase Breakdown
+The execution manager loads the selected plugins, resolves their dependencies, and shares module results through a common context.
+
+## 🔌 Plugin Architecture
+
+Each capability is an independent plugin. The manager discovers and initializes plugins, runs the selected modules, and shuts them down when the scan ends.
+
+### Plugin Lifecycle
+
+For each selected module, the manager runs the hooks in order and passes results to the export stage.
+
+```mermaid
+flowchart TB
+    Discover[Discover and load] --> Register[Register plugins]
+    Register --> Initialize[Initialize plugins]
+    Initialize --> BeforeRun
+
+    subgraph Module[Selected module lifecycle]
+        direction LR
+        BeforeRun["before_run()"] --> Execute["run()"]
+        Execute --> AfterRun["after_run()"]
+        AfterRun --> BeforeExport["before_export()"]
+        BeforeExport --> AfterExport["after_export()"]
+    end
+
+    AfterExport --> More{More modules?}
+    More -->|Yes| BeforeRun
+    More -->|No| Shutdown[Shutdown plugins]
+
+    classDef setup fill:#EAF2FF,stroke:#3973B9,color:#152642,stroke-width:2px;
+    classDef module fill:#E8F7F2,stroke:#2E8B72,color:#183D32,stroke-width:2px;
+    classDef decision fill:#FFF3E1,stroke:#C88724,color:#50330D,stroke-width:2px;
+
+    class Discover,Register,Initialize,Shutdown setup;
+    class BeforeRun,Execute,AfterRun,BeforeExport,AfterExport module;
+    class More decision;
+```
+
+## 🔄 Recon Pipeline
+
+The framework orders selected plugins by dependency, adds prerequisites automatically, and generates reports after reconnaissance completes.
+
+### Pipeline Overview
+
+```mermaid
+flowchart TB
+    Target([Authorized target])
+
+    subgraph Workflow[Dependency-ordered reconnaissance phases]
+        direction LR
+        Core["Phase 1 · Core Recon"] --> Discovery["Phase 2 · Discovery"]
+        Discovery --> Infrastructure["Phase 3 · Infrastructure"]
+        Infrastructure --> Reporting["Phase 4 · Reporting"]
+    end
+
+    Target --> Core
+    Reporting --> Output["JSON · TXT · Markdown · HTML dashboard"]
+
+    classDef target fill:#EAF2FF,stroke:#3973B9,color:#152642,stroke-width:1.5px;
+    classDef phase fill:#E8F7F2,stroke:#2E8B72,color:#183D32,stroke-width:1.5px;
+    classDef output fill:#FFF3E1,stroke:#C88724,color:#50330D,stroke-width:1.5px;
+
+    class Target target;
+    class Core,Discovery,Infrastructure,Reporting phase;
+    class Output output;
+```
+
+### Phase Breakdown
 
 | Phase | Modules |
 |--------|---------|
 | **Phase 1 — Core Recon** | Passive Enumeration, DNS Resolution, HTTP Probe, Port Scanner, Technology Detection, Screenshot Capture |
 | **Phase 2 — Discovery** | URL Discovery, JavaScript Analysis, Directory Fuzzing, Virtual Host Discovery |
-| **Phase 3 — Infrastructure** | TLS Analysis, WAF Detection, CDN Detection, Takeover Detection, Email Security |
+| **Phase 3 — Infrastructure** | Nuclei, TLS Analysis, WAF Detection, CDN Detection, Takeover Detection, Email Security |
 | **Phase 4 — Reporting** | Report Generator, HTML Dashboard |
-| **Phase 5 — Framework** | Command-Line Interface, Plugin System, Performance Monitoring, Dashboard Generation |
+| **Framework Services** | CLI, plugin loading, dependency resolution, shared context, performance tracking |
 
-## ✨ Pipeline Benefits
+## 📁 Project Structure
 
-- Phase-based reconnaissance workflow
-- Modular execution across all modules
-- Consistent data flow between phases
-- Easy integration of new modules
-- Automated report generation
-- Scalable and extensible architecture
-
----
-
-<p align="right">
-<a href="#recon-automation-framework">⬆️ Back to Top</a>
-</p>
-
-# 📁 Project Structure
-
-Recon Automation Framework is organized into independent components that separate the framework core, reconnaissance modules, configuration, and generated outputs. This structure keeps the codebase modular, maintainable, and easy to extend.
-
-## Repository Structure
+The repository separates the command-line interface, shared framework services, and reconnaissance plugins. Scan results are written to `output/` when the framework runs.
 
 ```text
 Recon-Automation-Framework/
-│
-├── cli/                     # Command-line interface
-├── config/                  # Framework configuration
-├── core/                    # Core framework components
-├── modules/                 # Reconnaissance modules
-├── output/                  # Generated reports and results
-├── wordlists/               # Fuzzing wordlists
-│
-├── recon.py                 # Framework entry point
-├── requirements.txt         # Python dependencies
+├── cli/
+│   ├── config.py
+│   ├── parser.py
+│   ├── pipeline.py
+│   └── validation.py
+├── config/
+│   └── config.py
+├── core/
+│   ├── performance/          # Profiling, benchmarks, and reports
+│   ├── plugins/              # Plugin discovery, loading, and registry
+│   ├── analysis.py
+│   ├── context.py
+│   ├── executor.py
+│   ├── http.py
+│   ├── logger.py
+│   ├── resolvers.py
+│   └── utils.py
+├── modules/
+│   ├── cdn/
+│   ├── crawler/
+│   ├── dashboard/
+│   ├── dns/
+│   ├── email/
+│   ├── fuzzing/
+│   ├── http/
+│   ├── javascript/
+│   ├── nuclei/
+│   ├── passive/
+│   ├── ports/
+│   ├── report/
+│   ├── screenshots/
+│   ├── takeover/
+│   ├── tech/
+│   ├── tls/
+│   ├── vhost/
+│   └── waf/
+├── wordlists/
+│   ├── directories/
+│   └── vhosts/
+├── images/                  # README screenshots and banner
+├── output/                  # Generated scan data and reports
+├── recon.py                 # Application entry point
+├── requirements.txt         # Runtime dependencies
+├── pyproject.toml           # Project and tooling configuration
 ├── README.md
+├── CONTRIBUTING.md
+├── SECURITY.md
+├── CODE_OF_CONDUCT.md
 └── LICENSE
 ```
 
-## Module Organization
+| Component | Responsibility |
+|---|---|
+| `cli/` | Argument parsing, input validation, and scan orchestration |
+| `core/` | Shared execution context, logging, HTTP utilities, plugin lifecycle, and performance tools |
+| `config/` | Framework settings and configuration defaults |
+| `modules/` | Pluggable reconnaissance, discovery, infrastructure, and reporting features |
+| `wordlists/` | Directory and virtual-host wordlists used during discovery |
+| `output/` | Scan artifacts and generated reports; populated at runtime |
+| `images/` | Screenshots and visual assets used by the README |
 
-```text
-modules/
-├── passive/
-├── dns/
-├── http/
-├── ports/
-├── tech/
-├── screenshots/
-├── crawler/
-├── javascript/
-├── fuzzing/
-├── vhost/
-├── tls/
-├── waf/
-├── cdn/
-├── takeover/
-├── email/
-├── report/
-└── dashboard/
-```
+Each plugin lives in its own `modules/<name>/` package. The files vary by module, while plugin entry points and shared interfaces are managed by `core/plugins/`.
 
-## Standard Module Layout
-
-Each module follows a consistent internal structure, making development, testing, and maintenance straightforward.
-
-```text
-module/
-├── analyzer.py
-├── constants.py
-├── exporter.py
-├── helpers.py
-├── manager.py
-├── plugin.py
-├── statistics.py
-└── ...
-```
-
----
-
-<p align="right">
-<a href="#recon-automation-framework">⬆️ Back to Top</a>
-</p>
-
-# 📦 Supported Modules
+## 📦 Supported Modules
 
 The framework includes dedicated modules for reconnaissance, discovery, infrastructure analysis, reporting, and framework management.
 
@@ -421,58 +273,51 @@ The framework includes dedicated modules for reconnaissance, discovery, infrastr
 |--------|:------:|---------------------|
 | **Phase 1 — Core Recon** | **6** | Passive, DNS, HTTP, Ports, Technology, Screenshots |
 | **Phase 2 — Discovery** | **4** | Crawler, JavaScript, Fuzzing, VHost |
-| **Phase 3 — Infrastructure** | **5** | TLS, WAF, CDN, Takeover, Email |
+| **Phase 3 — Infrastructure** | **6** | Nuclei, TLS, WAF, CDN, Takeover, Email |
 | **Phase 4 — Reporting** | **2** | Report, Dashboard |
-| **Phase 5 — Framework** | **4** | Command-Line Interface, Plugin System, Performance Monitoring, Dashboard Generation |
+| **Framework Services** | — | CLI, plugin loader, dependency resolver, shared context, performance tracking |
 
----
+### Phase 1 — Core Recon
 
-## Phase 1 — Core Recon
-
-### 🌐 Passive Enumeration
+#### 🌐 Passive Enumeration
 
 Passive Enumeration discovers subdomains and publicly available assets without directly interacting with the target infrastructure. It gathers information from multiple external intelligence sources while minimizing noise through normalization and deduplication.
 
-#### Features
+##### Features
 
 - Multi-source subdomain enumeration
-- Certificate Transparency log analysis
 - Public intelligence collection
 - Result normalization and deduplication
 - Automated export of discovered assets
 
-#### Example
+##### Example
 
 ```bash
 python recon.py example.com --passive
 ```
 
----
-
-### 🌍 DNS Resolution
+#### 🌍 DNS Resolution
 
 DNS Resolution validates discovered subdomains by resolving DNS records and collecting information required by subsequent reconnaissance modules.
 
-#### Features
+##### Features
 
 - Multi-threaded DNS resolution
 - Record validation
 - Fast lookup processing
 - Structured result generation
 
-#### Example
+##### Example
 
 ```bash
 python recon.py example.com --dns
 ```
 
----
-
-### 🌐 HTTP Probe
+#### 🌐 HTTP Probe
 
 HTTP Probe verifies which hosts are reachable over HTTP or HTTPS and collects response metadata for further analysis.
 
-#### Features
+##### Features
 
 - HTTP/HTTPS validation
 - Status code detection
@@ -480,39 +325,34 @@ HTTP Probe verifies which hosts are reachable over HTTP or HTTPS and collects re
 - Redirect handling
 - Title extraction
 
-#### Example
+##### Example
 
 ```bash
 python recon.py example.com --http
 ```
 
----
-
-### 📸 Screenshot Capture
+#### 📸 Screenshot Capture
 
 Screenshot Capture generates visual previews of live web applications to simplify manual analysis and asset identification.
 
-#### Features
+##### Features
 
 - Asynchronous screenshot capture
 - Full-page rendering
 - Automatic page title extraction
-- High-resolution image generation
 - Organized screenshot storage
 
-#### Example
+##### Example
 
 ```bash
 python recon.py example.com --screenshots
 ```
 
----
-
-### 🔓 Port Scanner
+#### 🔓 Port Scanner
 
 Port Scanner identifies open network ports and running services across discovered hosts using concurrent scanning techniques.
 
-#### Features
+##### Features
 
 - TCP port scanning
 - Multi-threaded execution
@@ -520,19 +360,17 @@ Port Scanner identifies open network ports and running services across discovere
 - Configurable port ranges
 - Structured scan results
 
-#### Example
+##### Example
 
 ```bash
 python recon.py example.com --ports
 ```
 
----
-
-### 🛠️ Technology Detection
+#### 🛠️ Technology Detection
 
 Technology Detection fingerprints web technologies used by target applications, providing insight into the underlying software stack.
 
-#### Features
+##### Features
 
 - CMS detection
 - Web server identification
@@ -540,29 +378,21 @@ Technology Detection fingerprints web technologies used by target applications, 
 - JavaScript framework detection
 - Library and technology fingerprinting
 
-#### Example
+##### Example
 
 ```bash
 python recon.py example.com --tech
 ```
 
----
-
-<p align="right">
-<a href="#recon-automation-framework">⬆️ Back to Top</a>
-</p>
-
-## 🔍 Phase 2 — Discovery
+### 🔍 Phase 2 — Discovery
 
 The Discovery phase expands the identified attack surface by analyzing web applications, extracting hidden resources, and discovering additional entry points for security assessment.
 
----
-
-### 🔗 URL Discovery
+#### 🔗 URL Discovery
 
 URL Discovery crawls target web applications to collect publicly accessible URLs and identify content that may be valuable for further analysis.
 
-#### Features
+##### Features
 
 - Recursive web crawling
 - URL normalization
@@ -570,19 +400,17 @@ URL Discovery crawls target web applications to collect publicly accessible URLs
 - JavaScript file collection
 - Structured URL export
 
-#### Example
+##### Example
 
 ```bash
 python recon.py example.com --crawler
 ```
 
----
-
-### 📜 JavaScript Analysis
+#### 📜 JavaScript Analysis
 
 JavaScript Analysis downloads and analyzes JavaScript files to identify endpoints, hidden resources, secrets, and other information useful during reconnaissance.
 
-#### Features
+##### Features
 
 - JavaScript download and parsing
 - Endpoint extraction
@@ -592,19 +420,17 @@ JavaScript Analysis downloads and analyzes JavaScript files to identify endpoint
 - Interesting file and directory identification
 - Structured report generation
 
-#### Example
+##### Example
 
 ```bash
 python recon.py example.com --javascript
 ```
 
----
-
-### 📂 Directory Fuzzing
+#### 📂 Directory Fuzzing
 
 Directory Fuzzing discovers hidden files and directories by testing common paths against the target web server.
 
-#### Features
+##### Features
 
 - Multi-threaded fuzzing
 - Configurable wordlists
@@ -612,19 +438,17 @@ Directory Fuzzing discovers hidden files and directories by testing common paths
 - Response filtering
 - Status code analysis
 
-#### Example
+##### Example
 
 ```bash
 python recon.py example.com --fuzzing
 ```
 
----
-
-### 🌍 Virtual Host Discovery
+#### 🌍 Virtual Host Discovery
 
 Virtual Host Discovery identifies additional virtual hosts configured on the target web server that may not be publicly referenced.
 
-#### Features
+##### Features
 
 - Virtual host enumeration
 - Host header fuzzing
@@ -632,25 +456,31 @@ Virtual Host Discovery identifies additional virtual hosts configured on the tar
 - Hidden application discovery
 - Multi-threaded execution
 
-#### Example
+##### Example
 
 ```bash
 python recon.py example.com --vhost
 ```
 
----
-
-## 🌐 Phase 3 — Infrastructure
+### 🌐 Phase 3 — Infrastructure
 
 The Infrastructure phase analyzes security controls and infrastructure components to provide a better understanding of the target environment.
 
----
+#### 🧪 Nuclei Vulnerability Scan
 
-### 🔐 TLS Analysis
+Nuclei runs template-based checks against discovered HTTP services and consolidates matching findings. The Nuclei command-line tool must be installed separately.
+
+##### Example
+
+```bash
+python recon.py example.com --nuclei
+```
+
+#### 🔐 TLS Analysis
 
 TLS Analysis inspects SSL/TLS configurations to identify supported protocols, certificates, and security settings.
 
-#### Features
+##### Features
 
 - SSL/TLS inspection
 - Certificate analysis
@@ -658,26 +488,24 @@ TLS Analysis inspects SSL/TLS configurations to identify supported protocols, ce
 - Cipher suite collection
 - Expiration monitoring
 
-#### Example
+##### Example
 
 ```bash
 python recon.py example.com --tls
 ```
 
----
-
-### 🛡️ WAF Detection
+#### 🛡️ WAF Detection
 
 WAF Detection identifies Web Application Firewalls protecting the target by analyzing HTTP responses and response patterns.
 
-#### Features
+##### Features
 
 - Automatic WAF fingerprinting
 - Response header analysis
 - Signature-based detection
 - Vendor identification
 
-#### Supported Vendors
+##### Supported Vendors
 
 - Cloudflare
 - Akamai
@@ -687,26 +515,24 @@ WAF Detection identifies Web Application Firewalls protecting the target by anal
 - FortiWeb
 - Azure WAF
 
-#### Example
+##### Example
 
 ```bash
 python recon.py example.com --waf
 ```
 
----
-
-### ☁️ CDN Detection
+#### ☁️ CDN Detection
 
 CDN Detection determines whether the target is served through a Content Delivery Network.
 
-#### Features
+##### Features
 
 - CDN fingerprinting
 - Response header analysis
 - IP range validation
 - Provider identification
 
-#### Supported Providers
+##### Supported Providers
 
 - Cloudflare
 - CloudFront
@@ -715,26 +541,24 @@ CDN Detection determines whether the target is served through a Content Delivery
 - BunnyCDN
 - Azure CDN
 
-#### Example
+##### Example
 
 ```bash
 python recon.py example.com --cdn
 ```
 
----
-
-### ⚠️ Takeover Detection
+#### ⚠️ Takeover Detection
 
 Takeover Detection checks for potential subdomain takeover opportunities by identifying dangling DNS records and unclaimed third-party services.
 
-#### Features
+##### Features
 
 - Service fingerprinting
 - CNAME validation
 - Dangling DNS detection
 - Takeover signature matching
 
-#### Supported Services
+##### Supported Services
 
 - GitHub Pages
 - AWS S3
@@ -744,19 +568,17 @@ Takeover Detection checks for potential subdomain takeover opportunities by iden
 - Azure
 - Shopify
 
-#### Example
+##### Example
 
 ```bash
 python recon.py example.com --takeover
 ```
 
----
-
-### 📧 Email Security
+#### 📧 Email Security
 
 Email Security analyzes DNS records related to email authentication and protection mechanisms.
 
-#### Features
+##### Features
 
 - SPF validation
 - DKIM detection
@@ -764,84 +586,82 @@ Email Security analyzes DNS records related to email authentication and protecti
 - MX record inspection
 - Mail server identification
 
-#### Example
+##### Example
 
 ```bash
 python recon.py example.com --email
 ```
 
----
-
-## 📊 Phase 4 — Reporting
+### 📊 Phase 4 — Reporting
 
 The Reporting module consolidates reconnaissance results into structured reports and an interactive dashboard for easier analysis and documentation.
 
-### Reporting & Dashboard
+#### Reporting & Dashboard
 
-#### Features
+The report module exports scan data in several formats. The dashboard presents module status and findings in a browser.
+
+<div align="left">
+  <img src="images/03-dashboard-modules.png" alt="Dashboard module status" width="85%">
+</div>
+
+##### Features
 
 - TXT report generation
 - JSON export
-- CSV export
 - Markdown report
 - Interactive HTML dashboard
 - Consolidated scan summary
 
-#### Supported Formats
+##### Supported Formats
 
 | Format | Supported |
 |---------|:---------:|
 | TXT | ✅ |
 | JSON | ✅ |
-| CSV | ✅ |
 | Markdown | ✅ |
-| HTML Dashboard | ✅ |
+| HTML dashboard | ✅ |
 
-#### Example
+##### Example
 
 ```bash
 python recon.py example.com --report
 ```
 
----
+<div align="left">
+  <img src="images/05-report-preview.png" alt="Generated reconnaissance report" width="85%">
+</div>
 
-## 🚀 Phase 5 — Framework
+### 🧰 Framework Services
 
-The Framework phase provides the core services that coordinate module execution, plugin management, performance optimization, and dashboard generation.
+The CLI and plugin manager coordinate module discovery, dependency resolution, execution, and performance tracking across the four reconnaissance phases.
 
-#### Components
+##### Components
 
 - Command-Line Interface
 - Plugin System
 - Performance Monitoring
-- Dashboard Generation
+- Shared Execution Context
 
-#### Responsibilities
+##### Responsibilities
 
 - Coordinate module execution
 - Manage plugin lifecycle
 - Track execution statistics
-- Generate reports and dashboards
 - Optimize framework performance
 
----
+## 🛠️ Installation
 
-<p align="right">
-<a href="#recon-automation-framework">⬆️ Back to Top</a>
-</p>
+Install the framework and its optional external tools before running a scan.
 
-# 🛠️ Installation
-
-Follow the steps below to install and run Recon Automation Framework.
-
-## Requirements
+### Requirements
 
 - Python 3.11+
 - Git
 - Linux (Recommended)
-- Playwright (Optional, required only for the Screenshot Capture module)
+- Playwright (required only for the Screenshot Capture module)
+- Nuclei (required only for the Nuclei module)
 
-## Clone the Repository
+### Clone the Repository
 
 ```bash
 git clone https://github.com/sahadatx/Recon-Automation-Framework.git
@@ -849,29 +669,29 @@ git clone https://github.com/sahadatx/Recon-Automation-Framework.git
 cd Recon-Automation-Framework
 ```
 
-## Create a Virtual Environment
+### Create a Virtual Environment
 
-### Linux
+#### Linux
 
 ```bash
 python3 -m venv venv
 source venv/bin/activate
 ```
 
-### Windows
+#### Windows
 
 ```powershell
 python -m venv venv
 venv\Scripts\activate
 ```
 
-## Install Dependencies
+### Install Dependencies
 
 ```bash
 pip install --upgrade pip
 pip install -r requirements.txt
 ```
-## Install Playwright (Optional)
+### Install Playwright (Optional)
 
 Required only for the Screenshot Capture module.
 
@@ -879,59 +699,45 @@ Required only for the Screenshot Capture module.
 python -m playwright install
 ```
 
-## Verify Installation
+### Verify Installation
 
 ```bash
 python recon.py --help
 ```
 
----
+Only scan systems you own or have explicit permission to assess.
 
-<p align="right">
-<a href="#recon-automation-framework">⬆️ Back to Top</a>
-</p>
-
-# ⚙️ Configuration
+## ⚙️ Configuration
 
 Configure API keys and framework settings before running reconnaissance modules.
 
-## Environment Variables
+### Environment Variables
 
 Create a `.env` file in the project root.
 
 ```env
 PDCP_API_KEY=your_pdcp_api_key
 SECURITYTRAILS_API_KEY=your_securitytrails_api_key
-SHODAN_API_KEY=your_shodan_api_key
 ```
 
-## Configuration Files
+### Configuration Files
 
-Framework settings are located in:
+Framework settings are defined in:
 
 ```text
-config/
-├── config.py
-└── settings.py
+config/config.py
 ```
 
-## Supported Providers
+### Supported Providers
 
 - ProjectDiscovery Chaos
 - SecurityTrails
-- Shodan
 
----
-
-<p align="right">
-<a href="#recon-automation-framework">⬆️ Back to Top</a>
-</p>
-
-# 🚀 Usage
+## 🚀 Usage
 
 Run individual modules or execute the complete reconnaissance pipeline.
 
-## Quick Start
+### Quick Start
 
 Run the complete reconnaissance workflow.
 
@@ -939,9 +745,7 @@ Run the complete reconnaissance workflow.
 python recon.py example.com --all
 ```
 
----
-
-## Run Individual Modules
+### Run Individual Modules
 
 ```bash
 python recon.py example.com --dns
@@ -949,21 +753,29 @@ python recon.py example.com --http
 python recon.py example.com --tech
 ```
 
-## Help
+Choose any module flag shown by `python recon.py --help`. The framework resolves required module dependencies automatically.
+
+### Tune a Scan
+
+```bash
+python recon.py example.com --all --threads 25 --timeout 15 --retries 2
+```
+
+Use `--verbose` for detailed logs or `--quiet` to suppress informational output.
+
+### Help
 
 ```bash
 python recon.py --help
 ```
 
----
+## 📂 Output
 
-<p align="right">
-<a href="#recon-automation-framework">⬆️ Back to Top</a>
-</p>
+Scan artifacts and reports are saved under `output/`.
 
-# 📂 Output
-
-Reconnaissance artifacts are stored in a structured output directory, making results easy to review, analyze, and integrate into subsequent security workflows.
+<div align="left">
+  <img src="images/04-dashboard-results.png" alt="Dashboard results overview" width="85%">
+</div>
 
 ```text
 output/
@@ -971,7 +783,6 @@ output/
 ├── reports/
 │   ├── report.txt
 │   ├── report.json
-│   ├── report.csv
 │   └── report.md
 │
 ├── dashboard/
@@ -988,87 +799,11 @@ output/
     └── framework.log
 ```
 
----
+## 🗺️ Roadmap
 
-<p align="right">
-<a href="#recon-automation-framework">⬆️ Back to Top</a>
-</p>
+Planned enhancements:
 
-# 📸 Screenshots
-
-The following screenshots showcase the framework interface, dashboard, reports, and performance metrics.
-
----
-
-## Screenshot 01 — Command-Line Interface
-
-<p align="center">
-<img src="images/01-cli-demo.png"
-alt="Command-Line Interface"
-width="100%">
-</p>
-
----
-
-## Screenshot 02 — Dashboard Overview
-
-<p align="center">
-<img src="images/02-dashboard-overview.png"
-alt="Dashboard Overview"
-width="100%">
-</p>
-
----
-
-## Screenshot 03 — Dashboard: Module Status
-
-<p align="center">
-<img src="images/03-dashboard-modules.png"
-alt="Dashboard Module Status"
-width="100%">
-</p>
-
----
-
-## Screenshot 04 — Dashboard: Results Overview
-
-<p align="center">
-<img src="images/04-dashboard-results.png"
-alt="Dashboard Results Overview"
-width="100%">
-</p>
-
----
-
-## Screenshot 05 — Generated Report
-
-<p align="center">
-<img src="images/05-report-preview.png"
-alt="Generated Report"
-width="100%">
-</p>
-
----
-
-## Screenshot 06 — Performance Metrics
-
-<p align="center">
-<img src="images/06-performance.png"
-alt="Performance Metrics"
-width="100%">
-</p>
-
----
-
-<p align="right">
-<a href="#recon-automation-framework">⬆️ Back to Top</a>
-</p>
-
-# 🗺️ Roadmap
-
-The following enhancements are planned for future releases to improve functionality, scalability, and usability.
-
-## Planned Features
+### Planned Features
 
 - Docker Support
 - REST API
@@ -1079,53 +814,33 @@ The following enhancements are planned for future releases to improve functional
 - Plugin Marketplace
 - Enhanced Reporting
 
----
+## ❓ Frequently Asked Questions
 
-<p align="right">
-<a href="#recon-automation-framework">⬆️ Back to Top</a>
-</p>
-
-# ❓ Frequently Asked Questions
-
-### Which operating systems are supported?
+#### Which operating systems are supported?
 
 Recon Automation Framework supports Linux and Windows. Linux is recommended for the best compatibility and performance.
 
----
-
-### Are API keys required?
+#### Are API keys required?
 
 API keys are optional. Some passive reconnaissance providers require them, while most modules can operate without additional configuration.
 
----
-
-### Does the framework support custom plugins?
+#### Does the framework support custom plugins?
 
 Yes. The modular architecture allows new reconnaissance modules to be integrated with minimal changes to the framework.
 
----
+#### What output formats are supported?
 
-### What output formats are supported?
+The framework generates results in JSON, TXT, and Markdown formats, along with an interactive HTML dashboard.
 
-The framework generates results in TXT, JSON, CSV, Markdown, and interactive HTML dashboard formats.
-
----
-
-### Is this framework intended for authorized security testing only?
+#### Is this framework intended for authorized security testing only?
 
 Yes. This framework is intended for educational purposes and authorized security assessments only. Always obtain proper permission before scanning or testing systems you do not own.
 
----
+## 🤝 Contributing
 
-<p align="right">
-<a href="#recon-automation-framework">⬆️ Back to Top</a>
-</p>
+Contributions are welcome. Please open an issue or pull request for changes.
 
-# 🤝 Contributing
-
-Contributions are welcome and appreciated. Whether you are fixing bugs, improving documentation, or adding new features, your contributions help make the project better.
-
-## Getting Started
+### Getting Started
 
 1. Fork the repository.
 2. Create a new feature branch.
@@ -1133,38 +848,24 @@ Contributions are welcome and appreciated. Whether you are fixing bugs, improvin
 4. Push the branch to your fork.
 5. Open a Pull Request.
 
-## Guidelines
+### Guidelines
 
 - Follow PEP 8 coding standards.
 - Write clear and descriptive commit messages.
 - Update documentation when necessary.
 - Include tests for new functionality whenever possible.
 
----
-
-<p align="right">
-<a href="#recon-automation-framework">⬆️ Back to Top</a>
-</p>
-
-# 📄 License
+## 📄 License
 
 This project is licensed under the **MIT License**.
 
 See the [LICENSE](LICENSE) file for complete license information.
 
----
+## 🙏 Acknowledgements
 
-<p align="right">
-<a href="#recon-automation-framework">⬆️ Back to Top</a>
-</p>
+Thanks to the open-source projects and libraries that support this framework, including:
 
-# 🙏 Acknowledgements
-
-Recon Automation Framework is built on the outstanding work of the open-source cybersecurity community. We sincerely appreciate the developers, maintainers, and contributors whose projects and libraries have made modern reconnaissance, security research, and automation more accessible.
-
-## Open-Source Security Projects
-
-Special thanks to the following projects for providing reliable tools and inspiration throughout the development of this framework:
+### Open-Source Security Projects
 
 - **ProjectDiscovery** — Subfinder, Chaos, httpx, Naabu, Katana, Nuclei
 - **OWASP** — Open Web Application Security Project
@@ -1173,9 +874,7 @@ Special thanks to the following projects for providing reliable tools and inspir
 - **FFUF** — Fast web fuzzing
 - **Wappalyzer** — Web technology fingerprinting
 
-## Python Libraries
-
-This project also relies on several excellent Python libraries:
+### Python Libraries
 
 - **Requests** — HTTP client
 - **Rich** — Terminal formatting and progress visualization
@@ -1183,46 +882,20 @@ This project also relies on several excellent Python libraries:
 - **Jinja2** — Template rendering
 - **Plotly** — Interactive data visualization
 
----
+## 👨‍💻 Author
 
-Open-source software thrives through collaboration, knowledge sharing, and community contributions. We gratefully acknowledge everyone who develops, maintains, and supports these projects, making tools like Recon Automation Framework possible.
-
----
-
-<p align="right">
-<a href="#recon-automation-framework">⬆️ Back to Top</a>
+<p align="center">
+  <strong>Sahadat Hossain</strong><br>
+  Cybersecurity Researcher · Penetration Tester · Python Developer
 </p>
 
-# 👨‍💻 Author
-
-**Sahadat Hossain**
-
-Cybersecurity Researcher • Penetration Tester • Python Developer
-
-### Contact
-
-- 📧 **Email:** pentester.sahadathossain@gmail.com
-- 💼 **LinkedIn:** https://www.linkedin.com/in/pentester-sahadat-hossain/
-- 🐙 **GitHub:** https://github.com/sahadatx
-- 🌐 **Portfolio:** https://sahadatx.github.io/Personal-Portfolio/
-
-> Feel free to connect for collaboration, security research, or open-source contributions.
-
----
-
-If you found this project useful, consider supporting it by:
-
-- ⭐ Starring the repository
-- 🍴 Forking the project
-- 🤝 Contributing improvements
-- 📢 Sharing it with others
-
----
+<p align="center">
+  <a href="mailto:pentester.sahadathossain@gmail.com"><img src="https://img.shields.io/badge/Email-Contact-0A66C2?style=for-the-badge&logo=gmail&logoColor=white" alt="Email Sahadat"></a>
+  <a href="https://www.linkedin.com/in/pentester-sahadat-hossain/"><img src="https://img.shields.io/badge/LinkedIn-Connect-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn profile"></a>
+  <a href="https://github.com/sahadatx"><img src="https://img.shields.io/badge/GitHub-Follow-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub profile"></a>
+  <a href="https://sahadatx.github.io/Personal-Portfolio/"><img src="https://img.shields.io/badge/Portfolio-Visit-5B4BDB?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Portfolio"></a>
+</p>
 
 <p align="center">
 Made with ❤️ by <strong>Sahadat Hossain</strong>
-</p>
-
-<p align="right">
-<a href="#recon-automation-framework">⬆️ Back to Top</a>
 </p>
