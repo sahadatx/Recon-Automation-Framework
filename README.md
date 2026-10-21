@@ -882,20 +882,36 @@ Thanks to the open-source projects and libraries that support this framework, in
 - **Jinja2** — Template rendering
 - **Plotly** — Interactive data visualization
 
-## 👨‍💻 Author
+## Author
 
-<p align="center">
-  <strong>Sahadat Hossain</strong><br>
-  Cybersecurity Researcher · Penetration Tester · Python Developer
-</p>
+**Sahadat Hossain**
 
-<p align="center">
-  <a href="mailto:pentester.sahadathossain@gmail.com"><img src="https://img.shields.io/badge/Email-Contact-0A66C2?style=for-the-badge&logo=gmail&logoColor=white" alt="Email Sahadat"></a>
-  <a href="https://www.linkedin.com/in/pentester-sahadat-hossain/"><img src="https://img.shields.io/badge/LinkedIn-Connect-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn profile"></a>
-  <a href="https://github.com/sahadatx"><img src="https://img.shields.io/badge/GitHub-Follow-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub profile"></a>
-  <a href="https://sahadatx.github.io/Personal-Portfolio/"><img src="https://img.shields.io/badge/Portfolio-Visit-5B4BDB?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Portfolio"></a>
-</p>
+Cybersecurity Researcher • Penetration Tester • Python Developer
+
+### Contact
+
+- 📧 **Email:** [pentester.sahadathossain@gmail.com](mailto:pentester.sahadathossain@gmail.com)
+- 💼 **LinkedIn:** [linkedin.com/in/pentester-sahadat-hossain](https://www.linkedin.com/in/pentester-sahadat-hossain/)
+- 🐙 **GitHub:** [github.com/sahadatx](https://github.com/sahadatx)
+- 🌐 **Portfolio:** [sahadatx.github.io/Personal-Portfolio](https://sahadatx.github.io/Personal-Portfolio/)
+
+> Feel free to connect for collaboration, security research, or open-source contributions.
+
+---
+
+If you found this project useful, consider supporting it by:
+
+- ⭐ Starring the repository
+- 🍴 Forking the project
+- 🤝 Contributing improvements
+- 📢 Sharing it with others
+
+---
 
 <p align="center">
 Made with ❤️ by <strong>Sahadat Hossain</strong>
+</p>
+
+<p align="right">
+<a href="#-overview">⬆️ Back to Top</a>
 </p>
