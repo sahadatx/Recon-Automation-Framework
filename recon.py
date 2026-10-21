@@ -20,6 +20,27 @@ from core.http import create_http_session
 from core.logger import console, divider, error, success
 from core.plugins.manager import plugin_manager
 
+MODULE_DISPLAY_NAMES = {
+    "passive": "Passive Enumeration",
+    "dns": "DNS Resolution",
+    "http": "HTTP Probe",
+    "ports": "Port Scanning",
+    "tech": "Technology Detection",
+    "crawler": "Web Crawler",
+    "javascript": "JavaScript Analysis",
+    "fuzzing": "Directory Fuzzing",
+    "screenshots": "Screenshot Capture",
+    "vhost": "Virtual Host Discovery",
+    "nuclei": "Nuclei Vulnerability Scan",
+    "waf": "WAF Detection",
+    "tls": "TLS Analysis",
+    "cdn": "CDN Detection",
+    "takeover": "Subdomain Takeover Check",
+    "email": "Email Security",
+    "report": "Report Generation",
+    "dashboard": "Dashboard Generation",
+}
+
 
 def create_context(
     config: dict[str, Any],
@@ -68,6 +89,10 @@ def execute_pipeline_module(
     config: dict[str, Any],
 ) -> None:
 
+    display_name = MODULE_DISPLAY_NAMES.get(
+        module,
+        module.replace("_", " ").title(),
+    )
 
     if not config["quiet"]:
 
@@ -76,7 +101,7 @@ def execute_pipeline_module(
         stage.add_column(ratio=1)
         stage.add_column(justify="right")
         stage.add_row(
-            Text(f"{module.upper()}  ·  RUNNING", style="bold bright_cyan"),
+            Text(f"{display_name}  ·  RUNNING", style="bold bright_cyan"),
             Text(f"MODULE {index:02}/{total:02}", style="bold white"),
         )
 
@@ -134,7 +159,7 @@ def execute_pipeline_module(
         console.print(
             Panel(
                 summary,
-                title=f"[bold green]✓ {module.upper()} COMPLETE[/bold green]",
+                title=f"[bold green]✓ {display_name} COMPLETE[/bold green]",
                 border_style="green",
                 box=box.ROUNDED,
                 padding=(0, 2),

@@ -10,7 +10,6 @@ from core.logger import info, warning
 from modules.passive.analyzer import analyze
 from modules.passive.assetfinder import run_assetfinder
 from modules.passive.chaos import run_chaos
-from modules.passive.crtsh import run_crtsh
 from modules.passive.findomain import run_findomain
 from modules.passive.securitytrails import run_securitytrails
 from modules.passive.subfinder import run_subfinder
@@ -40,10 +39,6 @@ PASSIVE_SOURCES: list[
         run_assetfinder,
     ),
     (
-        "crt.sh",
-        run_crtsh,
-    ),
-    (
         "Chaos",
         run_chaos,
     ),
@@ -56,12 +51,6 @@ PASSIVE_SOURCES: list[
         run_securitytrails,
     ),
 ]
-
-RETRYABLE_TOOLS: frozenset[str] = frozenset(
-    {
-        "crt.sh",
-    }
-)
 
 DOMAIN_RE = re.compile(r"^(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$")
 
@@ -124,13 +113,6 @@ def collect_subdomains(
 
     failed_sources: list[str] = []
 
-    retry_queue: list[
-        tuple[
-            str,
-            PassiveSource,
-        ]
-    ] = []
-
     total_sources = len(
         PASSIVE_SOURCES,
     )
@@ -188,45 +170,6 @@ def collect_subdomains(
         timings[name] = elapsed
 
         info(f"[{completed_sources}/{total_sources}] " f"{name} completed.")
-
-        if not subdomains and name in RETRYABLE_TOOLS:
-
-            retry_queue.append(
-                (
-                    name,
-                    function,
-                )
-            )
-
-    if retry_queue:
-
-        info("Retrying failed sources...")
-
-        for (
-            name,
-            function,
-        ) in retry_queue:
-
-            try:
-
-                retry_results = function(
-                    context,
-                    domain,
-                )
-
-                if retry_results:
-
-                    results[name] = retry_results
-
-                    if name in failed_sources:
-
-                        failed_sources.remove(
-                            name,
-                        )
-
-            except Exception as exc:
-
-                warning(f"{name} retry failed: {exc}")
 
     return (
         results,
